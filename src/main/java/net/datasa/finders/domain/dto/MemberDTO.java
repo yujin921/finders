@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.datasa.finders.domain.entity.RoleName;
 
 @Builder
 @Data
@@ -13,8 +14,7 @@ public class MemberDTO {
     String memberId;
     String memberPw;
     String memberName;
-    String memberPhone;
-    String memberEmail;
+    String email;
     boolean enabled;
-    String roleName;
+    RoleName roleName;
 }

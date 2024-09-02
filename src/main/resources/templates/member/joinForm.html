@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<meta charset="UTF-8">
+	<title>회원가입</title>
+	<!-- jQuery 파일 불러오기 -->
+	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+	<script>
+		$(document).ready(function() {
+			$('#joinForm').submit(validation);
+		});
+		
+		function validation() {
+			let id = $('#memberId').val();
+			let pw = $('#memberPw').val();
+			let name = $('#memberName').val();
+
+			if (id.length < 3 || id.length > 10) {
+				alert("ID는 3~10자로 입력하세요.");
+				return false;
+			}
+			if (pw.length < 3 || pw.length > 10) {
+				alert("비밀번호는 3~10자로 입력하세요.");
+				return false;
+			}
+			if (name == '') {
+				alert("이름을 입력하세요.");
+				return false;
+			}
+			
+			return true;
+		}
+	</script>
+</head>
+<body>
+	<h1>[ 회원가입 ]</h1>
+
+	<form id="joinForm" th:action="@{/member/join}" method="post">
+		<p>
+			<label>ID</label>
+			<input type="text" name="memberId" id="memberId">
+		</p>
+		<p>
+			<label>Password</label>
+			<input type="password" name="memberPw" id="memberPw">
+		</p>
+		<p>
+			<label>이름</label>
+			<input type="text" name="memberName" id="memberName">
+		</p>
+		<p>
+			<label>전화번호</label>
+			<input type="text" name="memberPhone" id="memberPhone">
+		</p>
+		<p>
+			<input type="submit" value="가입">
+		</p>
+	</form>
+</body>
+</html>

@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "member")
 public class MemberEntity {
-	@Id
+    @Id
     @Column(name = "member_id", length = 20)
     String memberId;
 
@@ -26,16 +26,13 @@ public class MemberEntity {
     @Column(name = "member_name", nullable = false, length = 100)
     String memberName;
 
-    @Column(name = "member_phone", nullable = false, length = 100)
-    String memberPhone;
-
-    @Column(name = "member_email", nullable = false, length = 100)
-    String memberEmail;
+    @Column(name = "email", nullable = false, length = 100)
+    String email;
 
     @Column(name = "enabled", nullable = false, columnDefinition = "tinyint(1) default 0")
     boolean enabled;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rolename", nullable = false)
-    String roleName;
+    RoleName roleName;
 }
