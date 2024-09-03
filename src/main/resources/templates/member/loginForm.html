@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script>
+	$(document).ready(function() {
+		$('#loginForm').submit(function() {
+			if ($('#id').val() == '' || $('#password').val() == '') {
+				alert('ID와 비밀번호를 입력하세요.');
+				return false;
+			}
+			return true;
+		});
+	});
+</script>
+</head>
+<body>
+	<h1>로그인 화면</h1>
+	
+	<section>
+		<form id="loginForm" th:action=@{/member/loginForm} method="post">
+			<table>
+				<tr>
+					<td>ID</td>
+					<td><input type="text" name="id" id="id"></td>
+				</tr>
+				<tr>
+					<td>Password</td>
+					<td><input type="password" name="pw" id="password" /></td>
+				</tr>
+			</table>
+		
+		
+		</form>
+	
+	
+	</section>
+</body>
+</html>
