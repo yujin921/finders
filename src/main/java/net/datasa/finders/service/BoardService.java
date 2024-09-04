@@ -97,6 +97,15 @@ public class BoardService {
                 .projectStatus(entity.getProjectStatus())
             .build();
     }
+
+    /*
+    public BoardEntity saveBoardImage(MultipartFile file) throws IOException {
+        BoardEntity boardEntity = new BoardEntity();
+
+        boardEntity.setProjectImage(Base64.getEncoder().encodeToString(file.getBytes()));
+        return boardRepository.save(boardEntity);
+    }
+    */
     
     public BoardDTO getBoard(int pNum) {
         BoardEntity entity = boardRepository.findById(pNum)
@@ -104,9 +113,10 @@ public class BoardService {
 
         BoardDTO dto = convertToDTO(entity);
 
-        
         return dto;
     }
+
+
 
     public void deleteBoard(int pNum) {
         boardRepository.deleteById(pNum);

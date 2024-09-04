@@ -55,6 +55,15 @@ public class BoardController {
         return "redirect:view";
     }
 
+    /*
+    @PostMapping("/upload")
+    public ResponseEntity<BoardEntity> uploadBoardImage(@RequestParam("image") MultipartFile file) throws IOException {
+        BoardEntity savedBoard = boardService.saveBoardImage(file);
+        return ResponseEntity.ok(savedBoard);
+    }
+
+     */
+
 	@GetMapping("read")
 	public String read(@RequestParam("projectNum") int pNum, Model model, @AuthenticationPrincipal AuthenticatedUser user) {
 	    try {
@@ -66,7 +75,7 @@ public class BoardController {
 	        return "redirect:/board/view";
 	    }
 	}
-	
+
 	@PostMapping("delete")
     public String deletePost(@RequestParam("projectNum") int pNum, @AuthenticationPrincipal AuthenticatedUser user) {
         try {
