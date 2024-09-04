@@ -11,33 +11,25 @@
 	<script>
 		$(document).ready(function() {
 			list();
-			
-			$('#category, #keyword').on('change input', function() {
-                list();
-            });
 		});
 				
 		function list() {
-			let category = $('#category').val();
-            let keyword = $('#keyword').val();
-			
 		    $.ajax({
 		        url: 'list',
 		        type: 'get',
-		        date: { category: category, keyword: keyword },
 		        success: function(list) {
 		            $('#output').empty();
 
 		            $(list).each(function(i, obj) {
+						const formattedDate = new Date(obj.recruitDeadline).toISOString().split('T')[0];
+
 		                let html = `
 		                    <tr>
-		                        <td>${obj.boardNum}</td>
-		                        <td>${obj.soldout === 0 ? '판매중' : '판매완료'}</td>
-		                        <td>${obj.category}</td>
-		                        <td><a href="/board/read?boardNum=${obj.boardNum}">${obj.title}</a></td>
-		                        <td>${obj.price}</td>
-		                        <td>${obj.memberId}</td>
-		                        <td>${obj.inputDate}</td>
+		                        <td>${obj.clientId}</td>
+		                        <td><a href="/board/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a></td>
+		                        <td>${formattedDate}</td>
+		                        <td>${obj.projectStatus}</td>
+		                        <td>${obj.projectImage}</td>
 		                    </tr>
 		                `;
 		                $('#output').append(html);
@@ -55,27 +47,14 @@
 	
 	<input type="button" onclick="window.location.href='/board/write';" value="글쓰기">
 	<br>
-	<label for="category">검색조건</label>
-    <select id="category" name="category">
-        <option>전체 카테고리 보기</option>
-        <option>컴퓨터</option>
-        <option>카메라</option>
-        <option>자동차</option>
-    </select>
-        
-    <label for="keyword"></label>
-    <input type="text" id="keyword" name="keyword" placeholder="검색어를 입력하세요">
-       
+
 	<table>
 		<thead>
 			<tr>
-				<th>번호</th>
-				<th>상태</th>
-				<th>카테고리</th>
-				<th>제목</th>
-				<th>판매가격</th>
 				<th>작성자</th>
-				<th>작성일</th>
+				<th>제목</th>
+				<th>기한</th>
+				<th>모집현황</th>
 			</tr>
 		</thead>
 		<tbody id="output">
