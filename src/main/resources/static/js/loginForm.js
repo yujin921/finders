@@ -19,4 +19,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+    
+    // 페이지가 완전히 로드된 후 에러 메시지를 처리합니다.
+    const errorMessage = document.querySelector('.errorMsg');
+
+    if (errorMessage) {
+        alert(errorMessage.innerText.trim());
+    }
 });
