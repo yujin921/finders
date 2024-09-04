@@ -1,5 +1,10 @@
 package net.datasa.finders.domain.entity;
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "member")
 public class MemberEntity {
@@ -35,4 +41,8 @@ public class MemberEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "rolename", nullable = false)
     RoleName roleName;
+    
+    @CreatedDate
+    @Column(name = "created_time", columnDefinition = "timestamp default current_timestamp")
+    private LocalDateTime createdTime;
 }

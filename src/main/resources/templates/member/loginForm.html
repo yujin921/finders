@@ -27,7 +27,7 @@
                 <input type="password" id="freelancer-password" name="password" required><br>
                 <input type="hidden" name="roleName" value="ROLE_FREELANCER" />
                 <button type="submit">로그인</button>
-                <div class="errorMsg" th:if="${param.error}"><script>alert('ID 또는 비밀번호가 틀립니다.')</script></div>
+                <div id="freelancer-error" class="errorMsg" th:if="${param.error}">ID 또는 비밀번호가 틀립니다.</div>
             </form>
         </div>
 
@@ -40,7 +40,7 @@
                 <input type="password" id="company-password" name="password" required><br>
                 <input type="hidden" name="roleName" value="ROLE_CLIENT" />
                 <button type="submit">로그인</button>
-                <div class="errorMsg" th:if="${param.error}"><script>alert('ID 또는 비밀번호가 틀립니다.')</script></div>
+                <div id="company-error" class="errorMsg" th:if="${param.error}">ID 또는 비밀번호가 틀립니다.</div>
             </form>
         </div>
     </div>

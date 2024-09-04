@@ -1,5 +1,7 @@
 package net.datasa.finders.domain.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +19,5 @@ public class MemberDTO {
     String email;
     boolean enabled;
     RoleName roleName;
+    LocalDateTime createdTime;
 }
