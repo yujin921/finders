@@ -85,14 +85,16 @@ public class BoardService {
      */
     private BoardDTO convertToDTO(BoardEntity entity) {
         return BoardDTO.builder()
-            .boardNum(entity.getBoardNum())
-            .memberId(entity.getMember() != null ? entity.getMember().getMemberId() : null)
-            .category(entity.getCategory())
-            .title(entity.getTitle())
-            .contents(entity.getContents())
-            .price(entity.getPrice())
-            .soldout(entity.getSoldout())
-            .buyerId(entity.getBuyerId() != null ? entity.getMember().getMemberId() : null)
+                .projectNum(entity.getProjectNum())
+                .clientId(entity.getClientId().getMemberId())
+                .projectTitle(entity.getProjectTitle())
+                .recruitDeadline(entity.getRecruitDeadline())
+                .projectStartDate(entity.getProjectStartDate())
+                .projectEndDate(entity.getProjectEndDate())
+                .projectBudget(entity.getProjectBudget())
+                .projectDescription(entity.getProjectDescription())
+                .projectImage(entity.getProjectImage())
+                .projectStatus(entity.getProjectStatus())
             .build();
     }
     
@@ -105,22 +107,8 @@ public class BoardService {
         
         return dto;
     }
-    
+
     public void deleteBoard(int boardNum) {
         boardRepository.deleteById(boardNum);
-    }
-
-    public void updateBoard(BoardDTO boardDTO, String id) {
-        BoardEntity entity = boardRepository.findById(boardDTO.getBoardNum())
-                .orElseThrow(() -> new EntityNotFoundException("해당 번호의 글이 없습니다."));
-                
-        MemberEntity buyer = memberRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
-        
-        entity.setSoldout(boardDTO.getSoldout());
-        entity.setBuyerId(buyer);
-        
-        log.debug("{}", entity.getBuyerId());
-        boardRepository.save(entity);
     }
 }
