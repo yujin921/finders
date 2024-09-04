@@ -4,7 +4,7 @@
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 	<meta charset="UTF-8">
-	<title>게시판</title>
+	<title>프로젝트 게시판</title>
 	<style>
 	</style>
 	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
@@ -29,7 +29,7 @@
 		                        <td><a href="/board/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a></td>
 		                        <td>${formattedDate}</td>
 		                        <td>${obj.projectStatus}</td>
-		                        <td>${obj.projectImage}</td>
+		                        <td><img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" style="max-width: 100px; max-height: 100px;"/></td>
 		                    </tr>
 		                `;
 		                $('#output').append(html);
@@ -43,7 +43,7 @@
 	</script>
 </head>
 <body>
-	<h1>[ 거래 게시판 ]</h1>
+	<h1>[ 프로젝트 게시판 ]</h1>
 	
 	<input type="button" onclick="window.location.href='/board/write';" value="글쓰기">
 	<br>
