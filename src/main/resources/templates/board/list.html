@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<meta charset="UTF-8">
+	<title>게시판</title>
+	<style>
+	</style>
+	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+	<script>
+		$(document).ready(function() {
+			list();
+		});
+				
+		function list() {
+		    $.ajax({
+		        url: 'list',
+		        type: 'get',
+		        success: function(list) {
+		            $('#output').empty();
+
+		            $(list).each(function(i, obj) {
+						const formattedDate = new Date(obj.recruitDeadline).toISOString().split('T')[0];
+
+		                let html = `
+		                    <tr>
+		                        <td>${obj.clientId}</td>
+		                        <td><a href="/board/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a></td>
+		                        <td>${formattedDate}</td>
+		                        <td>${obj.projectStatus}</td>
+		                        <td>${obj.projectImage}</td>
+		                    </tr>
+		                `;
+		                $('#output').append(html);
+		            });
+		        },
+		        error: function(e) {
+		            alert('조회 실패');
+		        }
+		    });
+		}
+	</script>
+</head>
+<body>
+	<h1>[ 거래 게시판 ]</h1>
+	
+	<input type="button" onclick="window.location.href='/board/write';" value="글쓰기">
+	<br>
+
+	<table>
+		<thead>
+			<tr>
+				<th>작성자</th>
+				<th>제목</th>
+				<th>기한</th>
+				<th>모집현황</th>
+			</tr>
+		</thead>
+		<tbody id="output">
+		</tbody>
+	</table>
+
+</body>
+</html>

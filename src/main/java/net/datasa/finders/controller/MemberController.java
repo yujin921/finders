@@ -18,11 +18,6 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("loginForm")
-    public String loginForm() {
-        return "/member/loginForm";
-    }
-
     @GetMapping("join")
     public String join() {
         return "/member/joinForm";
@@ -33,4 +28,28 @@ public class MemberController {
         memberService.join(member);
         return "redirect:/";
     }
+    
+    @GetMapping("loginForm")
+    public String loginForm() {
+        return "/member/loginForm";
+    }
+    
+    // 프리랜서 회원 페이지
+    @GetMapping("freelancer/view")
+    public String view1() {
+        return "/member/freelancerView";
+    }
+
+    // 고객(기업) 회원 페이지
+    @GetMapping("client/view")
+    public String view2() {
+        return "/member/clientView";
+    }
+    
+    // 관리자 페이지
+    @GetMapping("admin/view")
+    public String view3() {
+        return "/member/adminView";
+    }
+    
 }

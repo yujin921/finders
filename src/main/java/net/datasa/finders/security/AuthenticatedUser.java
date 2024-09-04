@@ -25,11 +25,12 @@ import lombok.ToString;
 public class AuthenticatedUser implements UserDetails {
     private String id;
     private String password;
-
+    private String roleName;   // 로그인 유형 구분을 위해 추가함
+    private boolean enabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+        return Collections.singletonList(new SimpleGrantedAuthority(roleName));
     }
 
     @Override
@@ -59,6 +60,6 @@ public class AuthenticatedUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }

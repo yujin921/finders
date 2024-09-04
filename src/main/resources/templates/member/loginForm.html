@@ -1,52 +1,48 @@
 <!DOCTYPE html>
 <html lang="ko"
-	  xmlns:th="http://www.thymeleaf.org"
-	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-	<meta charset="UTF-8">
-	<title>로그인</title>
-	<!-- jQuery 파일 불러오기 -->
-	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-	<script>
-		$(document).ready(function() {
-			$('#loginForm').submit(function() {
-				if ($('#id').val() == '' || $('#password').val() == '') {
-					alert('ID와 비밀번호를 입력하세요.');
-					return false;
-				}
-				return true;
-			});
-		});
-	</script>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+    <link rel="stylesheet" th:href="@{/css/loginForm.css}">
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/loginForm.js}"></script>
 </head>
 <body>
-	<h1>[ 로그인 ]</h1>
+    <div>
+        <h1>로그인</h1>
 
-	<section>
-		<form id="loginForm" th:action="@{/member/login}" method="post">
-		<table>
-		<tr>
-			<td>ID</td>
-			<td><input type="text" name="id" id="id" /></td>
-		</tr>
-		<tr>
-			<td>Password</td>
-			<td><input type="password" name="password" id="password" /></td>
-		</tr>
-		<tr>
-			<td class="white"></td>
-			<td class="white">
-				<div class="errorMsg" th:if="${param.error}"><script>alert('ID또는 비밀번호가 틀립니다.')</script></div>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2" class="center white">
-				<input type="submit" value="Login" />
-			</td>
-		</tr>
-		</table>
-		</form>
-	</section>
-	
+        <div class="tabs">
+            <button class="active" data-tab="freelancer-login">프리랜서 로그인</button>
+            <button data-tab="company-login">기업 로그인</button>
+        </div>
+
+        <!-- 프리랜서 로그인 폼 -->
+        <div id="freelancer-login" class="tab-content active">
+            <form id="freelancer-login-form" th:action="@{/member/login}" method="post">
+                <label for="freelancer-id">아이디:</label>
+                <input type="text" id="freelancer-id" name="id" required><br>
+                <label for="freelancer-password">비밀번호:</label>
+                <input type="password" id="freelancer-password" name="password" required><br>
+                <input type="hidden" name="roleName" value="ROLE_FREELANCER" />
+                <button type="submit">로그인</button>
+                <div id="freelancer-error" class="errorMsg" th:if="${param.error}">ID 또는 비밀번호가 틀립니다.</div>
+            </form>
+        </div>
+
+        <!-- 기업 로그인 폼 -->
+        <div id="company-login" class="tab-content">
+            <form id="company-login-form" th:action="@{/member/login}" method="post">
+                <label for="company-id">아이디:</label>
+                <input type="text" id="company-id" name="id" required><br>
+                <label for="company-password">비밀번호:</label>
+                <input type="password" id="company-password" name="password" required><br>
+                <input type="hidden" name="roleName" value="ROLE_CLIENT" />
+                <button type="submit">로그인</button>
+                <div id="company-error" class="errorMsg" th:if="${param.error}">ID 또는 비밀번호가 틀립니다.</div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
