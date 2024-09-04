@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<meta charset="UTF-8">
+	<title>게시판</title>
+	<style>
+	</style>
+	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+	<script>
+		$(document).ready(function() {
+			list();
+			
+			$('#category, #keyword').on('change input', function() {
+                list();
+            });
+		});
+				
+		function list() {
+			let category = $('#category').val();
+            let keyword = $('#keyword').val();
+			
+		    $.ajax({
+		        url: 'list',
+		        type: 'get',
+		        date: { category: category, keyword: keyword },
+		        success: function(list) {
+		            $('#output').empty();
+
+		            $(list).each(function(i, obj) {
+		                let html = `
+		                    <tr>
+		                        <td>${obj.boardNum}</td>
+		                        <td>${obj.soldout === 0 ? '판매중' : '판매완료'}</td>
+		                        <td>${obj.category}</td>
+		                        <td><a href="/board/read?boardNum=${obj.boardNum}">${obj.title}</a></td>
+		                        <td>${obj.price}</td>
+		                        <td>${obj.memberId}</td>
+		                        <td>${obj.inputDate}</td>
+		                    </tr>
+		                `;
+		                $('#output').append(html);
+		            });
+		        },
+		        error: function(e) {
+		            alert('조회 실패');
+		        }
+		    });
+		}
+	</script>
+</head>
+<body>
+	<h1>[ 거래 게시판 ]</h1>
+	
+	<input type="button" onclick="window.location.href='/board/write';" value="글쓰기">
+	<br>
+	<label for="category">검색조건</label>
+    <select id="category" name="category">
+        <option>전체 카테고리 보기</option>
+        <option>컴퓨터</option>
+        <option>카메라</option>
+        <option>자동차</option>
+    </select>
+        
+    <label for="keyword"></label>
+    <input type="text" id="keyword" name="keyword" placeholder="검색어를 입력하세요">
+       
+	<table>
+		<thead>
+			<tr>
+				<th>번호</th>
+				<th>상태</th>
+				<th>카테고리</th>
+				<th>제목</th>
+				<th>판매가격</th>
+				<th>작성자</th>
+				<th>작성일</th>
+			</tr>
+		</thead>
+		<tbody id="output">
+		</tbody>
+	</table>
+
+</body>
+</html>
