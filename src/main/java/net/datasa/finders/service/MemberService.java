@@ -20,14 +20,26 @@ public class MemberService {
     
     public void join(MemberDTO dto) {
 
-        MemberEntity entity = MemberEntity.builder()
+    	MemberEntity entity = MemberEntity.builder()
                 .memberId(dto.getMemberId())
-                .memberPw(passwordEncoder.encode(dto.getMemberPw()))        //비밀번호는 암호화
+                .memberPw(passwordEncoder.encode(dto.getMemberPw()))        // Encrypt password
                 .memberName(dto.getMemberName())
                 .email(dto.getEmail())
-                .enabled(true) // 활성화 여부
-                .roleName(RoleName.ROLE_CLIENT) // 역할 설정
+                .enabled(true) // Account enabled
+                .roleName(dto.getRoleName()) // Set role from DTO
                 .build();
+        
+        // Special handling for admin account
+        if (dto.getMemberId().equals("admin123")) {
+            entity = MemberEntity.builder()
+                    .memberId(dto.getMemberId())
+                    .memberPw(passwordEncoder.encode(dto.getMemberPw()))        // Encrypt password
+                    .memberName(dto.getMemberName())
+                    .email(dto.getEmail())
+                    .enabled(true) // Account enabled
+                    .roleName(RoleName.ROLE_ADMIN) // Set role to ADMIN
+                    .build();
+        }
 
         memberRepository.save(entity);
     }

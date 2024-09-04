@@ -3,6 +3,7 @@ package net.datasa.finders.security;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.entity.MemberEntity;
+import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.repository.MemberRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,13 +30,19 @@ public class AuthenticatedUserDetailsService implements UserDetailsService {
                 });
 
         log.debug("조회정보 : {}", memberEntity);
+        
+        String roleName = memberEntity.getRoleName().toString();
 
+        log.debug("RoleName 체크용 : {}", roleName);
+        
         // 인증정보 생성
+        // 사용자 역할에 따라 권한을 설정
         AuthenticatedUser user = AuthenticatedUser.builder()
-                .id(memberEntity.getMemberId())
-                .password(memberEntity.getMemberPw())
-                .build();
-
+        		.id(memberEntity.getMemberId())
+        		.password(memberEntity.getMemberPw())
+        		.roleName(roleName)
+        		.enabled(true)
+        		.build();
         
         return user;
     }
