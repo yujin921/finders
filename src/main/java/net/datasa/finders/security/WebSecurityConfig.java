@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 /**
  * 시큐리티 환경설정
@@ -23,12 +24,31 @@ public class WebSecurityConfig {
             , "/js/**"              //JavaSCript 파일들
             , "/member/join"        //회원가입
     };
+    
+    // 프리랜서 회원 접근 가능
+    private static final String[] FREELANCER_URLS = {
+            "/member/freelancer/**"
+    };
+    
+    // 고객(기업) 회원 접근 가능
+    private static final String[] CLIENT_URLS = {
+            "/member/client/**"
+    };
+
+    //관리자 접근 가능
+    private static final String[] ADMIN_URLS = {
+            "/member/admin/**"
+    };
 
     @Bean
-    protected SecurityFilterChain config(HttpSecurity http) throws Exception {
+    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    	
         http
             .authorizeHttpRequests(author -> author
                 .requestMatchers(PUBLIC_URLS).permitAll()
+                .requestMatchers(FREELANCER_URLS).hasAnyRole("FREELANCER", "ADMIN") //관리자는 모두 접근 가능
+                .requestMatchers(CLIENT_URLS).hasAnyRole("CLIENT", "ADMIN") //관리자는 모두 접근 가능
+                .requestMatchers(ADMIN_URLS).hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .httpBasic(Customizer.withDefaults())
@@ -37,7 +57,7 @@ public class WebSecurityConfig {
                     .usernameParameter("id")
                     .passwordParameter("password")
                     .loginProcessingUrl("/member/login")
-                    .defaultSuccessUrl("/", true)
+                    .successHandler(customSuccessHandler())  // Use custom success handler
                     .permitAll()
             )
             .logout(logout -> logout
@@ -55,6 +75,11 @@ public class WebSecurityConfig {
     @Bean
     public BCryptPasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public AuthenticationSuccessHandler customSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
     }
 
 }
