@@ -6,13 +6,62 @@
 	<meta charset="UTF-8">
 	<title>프로젝트 게시판</title>
 	<style>
+		.table-container {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr); /* 3개의 열을 균등하게 나누기 */
+			grid-auto-rows: auto; /* 행의 높이는 자동으로 설정 */
+			gap: 20px; /* 각 게시글 사이 간격 */
+			width: 100%; /* 부모 컨테이너의 너비를 100%로 설정 */
+			max-width: 1200px; /* 최대 너비를 1200px로 제한 */
+			margin: 0 auto; /* 가운데 정렬 */
+		}
+
+		.post {
+			border: 1px solid #ddd;
+			padding: 20px;
+			box-sizing: border-box;
+			background-color: #fff;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			width: 100%;
+		}
+
+		.thumbnail {
+			width: 300px;
+			height: auto;
+			margin-bottom: 15px;
+		}
+
+		.post-info {
+			text-align: center;
+		}
+
+		.post-info .author,
+		.post-info .date,
+		.post-info .status,
+		.post-info a {
+			display: block;
+			margin: 5px 0;
+		}
+
+		.post-info a {
+			font-weight: bold;
+			font-size: 1.1em;
+			color: #000;
+			text-decoration: none;
+		}
+
+		.post-info a:hover {
+			color: #007bff;
+		}
 	</style>
 	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 	<script>
 		$(document).ready(function() {
 			list();
 		});
-				
+
 		function list() {
 		    $.ajax({
 		        url: 'list',
@@ -20,20 +69,22 @@
 		        success: function(list) {
 		            $('#output').empty();
 
-		            $(list).each(function(i, obj) {
+					$(list).each(function(i, obj) {
 						const formattedDate = new Date(obj.recruitDeadline).toISOString().split('T')[0];
 
-		                let html = `
-		                    <tr>
-		                        <td>${obj.clientId}</td>
-		                        <td><a href="/board/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a></td>
-		                        <td>${formattedDate}</td>
-		                        <td>${obj.projectStatus}</td>
-		                        <td><img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" style="max-width: 100px; max-height: 100px;"/></td>
-		                    </tr>
-		                `;
-		                $('#output').append(html);
-		            });
+						let html = `
+							<div class="post">
+								<img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" class="thumbnail"/>
+								<div class="post-info">
+									<span class="author">${obj.clientId}</span>
+									<a href="/board/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a>
+									<span class="date">${formattedDate}</span>
+									<span class="status">${obj.projectStatus}</span>
+								</div>
+							</div>
+						`;
+						$('#output').append(html);
+					});
 		        },
 		        error: function(e) {
 		            alert('조회 실패');
@@ -44,22 +95,15 @@
 </head>
 <body>
 	<h1>[ 프로젝트 게시판 ]</h1>
-	
-	<input type="button" onclick="window.location.href='/board/write';" value="글쓰기">
-	<br>
 
-	<table>
-		<thead>
-			<tr>
-				<th>작성자</th>
-				<th>제목</th>
-				<th>기한</th>
-				<th>모집현황</th>
-			</tr>
-		</thead>
-		<tbody id="output">
-		</tbody>
-	</table>
+	<input type="button" onclick="window.location.href='/board/write';" value="글쓰기">
+	<br><br>
+
+	<div class="table-container" id="output">
+
+
+	</div>
+
 
 </body>
 </html>
