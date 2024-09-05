@@ -1,23 +1,25 @@
 import {
-	BalloonEditor,
+	DecoupledEditor,
 	AccessibilityHelp,
-	Autoformat,
+	Alignment,
 	AutoImage,
 	AutoLink,
 	Autosave,
 	BlockQuote,
-	BlockToolbar,
 	Bold,
 	CloudServices,
-	Code,
 	CodeBlock,
 	Essentials,
-	FindAndReplace,
+	FontBackgroundColor,
+	FontColor,
+	FontFamily,
+	FontSize,
 	Heading,
 	Highlight,
 	HorizontalLine,
 	ImageBlock,
 	ImageCaption,
+	ImageInline,
 	ImageInsertViaUrl,
 	ImageResize,
 	ImageStyle,
@@ -31,24 +33,15 @@ import {
 	LinkImage,
 	List,
 	ListProperties,
-	Markdown,
 	MediaEmbed,
 	Paragraph,
-	PasteFromMarkdownExperimental,
-	PasteFromOffice,
 	SelectAll,
-	SpecialCharacters,
-	SpecialCharactersArrows,
-	SpecialCharactersCurrency,
-	SpecialCharactersEssentials,
-	SpecialCharactersLatin,
-	SpecialCharactersMathematical,
-	SpecialCharactersText,
-	Strikethrough,
+	Subscript,
+	Superscript,
 	Table,
+	TableProperties,
 	TableToolbar,
 	TextTransformation,
-	Title,
 	TodoList,
 	Underline,
 	Undo
@@ -62,55 +55,54 @@ const editorConfig = {
 			'undo',
 			'redo',
 			'|',
-			'findAndReplace',
-			'selectAll',
-			'|',
 			'heading',
+			'|',
+			'fontSize',
+			'fontFamily',
+			'fontColor',
+			'fontBackgroundColor',
 			'|',
 			'bold',
 			'italic',
 			'underline',
-			'strikethrough',
-			'code',
 			'|',
-			'specialCharacters',
-			'horizontalLine',
 			'link',
-			'mediaEmbed',
 			'insertTable',
 			'highlight',
 			'blockQuote',
 			'codeBlock',
 			'|',
+			'alignment',
+			'|',
 			'bulletedList',
 			'numberedList',
 			'todoList',
 			'outdent',
-			'indent',
-			'|',
-			'accessibilityHelp'
+			'indent'
 		],
 		shouldNotGroupWhenFull: false
 	},
 	plugins: [
 		AccessibilityHelp,
-		Autoformat,
+		Alignment,
 		AutoImage,
 		AutoLink,
 		Autosave,
 		BlockQuote,
-		BlockToolbar,
 		Bold,
 		CloudServices,
-		Code,
 		CodeBlock,
 		Essentials,
-		FindAndReplace,
+		FontBackgroundColor,
+		FontColor,
+		FontFamily,
+		FontSize,
 		Heading,
 		Highlight,
 		HorizontalLine,
 		ImageBlock,
 		ImageCaption,
+		ImageInline,
 		ImageInsertViaUrl,
 		ImageResize,
 		ImageStyle,
@@ -124,29 +116,26 @@ const editorConfig = {
 		LinkImage,
 		List,
 		ListProperties,
-		Markdown,
 		MediaEmbed,
 		Paragraph,
-		PasteFromMarkdownExperimental,
-		PasteFromOffice,
 		SelectAll,
-		SpecialCharacters,
-		SpecialCharactersArrows,
-		SpecialCharactersCurrency,
-		SpecialCharactersEssentials,
-		SpecialCharactersLatin,
-		SpecialCharactersMathematical,
-		SpecialCharactersText,
-		Strikethrough,
+		Subscript,
+		Superscript,
 		Table,
+		TableProperties,
 		TableToolbar,
 		TextTransformation,
-		Title,
 		TodoList,
 		Underline,
 		Undo
 	],
-	blockToolbar: ['bold', 'italic', '|', 'link', 'insertTable', '|', 'bulletedList', 'numberedList', 'outdent', 'indent'],
+	fontFamily: {
+		supportAllValues: true
+	},
+	fontSize: {
+		options: [10, 12, 14, 'default', 18, 20, 22],
+		supportAllValues: true
+	},
 	heading: {
 		options: [
 			{
@@ -197,18 +186,14 @@ const editorConfig = {
 			'toggleImageCaption',
 			'imageTextAlternative',
 			'|',
-			'imageStyle:alignBlockLeft',
-			'imageStyle:block',
-			'imageStyle:alignBlockRight',
+			'imageStyle:inline',
+			'imageStyle:wrapText',
+			'imageStyle:breakText',
 			'|',
 			'resizeImage'
-		],
-		styles: {
-			options: ['alignBlockLeft', 'block', 'alignBlockRight']
-		}
+		]
 	},
-	initialData:
-		'<h2>Congratulations on setting up CKEditor 5! 🎉</h2>\n<p>\n    You\'ve successfully created a CKEditor 5 project. This powerful text editor will enhance your application, enabling rich text editing\n    capabilities that are customizable and easy to use.\n</p>\n<h3>What\'s next?</h3>\n<ol>\n    <li>\n        <strong>Integrate into your app</strong>: time to bring the editing into your application. Take the code you created and add to your\n        application.\n    </li>\n    <li>\n        <strong>Explore features:</strong> Experiment with different plugins and toolbar options to discover what works best for your needs.\n    </li>\n    <li>\n        <strong>Customize your editor:</strong> Tailor the editor\'s configuration to match your application\'s style and requirements. Or even\n        write your plugin!\n    </li>\n</ol>\n<p>\n    Keep experimenting, and don\'t hesitate to push the boundaries of what you can achieve with CKEditor 5. Your feedback is invaluable to us\n    as we strive to improve and evolve. Happy editing!\n</p>\n<h3>Helpful resources</h3>\n<ul>\n    <li>📝 <a href="https://orders.ckeditor.com/trial/premium-features">Trial sign up</a>,</li>\n    <li>📕 <a href="https://ckeditor.com/docs/ckeditor5/latest/installation/index.html">Documentation</a>,</li>\n    <li>⭐️ <a href="https://github.com/ckeditor/ckeditor5">GitHub</a> (star us if you can!),</li>\n    <li>🏠 <a href="https://ckeditor.com">CKEditor Homepage</a>,</li>\n    <li>🧑‍💻 <a href="https://ckeditor.com/ckeditor-5/demo/">CKEditor 5 Demos</a>,</li>\n</ul>\n<h3>Need help?</h3>\n<p>\n    See this text, but the editor is not starting up? Check the browser\'s console for clues and guidance. It may be related to an incorrect\n    license key if you use premium features or another feature-related requirement. If you cannot make it work, file a GitHub issue, and we\n    will help as soon as possible!\n</p>\n',
+	initialData: 'dfsdfsdfdsf',
 	language: 'ko',
 	link: {
 		addTargetToExternalLinks: true,
@@ -230,11 +215,66 @@ const editorConfig = {
 			reversed: true
 		}
 	},
-	placeholder: 'Type or paste your content here!',
-	table: {
-		contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+	menuBar: {
+		isVisible: true
 	},
-	translations: [translations]
+	placeholder: '여기에 작성하세요.',
+	table: {
+		contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties']
+	},
+	translations: [translations],
+	extraPlugins: [ MyCustomUploadAdapterPlugin ]
 };
 
-BalloonEditor.create(document.querySelector('#editor'), editorConfig);
+DecoupledEditor.create(document.querySelector('#editor'), editorConfig)
+    .then(editor => {
+        // 툴바와 메뉴바를 원하는 DOM 요소에 추가
+        document.querySelector('#editor-toolbar').appendChild(editor.ui.view.toolbar.element);
+        document.querySelector('#editor-menu-bar').appendChild(editor.ui.view.menuBarView.element);
+        
+        // 폼 제출 시 에디터 데이터를 textarea로 복사
+        document.querySelector('form').addEventListener('submit', (event) => {
+            document.querySelector('#editorContent').value = editor.getData();
+        });
+
+        window.editor = editor;  // 전역으로 에디터 참조 저장
+    })
+    .catch(error => {
+        console.error('There was a problem initializing the editor.', error);
+    });
+	        
+	// 커스텀 업로드 어댑터
+	function MyCustomUploadAdapterPlugin(editor) {
+	    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+	        return new MyUploadAdapter(loader);
+	    };
+	}
+
+	class MyUploadAdapter {
+	    constructor(loader) {
+	        this.loader = loader;
+	    }
+
+	    upload() {
+	        return this.loader.file
+	            .then(file => {
+	                const data = new FormData();
+	                data.append('upload', file);
+
+	                return fetch('/portfolio/upload-image', {  // 서버 업로드 엔드포인트 설정
+	                    method: 'POST',
+	                    body: data
+	                })
+	                .then(response => response.json())
+	                .then(result => {
+	                    return {
+	                        default: result.url  // 서버에서 반환된 이미지 URL
+	                    };
+	                });
+	            });
+	    }
+
+	    abort() {
+	        // 업로드 중단 처리
+	    }
+	}

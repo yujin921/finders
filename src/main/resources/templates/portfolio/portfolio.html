@@ -7,13 +7,25 @@
 		<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.0.0/ckeditor5.css">
 	</head>
 	<body>
-		<div>
-			<div class="main-container">
-				<div class="editor-container editor-container_balloon-editor editor-container_include-block-toolbar" id="editor-container">
-					<div class="editor-container__editor"><div id="editor"></div></div>
+		<form id="editorForm" action="save" method="post">
+		<button type="submit">save</button>
+			<div>
+				<div class="main-container">
+					<div class="editor-container editor-container_document-editor" id="editor-container">
+						<div class="editor-container__menu-bar" id="editor-menu-bar"></div>
+						<div class="editor-container__toolbar" id="editor-toolbar"></div>
+						<div class="editor-container__editor-wrapper">
+							<div class="editor-container__editor">
+									<textarea name="editorContent" id="editorContent" style="display:none;"></textarea>
+									<div id="editor"></div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
-		</div>
+		</form>
+		
+
 		<script type="importmap">
 		{
 			"imports": {
@@ -21,5 +33,8 @@
 				"ckeditor5/": "https://cdn.ckeditor.com/ckeditor5/43.0.0/"
 			}
 		}
+
 		</script>
 		<script type="module" src="/js/main.js"></script>
+	</body>
+</html>
