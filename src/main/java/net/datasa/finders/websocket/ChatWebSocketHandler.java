@@ -1,47 +1,32 @@
 package net.datasa.finders.websocket;
 
-import java.io.IOException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
-
 import net.datasa.finders.domain.dto.ChatMessageDTO;
-import net.datasa.finders.service.ChatMessageService;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.stereotype.Controller;
 
-public class ChatWebSocketHandler extends TextWebSocketHandler {
+@Controller
+public class ChatWebSocketHandler {
 
-    @Autowired
-    private ChatMessageService chatMessageService;
-
-    @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
-        String payload = message.getPayload();
-        System.out.println("Received message: " + payload);
-
-        // 메시지 저장 로직
-        ChatMessageDTO chatMessageDTO = ChatMessageDTO.builder()
-                .chatroomId(1) // 채팅방 ID는 실제 채팅방 ID로 설정
-                .senderId("user") // 발신자 ID는 실제 사용자 ID로 설정
-                .messageContent(payload)
-                .sentTime(new java.sql.Timestamp(System.currentTimeMillis()))
-                .build();
-
-        chatMessageService.saveChatMessage(chatMessageDTO);
-
-        // 클라이언트에 메시지 전송
-        session.sendMessage(new TextMessage("Message received: " + payload));
+    // 채팅 메시지를 수신하는 엔드포인트
+    @MessageMapping("/chat.sendMessage")
+    @SendTo("/topic/public")
+    public ChatMessageDTO sendMessage(ChatMessageDTO message) {
+        // 메시지 전송 시간 설정
+        message.setSentTime(new java.sql.Timestamp(System.currentTimeMillis()));
+        return message; // 받은 메시지를 그대로 리턴해서 브로드캐스트
     }
 
-    @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws IOException {
-        System.out.println("Connection established with: " + session.getId());
-    }
-
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws IOException {
-        System.out.println("Connection closed with: " + session.getId());
+    // 사용자가 채팅방에 입장할 때 호출되는 메서드
+    @MessageMapping("/chat.addUser")
+    @SendTo("/topic/public")
+    public ChatMessageDTO addUser(ChatMessageDTO message, SimpMessageHeaderAccessor headerAccessor) {
+        // 세션에 사용자 이름 저장
+        headerAccessor.getSessionAttributes().put("username", message.getSenderId());
+        // 입장 메시지 설정
+        message.setMessageContent(message.getSenderId() + "님이 입장하셨습니다.");
+        message.setSentTime(new java.sql.Timestamp(System.currentTimeMillis()));
+        return message;
     }
 }
