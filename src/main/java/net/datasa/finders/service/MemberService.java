@@ -5,7 +5,11 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import net.datasa.finders.domain.dto.ClientDTO;
+import net.datasa.finders.domain.dto.FreelancerDTO;
 import net.datasa.finders.domain.dto.MemberDTO;
+import net.datasa.finders.domain.entity.ClientEntity;
+import net.datasa.finders.domain.entity.FreelancerEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.repository.ClientRepository;
@@ -22,7 +26,7 @@ public class MemberService {
     private final FreelancerRepository freelancerRepository;
     private final ClientRepository clientRepository;
     
-    public void join(MemberDTO dto) {
+    public MemberEntity join(MemberDTO dto) {
 
     	MemberEntity entity = MemberEntity.builder()
                 .memberId(dto.getMemberId())
@@ -45,6 +49,30 @@ public class MemberService {
                     .build();
         }
 
-        memberRepository.save(entity);
+        return memberRepository.save(entity);
+    }
+    
+    public void joinFreelancer(FreelancerDTO dto, MemberEntity member) {
+    	FreelancerEntity freelancerEntity = FreelancerEntity.builder()
+    			.freelancerId(member.getMemberId())
+    			.freelancerPhone(dto.getFreelancerPhone())
+    			.address(dto.getAddress())
+    			.postalCode(dto.getPostalCode())
+    			.country(dto.getCountry())
+    			.build();
+    			freelancerRepository.save(freelancerEntity);
+    }
+    
+    public void joinClient(ClientDTO dto, MemberEntity member) {
+    	ClientEntity clientEntity = ClientEntity.builder()
+    			.clientId(member.getMemberId())
+    			.clientPhone(dto.getClientPhone())
+    			.clientAddress(dto.getClientAddress())
+    			.industry(dto.getIndustry())
+    			.foundedDate(dto.getFoundedDate())
+    			.employeeCount(dto.getEmployeeCount())
+    			.website(dto.getWebsite())
+    			.build();
+    			clientRepository.save(clientEntity);
     }
 }

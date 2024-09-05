@@ -2,13 +2,17 @@ package net.datasa.finders.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.ClientDTO;
+import net.datasa.finders.domain.dto.FreelancerDTO;
 import net.datasa.finders.domain.dto.MemberDTO;
+import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.service.MemberService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,8 +33,21 @@ public class MemberController {
     }
 
     @PostMapping("join")
-    public String join(@ModelAttribute MemberDTO member) {
-        memberService.join(member);
+    public String join(@RequestParam("roleName") String roleName,
+    		@ModelAttribute MemberDTO member,
+    		@ModelAttribute FreelancerDTO freelancer,
+    		@ModelAttribute ClientDTO client) {
+        	
+    	  MemberEntity memberEntity = memberService.join(member);
+    	  
+    	  log.debug("회원가입 내용 체크용: {}", memberEntity);
+    	  
+    	  if ("ROLE_FREELANCER".equals(roleName)) {
+              memberService.joinFreelancer(freelancer, memberEntity);
+          } else if ("ROLE_CLIENT".equals(roleName)) {
+              memberService.joinClient(client, memberEntity);
+          }
+        
         return "redirect:/";
     }
     
