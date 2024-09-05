@@ -23,6 +23,11 @@ header {
     font-size: 1.5em;
 }
 
+.logo > a > img {
+	width: 150px;
+	height: 120px;
+}
+
 .search-bar input {
     padding: 5px;
     border: none;
