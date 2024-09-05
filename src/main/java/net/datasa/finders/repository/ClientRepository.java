@@ -7,6 +7,6 @@ import net.datasa.finders.domain.entity.ClientEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 
 @Repository
-public interface ClientRepository extends JpaRepository<ClientEntity, MemberEntity> {
+public interface ClientRepository extends JpaRepository<ClientEntity, String> {
 
 }

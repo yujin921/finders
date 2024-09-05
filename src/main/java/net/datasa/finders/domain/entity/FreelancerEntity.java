@@ -26,10 +26,13 @@ import lombok.NoArgsConstructor;
 
 public class FreelancerEntity {
 
-	@Id
-	@ManyToOne
-	@JoinColumn(name = "freelancer_id", referencedColumnName = "member_id")
-	private MemberEntity freelancerId;
+    @Id
+    @Column(name = "freelancer_id")
+    private String freelancerId;
+
+    @ManyToOne
+    @JoinColumn(name = "freelancer_id", referencedColumnName = "member_id", insertable = false, updatable = false)
+    private MemberEntity memberEntity;
 
 	@Column(name = "freelancer_phone", length = 100)
 	private String freelancerPhone;
