@@ -6,19 +6,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberDTO {
-    String memberId;
-    String memberPw;
-    String memberName;
-    String profileImg;
-    String email;
-    boolean enabled;
-    RoleName roleName;
-    LocalDateTime createdTime;
+
+public class FreelancerDTO {
+	
+	String freelancerId;
+	String freelancerPhone;
+	String address;
+	String postalCode;
+	String country;
+	LocalDateTime lastLogin;
+	MemberEntity member;
+	
 }

@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import net.datasa.finders.domain.dto.MemberDTO;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.repository.ClientRepository;
+import net.datasa.finders.repository.FreelancerRepository;
 import net.datasa.finders.repository.MemberRepository;
 
 @RequiredArgsConstructor
@@ -17,6 +19,8 @@ public class MemberService {
 
 	private final BCryptPasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
+    private final FreelancerRepository freelancerRepository;
+    private final ClientRepository clientRepository;
     
     public void join(MemberDTO dto) {
 

@@ -31,7 +31,11 @@ public class MemberEntity {
 
     @Column(name = "member_name", nullable = false, length = 100)
     String memberName;
-
+    
+    @Lob  // 대용량 텍스트 필드를 나타내는 어노테이션
+    @Column(name = "profile_img", columnDefinition = "MEDIUMTEXT")
+    private String profileImg;
+    
     @Column(name = "email", nullable = false, length = 100)
     String email;
 

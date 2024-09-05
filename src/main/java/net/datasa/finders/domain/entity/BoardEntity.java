@@ -51,6 +51,7 @@ public class BoardEntity {
 
     @Column(name = "project_image", length = 255)
     private String projectImage;
+    
 
     @Column(name = "project_status", columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean projectStatus;

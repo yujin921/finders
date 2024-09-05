@@ -22,6 +22,11 @@ public class MemberController {
     public String join() {
         return "/member/joinForm";
     }
+    
+    @GetMapping("join1")
+    public String join1() {
+        return "/member/joinForm1";
+    }
 
     @PostMapping("join")
     public String join(@ModelAttribute MemberDTO member) {
@@ -50,6 +55,18 @@ public class MemberController {
     @GetMapping("admin/view")
     public String view3() {
         return "/member/adminView";
+    }
+    
+    // 프리랜서 마이페이지
+    @GetMapping("mypageFree")
+    public String mypageFree() {
+    	return "/member/mypageFree";
+    }
+    
+    // 클라이언트 마이페이지
+    @GetMapping("mypageClient")
+    public String mypageClient() {
+    	return "/member/mypageClient";
     }
     
 }
