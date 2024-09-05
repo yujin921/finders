@@ -17,6 +17,7 @@
         <div class="auth-buttons">
             <th:block sec:authorize="not isAuthenticated()">
             	<a th:href="@{/member/join}"><button>회원가입</button></a>
+            	<a th:href="@{/member/join1}"><button>회원가입</button></a>
         		<a th:href="@{/member/login}"><button>로그인</button></a>
     		</th:block>
 
