@@ -49,7 +49,7 @@ public class BoardService {
 	
     public List<BoardDTO> getList(String id) {
         
-    	Sort sort = Sort.by(Sort.Direction.DESC, "boardNum");
+    	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
     	
         //
         List<BoardEntity> entityList = boardRepository.findAll(sort);
@@ -97,18 +97,28 @@ public class BoardService {
                 .projectStatus(entity.getProjectStatus())
             .build();
     }
+
+    /*
+    public BoardEntity saveBoardImage(MultipartFile file) throws IOException {
+        BoardEntity boardEntity = new BoardEntity();
+
+        boardEntity.setProjectImage(Base64.getEncoder().encodeToString(file.getBytes()));
+        return boardRepository.save(boardEntity);
+    }
+    */
     
-    public BoardDTO getBoard(int boardNum) {
-        BoardEntity entity = boardRepository.findById(boardNum)
+    public BoardDTO getBoard(int pNum) {
+        BoardEntity entity = boardRepository.findById(pNum)
                 .orElseThrow(() -> new EntityNotFoundException("해당 번호의 글이 없습니다."));
 
         BoardDTO dto = convertToDTO(entity);
 
-        
         return dto;
     }
 
-    public void deleteBoard(int boardNum) {
-        boardRepository.deleteById(boardNum);
+
+
+    public void deleteBoard(int pNum) {
+        boardRepository.deleteById(pNum);
     }
 }
