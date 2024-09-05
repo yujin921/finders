@@ -1,0 +1,141 @@
+/* 기본 스타일 초기화 */
+body, h1, h2, h3, p, ul, li {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: #333;
+    color: #fff;
+}
+
+.logo {
+    font-size: 1.5em;
+}
+
+.search-bar input {
+    padding: 5px;
+    border: none;
+    border-radius: 4px;
+}
+
+.auth-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.auth-buttons button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    background: #555;
+    color: #fff;
+    cursor: pointer;
+}
+
+.auth-buttons a {
+    text-decoration: none;
+}
+
+nav {
+    background: #f4f4f4;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    padding: 10px 0;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0 10px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+}
+
+.slider {
+    position: relative;
+    max-width: 80%; /* 슬라이더의 너비 조정 */
+    height: 400px; /* 슬라이더의 높이 설정 */
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+.slides {
+    display: flex;
+    transition: transform 1s ease-in-out; /* 슬라이드 전환 시의 애니메이션 설정 */
+    width: 500%; /* 슬라이드 개수에 따라 너비 조정 */
+}
+
+.slide {
+    min-width: 20%; /* 슬라이드가 5개일 경우 20% */
+    box-sizing: border-box;
+}
+
+.slide img {
+    width: 100%; /* 이미지를 슬라이드에 맞게 조정 */
+    height: 100%; /* 슬라이드 높이에 맞게 이미지 높이 설정 */
+    object-fit: cover; /* 이미지가 슬라이드의 비율에 맞게 잘리도록 설정 */
+    display: block;
+}
+
+button.prev, button.next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+button.prev {
+    left: 10px;
+}
+
+button.next {
+    right: 10px;
+}
+
+.featured {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+    background: #f9f9f9;
+}
+
+.feature {
+    flex: 1 1 22%;
+    margin: 10px;
+    text-align: center;
+}
+
+.feature img {
+    max-width: 100%;
+    height: auto;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background: #333;
+    color: #fff;
+}
