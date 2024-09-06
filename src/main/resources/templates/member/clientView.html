@@ -24,15 +24,12 @@
         <div class="auth-buttons">
             <th:block sec:authorize="not isAuthenticated()">
             	<a th:href="@{/member/join}"><button>회원가입</button></a>
-            	<a th:href="@{/member/join1}"><button>회원가입</button></a>
         		<a th:href="@{/member/login}"><button>로그인</button></a>
     		</th:block>
 
     		<th:block sec:authorize="isAuthenticated()">
         		<a th:href="@{/member/logout}"><button>로그아웃</button></a>
         		<a th:href="@{/board/view}"><button>프로젝트 게시판</button></a>
-    			<a th:href="@{/project/view}"><button>프로젝트 관리</button></a>
-    		
     		</th:block>
         </div>
     </header>
@@ -44,7 +41,7 @@
             <li><a href="#">프로젝트 찾기</a></li>
             <li><a href="#">파트너스 찾기</a></li>
             <li><a href="#">이용 사례</a></li>
-            <li><a href="#">프로젝트 관리</a></li>
+            <li><a th:href="@{/project/management}">프로젝트 관리</a></li>
             <li><a href="#">미팅룸</a></li>
         </ul>
     </nav>

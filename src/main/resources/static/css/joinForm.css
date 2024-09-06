@@ -1,90 +1,101 @@
-/* 기본 스타일 */
+/* 기본적인 페이지 스타일 */
 body {
     font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background-color: #f4f4f4;
-}
-
-div {
-    width: 100%;
-    max-width: 600px;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 100%;
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 20px;
+    color: #333;
 }
 
+/* 컨테이너 스타일 */
+div {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 400px;
+}
+
+/* 탭 버튼 스타일 */
 .tabs {
     display: flex;
     justify-content: space-around;
     margin-bottom: 20px;
 }
 
-.tabs button {
-    background: #f4f4f4;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+button {
+    background-color: #ddd;
+    border: none;
     padding: 10px 20px;
     cursor: pointer;
-    transition: background 0.3s;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
-.tabs button.active {
-    background: #007bff;
+button.active {
+    background-color: #4CAF50;
     color: white;
 }
 
-.tab-content {
-    display: none;
+button:hover {
+    background-color: #ccc;
 }
 
-.tab-content.active {
-    display: block;
-}
-
+/* 폼 스타일 */
 form {
     display: flex;
     flex-direction: column;
 }
 
 label {
-    margin-bottom: 5px;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
 }
 
-input[type="text"],
-input[type="password"],
-input[type="email"] {
+input {
     padding: 10px;
+    margin-top: 5px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 15px;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
-button {
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    background: #007bff;
+button[type="submit"] {
+    background-color: #4CAF50;
     color: white;
+    border: none;
+    padding: 10px;
+    margin-top: 20px;
     cursor: pointer;
-    transition: background 0.3s;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
-button:hover {
-    background: #0056b3;
+button[type="submit"]:hover {
+    background-color: #45a049;
 }
 
+/* 에러 메시지 스타일 */
 .errorMsg {
     color: red;
+    font-size: 14px;
     margin-top: 10px;
+}
+
+/* 비활성화된 탭 내용 숨김 */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
 }

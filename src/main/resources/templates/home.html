@@ -24,13 +24,12 @@
         <div class="auth-buttons">
             <th:block sec:authorize="not isAuthenticated()">
             	<a th:href="@{/member/join}"><button>회원가입</button></a>
-            	<a th:href="@{/member/join1}"><button>회원가입</button></a>
         		<a th:href="@{/member/login}"><button>로그인</button></a>
     		</th:block>
 
     		<th:block sec:authorize="isAuthenticated()">
         		<a th:href="@{/member/logout}"><button>로그아웃</button></a>
-        		<a th:href="@{/board/list}"><button>프로젝트 게시판</button></a>
+        		<a th:href="@{/board/view}"><button>프로젝트 게시판</button></a>
     		</th:block>
         </div>
     </header>

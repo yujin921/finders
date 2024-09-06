@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트 관리 페이지</title>
+    <!-- FullCalendar 스타일 시트 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css">
+    <!-- Custom 스타일 시트 -->
+    <link rel="stylesheet" href="/css/management.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 사이드 바 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <a href="/">
+                    <img src="/images/findersLogo.png" alt="Finders Logo">
+                </a>
+            </div>
+            <button class="btn-create-project">새 프로젝트 생성</button>
+            <nav>
+                <ul>
+                    <li><a href="#">내 프로젝트 조회</a></li>
+                    <li><a href="#">대시보드</a></li>
+                    <li><a href="#">전체 업무</a></li>
+                    <li><a href="#">간트차트</a></li>
+                    <li><a href="#" id="calendar-tab">캘린더</a></li>
+                    <li><a href="#">임시저장</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <!-- 메인 화면 -->
+        <main class="main-content">
+            <header>
+                <div class="profile">
+                    <img src="/images/basicProfile.png" alt="프로필 이미지">
+                </div>
+                <h1>제목</h1>
+            </header>
+            <nav class="menu-tabs">
+                <a href="#" id="task-tab">업무</a>
+                <a href="#" id="feed-tab">피드</a>
+                <a href="#" id="gantt-tab">간트차트</a>
+                <a href="#" id="calendar-tab">캘린더</a>
+            </nav>
+            <section class="content">
+                <div id="task-content" class="tab-content">업무 내용</div>
+                <div id="feed-content" class="tab-content">피드 내용</div>
+                <div id="gantt-content" class="tab-content">간트차트 내용</div>
+                <div id="calendar-content" class="tab-content calendar-content">
+                    <div id="calendar"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <!-- FullCalendar 스크립트 파일 -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <!-- Custom 스크립트 파일 -->
+    <script src="/js/management.js" defer></script>
+</body>
+</html>

@@ -21,15 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class MemberController {
 
     private final MemberService memberService;
-
+    
     @GetMapping("join")
     public String join() {
         return "/member/joinForm";
-    }
-    
-    @GetMapping("join1")
-    public String join1() {
-        return "/member/joinForm1";
     }
 
     @PostMapping("join")

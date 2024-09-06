@@ -1,5 +1,7 @@
 package net.datasa.finders.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +29,9 @@ public class MemberService {
     private final ClientRepository clientRepository;
     
     public MemberEntity join(MemberDTO dto) {
-
+    	
+    	LocalDateTime now = LocalDateTime.now();  // 회원가입 일시, 회원정보 수정 일시
+    	
     	MemberEntity entity = MemberEntity.builder()
                 .memberId(dto.getMemberId())
                 .memberPw(passwordEncoder.encode(dto.getMemberPw()))        // Encrypt password
@@ -35,6 +39,8 @@ public class MemberService {
                 .email(dto.getEmail())
                 .enabled(true) // Account enabled
                 .roleName(dto.getRoleName()) // Set role from DTO
+                .createdTime(now)
+                .updatedTime(now)
                 .build();
         
         // Special handling for admin account
@@ -46,6 +52,8 @@ public class MemberService {
                     .email(dto.getEmail())
                     .enabled(true) // Account enabled
                     .roleName(RoleName.ROLE_ADMIN) // Set role to ADMIN
+                    .createdTime(now)
+                    .updatedTime(now)
                     .build();
         }
 
@@ -53,6 +61,7 @@ public class MemberService {
     }
     
     public void joinFreelancer(FreelancerDTO dto, MemberEntity member) {
+    	
     	FreelancerEntity freelancerEntity = FreelancerEntity.builder()
     			.freelancerId(member.getMemberId())
     			.freelancerPhone(dto.getFreelancerPhone())
@@ -64,6 +73,7 @@ public class MemberService {
     }
     
     public void joinClient(ClientDTO dto, MemberEntity member) {
+    	
     	ClientEntity clientEntity = ClientEntity.builder()
     			.clientId(member.getMemberId())
     			.clientPhone(dto.getClientPhone())

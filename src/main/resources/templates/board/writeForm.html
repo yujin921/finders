@@ -287,8 +287,9 @@
             font-size: 0.9em;
         }
 
-        /* 동적으로 추가되는 팀원/질문 섹션 */
-        .recruit-added-item {
+        /* 동적으로 추가되는 질문 섹션 */
+        .recruit-added-question {
+            width: calc(100%);
             margin-top: 10px;
             display: flex;
             justify-content: flex-start;
@@ -296,9 +297,18 @@
             gap: 10px; /* 간격 추가 */
         }
 
+        /* 동적으로 추가되는 질문 섹션 */
+        .recruit-added-item select{
+            width: 100px;
+        }
+
+        .recruit-added-item input{
+            width: 50px;
+        }
+
         /* 사전 검증 질문 박스 크기 문제 해결 */
         .recruit-question-input {
-            width: calc(100% - 60px); /* 입력 필드 크기 조정 */
+            width: calc(90% - 60px); /* 입력 필드 크기 조정 */
             padding: 8px;
             border-radius: 5px;
             border: 1px solid #ddd;
@@ -308,170 +318,206 @@
             margin-left: 0;
         }
     </style>
-</head>
-<body>
 
-<div class="container">
-    <h2>기본 정보</h2>
-
-    <div class="project-title-container">
-        <label for="project-title">프로젝트 제목</label><br>
-        <input type="text" id="project-title" name="project-title" maxlength="30" placeholder="프로젝트 제목을 입력하세요">
-    </div>
-
-    <div class="scope-of-work">
-        <div class="scope-option" onclick="toggleSelect(this)">
-            <input type="checkbox" name="scope" value="개발">
-            <img src="https://via.placeholder.com/50" alt="개발">
-            <p>개발</p>
-        </div>
-        <div class="scope-option" onclick="toggleSelect(this)">
-            <input type="checkbox" name="scope" value="디자인">
-            <img src="https://via.placeholder.com/50" alt="디자인">
-            <p>디자인</p>
-        </div>
-        <div class="scope-option" onclick="toggleSelect(this)">
-            <input type="checkbox" name="scope" value="기획">
-            <img src="https://via.placeholder.com/50" alt="기획">
-            <p>기획</p>
-        </div>
-        <div class="scope-option" onclick="toggleSelect(this)">
-            <input type="checkbox" name="scope" value="기타">
-            <img src="https://via.placeholder.com/50" alt="기타">
-            <p>기타</p>
-        </div>
-    </div>
-</div>
-
-<script>
-    // 단일 선택 구현 함수
-    function toggleSelect(element) {
-        // 선택된 항목이 있으면 모두 해제
-        document.querySelectorAll('.scope-option').forEach(option => {
-            option.classList.remove('selected');
-            option.querySelector('input[type="checkbox"]').checked = false;
-        });
-
-        // 클릭된 항목을 선택
-        const checkbox = element.querySelector('input[type="checkbox"]');
-        checkbox.checked = true;
-        element.classList.add('selected');
-    }
-</script>
-
-<div class="category-container">
-    <!-- 카테고리 섹션 -->
-    <div class="category-section">
-        <h3>카테고리</h3>
-        <p>해당하는 카테고리를 모두 선택해주세요.</p>
-        <div class="category-buttons">
-            <div class="category-btn" onclick="toggleCategory(this)">웹</div>
-            <div class="category-btn" onclick="toggleCategory(this)">안드로이드</div>
-            <div class="category-btn" onclick="toggleCategory(this)">iOS</div>
-            <div class="category-btn" onclick="toggleCategory(this)">PC 프로그램</div>
-            <div class="category-btn" onclick="toggleCategory(this)">임베디드</div>
-            <div class="category-btn" onclick="toggleCategory(this)">기타</div>
-        </div>
-    </div>
-
-    <!-- 이미지 업로드 섹션 -->
-    <div class="image-upload-section">
-        <h3>프로젝트 이미지</h3>
-        <p>프로젝트 찾기 창에서 보일 프로젝트 대표 이미지를 넣어주세요. (최대 1개)</p>
-
-        <!-- 업로드된 파일 정보 -->
-        <div class="uploaded-file">
-            <img src="https://via.placeholder.com/50" alt="파일 아이콘">
-            <span>일본 워홀 지원 웹사이트.png</span>
-            <span>64KB</span>
-            <a href="#" style="text-decoration: none;">다운로드</a>
-        </div>
-
-        <!-- 파일 업로드 버튼 -->
-        <button class="file-upload-btn">PNG 파일 업로드</button>
-    </div>
-</div>
-
-<script>
-    // 카테고리 선택 토글 기능
-    function toggleCategory(element) {
-        element.classList.toggle('selected');
-    }
-</script>
-
-<div class="tech-container">
-    <!-- 선택된 기술 표시 박스 -->
-    <div class="selected-techs" id="selected-techs">
-        <!-- 선택한 기술들이 여기에 표시됩니다. -->
-    </div>
-
-    <!-- 관련 기술 선택 섹션 -->
-    <div class="tech-section">
-        <h3>관련 기술</h3>
-        <p>프로젝트에서 활용될 기술에 대해 모두 선택해주세요.</p>
-        <div class="tech-buttons">
-            <div class="tech-button" onclick="toggleTech(this)">Python</div>
-            <div class="tech-button" onclick="toggleTech(this)">Javascript</div>
-            <div class="tech-button" onclick="toggleTech(this)">JAVA</div>
-            <div class="tech-button" onclick="toggleTech(this)">C++</div>
-            <div class="tech-button" onclick="toggleTech(this)">iOS</div>
-            <div class="tech-button" onclick="toggleTech(this)">안드로이드</div>
-        </div>
-    </div>
-
-    <!-- 상세 업무 내용 섹션 -->
-    <div class="detail-section">
-        <h3>상세업무 내용</h3>
-        <p>프로젝트와 관련된 상세한 내용들을 기입해주세요.</p>
-        <textarea id="detail-text" rows="5" maxlength="5000" placeholder="5000자 이내로 작성해주세요."></textarea>
-        <p class="char-count" id="char-count">0 / 5000</p>
-    </div>
-</div>
-
-<script>
-    // 선택한 기술을 담을 배열
-    const selectedTechs = [];
-
-    // 선택한 기술을 토글하는 함수
-    function toggleTech(element) {
-        const tech = element.textContent.trim();
-        const selectedTechsContainer = document.getElementById('selected-techs');
-
-        // 선택된 상태라면 선택 해제
-        if (element.classList.contains('selected')) {
-            element.classList.remove('selected');
-            // 배열에서 선택된 기술을 제거
-            const index = selectedTechs.indexOf(tech);
-            if (index !== -1) {
-                selectedTechs.splice(index, 1);
-            }
-        } else {
-            // 선택되지 않은 상태라면 선택 추가
+    <script>
+        // 업무 범위 선택 단일 선택 (scope)
+        function toggleSelect(element) {
+            const checkboxes = document.querySelectorAll('.scope-option input[type="checkbox"]');
+            checkboxes.forEach(checkbox => checkbox.checked = false); // 모든 체크박스 해제
+            element.querySelector('input[type="checkbox"]').checked = true; // 클릭한 항목 체크
+            document.querySelectorAll('.scope-option').forEach(option => option.classList.remove('selected'));
             element.classList.add('selected');
-            selectedTechs.push(tech);
         }
 
-        // 선택된 기술들을 상단에 표시
-        selectedTechsContainer.innerHTML = selectedTechs
-            .map(item => `<span class="selected-tech">${item}</span>`)
-            .join('');
-    }
+        // 카테고리 선택 기능 (다중 선택 가능)
+        function toggleCategory(element) {
+            element.classList.toggle('selected');
+            const selectedCategories = Array.from(document.querySelectorAll('.category-btn.selected')).map(btn => btn.dataset.category);
+            document.getElementById('selectedCategories').value = selectedCategories.join(',');
+        }
 
-    // 상세 업무 내용 글자 수 카운팅
-    const detailTextarea = document.getElementById('detail-text');
-    const charCount = document.getElementById('char-count');
+        // 선택한 기술들을 저장할 배열
+        let selectedTechs = [];
 
-    detailTextarea.addEventListener('input', function() {
-        const length = detailTextarea.value.length;
-        charCount.textContent = `${length} / 5000`;
-    });
-</script>
+        // 기술 버튼 클릭 시 호출되는 함수
+        function toggleTech(element) {
+            const tech = element.getAttribute('data-tech');  // data-tech 속성에서 기술명 가져오기
+            const selectedTechsContainer = document.getElementById('selected-techs');
 
+            // 선택된 상태라면 선택 해제
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                selectedTechs = selectedTechs.filter(t => t !== tech);  // 배열에서 제거
+            } else {
+                // 선택되지 않은 상태라면 선택 추가
+                element.classList.add('selected');
+                selectedTechs.push(tech);  // 배열에 추가
+            }
+            // 선택된 기술들을 상단에 표시
+            selectedTechsContainer.innerHTML = selectedTechs
+                .map(item => `<span class="selected-tech">${item}</span>`)
+                .join('');
+        }
+
+        document.querySelector('form').addEventListener('submit', function(event) {
+            // 선택된 기술을 hidden input에 저장
+            const selectedSkillsInput = document.getElementById('selectedSkills');
+            selectedSkillsInput.value = selectedTechs.join(',');
+        });
+
+        // 상세 업무 내용 글자 수 카운팅
+        function countCharacters() {
+            const detailTextarea = document.getElementById('detail-text');
+            const charCount = document.getElementById('char-count');
+
+            detailTextarea.addEventListener('input', function () {
+                const length = detailTextarea.value.length;
+                charCount.textContent = `${length} / 5000`;
+            });
+        }
+
+        // 모집 인원 추가 기능
+        function addTeamMember() {
+            const teamMembersContainer = document.getElementById('recruit-team-members');
+
+            // 새로운 팀원 입력 필드 생성
+            const newTeamMember = document.createElement('div');
+            newTeamMember.classList.add('recruit-added-item');
+            newTeamMember.innerHTML = `
+                <select name="role">
+                    <option value="개발">개발</option>
+                    <option value="기획">기획</option>
+                    <option value="디자인">디자인</option>
+                </select>
+                <input type="number" min="1" placeholder="명">
+            `;
+            teamMembersContainer.appendChild(newTeamMember);
+        }
+
+        // 사전 검증 질문 추가 기능
+        function addQuestion() {
+            const questionsContainer = document.getElementById('recruit-questions');
+
+            // 새로운 질문 입력 필드 생성
+            const newQuestion = document.createElement('div');
+            newQuestion.classList.add('recruit-added-question');
+            newQuestion.innerHTML = `
+                <input type="text" class="recruit-question-input" placeholder="사전 질문을 입력해주세요.">
+            `;
+            questionsContainer.appendChild(newQuestion);
+        }
+
+        // Call the character counting function on page load
+        window.onload = function () {
+            countCharacters();
+        };
+    </script>
+</head>
+<body>
+<form method="POST" action="/board/write" enctype="multipart/form-data">
+    <div class="container">
+        <h2>기본 정보</h2>
+
+        <!-- 프로젝트 제목 -->
+        <div class="project-title-container">
+            <label for="project-title">프로젝트 제목</label><br>
+            <input type="text" id="project-title" name="projectTitle" maxlength="30" placeholder="프로젝트 제목을 입력하세요">
+        </div>
+
+        <!-- 업무 범위 (scope) -->
+        <div class="scope-of-work">
+            <label for="project-title">업무범위</label><br>
+            <div class="scope-option" onclick="toggleSelect(this)">
+                <input type="checkbox" name="selectedWorkScopes" value="개발">
+                <img src="https://via.placeholder.com/50" alt="개발">
+                <p>개발</p>
+            </div>
+            <div class="scope-option" onclick="toggleSelect(this)">
+                <input type="checkbox" name="selectedWorkScopes" value="디자인">
+                <img src="https://via.placeholder.com/50" alt="디자인">
+                <p>디자인</p>
+            </div>
+            <div class="scope-option" onclick="toggleSelect(this)">
+                <input type="checkbox" name="selectedWorkScopes" value="기획">
+                <img src="https://via.placeholder.com/50" alt="기획">
+                <p>기획</p>
+            </div>
+            <div class="scope-option" onclick="toggleSelect(this)">
+                <input type="checkbox" name="selectedWorkScopes" value="기타">
+                <img src="https://via.placeholder.com/50" alt="기타">
+                <p>기타</p>
+            </div>
+        </div>
+
+        <!-- 카테고리 -->
+        <div class="category-container">
+            <div class="category-section">
+                <h3>카테고리</h3>
+                <p>해당하는 카테고리를 모두 선택해주세요.</p>
+                <div class="category-buttons">
+                    <div class="category-btn" onclick="toggleCategory(this)" data-category="웹">웹</div>
+                    <div class="category-btn" onclick="toggleCategory(this)" data-category="안드로이드">안드로이드</div>
+                    <div class="category-btn" onclick="toggleCategory(this)" data-category="iOS">iOS</div>
+                    <div class="category-btn" onclick="toggleCategory(this)" data-category="PC 프로그램">PC 프로그램</div>
+                    <div class="category-btn" onclick="toggleCategory(this)" data-category="임베디드">임베디드</div>
+                    <div class="category-btn" onclick="toggleCategory(this)" data-category="기타">기타</div>
+                </div>
+                <input type="hidden" id="selectedCategories" name="selectedCategories">
+            </div>
+        </div>
+
+        <!-- 이미지 업로드 -->
+        <div class="image-upload-section">
+            <h3>프로젝트 이미지</h3>
+            <p>프로젝트 찾기 창에서 보일 프로젝트 대표 이미지를 넣어주세요. (최대 1개)</p>
+            <input type="file" name="projectImageFile" accept="image/png, image/jpeg">
+        </div>
+
+        <!-- 제출 버튼 -->
+        <div>
+            <button type="submit">저장</button>
+        </div>
+    </div>
+
+    <div class="tech-container">
+        <input type="hidden" id="selectedSkills" name="selectedSkills">
+        <!-- 선택된 기술 표시 박스 -->
+        <div class="selected-techs" id="selected-techs">
+            <!-- 선택한 기술들이 여기에 표시됩니다. -->
+        </div>
+
+        <!-- 관련 기술 선택 섹션 -->
+        <div class="tech-section">
+            <h3>관련 기술</h3>
+            <p>프로젝트에서 활용될 기술에 대해 모두 선택해주세요.</p>
+            <div class="tech-buttons">
+                <div class="tech-button" data-tech="Python" onclick="toggleTech(this)">Python</div>
+                <div class="tech-button" data-tech="Javascript" onclick="toggleTech(this)">Javascript</div>
+                <div class="tech-button" data-tech="JAVA" onclick="toggleTech(this)">JAVA</div>
+                <div class="tech-button" data-tech="C++" onclick="toggleTech(this)">C++</div>
+                <div class="tech-button" data-tech="iOS" onclick="toggleTech(this)">iOS</div>
+                <div class="tech-button" data-tech="안드로이드" onclick="toggleTech(this)">안드로이드</div>
+            </div>
+        </div>
+
+        <!-- 상세 업무 내용 섹션 -->
+        <div class="detail-section">
+            <h3>상세업무 내용</h3>
+            <p>프로젝트와 관련된 상세한 내용들을 기입해주세요.</p>
+            <textarea id="detail-text" name="projectDescription" rows="5" maxlength="5000" placeholder="5000자 이내로 작성해주세요."></textarea>
+            <p class="char-count" id="char-count">0 / 5000</p>
+        </div>
+
+        <div>
+            <button type="submit">저장</button>
+        </div>
+    </div>
+</form>
 <div class="budget-container">
     <!-- 지출 가능 예산 -->
     <div class="budget-item">
         <label for="budget">지출 가능 예산</label>
-        <input type="text" id="budget" placeholder="₩ 300,000">
+        <input type="text" id="budget" name="projectBudget" placeholder="₩ 300,000">
         <div class="checkbox-container">
             <input type="checkbox" id="flexible">
             <label for="flexible">입력한 예산에서 조율이 가능합니다.</label>
@@ -481,13 +527,13 @@
     <!-- 프로젝트 시작일 -->
     <div class="budget-item">
         <label for="start-date">프로젝트 시작일</label>
-        <input type="date" id="start-date">
+        <input type="date" id="start-date" name="projectStartDate">
     </div>
 
     <!-- 프로젝트 종료일 -->
     <div class="budget-item">
         <label for="end-date">프로젝트 종료일</label>
-        <input type="date" id="end-date">
+        <input type="date" id="end-date" name="projectEndDate">
     </div>
 </div>
 
@@ -495,7 +541,7 @@
     <!-- 모집 마감일 -->
     <div class="recruit-section">
         <label for="recruit_deadline">모집 마감일</label>
-        <input type="date" id="recruit_deadline">
+        <input type="date" id="recruit_deadline" name="recruitDeadline">
     </div>
 
     <!-- 모집 인원 -->
@@ -529,39 +575,6 @@
         <button type="button" style="padding: 10px 20px;">저장</button>
     </div>
 </div>
-
-<script>
-    // 모집 인원 추가 기능
-    function addTeamMember() {
-        const teamMembersContainer = document.getElementById('recruit-team-members');
-
-        // 새로운 팀원 입력 필드 생성
-        const newTeamMember = document.createElement('div');
-        newTeamMember.classList.add('recruit-added-item');
-        newTeamMember.innerHTML = `
-            <select name="role">
-                <option value="개발">개발</option>
-                <option value="기획">기획</option>
-                <option value="디자인">디자인</option>
-            </select>
-            <input type="number" min="1" placeholder="명">
-        `;
-        teamMembersContainer.appendChild(newTeamMember);
-    }
-
-    // 사전 검증 질문 추가 기능
-    function addQuestion() {
-        const questionsContainer = document.getElementById('recruit-questions');
-
-        // 새로운 질문 입력 필드 생성
-        const newQuestion = document.createElement('div');
-        newQuestion.classList.add('recruit-added-item');
-        newQuestion.innerHTML = `
-            <input type="text" class="recruit-question-input" placeholder="사전 질문을 입력해주세요.">
-        `;
-        questionsContainer.appendChild(newQuestion);
-    }
-</script>
 
 </body>
 </html>
