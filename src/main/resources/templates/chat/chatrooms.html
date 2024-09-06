@@ -1,158 +1,53 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>채팅방</title>
+    <title>채팅룸</title>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f2f5;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
         }
-
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            width: 90%;
-            max-width: 400px;
-            height: 90vh;
-            background-color: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .chat-header {
-            background-color: #007bff;
-            padding: 15px;
-            color: white;
+        h1 {
             text-align: center;
-            font-weight: bold;
         }
-
-        .chat-box {
-            flex: 1;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-
-        .message {
-            display: flex;
-            align-items: flex-end;
-        }
-
-        .message.sent {
-            justify-content: flex-end;
-        }
-
-        .message-content {
-            max-width: 70%;
+        th, td {
             padding: 10px;
-            border-radius: 10px;
-            font-size: 14px;
-            line-height: 1.4;
+            border: 1px solid #ddd;
+            text-align: center;
         }
-
-        .message.sent .message-content {
-            background-color: #dcf8c6;
-            border-bottom-right-radius: 0;
-        }
-
-        .message.received .message-content {
-            background-color: #f1f0f0;
-            border-bottom-left-radius: 0;
-        }
-
-        .chat-input {
-            display: flex;
-            border-top: 1px solid #ddd;
-        }
-
-        .chat-input input {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            outline: none;
-            border-radius: 0;
-        }
-
-        .chat-input button {
-            padding: 0 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .chat-input button:hover {
-            background-color: #0056b3;
+        th {
+            background-color: #f4f4f4;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
-    <script>
-        let stompClient = null;
-
-        function connect(chatroomId) {
-            const socket = new SockJS('/ws/chat');
-            stompClient = Stomp.over(socket);
-
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/' + chatroomId, function (message) {
-                    const msg = JSON.parse(message.body);
-                    showMessage(msg.messageContent, 'received');
-                });
-            });
-        }
-
-        function sendMessage() {
-            const message = document.getElementById('message').value;
-            const chatroomId = document.getElementById('chatroomId').value;
-            stompClient.send("/app/chat.sendMessage", {}, JSON.stringify({
-                senderId: '사용자아이디', // 실제 사용자 ID를 넣어야 합니다.
-                messageContent: message,
-                chatroomId: chatroomId,
-                sentTime: new Date()
-            }));
-            showMessage(message, 'sent');
-            document.getElementById('message').value = '';
-        }
-
-        function showMessage(message, type) {
-            const chatBox = document.querySelector('.chat-box');
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', type);
-            messageElement.innerHTML = `<div class="message-content">${message}</div>`;
-            chatBox.appendChild(messageElement);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        window.onload = function () {
-            const chatroomId = new URLSearchParams(window.location.search).get('chatroomId');
-            document.getElementById('chatroomId').value = chatroomId;
-            connect(chatroomId);
-        };
-    </script>
 </head>
 <body>
-<div class="chat-container">
-    <div class="chat-header">채팅방</div>
-    <div class="chat-box"></div>
-    <input type="hidden" id="chatroomId"/>
-    <div class="chat-input">
-        <input type="text" id="message" placeholder="메시지를 입력하세요"/>
-        <button onclick="sendMessage()">Send</button>
-    </div>
-</div>
+    <h1>채팅방 목록</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>채팅방 ID</th>
+                <th>프로젝트 번호</th>
+                <th>채팅방 이름</th>
+                <th>생성 시간</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="chatroom : ${chatrooms}">
+                <td th:text="${chatroom.chatroomId}"></td>
+                <td th:text="${chatroom.projectNum}"></td>
+                <td th:text="${chatroom.chatroomName}"></td>
+                <td th:text="${chatroom.createdTime}"></td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>

@@ -1,38 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Chat Application</title>
-    <script type="text/javascript">
-        var socket;
-
-        function connect() {
-            socket = new WebSocket("ws://localhost:8080/ws/chat");
-
-            socket.onopen = function() {
-                console.log("Connected to WebSocket");
-            };
-
-            socket.onmessage = function(event) {
-                console.log("Message from server:", event.data);
-                var chat = document.getElementById('chat');
-                chat.value += event.data + '\n';
-            };
-
-            socket.onclose = function() {
-                console.log("Disconnected from WebSocket");
-            };
+    <title>Create Chat Room</title>
+    <style>
+        form {
+            width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
-
-        function sendMessage() {
-            var message = document.getElementById('message').value;
-            socket.send(message);
+        label, input, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
         }
-    </script>
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
-<body onload="connect()">
-    <h1>Chat Application</h1>
-    <textarea id="chat" rows="10" cols="50" readonly></textarea><br/>
-    <input type="text" id="message"/>
-    <button onclick="sendMessage()">Send</button>
+<body>
+    <h1 style="text-align: center;">채팅방 생성</h1>
+    <form action="/chat/create" method="post">
+        <label for="projectNum">프로젝트 번호:</label>
+        <input type="number" id="projectNum" name="projectNum" required>
+
+        <label for="chatroomName">채팅방 이름:</label>
+        <input type="text" id="chatroomName" name="chatroomName" required>
+
+        <button type="submit">채팅방 생성</button>
+    </form>
+
+    <a href="/chat">채팅방 목록으로 돌아가기</a>
 </body>
 </html>
