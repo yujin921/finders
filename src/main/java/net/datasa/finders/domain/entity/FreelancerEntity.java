@@ -46,7 +46,7 @@ public class FreelancerEntity {
 	@Column(name = "country", length = 100)
 	private String country;
 
-	@Column(name = "last_login", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-	private LocalDateTime lastLogin;
+	@Column(name = "updated_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+	private LocalDateTime updatedTime;
 
 }

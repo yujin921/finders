@@ -2,7 +2,6 @@ package net.datasa.finders.service;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.type.descriptor.java.LocalDateTimeJavaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,7 @@ public class MemberService {
     
     public MemberEntity join(MemberDTO dto) {
     	
-    	LocalDateTime now = LocalDateTime.now();
+    	LocalDateTime now = LocalDateTime.now();  // 회원가입 일시
     	
     	MemberEntity entity = MemberEntity.builder()
                 .memberId(dto.getMemberId())
@@ -52,6 +51,7 @@ public class MemberService {
                     .email(dto.getEmail())
                     .enabled(true) // Account enabled
                     .roleName(RoleName.ROLE_ADMIN) // Set role to ADMIN
+                    .createdTime(now)
                     .build();
         }
 
@@ -59,17 +59,24 @@ public class MemberService {
     }
     
     public void joinFreelancer(FreelancerDTO dto, MemberEntity member) {
+    	
+    	LocalDateTime now = LocalDateTime.now(); // 회원정보 수정 일시
+    	
     	FreelancerEntity freelancerEntity = FreelancerEntity.builder()
     			.freelancerId(member.getMemberId())
     			.freelancerPhone(dto.getFreelancerPhone())
     			.address(dto.getAddress())
     			.postalCode(dto.getPostalCode())
     			.country(dto.getCountry())
+    			.updatedTime(now)
     			.build();
     			freelancerRepository.save(freelancerEntity);
     }
     
     public void joinClient(ClientDTO dto, MemberEntity member) {
+    	
+    	LocalDateTime now = LocalDateTime.now(); // 회원정보 수정 일시
+    	
     	ClientEntity clientEntity = ClientEntity.builder()
     			.clientId(member.getMemberId())
     			.clientPhone(dto.getClientPhone())
@@ -78,6 +85,7 @@ public class MemberService {
     			.foundedDate(dto.getFoundedDate())
     			.employeeCount(dto.getEmployeeCount())
     			.website(dto.getWebsite())
+    			.updatedTime(now)
     			.build();
     			clientRepository.save(clientEntity);
     }

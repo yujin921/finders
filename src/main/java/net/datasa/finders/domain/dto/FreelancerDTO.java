@@ -21,7 +21,7 @@ public class FreelancerDTO {
 	String address;
 	String postalCode;
 	String country;
-	LocalDateTime lastLogin;
+	LocalDateTime updatedTime;
 	MemberEntity member;
 	
 }
