@@ -19,4 +19,10 @@ public class ProjectController {
 		
         return "/project/view";
     }
+	
+	@GetMapping("management")
+    public String management() {
+		
+        return "/project/management";
+    }
 }
