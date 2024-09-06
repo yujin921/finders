@@ -4,22 +4,87 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>finders</title>
+    <title>finders-client</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <!-- Font Awesome 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script th:src="@{/js/home.js}"></script>
 </head>
 <body>
-    <h1>[ Client ]</h1>
+    <header>
+        <div class="logo">
+        	<a href="/">
+        		<img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
+        	</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="검색...">
+            <button id="search-button"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="auth-buttons">
+            <th:block sec:authorize="not isAuthenticated()">
+            	<a th:href="@{/member/join}"><button>회원가입</button></a>
+            	<a th:href="@{/member/join1}"><button>회원가입</button></a>
+        		<a th:href="@{/member/login}"><button>로그인</button></a>
+    		</th:block>
 
-    <th:block sec:authorize="not isAuthenticated()">
-        <p><a th:href="@{/member/join}">회원가입</a></p>
-        <p><a th:href="@{/member/login}">로그인</a></p>
-    </th:block>
+    		<th:block sec:authorize="isAuthenticated()">
+        		<a th:href="@{/member/logout}"><button>로그아웃</button></a>
+        		<a th:href="@{/board/list}"><button>프로젝트 게시판</button></a>
+    		</th:block>
+        </div>
+    </header>
 
-    <th:block sec:authorize="isAuthenticated()">
-        <p><a th:href="@{/member/logout}">로그아웃</a></p>
-        <p><a th:href="@{/member/mypageClient}">마이페이지</a></p>
-        <p><a th:href="@{/board/view}">프로젝트 게시판</a></p>
-        <p><a th:href="@{/project/view}">프로젝트 관리</a></p>
-        
-    </th:block>
+    <!-- Navigation Menu -->
+    <nav>
+        <ul>
+            <li><a href="#">프로젝트 등록</a></li>
+            <li><a href="#">프로젝트 찾기</a></li>
+            <li><a href="#">파트너스 찾기</a></li>
+            <li><a href="#">이용 사례</a></li>
+            <li><a href="#">프로젝트 관리</a></li>
+            <li><a href="#">미팅룸</a></li>
+        </ul>
+    </nav>
+
+    <!-- Image Slider -->
+    <section class="slider">
+        <div class="slides">
+            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+1" alt="Slide 1"></div>
+            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+2" alt="Slide 2"></div>
+            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+3" alt="Slide 3"></div>
+            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+4" alt="Slide 4"></div>
+            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+5" alt="Slide 5"></div>
+        </div>
+        <button class="prev">‹</button>
+        <button class="next">›</button>
+    </section>
+
+    <!-- Featured Images -->
+    <section class="featured">
+        <div class="feature">
+            <img src="https://via.placeholder.com/300x200?text=Feature+1" alt="Feature 1">
+            <p>간단한 소개 1</p>
+        </div>
+        <div class="feature">
+            <img src="https://via.placeholder.com/300x200?text=Feature+2" alt="Feature 2">
+            <p>간단한 소개 2</p>
+        </div>
+        <div class="feature">
+            <img src="https://via.placeholder.com/300x200?text=Feature+3" alt="Feature 3">
+            <p>간단한 소개 3</p>
+        </div>
+        <div class="feature">
+            <img src="https://via.placeholder.com/300x200?text=Feature+4" alt="Feature 4">
+            <p>간단한 소개 4</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 회사 이름. All rights reserved.</p>
+        <p><a href="#">개인정보 처리방침</a> | <a href="#">이용 약관</a> | <a href="#">연락처</a></p>
+    </footer>
+    
 </body>
 </html>

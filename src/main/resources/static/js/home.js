@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const slides = Array.from(document.querySelectorAll('.slide'));
     const prevButton = document.querySelector('.prev');
     const nextButton = document.querySelector('.next');
+    const searchButton = document.querySelector('#search-button');
+    const searchInput = document.querySelector('#search-input');
 
     // 클론 생성
     slides.forEach(slide => {
@@ -76,6 +78,16 @@ document.addEventListener('DOMContentLoaded', () => {
         stopAutoSlide();
         showSlide(currentIndex - 1);
         startAutoSlide();
+    });
+
+    // 검색 버튼 클릭 시 동작
+    searchButton.addEventListener('click', () => {
+        const query = searchInput.value.trim();
+        if (query) {
+            console.log(`검색어: ${query}`);
+            // 검색 로직을 여기에 추가합니다. 예를 들어, 검색 페이지로 이동할 수 있습니다.
+            // window.location.href = `/search?query=${encodeURIComponent(query)}`;
+        }
     });
 
     // 시작 시 자동 슬라이드 변경
