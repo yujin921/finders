@@ -9,7 +9,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,16 +47,20 @@ public class BoardController {
     @PostMapping("write")
     public String write(
             @ModelAttribute BoardDTO boardDTO,
-            @RequestParam List<String> workScopes,  // 복수 카테고리 선택
-            @RequestParam List<String> skills,  // 복수 기술 선택
+            @RequestParam List<String> selectedWorkScopes,
+            @RequestParam List<String> selectedCategories,
+            @RequestParam("projectImageFile") MultipartFile projectImageFile, // 이미지 파일
+            @RequestParam("selectedSkills") String selectedSkills,  // 관련 기술
+            @RequestParam("projectDescription") String projectDescription,  // 상세 업무 내용
             @AuthenticationPrincipal AuthenticatedUser user) {
 
         // 작성한 글에 사용자 아이디 추가
         boardDTO.setClientId(user.getUsername());
-        log.debug("저장할 글 정보 : {}", boardDTO);
+        boardDTO.setSelectedSkills(Arrays.asList(selectedSkills.split(",")));  // 콤마로 구분된 기술 리스트로 변환
+        boardDTO.setProjectDescription(projectDescription);
 
-        // 서비스 호출: 프로젝트 제목 저장, 선택된 카테고리와 기술을 저장
-        boardService.write(boardDTO, workScopes, skills);
+        // BoardService 호출해서 프로젝트 및 관련 데이터 저장
+        boardService.write(boardDTO, selectedWorkScopes, selectedCategories, projectImageFile);
 
         return "redirect:view";
     }
