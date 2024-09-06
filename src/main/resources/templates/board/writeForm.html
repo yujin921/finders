@@ -359,16 +359,25 @@
                 .join('');
         }
 
-        document.querySelector('form').addEventListener('submit', function(event) {
-            // 선택된 기술을 hidden input에 저장
-            const selectedSkillsInput = document.getElementById('selectedSkills');
-            selectedSkillsInput.value = selectedTechs.join(',');
-        });
+        const checkFormInterval = setInterval(function() {
+            const form = document.querySelector('form');
+            if (form) {
+                // 폼에 이벤트 리스너 추가
+                form.addEventListener('submit', function(event) {
+                    const selectedSkillsInput = document.getElementById('selectedSkills');
+                    selectedSkillsInput.value = selectedTechs.join(',');
+                });
+                // 폼이 발견되면 더 이상 확인하지 않음
+                clearInterval(checkFormInterval);
+            }
+        }, 500);  // 0.5초마다 확인
 
         // 상세 업무 내용 글자 수 카운팅
         function countCharacters() {
             const detailTextarea = document.getElementById('detail-text');
             const charCount = document.getElementById('char-count');
+
+            console.log(detailTextarea, charCount);
 
             detailTextarea.addEventListener('input', function () {
                 const length = detailTextarea.value.length;
