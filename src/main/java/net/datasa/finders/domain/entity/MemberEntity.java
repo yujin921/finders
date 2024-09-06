@@ -1,15 +1,25 @@
 package net.datasa.finders.domain.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.springframework.data.annotation.CreatedDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Table(name = "member")
@@ -17,7 +27,6 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class MemberEntity {
 
     @Id
@@ -29,10 +38,6 @@ public class MemberEntity {
 
     @Column(name = "member_name", nullable = false, length = 100)
     private String memberName;
-
-    @Lob
-    @Column(name = "profile_img", columnDefinition = "MEDIUMTEXT")
-    private String profileImg;
 
     @Column(name = "email", nullable = false, length = 100)
     private String email;
@@ -48,12 +53,12 @@ public class MemberEntity {
     @Column(name = "created_time", columnDefinition = "timestamp default current_timestamp")
     private LocalDateTime createdTime;
 
-    // 다대다 관계 설정, 즉시 로딩으로 변경
+    // 프로젝트와의 다대다 관계 설정 (즉시 로딩으로 변경)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "team",  // 조인 테이블 이름
-            joinColumns = @JoinColumn(name = "member_id"),  // 멤버 측 조인
-            inverseJoinColumns = @JoinColumn(name = "project_num")  // 프로젝트 측 조인
+        name = "team",
+        joinColumns = @JoinColumn(name = "member_id"),
+        inverseJoinColumns = @JoinColumn(name = "project_num")
     )
-    private Set<ProjectEntity> projects;  // 멤버가 참여한 프로젝트 목록
+    private Set<ProjectEntity> projects = new HashSet<>();
 }

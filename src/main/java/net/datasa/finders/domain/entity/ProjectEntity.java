@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -25,6 +26,6 @@ public class ProjectEntity {
     private String projectName;
 
     // 멤버와의 다대다 관계 설정
-    @ManyToMany(mappedBy = "projects")  // MemberEntity의 projects 필드와 매핑
-    private Set<MemberEntity> members;  // 프로젝트에 참여한 멤버 목록
+    @ManyToMany(mappedBy = "projects")
+    private Set<MemberEntity> members = new HashSet<>();
 }
