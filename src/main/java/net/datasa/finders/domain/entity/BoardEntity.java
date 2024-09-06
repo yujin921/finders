@@ -34,24 +34,23 @@ public class BoardEntity {
     @Column(name = "project_title", length = 100, nullable = false)
     private String projectTitle;
 
-    @Column(name = "recruit_deadline", nullable = false)
+    @Column(name = "recruit_deadline")
     private LocalDateTime recruitDeadline;
 
-    @Column(name = "project_start_date", nullable = false)
+    @Column(name = "project_start_date")
     private LocalDateTime projectStartDate;
 
-    @Column(name = "project_end_date", nullable = false)
+    @Column(name = "project_end_date")
     private LocalDateTime projectEndDate;
 
-    @Column(name = "project_budget", nullable = false, precision = 10, scale = 2)
+    @Column(name = "project_budget", precision = 10, scale = 2)
     private BigDecimal projectBudget;
 
-    @Column(name = "project_description", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "project_description", columnDefinition = "TEXT")
     private String projectDescription;
 
-    @Column(name = "project_image", length = 255)
+    @Column(name = "project_image", columnDefinition = "MEDIUMTEXT")
     private String projectImage;
-    
 
     @Column(name = "project_status", columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean projectStatus;

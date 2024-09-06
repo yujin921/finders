@@ -15,11 +15,11 @@ import lombok.NoArgsConstructor;
 public class Board_CategoryEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "project_num")
-    int projectNum;
+    @Column(name = "category_num")
+    Integer categoryNum;
 
     @ManyToOne
-    @JoinColumn(name = "project_num", referencedColumnName = "project_num", insertable = false, updatable = false)
+    @JoinColumn(name = "project_num", referencedColumnName = "project_num")
     BoardEntity boardEntity;
 
     @Column(name = "category", nullable = false)

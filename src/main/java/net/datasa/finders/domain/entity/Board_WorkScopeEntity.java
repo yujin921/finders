@@ -15,15 +15,15 @@ import lombok.NoArgsConstructor;
 public class Board_WorkScopeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "project_num")
-    int projectNum;
+    @Column(name = "work_scope_num")
+    Integer workScopeNum;
 
     @ManyToOne
-    @JoinColumn(name = "project_num", referencedColumnName = "project_num", insertable = false, updatable = false)
+    @JoinColumn(name = "project_num", referencedColumnName = "project_num")
     BoardEntity boardEntity;
 
     @Column(name = "work_type", nullable = false)
-    String category;
+    String workType;
 
     @Column(name = "required_num", nullable = false)
     int requiredNum;
