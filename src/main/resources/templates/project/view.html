@@ -65,7 +65,7 @@
     <div class="container">
         <h1>프로젝트 관리</h1>
         <!-- 서버에서 실제 프로젝트 번호를 설정 -->
-        <input type="hidden" id="projectNum" value="1"> <!-- 실제 프로젝트 번호를 서버에서 받아오도록 수정 -->
+        <input type="hidden" id="projectNum" th:value="${projectNum}"> <!-- 서버에서 프로젝트 번호를 전달 -->
         <!-- 채팅방 입장 버튼 -->
         <button class="button" onclick="enterChatRoom()">채팅방 입장</button>
     </div>
