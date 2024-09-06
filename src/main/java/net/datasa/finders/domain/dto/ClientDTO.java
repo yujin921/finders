@@ -23,6 +23,5 @@ public class ClientDTO {
 	LocalDate foundedDate;
 	Integer employeeCount;
 	String website;
-	LocalDateTime updatedTime;
 	MemberEntity member;
 }
