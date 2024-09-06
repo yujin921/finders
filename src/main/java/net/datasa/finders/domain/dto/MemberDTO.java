@@ -21,4 +21,6 @@ public class MemberDTO {
     boolean enabled;
     RoleName roleName;
     LocalDateTime createdTime;
+    
+    
 }

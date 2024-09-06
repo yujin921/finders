@@ -41,6 +41,10 @@ public class MemberEntity {
 
     @Column(name = "email", nullable = false, length = 100)
     private String email;
+    
+    @Column(name = "profile_img", columnDefinition = "mediumtext")
+    private String profileImg;
+
 
     @Column(name = "enabled", nullable = false, columnDefinition = "tinyint(1) default 0")
     private boolean enabled;
