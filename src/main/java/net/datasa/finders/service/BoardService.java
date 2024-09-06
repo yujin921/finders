@@ -5,18 +5,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.BoardDTO;
-import net.datasa.finders.domain.entity.BoardEntity;
-import net.datasa.finders.domain.entity.Board_SkillEntity;
-import net.datasa.finders.domain.entity.Board_WorkScopeEntity;
-import net.datasa.finders.domain.entity.MemberEntity;
-import net.datasa.finders.repository.BoardRepository;
-import net.datasa.finders.repository.Board_SkillRepository;
-import net.datasa.finders.repository.Board_WorkScopeRepository;
-import net.datasa.finders.repository.MemberRepository;
+import net.datasa.finders.domain.entity.*;
+import net.datasa.finders.repository.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -27,48 +24,72 @@ import java.util.List;
 @Service
 @Transactional
 public class BoardService {
+    private final BoardRepository boardRepository;
+    private final MemberRepository memberRepository;
+    private final Board_WorkScopeRepository workScopeRepository;
+    private final Board_CategoryRepository categoryRepository;
+    private final Board_SkillRepository skillRepository;
 
-    private final Board_WorkScopeRepository boardWorkScopeRepository;
-    private final Board_SkillRepository boardSkillRepository;
-	private final BoardRepository boardRepository;
-	private final MemberRepository memberRepository;
-
-    public void write(BoardDTO boardDTO, List<String> workScopes, List<String> skills) {
+    public void write(BoardDTO boardDTO, List<String> selectedWorkScopes, List<String> selectedCategories, MultipartFile imageFile) {
         MemberEntity memberEntity = memberRepository.findById(boardDTO.getClientId())
-                .orElseThrow(() -> new EntityNotFoundException("회원아이디가 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("회원 아이디가 없습니다."));
 
-        BoardEntity boardEntity = new BoardEntity();
-        boardEntity.setClientId(memberEntity);
-        boardEntity.setProjectTitle(boardDTO.getProjectTitle());
-        boardEntity.setRecruitDeadline(boardDTO.getRecruitDeadline());
-        boardEntity.setProjectStartDate(boardDTO.getProjectStartDate());
-        boardEntity.setProjectEndDate(boardDTO.getProjectEndDate());
-        boardEntity.setProjectBudget(boardDTO.getProjectBudget());
-        boardEntity.setProjectDescription(boardDTO.getProjectDescription());
-        boardEntity.setProjectImage(boardDTO.getProjectImage());
-        boardEntity.setProjectStatus(boardDTO.getProjectStatus());
+        // 이미지 Base64 인코딩 처리
+        String imageBase64 = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imageBase64 = convertToBase64(imageFile);  // Base64로 변환된 이미지 저장
+        }
 
-        log.debug("저장되는 엔티티 : {}", boardEntity);
+        // BoardEntity 생성 후 저장
+        BoardEntity boardEntity = BoardEntity.builder()
+                .clientId(memberEntity)
+                .projectTitle(boardDTO.getProjectTitle())
+                .recruitDeadline(boardDTO.getRecruitDeadline())
+                .projectStartDate(boardDTO.getProjectStartDate())
+                .projectEndDate(boardDTO.getProjectEndDate())
+                .projectBudget(boardDTO.getProjectBudget())
+                .projectDescription(boardDTO.getProjectDescription())
+                .projectImage(imageBase64) // Base64로 변환된 이미지 저장
+                .build();
         boardRepository.save(boardEntity);
 
-        // Board_Work_ScopeEntity로 선택된 카테고리 저장
-        for (String workScope : workScopes) {
-            Board_WorkScopeEntity workScopeEntity = new Board_WorkScopeEntity();
-            workScopeEntity.setBoardEntity(boardEntity);  // FK 연결
-            workScopeEntity.setCategory(workScope);
-            workScopeEntity.setRequiredNum(0);  // 필요 인원 설정, 필요시 수정 가능
-            boardWorkScopeRepository.save(workScopeEntity);
+        // 업무 범위 저장 로직
+        for (String workScope : boardDTO.getSelectedWorkScopes()) {
+            Board_WorkScopeEntity workScopeEntity = Board_WorkScopeEntity.builder()
+                    .boardEntity(boardEntity)
+                    .workType(workScope)
+                    .build();
+            workScopeRepository.save(workScopeEntity);
         }
 
-        // Board_SkillEntity로 선택된 기술 저장
-        for (String skill : skills) {
-            Board_SkillEntity skillEntity = new Board_SkillEntity();
-            skillEntity.setBoardEntity(boardEntity);  // FK 연결
-            skillEntity.setSkillText(skill);
-            boardSkillRepository.save(skillEntity);
+        // 카테고리 저장 로직
+        for (String category : boardDTO.getSelectedCategories()) {
+            Board_CategoryEntity categoryEntity = Board_CategoryEntity.builder()
+                    .boardEntity(boardEntity)
+                    .category(category)
+                    .build();
+            categoryRepository.save(categoryEntity);
+        }
+
+        // 관련 기술 저장 로직
+        for (String skill : boardDTO.getSelectedSkills()) {
+            Board_SkillEntity skillEntity = Board_SkillEntity.builder()
+                    .boardEntity(boardEntity)
+                    .skillText(skill)
+                    .build();
+            skillRepository.save(skillEntity);
         }
     }
-	
+
+    // Base64 변환 유틸리티 메서드
+    private String convertToBase64(MultipartFile file) {
+        try {
+            byte[] fileContent = file.getBytes(); // MultipartFile을 바이트 배열로 변환
+            return Base64.getEncoder().encodeToString(fileContent); // Base64로 인코딩
+        } catch (IOException e) {
+            throw new RuntimeException("파일을 Base64로 변환하는 데 실패했습니다.", e);
+        }
+    }
 	
     public List<BoardDTO> getList(String id) {
         
@@ -116,9 +137,9 @@ public class BoardService {
                 .projectEndDate(entity.getProjectEndDate())
                 .projectBudget(entity.getProjectBudget())
                 .projectDescription(entity.getProjectDescription())
-                .projectImage(entity.getProjectImage())
+                .projectImage(entity.getProjectImage())  // 조회 시 Base64로 저장된 이미지 데이터
                 .projectStatus(entity.getProjectStatus())
-            .build();
+                .build();
     }
 
     /*
@@ -138,8 +159,6 @@ public class BoardService {
 
         return dto;
     }
-
-
 
     public void deleteBoard(int pNum) {
         boardRepository.deleteById(pNum);
