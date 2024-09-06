@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트 관리 페이지</title>
+    <link rel="stylesheet" th:href="@{/css/management.css}">
+</head>
+<body>
+    <div class="container">
+        <!-- 사이드 바 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <a href="/">
+        			<img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
+        		</a>
+            </div>
+            <button class="btn-create-project">새 프로젝트 생성</button>
+            <nav>
+                <ul>
+                    <li><a href="#">내 프로젝트 조회</a></li>
+                    <li><a href="#">대시보드</a></li>
+                    <li><a href="#">전체 업무</a></li>
+                    <li><a href="#">간트차트</a></li>
+                    <li><a href="#">캘린더</a></li>
+                    <li><a href="#">임시저장</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <!-- 메인 화면 -->
+        <main class="main-content">
+            <header>
+                <div class="profile">
+                    <img src="profile.png" alt="프로필 이미지">
+                </div>
+                <h1>제목</h1>
+            </header>
+            <nav class="menu-tabs">
+                <a href="#">업무</a>
+                <a href="#">피드</a>
+                <a href="#">간트차트</a>
+                <a href="#">캘린더</a>
+            </nav>
+            <section class="content">
+                <ul class="example-list">
+                    <li>예시 항목 1</li>
+                    <li>예시 항목 2</li>
+                    <li>예시 항목 3</li>
+                    <li>예시 항목 4</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

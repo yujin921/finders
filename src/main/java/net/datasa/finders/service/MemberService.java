@@ -1,5 +1,8 @@
 package net.datasa.finders.service;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.type.descriptor.java.LocalDateTimeJavaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +30,9 @@ public class MemberService {
     private final ClientRepository clientRepository;
     
     public MemberEntity join(MemberDTO dto) {
-
+    	
+    	LocalDateTime now = LocalDateTime.now();
+    	
     	MemberEntity entity = MemberEntity.builder()
                 .memberId(dto.getMemberId())
                 .memberPw(passwordEncoder.encode(dto.getMemberPw()))        // Encrypt password
@@ -35,6 +40,7 @@ public class MemberService {
                 .email(dto.getEmail())
                 .enabled(true) // Account enabled
                 .roleName(dto.getRoleName()) // Set role from DTO
+                .createdTime(now)
                 .build();
         
         // Special handling for admin account
