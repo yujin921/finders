@@ -6,6 +6,9 @@
     <title>프로젝트 관리 페이지</title>
     <!-- FullCalendar 스타일 시트 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css">
+    <!-- AnyChart 스타일 시트 -->
+    <link rel="stylesheet" href="https://cdn.anychart.com/releases/8.11.0/css/anychart-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.anychart.com/releases/8.11.0/fonts/css/anychart-font.min.css"/>
     <!-- Custom 스타일 시트 -->
     <link rel="stylesheet" href="/css/management.css">
 </head>
@@ -24,7 +27,7 @@
                     <li><a href="#">내 프로젝트 조회</a></li>
                     <li><a href="#">대시보드</a></li>
                     <li><a href="#">전체 업무</a></li>
-                    <li><a href="#">간트차트</a></li>
+                    <li><a href="#" id="gantt-tab">간트차트</a></li>
                     <li><a href="#" id="calendar-tab">캘린더</a></li>
                     <li><a href="#">임시저장</a></li>
                 </ul>
@@ -47,7 +50,9 @@
             <section class="content">
                 <div id="task-content" class="tab-content">업무 내용</div>
                 <div id="feed-content" class="tab-content">피드 내용</div>
-                <div id="gantt-content" class="tab-content">간트차트 내용</div>
+                <div id="gantt-content" class="tab-content">
+                    <div id="gantt-chart" style="height: 600px;"></div>
+                </div>
                 <div id="calendar-content" class="tab-content calendar-content">
                     <div id="calendar"></div>
                 </div>
@@ -56,6 +61,9 @@
     </div>
     <!-- FullCalendar 스크립트 파일 -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <!-- AnyChart 스크립트 파일 -->
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-gantt.min.js"></script>
     <!-- Custom 스크립트 파일 -->
     <script src="/js/management.js" defer></script>
 </body>
