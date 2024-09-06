@@ -41,6 +41,10 @@ public class MemberEntity {
 
     @Column(name = "email", nullable = false, length = 100)
     private String email;
+    
+    @Column(name = "profile_img", columnDefinition = "mediumtext")
+    private String profileImg;
+
 
     @Column(name = "enabled", nullable = false, columnDefinition = "tinyint(1) default 0")
     private boolean enabled;
@@ -52,6 +56,9 @@ public class MemberEntity {
     @CreatedDate
     @Column(name = "created_time", columnDefinition = "timestamp default current_timestamp")
     private LocalDateTime createdTime;
+    
+    @Column(name = "updated_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+	private LocalDateTime updatedTime;
 
     // 프로젝트와의 다대다 관계 설정 (즉시 로딩으로 변경)
     @ManyToMany(fetch = FetchType.EAGER)

@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "CHAT_ROOM")
 @Data
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor // 기본 생성자를 추가하여 Hibernate에서 엔티티를 생성할 수 있도록 합니다.
 public class ChatRoomEntity {
 

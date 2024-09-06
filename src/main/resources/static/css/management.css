@@ -81,21 +81,17 @@ h1 {
     font-weight: bold;
 }
 
-.content {
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.calendar-content {
     background-color: #f4f4f4;
     padding: 20px;
     border-radius: 5px;
-}
-
-.example-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.example-list li {
-    background-color: #fff;
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    min-height: 500px; /* 캘린더의 최소 높이 설정 */
 }

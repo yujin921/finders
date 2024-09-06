@@ -37,6 +37,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     
+    //Webflux 카카오
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    
     // WebSocket support 웹소켓
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }

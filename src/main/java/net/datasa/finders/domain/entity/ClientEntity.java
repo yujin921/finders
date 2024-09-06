@@ -46,6 +46,4 @@ public class ClientEntity {
     @Column(name = "website", length = 255)
     private String website;
 
-    @Column(name = "updated_time", nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private LocalDateTime updatedTime;
 }
