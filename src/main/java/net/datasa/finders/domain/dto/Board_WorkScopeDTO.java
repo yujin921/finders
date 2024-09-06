@@ -11,7 +11,6 @@ import net.datasa.finders.domain.entity.BoardEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Board_WorkScopeDTO {
-    private Integer projectNum;
     BoardEntity boardEntity;
     private String  workType;
     private Integer requiredNum;
