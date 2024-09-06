@@ -10,9 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 판매글 DTO
- */
 @Builder
 @Data
 @NoArgsConstructor

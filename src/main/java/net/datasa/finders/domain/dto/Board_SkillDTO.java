@@ -11,6 +11,7 @@ import net.datasa.finders.domain.entity.BoardEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Board_SkillDTO {
+	private int skillNum;
     BoardEntity boardEntity;
     private String skillText;
 }

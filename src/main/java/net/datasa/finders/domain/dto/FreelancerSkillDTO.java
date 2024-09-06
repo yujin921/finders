@@ -1,18 +1,17 @@
 package net.datasa.finders.domain.dto;
 
-import java.sql.Timestamp;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.datasa.finders.domain.entity.MemberEntity;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRoomDTO {
-    private int chatroomId;
-    private String chatroomName;
-    private Timestamp createdTime;
+public class FreelancerSkillDTO {
+	private int skillNum;
+    MemberEntity memberEntity;
+    private String skillText;
 }

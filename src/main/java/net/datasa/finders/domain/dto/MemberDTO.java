@@ -22,5 +22,4 @@ public class MemberDTO {
     RoleName roleName;
     LocalDateTime createdTime;
     LocalDateTime updatedTime;
-
 }

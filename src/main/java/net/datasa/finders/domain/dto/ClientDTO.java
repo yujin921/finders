@@ -1,7 +1,6 @@
 package net.datasa.finders.domain.dto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +12,6 @@ import net.datasa.finders.domain.entity.MemberEntity;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class ClientDTO {
 
 	String clientId;
