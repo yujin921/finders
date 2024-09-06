@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,4 +47,32 @@ public class ChatRoomController {
         chatRoomService.createChatRoomsForAllMemberProjects(memberId);
         return ResponseEntity.ok("채팅방이 성공적으로 생성되었습니다.");
     }
+
+    @GetMapping("/room")
+    public String getChatRoom(@RequestParam("id") int chatroomId, Model model) {
+        System.out.println("Requested chatroom ID: " + chatroomId); // 로그 출력
+        ChatRoomEntity chatRoom = chatRoomService.getChatRoomById(chatroomId);
+        if (chatRoom != null) {
+            String currentUserId = getCurrentUserId();
+            model.addAttribute("chatroomName", chatRoom.getChatroomName());
+            model.addAttribute("chatroomId", chatroomId);
+            model.addAttribute("currentUserId", currentUserId);
+            return "chat/chatroom"; // chatroom.html로 이동
+        } else {
+            return "error"; // 채팅방이 존재하지 않는 경우 에러 페이지로 이동
+        }
+    }
+
+
+    // 현재 로그인한 사용자의 ID를 반환하는 메서드
+    private String getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
+            org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+            return user.getUsername(); // 사용자 ID를 반환
+        }
+        return "unknown"; // 로그인하지 않은 경우
+    }
+    
+    
 }

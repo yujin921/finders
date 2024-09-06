@@ -16,5 +16,5 @@ public class ChatMessageDTO {
     private int chatroomId;      // 채팅방 ID
     private String senderId;    // 발신자 ID
     private String messageContent; // 메시지 내용
-    private Timestamp sentTime; // 메시지 전송 시간
+    private Timestamp sendTime; // 메시지 전송 시간
 }

@@ -27,6 +27,13 @@
         th {
             background-color: #f4f4f4;
         }
+        a {
+            text-decoration: none;
+            color: #333;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -44,7 +51,10 @@
             <tr th:each="chatroom : ${chatrooms}">
                 <td th:text="${chatroom.chatroomId}"></td>
                 <td th:text="${chatroom.projectNum}"></td>
-                <td th:text="${chatroom.chatroomName}"></td>
+                <td>
+                    <a th:href="@{/chat/room(id=${chatroom.chatroomId})}" 
+                       th:text="${chatroom.chatroomName}"></a>
+                </td>
                 <td th:text="${chatroom.createdTime}"></td>
             </tr>
         </tbody>

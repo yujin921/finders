@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.datasa.finders.domain.dto.ChatMessageDTO;
+import net.datasa.finders.domain.entity.ChatMessageEntity;
 import net.datasa.finders.domain.entity.ChatParticipantEntity;
 import net.datasa.finders.domain.entity.ChatRoomEntity;
 import net.datasa.finders.domain.entity.TeamEntity;
+import net.datasa.finders.repository.ChatMessageRepository;
 import net.datasa.finders.repository.ChatParticipantRepository;
 import net.datasa.finders.repository.ChatRoomRepository;
 import net.datasa.finders.repository.TeamRepository;
@@ -19,19 +22,22 @@ import net.datasa.finders.repository.TeamRepository;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final ChatParticipantRepository chatParticipantEntityRepository;
+    private final ChatParticipantRepository chatParticipantRepository;
     private final TeamRepository teamRepository;
+    private final ChatMessageService chatMessageService;
 
     @Autowired
     public ChatRoomService(ChatRoomRepository chatRoomRepository, 
-                           ChatParticipantRepository chatParticipantEntityRepository,
-                           TeamRepository teamRepository) {
+                           ChatParticipantRepository chatParticipantRepository,
+                           TeamRepository teamRepository,
+                           ChatMessageService chatMessageService) {
         this.chatRoomRepository = chatRoomRepository;
-        this.chatParticipantEntityRepository = chatParticipantEntityRepository;
+        this.chatParticipantRepository = chatParticipantRepository;
         this.teamRepository = teamRepository;
+        this.chatMessageService = chatMessageService;
     }
 
-    // 모든 채팅방 조회 메서드 추가
+    // 모든 채팅방 조회 메서드
     public List<ChatRoomEntity> getAllChatRooms() {
         return chatRoomRepository.findAll();
     }
@@ -64,9 +70,26 @@ public class ChatRoomService {
                             .participantId(member.getMemberId())
                             .joinedTime(LocalDateTime.now())
                             .build();
-                    chatParticipantEntityRepository.save(participant);
+                    chatParticipantRepository.save(participant);
                 }
             }
         }
     }
+
+    // 메시지 저장 메서드 (ChatMessageService로 위임)
+    @Transactional
+    public void saveMessage(ChatMessageDTO chatMessageDTO) {
+        chatMessageService.saveMessage(chatMessageDTO);
+    }
+
+    // 특정 채팅방의 모든 메시지 조회 (ChatMessageService로 위임)
+    public List<ChatMessageDTO> getMessagesForChatRoom(int chatroomId) {
+        return chatMessageService.getAllMessagesForChatroom(chatroomId);
+    }
+
+    // 채팅방 ID로 채팅방 정보 조회
+    public ChatRoomEntity getChatRoomById(int chatroomId) {
+        return chatRoomRepository.findById(chatroomId).orElse(null);
+    }
 }
+

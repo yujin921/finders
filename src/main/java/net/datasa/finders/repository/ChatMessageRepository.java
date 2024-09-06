@@ -9,7 +9,5 @@ import net.datasa.finders.domain.entity.ChatMessageEntity;
 
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, Integer> {
-    
-    // 특정 채팅방의 모든 메시지 조회
-    List<ChatMessageEntity> findByChatroomId(int chatroomId);
+    List<ChatMessageEntity> findAllByChatroomId(int chatroomId);
 }

@@ -1,11 +1,11 @@
 package net.datasa.finders.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import net.datasa.finders.domain.dto.ChatMessageDTO;
 import net.datasa.finders.domain.entity.ChatMessageEntity;
@@ -21,41 +21,30 @@ public class ChatMessageService {
         this.chatMessageRepository = chatMessageRepository;
     }
 
-    // Create or Update a ChatMessage
-    public ChatMessageDTO saveChatMessage(ChatMessageDTO chatMessageDTO) {
-        ChatMessageEntity entity = ChatMessageEntity.builder()
-                .chatroomId(chatMessageDTO.getChatroomId())
-                .messageId(chatMessageDTO.getMessageId())
-                .senderId(chatMessageDTO.getSenderId())
-                .messageContents(chatMessageDTO.getMessageContent()) // DTO와 Entity 필드 이름 일치
-                .sendTime(chatMessageDTO.getSentTime()) // DTO와 Entity 필드 이름 일치
-                .build();
-        ChatMessageEntity savedEntity = chatMessageRepository.save(entity);
-        return toDTO(savedEntity);
-    }
-
-    // Retrieve a ChatMessage by ID
-    public ChatMessageDTO getChatMessage(int messageId) {
-        Optional<ChatMessageEntity> entity = chatMessageRepository.findById(messageId);
-        return entity.map(this::toDTO).orElse(null);
-    }
-
-    // Retrieve all messages for a specific chatroom
+    // 특정 채팅방의 모든 메시지 조회
     public List<ChatMessageDTO> getAllMessagesForChatroom(int chatroomId) {
-        List<ChatMessageEntity> entities = chatMessageRepository.findByChatroomId(chatroomId);
+        List<ChatMessageEntity> entities = chatMessageRepository.findAllByChatroomId(chatroomId);
         return entities.stream()
-                .map(this::toDTO)
+                .map(entity -> ChatMessageDTO.builder()
+                        .messageId(entity.getMessageId())
+                        .chatroomId(entity.getChatroomId())
+                        .senderId(entity.getSenderId())
+                        .messageContent(entity.getMessageContents())
+                        .sendTime(entity.getSendTime()) // 필드 이름을 `sendTime`으로 변경
+                        .build())
                 .collect(Collectors.toList());
     }
 
-    // Convert Entity to DTO
-    private ChatMessageDTO toDTO(ChatMessageEntity entity) {
-        return ChatMessageDTO.builder()
-                .chatroomId(entity.getChatroomId())
-                .messageId(entity.getMessageId())
-                .senderId(entity.getSenderId())
-                .messageContent(entity.getMessageContents()) // DTO와 Entity 필드 이름 일치
-                .sentTime(entity.getSendTime()) // DTO와 Entity 필드 이름 일치
+    // 메시지 저장 메서드
+    @Transactional
+    public void saveMessage(ChatMessageDTO chatMessageDTO) {
+        ChatMessageEntity chatMessage = ChatMessageEntity.builder()
+                .chatroomId(chatMessageDTO.getChatroomId())
+                .senderId(chatMessageDTO.getSenderId())
+                .messageContents(chatMessageDTO.getMessageContent()) // 필드 이름을 `messageContent`로 변경
+                .sendTime(chatMessageDTO.getSendTime()) // 필드 이름을 `sendTime`으로 변경
                 .build();
+        chatMessageRepository.save(chatMessage);
     }
 }
+

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>채팅방</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .message p {
+            margin: 0;
+        }
+        .message .sender {
+            font-weight: bold;
+        }
+        .message .timestamp {
+            color: #888;
+            font-size: 0.9em;
+        }
+        .message-input {
+            display: flex;
+        }
+        .message-input input {
+            flex: 1;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .message-input button {
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .message-input button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <!-- STOMP and SockJS libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@6.0.0/dist/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.2/dist/sockjs.min.js"></script>
+</head>
+<body>
+    <h1 th:text="'채팅방 - ' + ${chatroomName}"></h1>
+    <div class="chat-container">
+        <div id="messages" class="messages">
+            <!-- Messages will be dynamically added here -->
+        </div>
+        <div class="message-input">
+            <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." />
+            <button id="sendMessageButton">전송</button>
+        </div>
+    </div>
+
+    <script>
+        var chatroomId = "${chatroomId}";
+        var currentUserId = "${currentUserId}";
+
+        var socket = new SockJS('/ws/chat');
+        var stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/messages/' + chatroomId, function (message) {
+                var messageData = JSON.parse(message.body);
+                displayMessage(messageData);
+            });
+        });
+
+        document.getElementById('sendMessageButton').addEventListener('click', function () {
+            var messageInput = document.getElementById('messageInput');
+            var messageContent = messageInput.value;
+
+            if (messageContent.trim() !== '') {
+                stompClient.send('/app/send', {}, JSON.stringify({
+                    chatroomId: chatroomId,
+                    senderId: currentUserId,
+                    messageContents: messageContent,
+                    sendTime: new Date().toISOString()
+                }));
+                messageInput.value = '';
+            }
+        });
+
+        function displayMessage(message) {
+            var messageContainer = document.getElementById('messages');
+            var messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = '<p class="sender">' + message.senderId + '</p>' +
+                '<p>' + message.messageContents + '</p>' +
+                '<p class="timestamp">' + new Date(message.sendTime).toLocaleString() + '</p>';
+            messageContainer.appendChild(messageElement);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>

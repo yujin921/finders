@@ -1,17 +1,16 @@
 package net.datasa.finders.repository;
 
-import net.datasa.finders.domain.entity.ChatRoomEntity;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import net.datasa.finders.domain.entity.ChatRoomEntity;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoomEntity, Integer> {
+    boolean existsByProjectNum(int projectNum);
 
-    // 특정 프로젝트 번호에 해당하는 채팅방이 존재하는지 확인하는 메서드
-    boolean existsByProjectNum(Integer projectNum);
-
-    // chatroom_id 목록을 통해 채팅방 정보 조회
-    List<ChatRoomEntity> findByChatroomIdIn(List<Integer> chatroomIds);
+    // 채팅방 ID로 채팅방 조회
+    Optional<ChatRoomEntity> findById(int chatroomId);
 }
