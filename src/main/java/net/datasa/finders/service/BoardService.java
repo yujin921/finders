@@ -6,8 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.BoardDTO;
 import net.datasa.finders.domain.entity.BoardEntity;
+import net.datasa.finders.domain.entity.Board_SkillEntity;
+import net.datasa.finders.domain.entity.Board_WorkScopeEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.repository.BoardRepository;
+import net.datasa.finders.repository.Board_SkillRepository;
+import net.datasa.finders.repository.Board_WorkScopeRepository;
 import net.datasa.finders.repository.MemberRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -24,26 +28,45 @@ import java.util.List;
 @Transactional
 public class BoardService {
 
+    private final Board_WorkScopeRepository boardWorkScopeRepository;
+    private final Board_SkillRepository boardSkillRepository;
 	private final BoardRepository boardRepository;
 	private final MemberRepository memberRepository;
-	
-	public void write(BoardDTO boardDTO) {
+
+    public void write(BoardDTO boardDTO, List<String> workScopes, List<String> skills) {
         MemberEntity memberEntity = memberRepository.findById(boardDTO.getClientId())
                 .orElseThrow(() -> new EntityNotFoundException("회원아이디가 없습니다."));
 
-        BoardEntity entity = new BoardEntity();
-        entity.setClientId(memberEntity);
-        entity.setProjectTitle(boardDTO.getProjectTitle());
-        entity.setRecruitDeadline(boardDTO.getRecruitDeadline());
-        entity.setProjectStartDate(boardDTO.getProjectStartDate());
-        entity.setProjectEndDate(boardDTO.getProjectEndDate());
-        entity.setProjectBudget(boardDTO.getProjectBudget());
-        entity.setProjectDescription(boardDTO.getProjectDescription());
-        entity.setProjectImage(boardDTO.getProjectImage());
-        entity.setProjectStatus(boardDTO.getProjectStatus());
-        
-        log.debug("저장되는 엔티티 : {}", entity);
-        boardRepository.save(entity);
+        BoardEntity boardEntity = new BoardEntity();
+        boardEntity.setClientId(memberEntity);
+        boardEntity.setProjectTitle(boardDTO.getProjectTitle());
+        boardEntity.setRecruitDeadline(boardDTO.getRecruitDeadline());
+        boardEntity.setProjectStartDate(boardDTO.getProjectStartDate());
+        boardEntity.setProjectEndDate(boardDTO.getProjectEndDate());
+        boardEntity.setProjectBudget(boardDTO.getProjectBudget());
+        boardEntity.setProjectDescription(boardDTO.getProjectDescription());
+        boardEntity.setProjectImage(boardDTO.getProjectImage());
+        boardEntity.setProjectStatus(boardDTO.getProjectStatus());
+
+        log.debug("저장되는 엔티티 : {}", boardEntity);
+        boardRepository.save(boardEntity);
+
+        // Board_Work_ScopeEntity로 선택된 카테고리 저장
+        for (String workScope : workScopes) {
+            Board_WorkScopeEntity workScopeEntity = new Board_WorkScopeEntity();
+            workScopeEntity.setBoardEntity(boardEntity);  // FK 연결
+            workScopeEntity.setCategory(workScope);
+            workScopeEntity.setRequiredNum(0);  // 필요 인원 설정, 필요시 수정 가능
+            boardWorkScopeRepository.save(workScopeEntity);
+        }
+
+        // Board_SkillEntity로 선택된 기술 저장
+        for (String skill : skills) {
+            Board_SkillEntity skillEntity = new Board_SkillEntity();
+            skillEntity.setBoardEntity(boardEntity);  // FK 연결
+            skillEntity.setSkillText(skill);
+            boardSkillRepository.save(skillEntity);
+        }
     }
 	
 	

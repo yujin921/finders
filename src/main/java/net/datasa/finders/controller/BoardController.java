@@ -42,16 +42,20 @@ public class BoardController {
         return list;
     }
 
-	@PostMapping("write")
+    @PostMapping("write")
     public String write(
-            @ModelAttribute BoardDTO boardDTO
-            , @AuthenticationPrincipal AuthenticatedUser user) {
+            @ModelAttribute BoardDTO boardDTO,
+            @RequestParam List<String> workScopes,  // 복수 카테고리 선택
+            @RequestParam List<String> skills,  // 복수 기술 선택
+            @AuthenticationPrincipal AuthenticatedUser user) {
 
-        //작성한 글에 사용자 아이디 추가
+        // 작성한 글에 사용자 아이디 추가
         boardDTO.setClientId(user.getUsername());
         log.debug("저장할 글 정보 : {}", boardDTO);
-        
-        boardService.write(boardDTO);
+
+        // 서비스 호출: 프로젝트 제목 저장, 선택된 카테고리와 기술을 저장
+        boardService.write(boardDTO, workScopes, skills);
+
         return "redirect:view";
     }
 
