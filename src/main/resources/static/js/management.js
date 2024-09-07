@@ -74,14 +74,14 @@ document.addEventListener('DOMContentLoaded', function() {
             anychart.data.loadJsonFile(
                 'https://cdn.anychart.com/samples/gantt-charts/activity-oriented-chart/data.json',
                 function (data) {
-                    var treeData = anychart.data.tree(data, 'as-table');
+                    let treeData = anychart.data.tree(data, 'as-table');
 
-                    var chart = anychart.ganttProject();
+                    let chart = anychart.ganttProject();
                     chart.data(treeData);
 
                     chart.splitterPosition(370);
 
-                    var dataGrid = chart.dataGrid();
+                    let dataGrid = chart.dataGrid();
 
                     dataGrid.column(0)
                         .title('#')
@@ -96,11 +96,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         .labels()
                         .hAlign('right')
                         .format(function () {
-                            var date = new Date(this.actualStart);
-                            var month = date.getUTCMonth() + 1;
-                            var strMonth = month > 9 ? month : '0' + month;
-                            var utcDate = date.getUTCDate();
-                            var strDate = utcDate > 9 ? utcDate : '0' + utcDate;
+                            let date = new Date(this.actualStart);
+                            let month = date.getUTCMonth() + 1;
+                            let strMonth = month > 9 ? month : '0' + month;
+                            let utcDate = date.getUTCDate();
+                            let strDate = utcDate > 9 ? utcDate : '0' + utcDate;
                             return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
                         });
 
@@ -110,11 +110,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         .labels()
                         .hAlign('right')
                         .format(function () {
-                            var date = new Date(this.actualEnd);
-                            var month = date.getUTCMonth() + 1;
-                            var strMonth = month > 9 ? month : '0' + month;
-                            var utcDate = date.getUTCDate();
-                            var strDate = utcDate > 9 ? utcDate : '0' + utcDate;
+                            let date = new Date(this.actualEnd);
+                            let month = date.getUTCMonth() + 1;
+                            let strMonth = month > 9 ? month : '0' + month;
+                            let utcDate = date.getUTCDate();
+                            let strDate = utcDate > 9 ? utcDate : '0' + utcDate;
                             return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
                         });
 
