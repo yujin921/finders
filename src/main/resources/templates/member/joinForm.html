@@ -5,6 +5,8 @@
     <title>회원가입</title>
     <link rel="stylesheet" th:href="@{/css/joinForm.css}">
     <script th:src="@{/js/joinForm.js}" defer></script>
+    <script th:src="@{/js/popup_2.js}"></script>
+    
 </head>
 <body>
     <div>
@@ -41,12 +43,24 @@
                 
                 <h1>상세 정보</h1>
                 <!-- 프리랜서 회원 상세 정보 -->
-                <label for="freelancer-phone">휴대전화</label>
+                <label for="freelancer-phone">연락처</label>
                 <input type="text" id="freelancer-phone" name="freelancerPhone"><br>
+                
+                <!-- 주석 처리
                 <label for="freelancer-address">주소</label>
                 <input type="text" id="freelancer-address" name="address"><br>
                 <label for="freelancer-postalcode">우편번호</label>
                 <input type="text" id="freelancer-postalcode" name="postalCode"><br>
+                 -->
+                 
+                <!-- 카카오 확인 -->
+                <input type="text" id="sample6_postcode" name="postalCode" placeholder="우편번호" readonly="readonly">
+    			<input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
+    			<input type="text" id="sample6_address" name="address" placeholder="주소" readonly="readonly"><br>
+   				<input type="text" id="sample6_detailAddress" name="detailAddress" placeholder="상세주소">
+    			<input type="text" id="sample6_extraAddress" name="extraAddress" placeholder="참고항목">
+                <!-- 카카오 확인 끝-->
+                
                 <label for="freelancer-country">체류 중인 국가</label>
                 <input type="text" id="freelancer-country" name="country"><br>
                 <button type="submit">회원가입</button>
@@ -77,8 +91,13 @@
                 <!-- client 회원 상세 정보 -->
                 <label for="client-phone">연락처</label>
                 <input type="text" id="client-phone" name="clientPhone"><br>
-                <label for="client-address">주소</label>
-                <input type="text" id="client-address" name="clientAddress"><br>
+                <!-- 카카오 확인 -->
+                <input type="text" id="sample6_postcode_client" name="postalCode" placeholder="우편번호" readonly="readonly">
+    			<input type="button" onclick="sample6_execDaumPostcode_client()" value="우편번호 찾기"><br>
+    			<input type="text" id="sample6_address_client" name="address" placeholder="주소" readonly="readonly"><br>
+   				<input type="text" id="sample6_detailAddress_client" name="detailAddress" placeholder="상세주소">
+    			<input type="text" id="sample6_extraAddress_client" name="extraAddress" placeholder="참고항목">
+                <!-- 카카오 확인 끝-->
                 <label for="client-industry">산업 분야</label>
                 <input type="text" id="client-industry" name="industry"><br>
                 <label for="client-foundeddate">설립일</label>
@@ -87,11 +106,14 @@
                 <input type="number" id="client-employeecount" name="employeeCount"><br>
                 <label for="client-website">사이트 URL</label>
                 <input type="text" id="client-website" name="website"><br>
-                
                 <button type="submit">회원가입</button>
                 <div class="errorMsg" th:if="${param.error}"><script>alert('회원가입에 실패했습니다.')</script></div>
             </form>
         </div>
     </div>
 </body>
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  <style>
+    .wrong_text{font-size:1rem;color:#f44e38;letter-spacing:-.2px;font-weight:300;margin:8px 0 2px;line-height:1em;display:none}
+  </style>
 </html>

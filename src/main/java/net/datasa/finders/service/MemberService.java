@@ -94,9 +94,11 @@ public class MemberService {
     	FreelancerEntity freelancerEntity = FreelancerEntity.builder()
     			.freelancerId(member.getMemberId())
     			.freelancerPhone(dto.getFreelancerPhone())
-    			.address(dto.getAddress())
-    			.postalCode(dto.getPostalCode())
     			.country(dto.getCountry())
+    			.postalCode(dto.getPostalCode())
+    			.address(dto.getAddress())
+    			.detailAddress(dto.getDetailAddress())
+    			.extraAddress(dto.getExtraAddress())
     			.build();
     			freelancerRepository.save(freelancerEntity);
     }
@@ -106,11 +108,14 @@ public class MemberService {
     	ClientEntity clientEntity = ClientEntity.builder()
     			.clientId(member.getMemberId())
     			.clientPhone(dto.getClientPhone())
-    			.clientAddress(dto.getClientAddress())
     			.industry(dto.getIndustry())
     			.foundedDate(dto.getFoundedDate())
     			.employeeCount(dto.getEmployeeCount())
     			.website(dto.getWebsite())
+    			.postalCode(dto.getPostalCode())
+    			.address(dto.getAddress())
+    			.detailAddress(dto.getDetailAddress())
+    			.extraAddress(dto.getExtraAddress())
     			.build();
     			clientRepository.save(clientEntity);
     }

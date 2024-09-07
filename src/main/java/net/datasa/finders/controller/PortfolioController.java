@@ -58,6 +58,13 @@ public class PortfolioController {
 	 * response.put("error", "Image upload failed"); return new
 	 * ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR); } }
 	 */
+	
+	/**
+	 * 포트폴리오 작성시 임시로 저장되는 파일들 올라가는 장소 설정 및 에디터에 반환
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
 	@ResponseBody
     @PostMapping("/upload-image")
     public String uploadImage(@RequestParam("upload") MultipartFile file) throws IOException {
@@ -69,7 +76,7 @@ public class PortfolioController {
         file.transferTo(dest);
 
         // 저장된 파일의 경로를 반환
-        return "{\"url\":\"http://localhost:8888/images/" + file.getOriginalFilename() + "\"}";
+        return "{\"url\":\"http://localhost:8888/images/portfolio/" + file.getOriginalFilename() + "\"}";
     }
     
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -38,10 +39,10 @@ public class BoardEntity {
     private LocalDateTime recruitDeadline;
 
     @Column(name = "project_start_date")
-    private LocalDateTime projectStartDate;
+    private LocalDate projectStartDate;
 
     @Column(name = "project_end_date")
-    private LocalDateTime projectEndDate;
+    private LocalDate projectEndDate;
 
     @Column(name = "project_budget", precision = 10, scale = 2)
     private BigDecimal projectBudget;

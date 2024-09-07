@@ -27,6 +27,11 @@
         }
         .message {
             margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            max-width: 60%;
+            padding: 10px;
+            border-radius: 10px;
         }
         .message p {
             margin: 0;
@@ -59,13 +64,28 @@
         .message-input button:hover {
             background-color: #0056b3;
         }
+        .message.mine {
+            background-color: #d1e7dd;
+            margin-left: auto; /* 오른쪽으로 이동 */
+            text-align: right;
+        }
+        .message.others {
+            background-color: #f1f1f1;
+            margin-right: auto; /* 왼쪽으로 이동 */
+            text-align: left;
+        }
     </style>
-    <!-- STOMP and SockJS libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@6.0.0/dist/stomp.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.2/dist/sockjs.min.js"></script>
+    <!-- WebJars를 사용하여 SockJS와 STOMP.js 로드 -->
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
 </head>
 <body>
-    <h1 th:text="'채팅방 - ' + ${chatroomName}"></h1>
+    <h1 th:text="'채팅방 - ' + ${chatroomName}">채팅방</h1>
+    <!-- 데이터를 데이터 속성으로 설정 -->
+    <div id="chatroom-data" 
+         th:data-chatroom-id="${chatroomId}" 
+         th:data-member-id="${memberId}"></div>
+
     <div class="chat-container">
         <div id="messages" class="messages">
             <!-- Messages will be dynamically added here -->
@@ -77,42 +97,69 @@
     </div>
 
     <script>
-        var chatroomId = "${chatroomId}";
-        var currentUserId = "${currentUserId}";
+        // 데이터 속성에서 변수 가져오기
+        var chatroomElement = document.getElementById('chatroom-data');
+        var chatroomId = chatroomElement.getAttribute('data-chatroom-id');
+        var memberId = chatroomElement.getAttribute('data-member-id');
 
-        var socket = new SockJS('/ws/chat');
-        var stompClient = Stomp.over(socket);
+        console.log("Loaded chatroomId:", chatroomId); // 확인용 로그 추가
+        console.log("Loaded memberId:", memberId); // 확인용 로그 추가
 
+        // WebSocket 연결을 위한 SockJS 사용
+        var socket = new SockJS('/ws/chat'); // 서버의 WebSocket 엔드포인트에 연결
+        var stompClient = Stomp.over(socket); // STOMP 프로토콜을 WebSocket 위에서 사용
+
+        // STOMP 클라이언트를 서버에 연결
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
+            // 채팅방의 메시지 구독 설정
             stompClient.subscribe('/topic/messages/' + chatroomId, function (message) {
                 var messageData = JSON.parse(message.body);
-                displayMessage(messageData);
+                displayMessage(messageData); // 수신한 메시지를 화면에 표시
             });
+        }, function (error) {
+            console.error('WebSocket connection error:', error);
         });
-
+        
+     // 전송 버튼 클릭 시 메시지 전송
         document.getElementById('sendMessageButton').addEventListener('click', function () {
             var messageInput = document.getElementById('messageInput');
             var messageContent = messageInput.value;
 
             if (messageContent.trim() !== '') {
-                stompClient.send('/app/send', {}, JSON.stringify({
-                    chatroomId: chatroomId,
-                    senderId: currentUserId,
+                var messageData = {
+                    chatroomId: parseInt(chatroomId), // 정수로 변환하여 전송
+                    senderId: memberId, // memberId를 senderId로 사용
                     messageContents: messageContent,
                     sendTime: new Date().toISOString()
-                }));
+                };
+
+                // 서버로 메시지 전송
+                stompClient.send('/app/send', {}, JSON.stringify(messageData));
+
+                // 입력 필드 초기화
                 messageInput.value = '';
             }
         });
+
 
         function displayMessage(message) {
             var messageContainer = document.getElementById('messages');
             var messageElement = document.createElement('div');
             messageElement.classList.add('message');
+
+            // 현재 사용자가 보낸 메시지인지 확인
+            if (message.senderId === memberId) {
+                messageElement.classList.add('mine');
+            } else {
+                messageElement.classList.add('others');
+            }
+
+            // message.senderId를 사용하여 올바르게 표시
             messageElement.innerHTML = '<p class="sender">' + message.senderId + '</p>' +
                 '<p>' + message.messageContents + '</p>' +
                 '<p class="timestamp">' + new Date(message.sendTime).toLocaleString() + '</p>';
+                
             messageContainer.appendChild(messageElement);
             messageContainer.scrollTop = messageContainer.scrollHeight;
         }

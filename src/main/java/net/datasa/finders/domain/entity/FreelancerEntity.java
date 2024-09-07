@@ -37,11 +37,24 @@ public class FreelancerEntity {
 	@Column(name = "freelancer_phone", length = 100)
 	private String freelancerPhone;
 
-	@Column(name = "address", columnDefinition = "TEXT")
-	private String address;
-
+//	@Column(name = "address", columnDefinition = "TEXT")
+//	private String address;
+//
+//	@Column(name = "postal_code", length = 20)
+//	private String postalCode;
+	
 	@Column(name = "postal_code", length = 20)
 	private String postalCode;
+	
+	@Column(name = "address", length = 100)
+	private String address;
+	
+	@Column(name = "detail_address", length = 100)
+	private String detailAddress;	
+	
+	@Column(name = "extra_address", length = 100)
+	private String extraAddress;
+	
 
 	@Column(name = "country", length = 100)
 	private String country;
