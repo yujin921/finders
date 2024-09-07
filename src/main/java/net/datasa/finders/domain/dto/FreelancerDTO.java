@@ -13,8 +13,10 @@ import net.datasa.finders.domain.entity.MemberEntity;
 public class FreelancerDTO {
 	String freelancerId;
 	String freelancerPhone;
-	String address;
-	String postalCode;
 	String country;
 	MemberEntity member;
+	String postalCode;
+	String address;
+	String detailAddress;
+	String extraAddress;
 }

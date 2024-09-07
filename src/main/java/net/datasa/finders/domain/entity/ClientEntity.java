@@ -31,8 +31,8 @@ public class ClientEntity {
     @Column(name = "client_phone", length = 20)
     private String clientPhone;
 
-    @Column(name = "client_address", columnDefinition = "TEXT")
-    private String clientAddress;
+//    @Column(name = "client_address", columnDefinition = "TEXT")
+//    private String clientAddress;
 
     @Column(name = "industry", length = 100)
     private String industry;
@@ -45,5 +45,17 @@ public class ClientEntity {
 
     @Column(name = "website", length = 255)
     private String website;
+    
+	@Column(name = "postal_code", length = 20)
+	private String postalCode;
+	
+	@Column(name = "address", length = 100)
+	private String address;
+	
+	@Column(name = "detail_address", length = 100)
+	private String detailAddress;	
+	
+	@Column(name = "extra_address", length = 100)
+	private String extraAddress;
 
 }

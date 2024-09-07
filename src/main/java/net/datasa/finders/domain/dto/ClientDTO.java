@@ -16,10 +16,13 @@ public class ClientDTO {
 
 	String clientId;
 	String clientPhone;
-	String clientAddress;
 	String industry;
 	LocalDate foundedDate;
 	Integer employeeCount;
 	String website;
 	MemberEntity member;
+	String postalCode;
+	String address;
+	String detailAddress;
+	String extraAddress;
 }
