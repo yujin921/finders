@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-<meta charset="UTF-8">
-<title>회원가입</title>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
     <link rel="stylesheet" th:href="@{/css/joinForm.css}">
-    <script th:src="@{/js/joinForm.js}"></script>
+    <script th:src="@{/js/joinForm.js}" defer></script>
 </head>
 <body>
-	 <div>
+    <div>
         <h1>회원가입</h1>
 
         <div class="tabs">
@@ -19,7 +17,12 @@
 
         <!-- 프리랜서 회원가입 폼 -->
         <div id="freelancer-join" class="tab-content active">
-            <form id="freelancer-join-form" th:action="@{/member/join}" method="post">
+            <form id="freelancer-join-form" th:action="@{/member/join}" method="post" enctype="multipart/form-data">
+                <!-- 프로필 이미지 업로드 -->
+                <label for="freelancer-profile-image">프로필 이미지:</label>
+                <input type="file" id="freelancer-profile-image" name="profileImage" accept="image/*">
+                <img id="freelancer-profile-preview" src="default-profile.png" alt="프로필 이미지 미리보기">
+
                 <!-- 프리랜서 회원 기본 정보 -->
                 <h1>기본 정보</h1>
                 <label for="freelancer-id">아이디</label>
@@ -49,7 +52,12 @@
 
         <!-- client 회원가입 폼 -->
         <div id="client-join" class="tab-content">
-            <form id="client-join-form" th:action="@{/member/join}" method="post">
+            <form id="client-join-form" th:action="@{/member/join}" method="post" enctype="multipart/form-data">
+                <!-- 프로필 이미지 업로드 -->
+                <label for="client-profile-image">프로필 이미지:</label>
+                <input type="file" id="client-profile-image" name="profileImage" accept="image/*">
+                <img id="client-profile-preview" src="default-profile.png" alt="프로필 이미지 미리보기">
+
                 <h1>기본 정보</h1>
                 <!-- client 회원 기본 정보 -->
                 <label for="client-id">아이디</label>
