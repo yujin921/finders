@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import net.datasa.finders.domain.entity.ChatRoomEntity;
+import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ChatRoomService;
 
 @Controller
@@ -50,29 +51,24 @@ public class ChatRoomController {
 
     @GetMapping("/room")
     public String getChatRoom(@RequestParam("id") int chatroomId, Model model) {
-        System.out.println("Requested chatroom ID: " + chatroomId); // 로그 출력
         ChatRoomEntity chatRoom = chatRoomService.getChatRoomById(chatroomId);
         if (chatRoom != null) {
             String currentUserId = getCurrentUserId();
             model.addAttribute("chatroomName", chatRoom.getChatroomName());
             model.addAttribute("chatroomId", chatroomId);
-            model.addAttribute("currentUserId", currentUserId);
+            model.addAttribute("memberId", currentUserId);  // 여기서 memberId로 설정
             return "chat/chatroom"; // chatroom.html로 이동
         } else {
             return "error"; // 채팅방이 존재하지 않는 경우 에러 페이지로 이동
         }
     }
 
-
-    // 현재 로그인한 사용자의 ID를 반환하는 메서드
     private String getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
-            org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
-            return user.getUsername(); // 사용자 ID를 반환
+        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof AuthenticatedUser) {
+            AuthenticatedUser user = (AuthenticatedUser) authentication.getPrincipal();
+            return user.getId(); // 사용자 ID 반환
         }
         return "unknown"; // 로그인하지 않은 경우
     }
-    
-    
 }
