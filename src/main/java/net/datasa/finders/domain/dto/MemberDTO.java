@@ -16,7 +16,6 @@ public class MemberDTO {
     String memberId;
     String memberPw;
     String memberName;
-    String profileImg;
     String email;
     boolean enabled;
     RoleName roleName;

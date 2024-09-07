@@ -1,5 +1,17 @@
 package net.datasa.finders.controller;
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ClientDTO;
@@ -8,13 +20,6 @@ import net.datasa.finders.domain.dto.MemberDTO;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.service.MemberService;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 @Slf4j
 @RequiredArgsConstructor
 @Controller
@@ -22,6 +27,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class MemberController {
 
     private final MemberService memberService;
+    
+    //application.properties 파일 관련 설정값
+  	@Value("${member.uploadPath}")
+  	String uploadPath;
     
     // 여기부터카카오
     
@@ -34,20 +43,43 @@ public class MemberController {
 
     @PostMapping("join")
     public String join(@RequestParam("roleName") String roleName,
-    		@ModelAttribute MemberDTO member,
-    		@ModelAttribute FreelancerDTO freelancer,
-    		@ModelAttribute ClientDTO client) {
-        	
-    	  MemberEntity memberEntity = memberService.join(member);
-    	  
-    	  log.debug("회원가입 내용 체크용: {}", memberEntity);
-    	  
-    	  if ("ROLE_FREELANCER".equals(roleName)) {
-              memberService.joinFreelancer(freelancer, memberEntity);
-          } else if ("ROLE_CLIENT".equals(roleName)) {
-              memberService.joinClient(client, memberEntity);
-          }
-        
+                       @ModelAttribute MemberDTO member,
+                       @RequestParam("profileImg") MultipartFile profileImg,
+                       @ModelAttribute FreelancerDTO freelancer,
+                       @ModelAttribute ClientDTO client,
+                       Model model) {
+    	
+    	if (profileImg != null) {
+			log.debug("파일 존재 여부 : {}", profileImg.isEmpty());
+			log.debug("파라미터 이름 : {}", profileImg.getName());
+			log.debug("파일의 이름 : {}", profileImg.getOriginalFilename());
+			log.debug("크기 : {}", profileImg.getSize());
+			log.debug("파일 종류 : {}", profileImg.getContentType());
+		}
+
+        try {
+            // 회원 가입 처리
+            MemberEntity memberEntity = memberService.join(member, uploadPath, profileImg);
+
+            log.debug("회원가입 내용 체크용: {}", memberEntity);
+
+            // 역할에 따라 Freelancer 또는 Client 추가
+            if ("ROLE_FREELANCER".equals(roleName)) {
+                memberService.joinFreelancer(freelancer, memberEntity);
+            } else if ("ROLE_CLIENT".equals(roleName)) {
+                memberService.joinClient(client, memberEntity);
+            }
+
+        } catch (IOException e) {
+        	log.error("파일 처리 중 오류 발생", e);
+
+            // 오류 메시지를 모델에 추가
+            model.addAttribute("errorMessage", "파일 업로드 중 오류가 발생했습니다. 다시 시도해 주세요.");
+
+            // 회원가입 페이지로 포워딩
+            return "/member/joinForm";
+        }
+
         return "redirect:/";
     }
     

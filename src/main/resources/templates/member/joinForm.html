@@ -14,14 +14,18 @@
             <button class="active" data-tab="freelancer-join">프리랜서 회원가입</button>
             <button data-tab="client-join">기업 회원가입</button>
         </div>
+        
+        <!-- 오류 메시지 표시 -->
+    	<div th:if="${errorMessage}" style="color: red;">
+        	<p th:text="${errorMessage}"></p>
+    	</div>
 
         <!-- 프리랜서 회원가입 폼 -->
         <div id="freelancer-join" class="tab-content active">
             <form id="freelancer-join-form" th:action="@{/member/join}" method="post" enctype="multipart/form-data">
                 <!-- 프로필 이미지 업로드 -->
-                <label for="freelancer-profile-image">프로필 이미지:</label>
-                <input type="file" id="freelancer-profile-image" name="profileImage" accept="image/*">
-                <img id="freelancer-profile-preview" src="default-profile.png" alt="프로필 이미지 미리보기">
+                <label for="freelancer-profile-img">프로필 이미지</label>
+                <input type="file" id="freelancer-profile-img" name="profileImg"><br>
 
                 <!-- 프리랜서 회원 기본 정보 -->
                 <h1>기본 정보</h1>
@@ -53,10 +57,9 @@
         <!-- client 회원가입 폼 -->
         <div id="client-join" class="tab-content">
             <form id="client-join-form" th:action="@{/member/join}" method="post" enctype="multipart/form-data">
-                <!-- 프로필 이미지 업로드 -->
-                <label for="client-profile-image">프로필 이미지:</label>
-                <input type="file" id="client-profile-image" name="profileImage" accept="image/*">
-                <img id="client-profile-preview" src="default-profile.png" alt="프로필 이미지 미리보기">
+                <label for="client-profile-img">프로필 이미지</label>
+                <input type="file" id="client-profile-img" name="profileImg"><br>
+                <input type="hidden" name="roleName" value="ROLE_CLIENT" />
 
                 <h1>기본 정보</h1>
                 <!-- client 회원 기본 정보 -->
