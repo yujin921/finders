@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const tabs = document.querySelectorAll('.menu-tabs a');
+    const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
 
     tabs.forEach(tab => {
         tab.addEventListener('click', function(event) {
             event.preventDefault();
-            const targetId = this.id.replace('-tab', '-content');
+            const targetId = this.getAttribute('data-tab');
 
             contents.forEach(content => {
                 content.classList.remove('active');
@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
             events: [
-                // 중요한 일정 예시
                 {
                     title: '프로젝트 시작',
                     start: '2024-09-01',
@@ -50,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     start: '2024-09-30',
                     color: 'red'
                 },
-                // 추가적인 이벤트 예시
                 {
                     title: '미팅',
                     start: '2024-09-10T10:00:00',
@@ -73,63 +71,59 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         anychart.onDocumentReady(function() {
-            // 프로젝트 데이터 예시
-            const data = [
-                {
-                    id: "1",
-                    name: "프로젝트 기획",
-                    actualStart: "2024-09-01",
-                    actualEnd: "2024-09-07",
-                    progress: 100
-                },
-                {
-                    id: "2",
-                    name: "디자인 단계",
-                    actualStart: "2024-09-08",
-                    actualEnd: "2024-09-14",
-                    progress: 70
-                },
-                {
-                    id: "3",
-                    name: "개발 단계",
-                    actualStart: "2024-09-15",
-                    actualEnd: "2024-10-05",
-                    progress: 30
-                },
-                {
-                    id: "4",
-                    name: "테스트 단계",
-                    actualStart: "2024-10-06",
-                    actualEnd: "2024-10-12",
-                    progress: 0
-                },
-                {
-                    id: "5",
-                    name: "배포 및 리뷰",
-                    actualStart: "2024-10-13",
-                    actualEnd: "2024-10-20",
-                    progress: 0
+            anychart.data.loadJsonFile(
+                'https://cdn.anychart.com/samples/gantt-charts/activity-oriented-chart/data.json',
+                function (data) {
+                    var treeData = anychart.data.tree(data, 'as-table');
+
+                    var chart = anychart.ganttProject();
+                    chart.data(treeData);
+
+                    chart.splitterPosition(370);
+
+                    var dataGrid = chart.dataGrid();
+
+                    dataGrid.column(0)
+                        .title('#')
+                        .width(30)
+                        .labels({ hAlign: 'center' });
+
+                    dataGrid.column(1).labels().hAlign('left').width(180);
+
+                    dataGrid.column(2)
+                        .title('Start Time')
+                        .width(70)
+                        .labels()
+                        .hAlign('right')
+                        .format(function () {
+                            var date = new Date(this.actualStart);
+                            var month = date.getUTCMonth() + 1;
+                            var strMonth = month > 9 ? month : '0' + month;
+                            var utcDate = date.getUTCDate();
+                            var strDate = utcDate > 9 ? utcDate : '0' + utcDate;
+                            return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
+                        });
+
+                    dataGrid.column(3)
+                        .title('End Time')
+                        .width(80)
+                        .labels()
+                        .hAlign('right')
+                        .format(function () {
+                            var date = new Date(this.actualEnd);
+                            var month = date.getUTCMonth() + 1;
+                            var strMonth = month > 9 ? month : '0' + month;
+                            var utcDate = date.getUTCDate();
+                            var strDate = utcDate > 9 ? utcDate : '0' + utcDate;
+                            return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
+                        });
+
+                    chart.container('gantt-chart');
+                    chart.draw();
+
+                    chart.zoomTo(951350400000, 954201600000);
                 }
-            ];
-
-            // 간트 차트 생성
-            const chart = anychart.ganttProject();
-
-            // 데이터 설정
-            chart.data(data);
-
-            // 차트 제목 설정
-            chart.title("프로젝트 간트 차트");
-
-            // 차트 설정
-            chart.getTimeline().setDateFormat("yyyy-MM-dd");
-            chart.getTimeline().header().title().text("간트 차트");
-
-            // 컨테이너 ID 설정
-            chart.container("gantt-chart");
-
-            // 차트 그리기
-            chart.draw();
+            );
         });
     }
 });
