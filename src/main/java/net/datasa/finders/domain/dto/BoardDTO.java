@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,8 +20,8 @@ public class BoardDTO {
     private String clientId;
     private String projectTitle;
     private LocalDateTime recruitDeadline;
-    private LocalDateTime projectStartDate;
-    private LocalDateTime projectEndDate;
+    private LocalDate projectStartDate;
+    private LocalDate projectEndDate;
     private BigDecimal projectBudget;
     private String projectDescription;
     private MultipartFile projectImageFile;
@@ -28,5 +29,5 @@ public class BoardDTO {
     private Boolean projectStatus;
     private List<String> selectedSkills;
     private List<String> selectedCategories;
-    private List<String> selectedWorkScopes;
+    private String selectedWorkScopes;
 }
