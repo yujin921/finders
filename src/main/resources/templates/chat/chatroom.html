@@ -163,6 +163,21 @@
             messageContainer.appendChild(messageElement);
             messageContainer.scrollTop = messageContainer.scrollHeight;
         }
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            loadPreviousMessages();
+        });
+
+        function loadPreviousMessages() {
+            fetch(`/chat/messages?chatroomId=${chatroomId}`)
+                .then(response => response.json())
+                .then(messages => {
+                    messages.forEach(message => displayMessage(message));
+                })
+                .catch(error => {
+                    console.error('Failed to load messages:', error);
+                });
+        }
     </script>
 </body>
 </html>
