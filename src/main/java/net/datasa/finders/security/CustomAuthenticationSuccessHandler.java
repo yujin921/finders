@@ -38,18 +38,18 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         if ("ROLE_ADMIN".equals(roleName)) {
             // Admin can access any URL
-        	redirectUrl = "/member/admin/view";
+        	redirectUrl = "/";
+        	// redirectUrl = "/member/admin/view";
         } else if (roleFromForm != null && roleName != null && roleFromForm.equals(roleName)) {
             // User role matches the role in the form
             switch (roleName) {
                 case "ROLE_FREELANCER":
-                    redirectUrl = "/member/freelancer/view";
+                	redirectUrl = "/";
+                    // redirectUrl = "/member/freelancer/view";
                     break;
                 case "ROLE_CLIENT":
-                    redirectUrl = "/member/client/view";
-                    break;
-                default:
-                    redirectUrl = "/member/admin/view";
+                	redirectUrl = "/";
+                    // redirectUrl = "/member/client/view";
                     break;
             }
         } else {

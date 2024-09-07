@@ -1,9 +1,15 @@
 package net.datasa.finders.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +34,33 @@ public class MemberService {
     private final FreelancerRepository freelancerRepository;
     private final ClientRepository clientRepository;
     
-    public MemberEntity join(MemberDTO dto) {
+    public MemberEntity join(MemberDTO dto, String uploadPath, MultipartFile profileImg) throws IOException {
     	
     	LocalDateTime now = LocalDateTime.now();  // 회원가입 일시, 회원정보 수정 일시
     	
+    	// 첨부파일이 있는지 확인
+    	if (profileImg != null && !profileImg.isEmpty()) {
+    		// 저장할 경로의 디렉토리가 있는지 확인 -> 없으면 생성
+    		File directoryPath = new File(uploadPath);
+    		
+    		if (!directoryPath.isDirectory()) {
+    			directoryPath.mkdirs();
+    		}
+    	}
+    				
+    	// 저장할 파일명 생성
+    	// 내 이력서.doc -> 20240806_6156df53-a49b-4419-a336-cb6da0fa9640.doc
+    	String originalName = profileImg.getOriginalFilename();
+    	String extension = originalName.substring(originalName.lastIndexOf("."));  // 확장자를 가져옴
+    	String dateString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    	String uuidString = UUID.randomUUID().toString();
+    	String fileName = dateString + "_" + uuidString + extension;
+    	
+    	File file = new File(uploadPath, fileName);
+    	profileImg.transferTo(file);
+    	
     	MemberEntity entity = MemberEntity.builder()
+    			.profileImg(fileName)
                 .memberId(dto.getMemberId())
                 .memberPw(passwordEncoder.encode(dto.getMemberPw()))        // Encrypt password
                 .memberName(dto.getMemberName())
@@ -46,6 +74,7 @@ public class MemberService {
         // Special handling for admin account
         if (dto.getMemberId().equals("admin123")) {
             entity = MemberEntity.builder()
+            		.profileImg(fileName)
                     .memberId(dto.getMemberId())
                     .memberPw(passwordEncoder.encode(dto.getMemberPw()))        // Encrypt password
                     .memberName(dto.getMemberName())

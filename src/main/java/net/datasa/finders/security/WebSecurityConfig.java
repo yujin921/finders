@@ -57,8 +57,7 @@ public class WebSecurityConfig {
                     .usernameParameter("id")
                     .passwordParameter("password")
                     .loginProcessingUrl("/member/login")
-                    // .successHandler(customSuccessHandler())  // Use custom success handler
-                    .defaultSuccessUrl("/", true)
+                    .successHandler(customSuccessHandler())  // Use custom success handler
                     .permitAll()
             )
             .logout(logout -> logout
