@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -30,9 +33,14 @@ public class BoardService {
     private final Board_CategoryRepository categoryRepository;
     private final Board_SkillRepository skillRepository;
 
-    public void write(BoardDTO boardDTO, List<String> selectedWorkScopes, List<String> selectedCategories, MultipartFile imageFile) {
+    public void write(BoardDTO boardDTO, MultipartFile imageFile, String selectedWorkScopes
+            , String selectedSkills, String projectDescription, BigDecimal projectBudget
+            , LocalDate projectStartDate, LocalDate projectEndDate) {
         MemberEntity memberEntity = memberRepository.findById(boardDTO.getClientId())
                 .orElseThrow(() -> new EntityNotFoundException("회원 아이디가 없습니다."));
+
+        boardDTO.setSelectedSkills(Arrays.asList(selectedSkills.split(",")));  // 콤마로 구분된 기술 리스트로 변환
+        boardDTO.setProjectDescription(projectDescription);
 
         // 이미지 Base64 인코딩 처리
         String imageBase64 = null;
@@ -45,23 +53,23 @@ public class BoardService {
                 .clientId(memberEntity)
                 .projectTitle(boardDTO.getProjectTitle())
                 .recruitDeadline(boardDTO.getRecruitDeadline())
-                .projectStartDate(boardDTO.getProjectStartDate())
-                .projectEndDate(boardDTO.getProjectEndDate())
-                .projectBudget(boardDTO.getProjectBudget())
+                .projectStartDate(projectStartDate)
+                .projectEndDate(projectEndDate)
+                .projectBudget(projectBudget)
                 .projectDescription(boardDTO.getProjectDescription())
                 .projectImage(imageBase64) // Base64로 변환된 이미지 저장
                 .build();
         boardRepository.save(boardEntity);
 
         // 업무 범위 저장 로직
-        for (String workScope : boardDTO.getSelectedWorkScopes()) {
-            Board_WorkScopeEntity workScopeEntity = Board_WorkScopeEntity.builder()
-                    .boardEntity(boardEntity)
-                    .workType(workScope)
-                    .build();
-            workScopeRepository.save(workScopeEntity);
-        }
 
+        Board_WorkScopeEntity workScopeEntity = Board_WorkScopeEntity.builder()
+                .boardEntity(boardEntity)
+                .workType(selectedWorkScopes)
+                .build();
+        workScopeRepository.save(workScopeEntity);
+
+        log.debug("카테고리 : {}", boardDTO.getSelectedCategories());
         // 카테고리 저장 로직
         for (String category : boardDTO.getSelectedCategories()) {
             Board_CategoryEntity categoryEntity = Board_CategoryEntity.builder()
@@ -94,14 +102,9 @@ public class BoardService {
     public List<BoardDTO> getList(String id) {
         
     	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
-    	
-        //
-        List<BoardEntity> entityList = boardRepository.findAll(sort);
-    	
-        //DTO를 저장할 리스트 생성
-        List<BoardDTO> dtoList = new ArrayList<>();
+    	List<BoardEntity> entityList = boardRepository.findAll(sort);
+    	List<BoardDTO> dtoList = new ArrayList<>();
 
-        //DB에서 조회한 해당 사용자의 거래 내역을 DTO객체로 변환하여 ArrayList에 저장한다.
         for (BoardEntity entity : entityList) {
             BoardDTO dto = BoardDTO.builder()
                     .projectNum(entity.getProjectNum())
@@ -141,15 +144,6 @@ public class BoardService {
                 .projectStatus(entity.getProjectStatus())
                 .build();
     }
-
-    /*
-    public BoardEntity saveBoardImage(MultipartFile file) throws IOException {
-        BoardEntity boardEntity = new BoardEntity();
-
-        boardEntity.setProjectImage(Base64.getEncoder().encodeToString(file.getBytes()));
-        return boardRepository.save(boardEntity);
-    }
-    */
     
     public BoardDTO getBoard(int pNum) {
         BoardEntity entity = boardRepository.findById(pNum)
