@@ -117,4 +117,10 @@ public class MemberController {
     	return "/member/mypageClient";
     }
     
+    // 클라이언트 마이페이지
+    @GetMapping("myPage")
+    public String myPage() {
+    	return "/member/myPage";
+    }
+    
 }
