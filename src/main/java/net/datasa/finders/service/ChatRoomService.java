@@ -194,4 +194,21 @@ public class ChatRoomService {
                 .map(memberId -> currentParticipants.contains(memberId) ? memberId + " (참가 중)" : memberId)
                 .collect(Collectors.toList());
     }
+    
+    // 멤버 초대 로직
+    @Transactional
+    public void inviteMember(int chatroomId, String memberId) {
+        // 이미 초대된 멤버인지 확인
+        boolean isAlreadyParticipant = chatParticipantRepository.existsByChatroomIdAndParticipantId(chatroomId, memberId);
+        if (!isAlreadyParticipant) {
+            ChatParticipantEntity participant = ChatParticipantEntity.builder()
+                    .chatroomId(chatroomId)
+                    .participantId(memberId)
+                    .joinedTime(LocalDateTime.now())
+                    .build();
+            chatParticipantRepository.save(participant);
+        } else {
+            throw new IllegalArgumentException("이미 참가 중인 멤버입니다.");
+        }
+    }
 }
