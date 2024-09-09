@@ -1,6 +1,7 @@
 package net.datasa.finders.domain.entity;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,13 +9,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor; // 기본 생성자 추가를 위한 Lombok 주석
 
 @Entity
 @Table(name = "CHAT_TEXT")
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatMessageEntity {
 
     @Id

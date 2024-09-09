@@ -1,12 +1,18 @@
 package net.datasa.finders.controller;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import net.datasa.finders.domain.dto.ChatMessageDTO;
 import net.datasa.finders.service.ChatMessageService;
 
@@ -24,6 +30,14 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    
+    // 이전 채팅 메시지 로드 API
+    @GetMapping("/chat/messages")
+    @ResponseBody
+    public List<ChatMessageDTO> getChatMessages(@RequestParam("chatroomId") int chatroomId) {
+        return chatMessageService.getAllMessagesForChatroom(chatroomId);
+    }
+    
     @MessageMapping("/send")
     public void sendMessage(@Payload ChatMessageDTO chatMessage) {
         logger.info("Received message: {}", chatMessage); // 메시지 수신 로그 추가
