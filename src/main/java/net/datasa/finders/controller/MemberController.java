@@ -1,7 +1,9 @@
 package net.datasa.finders.controller;
 
 import java.io.IOException;
+import java.security.Principal;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,15 +29,12 @@ import net.datasa.finders.service.MemberService;
 public class MemberController {
 
     private final MemberService memberService;
-    
+
     //application.properties 파일 관련 설정값
   	@Value("${member.uploadPath}")
   	String uploadPath;
-    
-    // 여기부터카카오
-    
-    //여기까지 카카오
-    
+
+  	
     @GetMapping("join")
     public String join() {
         return "/member/joinForm";

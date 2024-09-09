@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -115,10 +116,10 @@ public class MemberService {
             profileImg.transferTo(file);
             
             // 이미지가 업로드된 경우 서버 내 저장된 이미지 경로 설정
-            imageUrl = "/images/" + fileName;  // 예시 URL 경로
+            imageUrl = fileName;  // 예시 URL 경로
         } else {
             // 이미지가 첨부되지 않았을 경우 기본 이미지 URL 설정
-            imageUrl = "https://i.namu.wiki/i/Bge3xnYd4kRe_IKbm2uqxlhQJij2SngwNssjpjaOyOqoRhQlNwLrR2ZiK-JWJ2b99RGcSxDaZ2UCI7fiv4IDDQ.webp";  // 기본 이미지 URL
+            imageUrl = null;  // 기본 이미지 URL
         }
         
         // MemberEntity 생성
@@ -136,17 +137,7 @@ public class MemberService {
         
         // Special handling for admin account
         if (dto.getMemberId().equals("admin123")) {
-            entity = MemberEntity.builder()
-                    .profileImg(imageUrl)
-                    .memberId(dto.getMemberId())
-                    .memberPw(passwordEncoder.encode(dto.getMemberPw()))        // Encrypt password
-                    .memberName(dto.getMemberName())
-                    .email(dto.getEmail())
-                    .enabled(true) // Account enabled
-                    .roleName(RoleName.ROLE_ADMIN) // Set role to ADMIN
-                    .createdTime(now)
-                    .updatedTime(now)
-                    .build();
+        	entity.setRoleName(RoleName.ROLE_ADMIN);
         }
 
         return memberRepository.save(entity);
@@ -183,4 +174,11 @@ public class MemberService {
     			.build();
     			clientRepository.save(clientEntity);
     }
+
+
+    public MemberEntity findByMemberId(String memberId) {
+        return memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("User not found with memberId: " + memberId));
+    }
+	
 }
