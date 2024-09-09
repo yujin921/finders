@@ -67,15 +67,15 @@
         }
         .message.mine {
             background-color: #d1e7dd;
-            margin-left: auto; 
+            margin-left: auto;
             text-align: right;
         }
         .message.others {
             background-color: #f1f1f1;
-            margin-right: auto; 
+            margin-right: auto;
             text-align: left;
         }
-        .participants-modal {
+        .modal {
             display: none;
             position: fixed;
             top: 50%;
@@ -83,8 +83,9 @@
             transform: translate(-50%, -50%);
             background-color: #fff;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             border-radius: 8px;
+            width: 400px;
             z-index: 1000;
         }
         .overlay {
@@ -97,25 +98,61 @@
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .modal-content {
+            max-height: 300px;
+            overflow-y: auto;
+        }
         .modal ul {
             list-style: none;
             padding: 0;
-            margin: 10px 0;
+            margin: 0;
         }
         .modal li {
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
             margin-bottom: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .modal li:hover {
-            background-color: #f0f0f0;
+            background-color: #f9f9f9;
         }
         .modal .selected {
             background-color: #007bff;
             color: white;
+        }
+        .modal .button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .modal button {
+            padding: 8px 12px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .modal button:hover {
+            background-color: #0056b3;
         }
         .button-container {
             display: flex;
@@ -128,10 +165,10 @@
 </head>
 <body>
     <h1 th:text="'채팅방 - ' + ${chatroomName}">채팅방</h1>
-<div id="chatroom-data" 
-     th:data-chatroom-id="${chatroomId}" 
-     th:data-member-id="${memberId}" 
-     th:data-project-num="${projectNum}"></div>
+    <div id="chatroom-data" 
+         th:data-chatroom-id="${chatroomId}" 
+         th:data-member-id="${memberId}" 
+         th:data-project-num="${projectNum}"></div>
      
     <div class="chat-container">
         <div id="messages" class="messages"></div>
@@ -146,21 +183,32 @@
     </div>
 
     <!-- 멤버 보기 모달 -->
-    <div id="participantsModal" class="participants-modal">
-        <h3>참가자 목록</h3>
-        <ul id="participantList"></ul>
-        <button class="button" onclick="openInviteModal()">채팅방 초대</button>
-        <button class="button" onclick="closeParticipantsModal()">닫기</button>
+    <div id="participantsModal" class="modal">
+        <div class="modal-header">
+            <h3>참가자 목록</h3>
+            <button onclick="closeParticipantsModal()">닫기</button>
+        </div>
+        <div class="modal-content">
+            <ul id="participantList"></ul>
+        </div>
+        <div class="button-container">
+            <button class="button" onclick="openInviteModal()">채팅방 초대</button>
+        </div>
     </div>
 
     <!-- 초대 모달 -->
-    <div id="inviteModal" class="participants-modal">
-        <h3>참가자 초대</h3>
-        <ul id="inviteList"></ul>
-        <button class="button" onclick="closeInviteModal()">닫기</button>
+    <div id="inviteModal" class="modal">
+        <div class="modal-header">
+            <h3>참가자 초대</h3>
+            <button onclick="closeInviteModal()">닫기</button>
+        </div>
+        <div class="modal-content">
+            <ul id="inviteList"></ul>
+        </div>
     </div>
 
     <div class="overlay" id="overlay"></div>
+
 
     <script>
         var chatroomElement = document.getElementById('chatroom-data');

@@ -1,7 +1,6 @@
 package net.datasa.finders.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import net.datasa.finders.domain.dto.ChatRoomDTO;
 import net.datasa.finders.domain.dto.CreateChatRoomRequestDTO;
+import net.datasa.finders.domain.dto.InviteRequestDTO;
 import net.datasa.finders.domain.dto.ProjectDTO;
 import net.datasa.finders.domain.entity.ChatRoomEntity;
 import net.datasa.finders.security.AuthenticatedUser;
@@ -147,5 +147,12 @@ public class ChatRoomController {
                                                                 @RequestParam("chatroomId") int chatroomId) {
         List<String> availableMembers = chatRoomService.getAvailableTeamMembers(projectNum, chatroomId);
         return ResponseEntity.ok(availableMembers);
+    }
+    
+    @PostMapping("/invite")
+    @ResponseBody
+    public ResponseEntity<String> inviteMemberToChatRoom(@RequestBody InviteRequestDTO request) {
+        chatRoomService.inviteMember(request.getChatroomId(), request.getMemberId());
+        return ResponseEntity.ok("초대가 완료되었습니다.");
     }
 }
