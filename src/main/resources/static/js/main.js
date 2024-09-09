@@ -234,7 +234,7 @@ DecoupledEditor.create(document.querySelector('#editor'), editorConfig)
         
         // 폼 제출 시 에디터 데이터를 textarea로 복사
         document.querySelector('form').addEventListener('submit', (event) => {
-            document.querySelector('#editorContent').value = editor.getData();
+            document.querySelector('#projectDescription').value = editor.getData();
         });
 
         window.editor = editor;  // 전역으로 에디터 참조 저장
