@@ -1,7 +1,5 @@
 package net.datasa.finders.domain.dto;
 
-import java.sql.Timestamp;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRoomDTO {
+public class InviteRequestDTO {
     private int chatroomId;
-    private int projectNum; // 프로젝트 번호 추가
-    private String chatroomName;
-    private Timestamp createdTime;
+    private String memberId;
 }
-
