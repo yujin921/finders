@@ -28,6 +28,7 @@
     		</th:block>
 
     		<th:block sec:authorize="isAuthenticated()">
+    			<img th:src="${profileImgUrl}" alt="Profile Image" style="width:100px;height:100px;border-radius:50%;"/>
         		<a th:href="@{/member/logout}"><button>로그아웃</button></a>
         		<a th:href="@{/board/view}"><button>프로젝트 게시판</button></a>
     		    <a th:href="@{/project/view}"><button>프로젝트 관리</button></a>
