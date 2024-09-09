@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatRoomDTO {
     private int chatroomId;
+    private int projectNum; // 프로젝트 번호 추가
     private String chatroomName;
     private Timestamp createdTime;
 }
+

@@ -19,4 +19,9 @@ public class TeamEntity {
     @Id
     @Column(name = "member_id", nullable = false)
     private String memberId;
+
+    // ProjectEntity와의 관계 설정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_num", insertable = false, updatable = false)
+    private ProjectEntity project; // ProjectEntity와의 연결
 }
