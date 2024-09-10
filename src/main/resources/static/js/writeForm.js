@@ -128,7 +128,7 @@ function countCharacters() {
 // 모집 인원 추가 기능
 function addTeamMember() {
     const teamMembersContainer = document.getElementById('recruit-team-members');
-
+    const recruitDeadline = document.getElementById('recruit_deadline').value;
     // 새로운 팀원 입력 필드 생성
     const newTeamMember = document.createElement('div');
     newTeamMember.classList.add('recruit-added-item');
@@ -136,12 +136,15 @@ function addTeamMember() {
                 <select name="role"></select>
                 <select name="category"></select>
                 <input type="number" min="1" placeholder="명" name="teamSize[]">
+                <button type="button" onclick="remove(this)">삭제</button>
             `;
     teamMembersContainer.appendChild(newTeamMember);
 
     // 새로 추가된 팀원의 role select 필드 업데이트
     updateRecruitSelectOptions();
     updateRecruitCategoryOptions();
+
+    document.getElementById('recruit_deadline').value = recruitDeadline;
 }
 
 // 사전 검증 질문 추가 기능
@@ -153,6 +156,7 @@ function addQuestion() {
     newQuestion.classList.add('recruit-added-question');
     newQuestion.innerHTML = `
                 <input type="text" class="recruit-question-input" placeholder="사전 질문을 입력해주세요." name="question[]">
+                <button type="button" onclick="remove(this)">삭제</button>
             `;
     questionsContainer.appendChild(newQuestion);
 }
@@ -161,3 +165,8 @@ function addQuestion() {
 window.onload = function () {
     countCharacters();
 };
+
+function remove(button) {
+    const teamMember = button.parentNode;
+    teamMember.remove();
+}
