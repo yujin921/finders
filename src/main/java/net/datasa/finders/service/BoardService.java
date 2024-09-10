@@ -66,7 +66,7 @@ public class BoardService {
                 .projectStatus(false)
                 .build();
         boardRepository.save(boardEntity);
-
+    /*
         // 업무 범위 저장 로직
         for (String selectedWorkScopes : boardDTO.getSelectedWorkScopes()) {
             Board_WorkScopeEntity workScopeEntity = Board_WorkScopeEntity.builder()
@@ -84,7 +84,7 @@ public class BoardService {
                     .build();
             categoryRepository.save(categoryEntity);
         }
-
+*/
         // 관련 기술 저장 로직
         for (String skill : boardDTO.getSelectedSkills()) {
             Board_SkillEntity skillEntity = Board_SkillEntity.builder()
@@ -154,16 +154,10 @@ public class BoardService {
                     .build();
             dtoList.add(dto);
         }
-        
-        //DTO객체들이 저장된 리스트를 리턴한다.
+
         return dtoList;
     }
-    
-    /**
-     * DB에서 조회한 게시글 정보인 BoardEntity 객체를 BoardDTO 객체로 변환
-     * @param entity    게시글 정보 Entity 객체
-     * @return          게시글 정보 DTO 개체
-     */
+
     private BoardDTO convertToDTO(BoardEntity entity) {
         return BoardDTO.builder()
                 .projectNum(entity.getProjectNum())

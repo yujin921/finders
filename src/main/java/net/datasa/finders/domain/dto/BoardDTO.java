@@ -30,4 +30,6 @@ public class BoardDTO {
     private List<String> selectedSkills;
     private List<String> selectedCategories;
     private List<String> selectedWorkScopes;
+    private List<String> outputList;
+    private int requiredNum;
 }
