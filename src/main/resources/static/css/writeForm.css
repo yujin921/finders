@@ -1,0 +1,311 @@
+.container {
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.scope-of-work {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.scope-option {
+    border: 1px solid #ddd;
+    padding: 20px;
+    width: 120px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.scope-option:hover {
+    border-color: #28a745;
+}
+
+.scope-option.selected {
+    border-color: #28a745;
+    background-color: #f0f8f5;
+}
+
+.scope-option img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.scope-option input[type="checkbox"] {
+    display: none;
+}
+
+.project-title-container {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.project-title-container input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+.category-container {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.category-section {
+    margin-bottom: 30px;
+}
+
+.category-section h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.category-btn {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.category-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.category-btn.selected {
+    background-color: #28a745;
+    color: #fff;
+    border-color: #28a745;
+}
+
+/* 이미지 업로드 섹션 */
+.image-upload-section {
+    margin-top: 30px;
+}
+
+.image-upload-section h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.uploaded-file {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.uploaded-file img {
+    margin-right: 10px;
+}
+
+.file-upload-btn {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 5px;
+}
+
+.file-upload-btn:hover {
+    background-color: #e0e0e0;
+}
+.tech-container {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.selected-techs {
+    background-color: #f0f8f5;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.selected-tech {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+
+.tech-section h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.tech-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tech-button {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.tech-button:hover {
+    background-color: #e0e0e0;
+}
+
+.tech-button.selected {
+    background-color: #28a745;
+    color: #fff;
+    border-color: #28a745;
+}
+
+.detail-section {
+    margin-top: 20px;
+}
+
+.detail-section textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.char-count {
+    text-align: right;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #888;
+}
+
+.budget-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin: 20px auto;
+    max-width: 1000px;
+}
+
+.budget-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 300px;
+}
+
+.budget-item label {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.budget-item input[type="text"],
+.budget-item input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 1.1em;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.recruit-container {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.recruit-section {
+    margin-bottom: 20px;
+}
+
+.recruit-section label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.recruit-section input,
+.recruit-section select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.recruit-team-section {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px; /* 간격 추가 */
+}
+
+/* 모집 인원의 Select 크기 조정 */
+.recruit-team-section select {
+    width: 100px; /* Select 옵션 크기 줄이기 */
+}
+
+/* 모집 인원의 Input 크기 조정 */
+.recruit-team-section input {
+    width: 50px; /* 입력 필드 크기 줄이기 */
+}
+
+.recruit-add-button {
+    cursor: pointer;
+    color: #28a745;
+    font-size: 0.9em;
+}
+
+/* 동적으로 추가되는 질문 섹션 */
+.recruit-added-section {
+    width: calc(100%);
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 동적으로 추가되는 질문 섹션 */
+.recruit-added-item select{
+    width: 100px;
+}
+
+.recruit-added-item input{
+    width: 50px;
+}
+
+.recruit-question-input {
+    width: calc(90% - 60px);
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.recruit-question-section .recruit-add-button {
+    margin-left: 0;
+}
