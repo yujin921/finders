@@ -39,6 +39,26 @@ public class MemberController {
     public String join() {
         return "/member/joinForm";
     }
+    
+    @GetMapping("idCheck")
+    public String idCheck() {
+    	return "/member/idCheck";
+    }
+    
+    @PostMapping("idCheck")
+    public String idCheck(
+    		@RequestParam("searchId") String searchId,
+    		Model model) {
+    	log.debug("전달된 검색 ID : {}", searchId );
+    	boolean result = memberService.idCheck(searchId);
+    	
+    	log.debug("전달된 ID 검색 결과 : {}", result);
+    	
+    	model.addAttribute("searchId", searchId);
+		model.addAttribute("result", result);
+		
+		return "member/idCheck";
+    }
 
     @PostMapping("join")
     public String join(@RequestParam("roleName") String roleName,
@@ -120,7 +140,7 @@ public class MemberController {
     // 클라이언트 마이페이지
     @GetMapping("myPage")
     public String myPage() {
-    	return "/member/myPage";
+    return "/member/myPage";
     }
     
 }

@@ -1,8 +1,11 @@
 package net.datasa.finders.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,25 +51,25 @@ public class ChatRoomController {
         return "chat/chatrooms"; // chatrooms.html로 이동
     }
 
-    @GetMapping("/create")
-    public String createChatRoomPage(Model model) {
-        // 현재 로그인한 사용자 ID 가져오기
-        String currentUserId = getCurrentUserId();
-        
-        // 사용자가 참여하고 있는 프로젝트 목록 가져오기
-        List<ProjectDTO> projects = chatRoomService.getProjectsForMember(currentUserId);
-        
-        // 모델에 프로젝트 목록 추가
-        model.addAttribute("projects", projects);
-        return "create-chatroom"; // create-chatroom.html로 이동
-    }
+//    @GetMapping("/create")
+//    public String createChatRoomPage(Model model) {
+//        // 현재 로그인한 사용자 ID 가져오기
+//        String currentUserId = getCurrentUserId();
+//        
+//        // 사용자가 참여하고 있는 프로젝트 목록 가져오기
+//        List<ProjectDTO> projects = chatRoomService.getProjectsForMember(currentUserId);
+//        
+//        // 모델에 프로젝트 목록 추가
+//        model.addAttribute("projects", projects);
+//        return "create-chatroom"; // create-chatroom.html로 이동
+//    }
 
-    // member_id에 기반해 채팅방 생성
-    @PostMapping("/create")
-    public ResponseEntity<String> createChatRoomsForMember(@RequestParam("memberId") String memberId) {
-        chatRoomService.createChatRoomsForAllMemberProjects(memberId);
-        return ResponseEntity.ok("채팅방이 성공적으로 생성되었습니다.");
-    }
+//    // member_id에 기반해 채팅방 생성
+//    @PostMapping("/create")
+//    public ResponseEntity<String> createChatRoomsForMember(@RequestParam("memberId") String memberId) {
+//        chatRoomService.createChatRoomsForAllMemberProjects(memberId);
+//        return ResponseEntity.ok("채팅방이 성공적으로 생성되었습니다.");
+//    }
 
     @GetMapping("/room")
     public String getChatRoom(@RequestParam("id") int chatroomId, Model model) {
@@ -154,5 +157,18 @@ public class ChatRoomController {
     public ResponseEntity<String> inviteMemberToChatRoom(@RequestBody InviteRequestDTO request) {
         chatRoomService.inviteMember(request.getChatroomId(), request.getMemberId());
         return ResponseEntity.ok("초대가 완료되었습니다.");
+    }
+    
+    @GetMapping("/getProjectNum")
+    public ResponseEntity<Map<String, Object>> getProjectNum(@RequestParam("chatroomId") int chatroomId) {
+        // chatroomId에 맞는 projectNum 조회
+        Integer projectNum = chatRoomService.findProjectNumByChatroomId(chatroomId);
+        if (projectNum != null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("projectNum", projectNum);
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 }

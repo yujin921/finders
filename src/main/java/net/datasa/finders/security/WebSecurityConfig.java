@@ -23,6 +23,7 @@ public class WebSecurityConfig {
             , "/css/**"             //CSS파일들
             , "/js/**"              //JavaSCript 파일들
             , "/member/join"        //회원가입
+            , "/member/idCheck"		//중복체크
     };
     
     // 프리랜서 회원 접근 가능

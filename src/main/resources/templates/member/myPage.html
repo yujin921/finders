@@ -1,10 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
 <body>
-	<h1>마이페이지</h1>
+	<div sec:authorize="isAuthenticated()">
+	<h1>안녕하세요, <span sec:authentication="name"></span>님!</h1>
+	</div>
+	
+	        <!-- 프리랜서 회원가입 폼 -->
+        <div sec:authorize="hasRole('ROLE_FREELANCER')" id="freelancer-update">
+            <form id="freelancer-update-form" th:action="@{/member/update}" method="post" enctype="multipart/form-data">
+                <!-- 프로필 이미지 업로드 -->
+                <label for="freelancer-profile-img">프로필 이미지</label>
+                <input type="file" id="freelancer-profile-img" name="profileImg"><br>
+
+                <!-- 프리랜서 회원 기본 정보 -->
+                <h1>기본 정보</h1>
+                <label for="freelancer-id">아이디</label>
+                <input type="text" id="freelancer-id" name="memberId" required readonly="readonly" th:value="${#authentication.name}">
+                <br>
+                <label for="freelancer-password">비밀번호</label>
+                <input type="password" id="freelancer-password" name="memberPw" placeholder="비밀번호는 8자 이상 20자 이하로 입력하세요." required><br>
+                <input type="password" id="freelancer-password-check" placeholder="동일한 비밀번호를 재입력하세요."><br>
+                <label for="freelancer-name">이름</label>
+                <input type="text" id="freelancer-name" name="memberName" required><br>
+                <label for="freelancer-email">이메일</label>
+                <input type="email" id="freelancer-email" name="email" required><br>
+                <input type="hidden" name="roleName" value="ROLE_FREELANCER" />
+                
+                <h1>상세 정보</h1>
+                <!-- 프리랜서 회원 상세 정보 -->
+                <label for="freelancer-phone">연락처</label>
+                <input type="text" id="freelancer-phone" name="freelancerPhone"><br>
+                 
+                <!-- 카카오 확인 -->
+                <input type="text" id="sample6_postcode" name="postalCode" placeholder="우편번호" readonly="readonly">
+    			<input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
+    			<input type="text" id="sample6_address" name="address" placeholder="주소" readonly="readonly"><br>
+   				<input type="text" id="sample6_detailAddress" name="detailAddress" placeholder="상세주소">
+    			<input type="text" id="sample6_extraAddress" name="extraAddress" placeholder="참고항목">
+                <!-- 카카오 확인 끝-->
+                
+                <label for="freelancer-country">체류 중인 국가</label>
+                <input type="text" id="freelancer-country" name="country"><br>
+                <button type="submit">회원가입</button>
+                <div class="errorMsg" th:if="${param.error}"><script>alert('회원가입에 실패했습니다.')</script></div>
+            </form>
+        </div>
+
+        <!-- client 회원가입 폼 -->
+        <div sec:authorize="hasRole('ROLE_CLIENT')" id="client-update">
+            <form id="client-update-form" th:action="@{/member/update}" method="post" enctype="multipart/form-data">
+                <label for="client-profile-img">프로필 이미지</label>
+                <input type="file" id="client-profile-img" name="profileImg"><br>
+
+                <h1>기본 정보</h1>
+                <!-- client 회원 기본 정보 -->
+                <label for="client-id">아이디</label>
+                <input type="text" id="client-id" name="memberId" required readonly="readonly" th:value="${#authentication.name}"><br>
+                <br>
+                <label for="client-password">비밀번호</label>
+                <input type="password" id="client-password" name="memberPw" placeholder="비밀번호는 8자 이상 20자 이하로 입력하세요." required><br>
+                <input type="password" id="client-password-check" placeholder="동일한 비밀번호를 재입력하세요."><br>
+                <label for="client-name">이름</label>
+                <input type="text" id="client-name" name="memberName" required><br>
+                <label for="client-email">이메일</label>
+                <input type="email" id="client-email" name="email" required><br>
+                <input type="hidden" name="roleName" value="ROLE_CLIENT" />
+                
+                <h1>상세 정보</h1>
+                <!-- client 회원 상세 정보 -->
+                <label for="client-phone">연락처</label>
+                <input type="text" id="client-phone" name="clientPhone"><br>
+                <!-- 카카오 확인 -->
+                <input type="text" id="sample6_postcode_client" name="postalCode" placeholder="우편번호" readonly="readonly">
+    			<input type="button" onclick="sample6_execDaumPostcode_client()" value="우편번호 찾기"><br>
+    			<input type="text" id="sample6_address_client" name="address" placeholder="주소" readonly="readonly"><br>
+   				<input type="text" id="sample6_detailAddress_client" name="detailAddress" placeholder="상세주소">
+    			<input type="text" id="sample6_extraAddress_client" name="extraAddress" placeholder="참고항목">
+                <!-- 카카오 확인 끝-->
+                <label for="client-industry">산업 분야</label>
+                <input type="text" id="client-industry" name="industry"><br>
+                <label for="client-foundeddate">설립일</label>
+                <input type="date" id="client-foundeddate" name="foundedDate"><br>
+                <label for="client-employeecount">사원 수</label>
+                <input type="number" id="client-employeecount" name="employeeCount"><br>
+                <label for="client-website">사이트 URL</label>
+                <input type="text" id="client-website" name="website"><br>
+                <button type="submit">회원가입</button>
+                <div class="errorMsg" th:if="${param.error}"><script>alert('회원가입에 실패했습니다.')</script></div>
+            </form>
+        </div>
 </body>
 </html>

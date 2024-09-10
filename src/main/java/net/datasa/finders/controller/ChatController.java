@@ -1,10 +1,12 @@
 package net.datasa.finders.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -39,8 +41,16 @@ public class ChatController {
     }
     
     @MessageMapping("/send")
-    public void sendMessage(@Payload ChatMessageDTO chatMessage) {
-        logger.info("Received message: {}", chatMessage); // 메시지 수신 로그 추가
+    public void sendMessage(@Payload ChatMessageDTO chatMessage, 
+                            @Header("simpUser") Principal principal) {
+        logger.info("Received message: {}", chatMessage);
+
+        // Principal로부터 현재 사용자 ID 설정
+        String currentUserId = (principal != null) ? principal.getName() : "UnknownUser";
+
+        // 받은 메시지에서 senderId를 현재 로그인된 사용자 ID로 설정
+        chatMessage.setSenderId(currentUserId);
+
         try {
             // 메시지를 데이터베이스에 저장
             chatMessageService.saveMessage(chatMessage);
