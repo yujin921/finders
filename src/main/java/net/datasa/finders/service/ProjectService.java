@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.datasa.finders.domain.entity.ChatRoomEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.ProjectEntity;
+import net.datasa.finders.repository.ChatRoomRepository;
 import net.datasa.finders.repository.MemberRepository;
 import net.datasa.finders.repository.ProjectRepository;
 
@@ -19,6 +21,12 @@ public class ProjectService {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private ChatRoomRepository chatRoomRepository; // ChatRoomRepository 주입 추가
+
+    @Autowired
+    private ChatParticipantService chatParticipantService; // ChatParticipantService 주입
 
     @Transactional
     public void addMemberToProject(String userId, int projectNum) {
@@ -41,20 +49,15 @@ public class ProjectService {
         System.out.println("Saving member-project relationship...");
         memberRepository.save(member);  // 이 단계에서 team 테이블에 데이터가 삽입됩니다.
 
-        // 로그로 데이터 삽입 확인
-        System.out.println("User " + userId + " added to project " + projectNum);
+        // 팀 추가 후 chat_participant 업데이트 로직 추가
+        ChatRoomEntity chatRoom = chatRoomRepository.findByProjectNum(projectNum)
+                .orElseThrow(() -> new IllegalArgumentException("프로젝트에 해당하는 채팅방을 찾을 수 없습니다: " + projectNum));
 
-        // 확인을 위해 팀 테이블 데이터 조회
-        // 주의: 실제로 이 쿼리는 데이터베이스에서 잘 실행되는지 확인만을 위해 사용합니다.
-        try {
-            List<Object[]> teamData = memberRepository.findTeamEntries();
-            System.out.println("현재 team 테이블 데이터:");
-            for (Object[] entry : teamData) {
-                System.out.println("project_num: " + entry[0] + ", member_id: " + entry[1]);
-            }
-        } catch (Exception e) {
-            System.err.println("팀 테이블 조회 중 오류 발생: " + e.getMessage());
-        }
+        // 채팅방 참여자 추가
+        chatParticipantService.addParticipant(chatRoom.getChatroomId(), userId);
+
+        // 로그로 데이터 삽입 확인
+        System.out.println("User " + userId + " added to project " + projectNum + " and chat participant.");
     }
 
     // 프로젝트에 속한 사용자인지 확인하는 메서드

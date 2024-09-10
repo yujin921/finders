@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<MemberEntity, String> {
@@ -19,4 +20,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
     // team 테이블의 데이터를 확인하기 위한 임시 메서드
     @Query(value = "SELECT project_num, member_id FROM team", nativeQuery = true)
     List<Object[]> findTeamEntries();
+
+    Optional<MemberEntity> findByMemberId(String memberId);
+
 }

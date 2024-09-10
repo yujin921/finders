@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>채팅방</title>
     <style>
+        /* 기존 CSS 유지 */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -16,7 +17,7 @@
         .chat-container {
             display: flex;
             flex-direction: column;
-            height: 80vh;
+            height: 70vh;
         }
         .messages {
             flex: 1;
@@ -66,102 +67,316 @@
         }
         .message.mine {
             background-color: #d1e7dd;
-            margin-left: auto; /* 오른쪽으로 이동 */
+            margin-left: auto;
             text-align: right;
         }
         .message.others {
             background-color: #f1f1f1;
-            margin-right: auto; /* 왼쪽으로 이동 */
+            margin-right: auto;
             text-align: left;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            width: 400px;
+            z-index: 1000;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .modal-content {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .modal ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .modal li {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal li:hover {
+            background-color: #f9f9f9;
+        }
+        .modal .selected {
+            background-color: #007bff;
+            color: white;
+        }
+        .modal .button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .modal button {
+            padding: 8px 12px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .modal button:hover {
+            background-color: #0056b3;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
     </style>
-    <!-- WebJars를 사용하여 SockJS와 STOMP.js 로드 -->
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
 </head>
 <body>
     <h1 th:text="'채팅방 - ' + ${chatroomName}">채팅방</h1>
-    <!-- 데이터를 데이터 속성으로 설정 -->
     <div id="chatroom-data" 
          th:data-chatroom-id="${chatroomId}" 
-         th:data-member-id="${memberId}"></div>
-
+         th:data-member-id="${memberId}" 
+         th:data-project-num="${projectNum}"></div>
+     
     <div class="chat-container">
-        <div id="messages" class="messages">
-            <!-- Messages will be dynamically added here -->
-        </div>
+        <div id="messages" class="messages"></div>
         <div class="message-input">
             <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." />
             <button id="sendMessageButton">전송</button>
         </div>
     </div>
 
+    <div class="button-container">
+        <button class="button" onclick="openParticipantsModal()">멤버 보기</button>
+    </div>
+
+    <!-- 멤버 보기 모달 -->
+    <div id="participantsModal" class="modal">
+        <div class="modal-header">
+            <h3>참가자 목록</h3>
+            <button onclick="closeParticipantsModal()">닫기</button>
+        </div>
+        <div class="modal-content">
+            <ul id="participantList"></ul>
+        </div>
+        <div class="button-container">
+            <button class="button" onclick="openInviteModal()">채팅방 초대</button>
+        </div>
+    </div>
+
+    <!-- 초대 모달 -->
+    <div id="inviteModal" class="modal">
+        <div class="modal-header">
+            <h3>참가자 초대</h3>
+            <button onclick="closeInviteModal()">닫기</button>
+        </div>
+        <div class="modal-content">
+            <ul id="inviteList"></ul>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+
     <script>
-        // 데이터 속성에서 변수 가져오기
         var chatroomElement = document.getElementById('chatroom-data');
         var chatroomId = chatroomElement.getAttribute('data-chatroom-id');
+        var projectNum = chatroomElement.getAttribute('data-project-num'); // projectNum 가져오기
         var memberId = chatroomElement.getAttribute('data-member-id');
 
-        console.log("Loaded chatroomId:", chatroomId); // 확인용 로그 추가
-        console.log("Loaded memberId:", memberId); // 확인용 로그 추가
+        console.log("Chatroom ID:", chatroomId); // 디버깅을 위한 로그
+        console.log("Project Number:", projectNum); // projectNum 확인
+        console.log("Member ID:", memberId); // memberId 확인
 
-        // WebSocket 연결을 위한 SockJS 사용
-        var socket = new SockJS('/ws/chat'); // 서버의 WebSocket 엔드포인트에 연결
-        var stompClient = Stomp.over(socket); // STOMP 프로토콜을 WebSocket 위에서 사용
+        var socket = new SockJS('/ws/chat');
+        var stompClient = Stomp.over(socket);
 
-        // STOMP 클라이언트를 서버에 연결
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
-            // 채팅방의 메시지 구독 설정
             stompClient.subscribe('/topic/messages/' + chatroomId, function (message) {
                 var messageData = JSON.parse(message.body);
-                displayMessage(messageData); // 수신한 메시지를 화면에 표시
+                displayMessage(messageData);
             });
         }, function (error) {
             console.error('WebSocket connection error:', error);
         });
-        
-     // 전송 버튼 클릭 시 메시지 전송
+
         document.getElementById('sendMessageButton').addEventListener('click', function () {
             var messageInput = document.getElementById('messageInput');
             var messageContent = messageInput.value;
 
             if (messageContent.trim() !== '') {
                 var messageData = {
-                    chatroomId: parseInt(chatroomId), // 정수로 변환하여 전송
-                    senderId: memberId, // memberId를 senderId로 사용
+                    chatroomId: parseInt(chatroomId),
+                    senderId: memberId,
                     messageContents: messageContent,
                     sendTime: new Date().toISOString()
                 };
 
-                // 서버로 메시지 전송
                 stompClient.send('/app/send', {}, JSON.stringify(messageData));
-
-                // 입력 필드 초기화
                 messageInput.value = '';
             }
         });
-
 
         function displayMessage(message) {
             var messageContainer = document.getElementById('messages');
             var messageElement = document.createElement('div');
             messageElement.classList.add('message');
-
-            // 현재 사용자가 보낸 메시지인지 확인
             if (message.senderId === memberId) {
                 messageElement.classList.add('mine');
             } else {
                 messageElement.classList.add('others');
             }
-
-            // message.senderId를 사용하여 올바르게 표시
             messageElement.innerHTML = '<p class="sender">' + message.senderId + '</p>' +
                 '<p>' + message.messageContents + '</p>' +
                 '<p class="timestamp">' + new Date(message.sendTime).toLocaleString() + '</p>';
-                
             messageContainer.appendChild(messageElement);
             messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadPreviousMessages();
+        });
+
+        function loadPreviousMessages() {
+            fetch(`/chat/messages?chatroomId=${chatroomId}`)
+                .then(response => response.json())
+                .then(messages => {
+                    messages.forEach(message => displayMessage(message));
+                })
+                .catch(error => {
+                    console.error('Failed to load messages:', error);
+                });
+        }
+
+        function openParticipantsModal() {
+            fetch(`/chat/participants?chatroomId=${chatroomId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load participants');
+                    }
+                    return response.json();
+                })
+                .then(participants => {
+                    const participantList = document.getElementById('participantList');
+                    participantList.innerHTML = ''; 
+                    participants.forEach(participant => {
+                        const li = document.createElement('li');
+                        li.textContent = participant; 
+                        participantList.appendChild(li);
+                    });
+                    document.getElementById('participantsModal').style.display = 'block';
+                    document.getElementById('overlay').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Failed to load participants:', error);
+                    alert('참가자 목록을 불러오는 중 오류가 발생했습니다.');
+                });
+        }
+
+        function closeParticipantsModal() {
+            document.getElementById('participantsModal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function openInviteModal() {
+            // chatroom-data에서 projectNum과 chatroomId 가져오기
+            const projectNum = document.getElementById('chatroom-data').getAttribute('data-project-num');
+            const chatroomId = document.getElementById('chatroom-data').getAttribute('data-chatroom-id');
+
+            if (!projectNum || isNaN(projectNum) || !chatroomId || isNaN(chatroomId)) {
+                alert('유효한 프로젝트 번호 또는 채팅방 ID가 필요합니다.');
+                return;
+            }
+
+            fetch(`/chat/getAvailableTeamMembers?projectNum=${projectNum}&chatroomId=${chatroomId}`)
+                .then(response => response.json())
+                .then(members => {
+                    const inviteList = document.getElementById('inviteList');
+                    inviteList.innerHTML = '';
+                    if (!Array.isArray(members)) {
+                        alert('멤버 목록을 불러오는 중 오류가 발생했습니다.');
+                        return;
+                    }
+
+                    members.forEach(member => {
+                        const li = document.createElement('li');
+                        li.textContent = member;
+                        // '참가 중' 멤버는 클릭 불가하게 처리
+                        if (member.includes('(참가 중)')) {
+                            li.style.color = 'grey';
+                            li.style.pointerEvents = 'none'; // 클릭 불가 처리
+                        } else {
+                            li.onclick = () => inviteMember(member.replace(' (참가 중)', ''), li);
+                        }
+                        inviteList.appendChild(li);
+                    });
+
+                    document.getElementById('inviteModal').style.display = 'block';
+                    document.getElementById('overlay').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Failed to load members:', error);
+                    alert('멤버 목록을 불러오는 중 오류가 발생했습니다.');
+                });
+        }
+
+
+        function closeInviteModal() {
+            document.getElementById('inviteModal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function inviteMember(memberId, element) {
+            fetch(`/chat/invite`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chatroomId, memberId })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert(`${memberId}님이 초대되었습니다.`);
+                    element.classList.add('selected');
+                } else {
+                    alert('초대 실패');
+                }
+            })
+            .catch(error => {
+                console.error('Failed to invite member:', error);
+                alert('초대 중 오류가 발생했습니다.');
+            });
         }
     </script>
 </body>
