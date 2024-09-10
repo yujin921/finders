@@ -8,7 +8,8 @@
 	</head>
 	<body>
 		<form id="editorForm" action="save" method="post">
-		<button type="submit">save</button>
+		<button type="submit">save</button><br>
+		제목 : <input type="text" name="projectTitle" id="projectTitle">
 			<div>
 				<div class="main-container">
 					<div class="editor-container editor-container_document-editor" id="editor-container">
@@ -16,7 +17,7 @@
 						<div class="editor-container__toolbar" id="editor-toolbar"></div>
 						<div class="editor-container__editor-wrapper">
 							<div class="editor-container__editor">
-									<textarea name="editorContent" id="editorContent" style="display:none;"></textarea>
+									<textarea name="projectDescription" id="projectDescription" style="display:none;"></textarea>
 									<div id="editor"></div>
 							</div>
 						</div>

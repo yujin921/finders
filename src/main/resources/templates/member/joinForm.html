@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>회원가입</title>
     <link rel="stylesheet" th:href="@{/css/joinForm.css}">
+    
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
     <script th:src="@{/js/joinForm.js}" defer></script>
     <script th:src="@{/js/popup_2.js}"></script>
     
@@ -32,9 +35,12 @@
                 <!-- 프리랜서 회원 기본 정보 -->
                 <h1>기본 정보</h1>
                 <label for="freelancer-id">아이디</label>
-                <input type="text" id="freelancer-id" name="memberId" required><br>
+                <input type="text" id="freelancer-id" name="memberId" required readonly="readonly">
+                <input type="button" id="freelancerIdCheck" value="ID 중복확인">
+                <br>
                 <label for="freelancer-password">비밀번호</label>
-                <input type="password" id="freelancer-password" name="memberPw" required><br>
+                <input type="password" id="freelancer-password" name="memberPw" placeholder="비밀번호는 8자 이상 20자 이하로 입력하세요." required><br>
+                <input type="password" id="freelancer-password-check" placeholder="동일한 비밀번호를 재입력하세요."><br>
                 <label for="freelancer-name">이름</label>
                 <input type="text" id="freelancer-name" name="memberName" required><br>
                 <label for="freelancer-email">이메일</label>
@@ -45,13 +51,6 @@
                 <!-- 프리랜서 회원 상세 정보 -->
                 <label for="freelancer-phone">연락처</label>
                 <input type="text" id="freelancer-phone" name="freelancerPhone"><br>
-                
-                <!-- 주석 처리
-                <label for="freelancer-address">주소</label>
-                <input type="text" id="freelancer-address" name="address"><br>
-                <label for="freelancer-postalcode">우편번호</label>
-                <input type="text" id="freelancer-postalcode" name="postalCode"><br>
-                 -->
                  
                 <!-- 카카오 확인 -->
                 <input type="text" id="sample6_postcode" name="postalCode" placeholder="우편번호" readonly="readonly">
@@ -77,9 +76,12 @@
                 <h1>기본 정보</h1>
                 <!-- client 회원 기본 정보 -->
                 <label for="client-id">아이디</label>
-                <input type="text" id="client-id" name="memberId" required><br>
+                <input type="text" id="client-id" name="memberId" required readonly="readonly"><br>
+                <input type="button" id="clientIdCheck" value="ID 중복확인">
+                <br>
                 <label for="client-password">비밀번호</label>
-                <input type="password" id="client-password" name="memberPw" required><br>
+                <input type="password" id="client-password" name="memberPw" placeholder="비밀번호는 8자 이상 20자 이하로 입력하세요." required><br>
+                <input type="password" id="client-password-check" placeholder="동일한 비밀번호를 재입력하세요."><br>
                 <label for="client-name">이름</label>
                 <input type="text" id="client-name" name="memberName" required><br>
                 <label for="client-email">이메일</label>

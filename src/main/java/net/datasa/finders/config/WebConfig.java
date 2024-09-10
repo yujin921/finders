@@ -8,8 +8,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 	@Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // C:/upload 디렉토리를 /images/** 경로로 매핑
+        // C:/upload/portfolio/ 디렉토리를 /images/ckedictor/** 경로로 매핑
         registry.addResourceHandler("/images/portfolio/**")
-                .addResourceLocations("file:/C:/upload/");
+                .addResourceLocations("file:/C:/upload/ckedictor/");
+        
+        // C:/upload/profile/ 디렉토리를 /images/profile/** 경로로 매핑
+        registry.addResourceHandler("/images/profile/**")
+        		.addResourceLocations("file:///c:/upload/profile/");
     }
 }

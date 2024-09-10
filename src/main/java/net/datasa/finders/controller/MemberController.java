@@ -1,7 +1,9 @@
 package net.datasa.finders.controller;
 
 import java.io.IOException;
+import java.security.Principal;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,18 +29,35 @@ import net.datasa.finders.service.MemberService;
 public class MemberController {
 
     private final MemberService memberService;
-    
+
     //application.properties 파일 관련 설정값
   	@Value("${member.uploadPath}")
   	String uploadPath;
-    
-    // 여기부터카카오
-    
-    //여기까지 카카오
-    
+
+  	
     @GetMapping("join")
     public String join() {
         return "/member/joinForm";
+    }
+    
+    @GetMapping("idCheck")
+    public String idCheck() {
+    	return "/member/idCheck";
+    }
+    
+    @PostMapping("idCheck")
+    public String idCheck(
+    		@RequestParam("searchId") String searchId,
+    		Model model) {
+    	log.debug("전달된 검색 ID : {}", searchId );
+    	boolean result = memberService.idCheck(searchId);
+    	
+    	log.debug("전달된 ID 검색 결과 : {}", result);
+    	
+    	model.addAttribute("searchId", searchId);
+		model.addAttribute("result", result);
+		
+		return "member/idCheck";
     }
 
     @PostMapping("join")
@@ -116,6 +135,12 @@ public class MemberController {
     @GetMapping("mypageClient")
     public String mypageClient() {
     	return "/member/mypageClient";
+    }
+    
+    // 클라이언트 마이페이지
+    @GetMapping("myPage")
+    public String myPage() {
+    return "/member/myPage";
     }
     
 }

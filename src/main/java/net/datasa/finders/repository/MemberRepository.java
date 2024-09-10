@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<MemberEntity, String> {
@@ -20,6 +21,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
     @Query(value = "SELECT project_num, member_id FROM team", nativeQuery = true)
     List<Object[]> findTeamEntries();
 
-	MemberEntity findByMemberId(String memberId);
+    Optional<MemberEntity> findByMemberId(String memberId);
 
 }

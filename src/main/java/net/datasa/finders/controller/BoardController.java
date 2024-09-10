@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -48,33 +49,28 @@ public class BoardController {
     @PostMapping("write")
     public String write(
             @ModelAttribute BoardDTO boardDTO,
-            @RequestParam String selectedWorkScopes,
             @RequestParam("projectImageFile") MultipartFile projectImageFile, // 이미지 파일
             @RequestParam("selectedSkills") String selectedSkills,  // 관련 기술
             @RequestParam("projectDescription") String projectDescription,  // 상세 업무 내용
             @RequestParam("projectBudget") BigDecimal projectBudget,  // 지출 예산
             @RequestParam("projectStartDate") LocalDate projectStartDate,  // 프로젝트 시작일
             @RequestParam("projectEndDate") LocalDate projectEndDate,  // 프로젝트 종료일
+            @RequestParam("recruitDeadline") LocalDateTime recruitDeadline,
+            @RequestParam("role") List<String> roles, // 모집 인원 역할
+            @RequestParam("category") List<String> categories, // 모집 인원 카테고리
+            @RequestParam("teamSize[]") List<Integer> teamSizes, // 모집 인원
+            @RequestParam("question[]") List<String> questions, // 사전 질문
             @AuthenticationPrincipal AuthenticatedUser user) {
 
         // 작성한 글에 사용자 아이디 추가
         boardDTO.setClientId(user.getUsername());
 
         // BoardService 호출해서 프로젝트 및 관련 데이터 저장
-        boardService.write(boardDTO, projectImageFile, selectedWorkScopes, selectedSkills
-                , projectDescription, projectBudget, projectStartDate, projectEndDate);
+        boardService.write(boardDTO, projectImageFile, selectedSkills
+                , projectDescription, projectBudget, projectStartDate, projectEndDate, recruitDeadline, roles, categories, teamSizes, questions);
 
         return "redirect:view";
     }
-
-    /*
-    @PostMapping("/upload")
-    public ResponseEntity<BoardEntity> uploadBoardImage(@RequestParam("image") MultipartFile file) throws IOException {
-        BoardEntity savedBoard = boardService.saveBoardImage(file);
-        return ResponseEntity.ok(savedBoard);
-    }
-
-     */
 
 	@GetMapping("read")
 	public String read(@RequestParam("projectNum") int pNum, Model model, @AuthenticationPrincipal AuthenticatedUser user) {

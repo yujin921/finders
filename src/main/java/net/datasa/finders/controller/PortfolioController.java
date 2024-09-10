@@ -2,14 +2,11 @@ package net.datasa.finders.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,23 +15,28 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.FreelancerPortfoliosDTO;
+import net.datasa.finders.security.AuthenticatedUser;
+import net.datasa.finders.service.FreelancerPortfoliosService;
 
 @Slf4j
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("portfolio")
 public class PortfolioController {
+	
+	private final FreelancerPortfoliosService FPService;
 
 	@GetMapping("edit")
-    public String protfolio() {
+    public String portfolio() {
 		
         return "/portfolio/portfolio";
     }
 	
 	@PostMapping("save")
-    public String save(@RequestParam("editorContent") String contents) {
-		log.debug("출력내용 : {}",contents);
-        return "redirect:/portfolio/portfolio";
+    public String save(@ModelAttribute FreelancerPortfoliosDTO FPDTO, @AuthenticationPrincipal AuthenticatedUser user) {
+		FPService.save(FPDTO, user);
+        return "/portfolio/portfolioList";
     }
 	
 	// 이미지 업로드 경로 설정 (로컬 경로 예시)
