@@ -29,5 +29,5 @@ public class BoardDTO {
     private Boolean projectStatus;
     private List<String> selectedSkills;
     private List<String> selectedCategories;
-    private String selectedWorkScopes;
+    private List<String> selectedWorkScopes;
 }
