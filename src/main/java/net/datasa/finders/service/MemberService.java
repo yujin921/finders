@@ -134,6 +134,7 @@ public class MemberService {
                 .createdTime(now)
                 .updatedTime(now)
                 .build();
+       
         
         // Special handling for admin account
         if (dto.getMemberId().equals("admin123")) {
@@ -141,6 +142,10 @@ public class MemberService {
         }
 
         return memberRepository.save(entity);
+    }
+    
+    public boolean idCheck(String searchId) {
+    	return !memberRepository.existsById(searchId);
     }
 
     
