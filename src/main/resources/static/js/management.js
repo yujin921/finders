@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
     let calendar = null;
+    let ganttChartLoaded = false;
 
     tabs.forEach(tab => {
         tab.addEventListener('click', function(event) {
@@ -22,11 +23,123 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    function loadCalendar() {
-        const calendarEl = document.getElementById('calendar');
-        if (!calendarEl) {
-            return;
+    // 업무 등록 버튼 이벤트 리스너
+    const addTaskButton = document.getElementById('add-task-button');
+    if (addTaskButton) {
+        addTaskButton.addEventListener('click', openTaskModal);
+    }
+
+    // 업무 모달 열기
+	function openTaskModal() {
+	    const modal = document.createElement('div');
+	    modal.classList.add('modal');
+
+	    const modalContent = document.createElement('div');
+	    modalContent.classList.add('modal-content');
+
+	    const title = document.createElement('h3');
+	    title.textContent = '업무 등록';
+
+	    const form = document.createElement('form');
+	    form.innerHTML = `
+	        <div class="form-group">
+	            <label for="task-name">업무명</label>
+	            <input type="text" id="task-name" required>
+	        </div>
+	        
+	        <div class="form-group">
+	            <label for="task-status">상태</label>
+	            <select id="task-status" required>
+	                <option value="요청">요청</option>
+	                <option value="진행">진행</option>
+	                <option value="피드백">피드백</option>
+	                <option value="보류">보류</option>
+	                <option value="완료">완료</option>
+	            </select>
+	        </div>
+	        
+	        <div class="form-group">
+	            <label for="task-priority">우선순위</label>
+	            <select id="task-priority" required>
+	                <option value="낮음">낮음</option>
+	                <option value="보통">보통</option>
+	                <option value="높음">높음</option>
+	                <option value="긴급">긴급</option>
+	            </select>
+	        </div>
+
+	        <div class="form-group">
+	            <label for="task-assignee">담당자</label>
+	            <input type="text" id="task-assignee" required>
+	        </div>
+
+	        <div class="modal-buttons">
+	            <button type="button" class="btn-close">취소</button>
+	            <button type="submit" class="btn-save">저장</button>
+	        </div>
+	    `;
+
+	    modalContent.appendChild(title);
+	    modalContent.appendChild(form);
+	    modal.appendChild(modalContent);
+
+	    document.body.appendChild(modal);
+
+	    const closeButton = modal.querySelector('.btn-close');
+	    const saveButton = modal.querySelector('.btn-save');
+	    
+	    closeButton.addEventListener('click', () => {
+	        document.body.removeChild(modal);
+	    });
+
+	    form.addEventListener('submit', function(event) {
+	        event.preventDefault();
+	        const name = document.getElementById('task-name').value;
+	        const status = document.getElementById('task-status').value;
+	        const priority = document.getElementById('task-priority').value;
+	        const assignee = document.getElementById('task-assignee').value;
+
+	        addTaskToTable(name, status, priority, assignee);
+	        document.body.removeChild(modal);
+	    });
+	}
+
+    // 업무를 테이블에 추가하는 함수
+    function addTaskToTable(name, status, priority, assignee) {
+        const taskTableBody = document.querySelector('#task-table tbody');
+        const newRow = document.createElement('tr');
+
+        newRow.innerHTML = `
+            <td class="task-name">${name}</td>
+            <td>${status}</td>
+            <td>${priority}</td>
+            <td>${assignee}</td>
+        `;
+
+        // 상태가 '완료'일 때 가운데 밑줄 추가
+        if (status === '완료') {
+            newRow.querySelector('.task-name').style.textDecoration = 'line-through';
+            newRow.querySelector('.task-name').style.textDecorationColor = 'red'; // 선택적으로 색상 변경 가능
         }
+
+        // 상태가 변경될 때 자동으로 가운데 밑줄 업데이트
+        newRow.querySelector('td:nth-child(2)').addEventListener('change', function() {
+            if (this.textContent === '완료') {
+                newRow.querySelector('.task-name').style.textDecoration = 'line-through';
+            } else {
+                newRow.querySelector('.task-name').style.textDecoration = 'none';
+            }
+        });
+
+        taskTableBody.appendChild(newRow);
+    }
+
+    // 캘린더 로드
+    function loadCalendar() {
+        if (calendar) return; // 이미 캘린더가 로드된 경우
+
+        const calendarEl = document.getElementById('calendar');
+        if (!calendarEl) return;
 
         calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
@@ -78,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
         calendar.render();
     }
 
+    // 일정 추가 모달 열기
     function openEventModal(dateStr) {
         const title = prompt('새 일정 제목을 입력하세요:', '');
         if (!title) return;
@@ -125,6 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // 일정 상세 모달 열기
     function openEventDetailModal(event) {
         const modal = document.createElement('div');
         modal.classList.add('modal');
@@ -161,6 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(modal);
     }
 
+    // 일정 상세 내용 포맷팅
     function formatEventDetails(event) {
         const startDate = new Date(event.start);
         const endDate = event.end ? new Date(event.end) : null;
@@ -169,6 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return `${startDateStr} ~ ${endDateStr}`;
     }
 
+    // 날짜 포맷팅
     function formatDate(date) {
         const options = {
             year: 'numeric',
@@ -181,17 +298,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return new Intl.DateTimeFormat('en-US', options).format(date);
     }
 
-    let ganttChartLoaded = false;
-
+    // 간트차트 로드
     function loadGanttChart() {
         const ganttChartEl = document.getElementById('gantt-chart');
-        if (!ganttChartEl) {
-            return;
-        }
+        if (!ganttChartEl) return;
 
-        if (ganttChartLoaded) {
-            return;
-        }
+        if (ganttChartLoaded) return;
 
         ganttChartLoaded = true;
 

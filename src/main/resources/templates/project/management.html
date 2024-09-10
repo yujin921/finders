@@ -26,7 +26,7 @@
                 <ul>
                     <li><span>내 프로젝트 조회</span></li>
                     <li><span>대시보드</span></li>
-                    <li><span>전체 업무</span></li>
+                    <li><span class="tab-link" data-tab="task-content">전체 업무</span></li>
                     <li><span class="tab-link gantt-tab" data-tab="gantt-content">간트차트</span></li>
                     <li><span class="tab-link calendar-tab" data-tab="calendar-content">캘린더</span></li>
                     <li><span>임시저장</span></li>
@@ -41,14 +41,23 @@
                 </div>
                 <h1>제목</h1>
             </header>
-            <nav class="menu-tabs">
-                <span class="tab-link" data-tab="task-content">업무</span>
-                <span class="tab-link" data-tab="feed-content">피드</span>
-                <span class="tab-link gantt-tab" data-tab="gantt-content">간트차트</span>
-                <span class="tab-link calendar-tab" data-tab="calendar-content">캘린더</span>
-            </nav>
             <section class="content">
-                <div id="task-content" class="tab-content">업무 내용</div>
+                <div id="task-content" class="tab-content">
+                    <button id="add-task-button">업무 등록</button>
+                    <table id="task-table">
+                        <thead>
+                            <tr>
+                                <th>업무명</th>
+                                <th>상태</th>
+                                <th>우선순위</th>
+                                <th>담당자</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 업무 내용이 동적으로 추가됨 -->
+                        </tbody>
+                    </table>
+                </div>
                 <div id="feed-content" class="tab-content">피드 내용</div>
                 <div id="gantt-content" class="tab-content">
                     <div id="gantt-chart" style="height: 600px;"></div>
