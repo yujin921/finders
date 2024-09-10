@@ -4,14 +4,22 @@
     <meta charset="UTF-8">
     <title>채팅방</title>
     <style>
-        /* 기존 CSS 유지 */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
             background-color: #f9f9f9;
         }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
         h1 {
+            margin: 0;
+            flex: 1;
             text-align: center;
         }
         .chat-container {
@@ -61,6 +69,7 @@
             color: white;
             border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
         .message-input button:hover {
             background-color: #0056b3;
@@ -98,18 +107,6 @@
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.2em;
-        }
         .modal-content {
             max-height: 300px;
             overflow-y: auto;
@@ -139,7 +136,7 @@
         }
         .modal .button-container {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between; /* 버튼을 양 끝으로 배치 */
             margin-top: 10px;
         }
         .modal button {
@@ -154,22 +151,74 @@
         .modal button:hover {
             background-color: #0056b3;
         }
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+
+        .button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0, 123, 255, 0.2);
         }
+        .button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+            transform: translateY(-2px);
+        }
+		.modal-header {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    border-bottom: 1px solid #ddd;
+		    padding: 10px 20px;
+		    margin-bottom: 10px;
+		}
+		
+		.button-container {
+		    display: flex;
+		    gap: 10px;
+		    margin-left: auto; /* Pushes the button container to the right */
+		}
+		
+		.deletebutton {
+		    padding: 8px 8px;
+		    background-color: #ff4d4f !important;
+		    color: white;
+		    border: none;
+		    border-radius: 4px;
+		    cursor: pointer;
+		    transition: background-color 0.3s;
+		}
+		
+		.deletebutton:hover {
+		    background-color: #d32f2f;
+		}
+		.message.system {
+		    background-color: #e0e0e0; /* 시스템 메시지 배경색 */
+		    color: #555; /* 시스템 메시지 텍스트 색상 */
+		    margin-left: auto;
+		    margin-right: auto;
+		    text-align: center;
+		    max-width: 80%;
+		}
     </style>
-    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
-    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
 </head>
 <body>
-    <h1 th:text="'채팅방 - ' + ${chatroomName}">채팅방</h1>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <div class="header-container">
+        <h1 th:text="'채팅방 - ' + ${chatroomName}">채팅방</h1>
+        <div class="button-container">
+            <button class="button" onclick="openParticipantsModal()">멤버 보기</button>
+        </div>
+    </div>
     <div id="chatroom-data" 
          th:data-chatroom-id="${chatroomId}" 
          th:data-member-id="${memberId}" 
          th:data-project-num="${projectNum}"></div>
-     
+
     <div class="chat-container">
         <div id="messages" class="messages"></div>
         <div class="message-input">
@@ -178,47 +227,41 @@
         </div>
     </div>
 
-    <div class="button-container">
-        <button class="button" onclick="openParticipantsModal()">멤버 보기</button>
-    </div>
-
     <!-- 멤버 보기 모달 -->
     <div id="participantsModal" class="modal">
         <div class="modal-header">
             <h3>참가자 목록</h3>
-            <button onclick="closeParticipantsModal()">닫기</button>
+            <div class="button-container">
+                <button class="button" onclick="openInviteModal()">채팅방 초대</button>
+                <button class="deletebutton" onclick="closeParticipantsModal()">닫기</button>
+            </div>
         </div>
         <div class="modal-content">
             <ul id="participantList"></ul>
         </div>
-        <div class="button-container">
-            <button class="button" onclick="openInviteModal()">채팅방 초대</button>
-        </div>
     </div>
 
-    <!-- 초대 모달 -->
-    <div id="inviteModal" class="modal">
-        <div class="modal-header">
-            <h3>참가자 초대</h3>
-            <button onclick="closeInviteModal()">닫기</button>
-        </div>
-        <div class="modal-content">
-            <ul id="inviteList"></ul>
-        </div>
-    </div>
+	  <!-- 초대 모달 -->
+	<div id="inviteModal" class="modal">
+	    <div class="modal-header">
+	        <h3>참가자 목록</h3>
+	        <div class="button-container">
+	            <button class="button" onclick="openInviteModal()">채팅방 초대</button>
+	            <button class="deletebutton" onclick="closeInviteModal()">닫기</button> <!-- Use correct function for closing -->
+	        </div>
+	    </div>
+	    <div class="modal-content">
+	        <ul id="inviteList"></ul>
+	    </div>
+	</div>
 
     <div class="overlay" id="overlay"></div>
-
 
     <script>
         var chatroomElement = document.getElementById('chatroom-data');
         var chatroomId = chatroomElement.getAttribute('data-chatroom-id');
-        var projectNum = chatroomElement.getAttribute('data-project-num'); // projectNum 가져오기
+        var projectNum = chatroomElement.getAttribute('data-project-num');
         var memberId = chatroomElement.getAttribute('data-member-id');
-
-        console.log("Chatroom ID:", chatroomId); // 디버깅을 위한 로그
-        console.log("Project Number:", projectNum); // projectNum 확인
-        console.log("Member ID:", memberId); // memberId 확인
 
         var socket = new SockJS('/ws/chat');
         var stompClient = Stomp.over(socket);
@@ -254,14 +297,25 @@
             var messageContainer = document.getElementById('messages');
             var messageElement = document.createElement('div');
             messageElement.classList.add('message');
-            if (message.senderId === memberId) {
-                messageElement.classList.add('mine');
+
+            // senderId가 "System"인 경우 시스템 메시지로 처리
+            if (message.senderId === "System") {
+                messageElement.classList.add('system'); // 시스템 메시지 스타일
+                messageElement.innerHTML = '<p class="sender">System</p>' +
+                    '<p>' + message.messageContents + '</p>' +
+                    '<p class="timestamp">' + new Date(message.sendTime).toLocaleString() + '</p>';
+            } else if (message.senderId === memberId) {
+                messageElement.classList.add('mine'); // 로그인한 사용자의 메시지 스타일
+                messageElement.innerHTML = '<p class="sender">' + message.senderId + '</p>' +
+                    '<p>' + message.messageContents + '</p>' +
+                    '<p class="timestamp">' + new Date(message.sendTime).toLocaleString() + '</p>';
             } else {
-                messageElement.classList.add('others');
+                messageElement.classList.add('others'); // 다른 사용자의 메시지 스타일
+                messageElement.innerHTML = '<p class="sender">' + message.senderId + '</p>' +
+                    '<p>' + message.messageContents + '</p>' +
+                    '<p class="timestamp">' + new Date(message.sendTime).toLocaleString() + '</p>';
             }
-            messageElement.innerHTML = '<p class="sender">' + message.senderId + '</p>' +
-                '<p>' + message.messageContents + '</p>' +
-                '<p class="timestamp">' + new Date(message.sendTime).toLocaleString() + '</p>';
+
             messageContainer.appendChild(messageElement);
             messageContainer.scrollTop = messageContainer.scrollHeight;
         }
@@ -312,7 +366,6 @@
         }
 
         function openInviteModal() {
-            // chatroom-data에서 projectNum과 chatroomId 가져오기
             const projectNum = document.getElementById('chatroom-data').getAttribute('data-project-num');
             const chatroomId = document.getElementById('chatroom-data').getAttribute('data-chatroom-id');
 
@@ -334,10 +387,9 @@
                     members.forEach(member => {
                         const li = document.createElement('li');
                         li.textContent = member;
-                        // '참가 중' 멤버는 클릭 불가하게 처리
                         if (member.includes('(참가 중)')) {
                             li.style.color = 'grey';
-                            li.style.pointerEvents = 'none'; // 클릭 불가 처리
+                            li.style.pointerEvents = 'none';
                         } else {
                             li.onclick = () => inviteMember(member.replace(' (참가 중)', ''), li);
                         }
@@ -353,10 +405,10 @@
                 });
         }
 
-
         function closeInviteModal() {
             document.getElementById('inviteModal').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
+            closeParticipantsModal();
         }
 
         function inviteMember(memberId, element) {
@@ -369,6 +421,9 @@
                 if (response.ok) {
                     alert(`${memberId}님이 초대되었습니다.`);
                     element.classList.add('selected');
+                    closeInviteModal();
+                    closeParticipantsModal();
+                    sendSystemMessage(`${memberId}님이 채팅방에 초대되었습니다.`); // 시스템 메시지로 전송
                 } else {
                     alert('초대 실패');
                 }
@@ -377,6 +432,17 @@
                 console.error('Failed to invite member:', error);
                 alert('초대 중 오류가 발생했습니다.');
             });
+        }
+
+        function sendSystemMessage(content) {
+            const messageData = {
+                chatroomId: parseInt(chatroomId),
+                senderId: "System", // 발신자를 시스템으로 설정
+                messageContents: content,
+                sendTime: new Date().toISOString()
+            };
+
+            stompClient.send('/app/send', {}, JSON.stringify(messageData)); // 서버로 메시지 전송
         }
     </script>
 </body>

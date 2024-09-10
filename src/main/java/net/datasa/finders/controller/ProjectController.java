@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.service.MemberService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,6 +23,12 @@ public class ProjectController {
     public String list() {
 		
         return "/project/list";
+	}
+
+	@GetMapping("view2")
+    public String protfolio2() {
+		
+        return "/project/view2";
     }
 	
 	@GetMapping("management")

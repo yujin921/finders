@@ -48,25 +48,25 @@ public class ChatRoomController {
         return "chat/chatrooms"; // chatrooms.html로 이동
     }
 
-    @GetMapping("/create")
-    public String createChatRoomPage(Model model) {
-        // 현재 로그인한 사용자 ID 가져오기
-        String currentUserId = getCurrentUserId();
-        
-        // 사용자가 참여하고 있는 프로젝트 목록 가져오기
-        List<ProjectDTO> projects = chatRoomService.getProjectsForMember(currentUserId);
-        
-        // 모델에 프로젝트 목록 추가
-        model.addAttribute("projects", projects);
-        return "create-chatroom"; // create-chatroom.html로 이동
-    }
+//    @GetMapping("/create")
+//    public String createChatRoomPage(Model model) {
+//        // 현재 로그인한 사용자 ID 가져오기
+//        String currentUserId = getCurrentUserId();
+//        
+//        // 사용자가 참여하고 있는 프로젝트 목록 가져오기
+//        List<ProjectDTO> projects = chatRoomService.getProjectsForMember(currentUserId);
+//        
+//        // 모델에 프로젝트 목록 추가
+//        model.addAttribute("projects", projects);
+//        return "create-chatroom"; // create-chatroom.html로 이동
+//    }
 
-    // member_id에 기반해 채팅방 생성
-    @PostMapping("/create")
-    public ResponseEntity<String> createChatRoomsForMember(@RequestParam("memberId") String memberId) {
-        chatRoomService.createChatRoomsForAllMemberProjects(memberId);
-        return ResponseEntity.ok("채팅방이 성공적으로 생성되었습니다.");
-    }
+//    // member_id에 기반해 채팅방 생성
+//    @PostMapping("/create")
+//    public ResponseEntity<String> createChatRoomsForMember(@RequestParam("memberId") String memberId) {
+//        chatRoomService.createChatRoomsForAllMemberProjects(memberId);
+//        return ResponseEntity.ok("채팅방이 성공적으로 생성되었습니다.");
+//    }
 
     @GetMapping("/room")
     public String getChatRoom(@RequestParam("id") int chatroomId, Model model) {
