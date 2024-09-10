@@ -20,6 +20,12 @@ public class ProjectController {
         return "/project/view";
     }
 	
+	@GetMapping("view2")
+    public String protfolio2() {
+		
+        return "/project/view2";
+    }
+	
 	@GetMapping("management")
     public String management() {
 		

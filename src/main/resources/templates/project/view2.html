@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>프로젝트 관리</title>
+    <style>
+    /* 기존 스타일 설정 */
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f9;
+    }
+    .container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin: auto;
+    }
+    .button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 10px;
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+    .button:hover {
+        background-color: #0056b3;
+        box-shadow: 0 4px 12px rgba(0, 91, 187, 0.3);
+    }
+    .sidebar {
+        width: 0;
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100%;
+        background-color: #2c3e50;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+        z-index: 1000;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    }
+    .sidebar-content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 20px;
+        color: white;
+    }
+    .closebtn {
+        position: absolute;
+        top: 20px;
+        right: 25px;
+        font-size: 36px;
+        color: #ecf0f1;
+        cursor: pointer;
+    }
+    .chat-room-list {
+        flex: 1;
+        margin-top: 20px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+    .chat-room-item {
+        padding: 15px;
+        background-color: #34495e;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        text-decoration: none;
+        color: white;
+        display: block;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+    .chat-room-item:hover {
+        background-color: #3b5998;
+        transform: translateY(-2px);
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #ffffff;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        width: 450px;
+        max-height: 80vh;
+        overflow-y: auto;
+        z-index: 1001;
+    }
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+    }
+    .button-close {
+        padding: 8px 12px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 10px;
+    }
+    .button-close:hover {
+        background-color: #c82333;
+    }
+    .input-container {
+        margin-top: 10px;
+    }
+    .message-input {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .message-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    .send-button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .send-button:hover {
+        background-color: #218838;
+    }
+    .members-list, .projects-list {
+        max-height: 150px;
+        overflow-y: auto;
+        padding: 0;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    .members-list li, .projects-list li {
+        padding: 8px;
+        cursor: pointer;
+        border-bottom: 1px solid #ddd;
+        transition: background-color 0.3s;
+        color: #333; /* 글자 색상을 어두운 색으로 강제 설정 */
+    }
+    .members-list li:hover, .projects-list li:hover {
+        background-color: #f1f1f1;
+    }
+    </style>
+</head>
+<body>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="container">
+        <h1>프로젝트 관리</h1>
+        <button class="button" onclick="openSidebar()">채팅방 목록</button>
+    </div>
+
+    <!-- 사이드바 -->
+    <div id="chatSidebar" class="sidebar">
+        <span class="closebtn" onclick="closeSidebar()">&times;</span>
+        <div class="sidebar-content">
+            <button class="button" onclick="openCreateChatRoomModal()">채팅방 만들기</button>
+            <div id="chatRoomsContent" class="chat-room-list">
+                <!-- 채팅방 목록이 여기에 로드됩니다. -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 채팅방 모달 -->
+    <div class="overlay" id="chatOverlay" onclick="closeChatModal()"></div>
+    <div id="chatModal" class="modal">
+        <h3 id="chatroomTitle"></h3>
+        <div id="chatroom-data" data-chatroom-id="" data-member-id="" data-project-num=""></div>
+        <div class="chat-container">
+            <div id="messages" class="messages"></div>
+            <div class="message-input">
+                <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." />
+                <button id="sendMessageButton" class="send-button">전송</button>
+            </div>
+        </div>
+        <button class="button-close" onclick="closeChatModal()">닫기</button>
+    </div>
+
+    <!-- 채팅방 만들기 모달 -->
+    <div class="overlay" id="createChatOverlay" onclick="closeModal()"></div>
+    <div id="createChatRoomModal" class="modal">
+        <h2>채팅방 생성</h2>
+        <div id="projectList">
+            <p>참여 중인 프로젝트 목록:</p>
+            <ul id="projects" class="projects-list"></ul>
+        </div>
+        <div id="teamMemberList" class="members-list" style="display: none;">
+            <p>프로젝트에 참여 중인 팀원 목록:</p>
+            <ul id="members"></ul>
+        </div>
+        <div class="input-container" id="chatRoomNameContainer" style="display: none;">
+            <label for="chatRoomName">채팅방 이름을 입력하세요:</label>
+            <input type="text" id="chatRoomName" placeholder="채팅방 이름">
+        </div>
+        <div class="button-row">
+            <button class="button-small button" id="createChatRoomButton" onclick="createChatRoom()" style="display: none;">채팅방 생성</button>
+            <button class="button-close" onclick="closeModal()">닫기</button>
+        </div>
+    </div>
+
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+<script>
+   // 전역 변수 선언
+let selectedMembers = []; // 선택된 팀원들 저장
+let selectedProjectNum = null; // 선택된 프로젝트 번호를 저장하는 변수
+
+// 사이드바 열기
+function openSidebar() {
+    document.getElementById("chatSidebar").style.width = "300px";
+    loadChatRooms(); // 사이드바에 채팅방 목록 로드
+}
+
+// 사이드바 닫기
+function closeSidebar() {
+    document.getElementById("chatSidebar").style.width = "0";
+}
+
+// 채팅방 목록을 불러오는 함수
+function loadChatRooms() {
+    fetch('/chat/getChatRooms')
+        .then(response => response.json())
+        .then(chatrooms => {
+            const chatRoomsContent = document.getElementById('chatRoomsContent');
+            chatRoomsContent.innerHTML = '';
+
+            chatrooms.forEach(room => {
+                const roomLink = document.createElement('a');
+                roomLink.classList.add('chat-room-item');
+                roomLink.textContent = room.chatroomName;
+                roomLink.href = '#';
+                roomLink.onclick = (event) => {
+                    event.preventDefault();
+                    openChatRoom(room.chatroomId, room.chatroomName);
+                };
+                chatRoomsContent.appendChild(roomLink);
+            });
+        })
+        .catch(error => {
+            console.error('채팅방 목록을 불러오는 중 오류 발생:', error);
+            alert('채팅방 목록을 로드할 수 없습니다.');
+        });
+}
+
+// WebSocket 연결을 관리할 객체
+let stompClients = {};
+
+// 채팅방 모달 열기
+function openChatRoom(chatroomId, chatroomName) {
+    document.getElementById('chatOverlay').style.display = 'block';
+    document.getElementById('chatModal').style.display = 'block';
+    document.getElementById('chatroomTitle').textContent = chatroomName;
+    document.getElementById('chatroom-data').setAttribute('data-chatroom-id', chatroomId);
+
+    // 메시지 영역 초기화
+    document.getElementById('messages').innerHTML = '';
+
+    // 이전 메시지 로드
+    loadPreviousMessages(chatroomId);
+
+    // 해당 채팅방의 WebSocket 연결 설정
+    connectWebSocket(chatroomId);
+}
+
+// 채팅방 모달 닫기
+function closeChatModal() {
+    document.getElementById('chatOverlay').style.display = 'none';
+    document.getElementById('chatModal').style.display = 'none';
+
+    // 현재 열려있는 채팅방 ID를 가져와 연결 해제
+    const chatroomElement = document.getElementById('chatroom-data');
+    const chatroomId = chatroomElement.getAttribute('data-chatroom-id');
+
+    if (stompClients[chatroomId]) {
+        stompClients[chatroomId].disconnect(() => {
+            console.log(`Disconnected from chatroom ${chatroomId}`);
+        });
+        delete stompClients[chatroomId]; // 연결 해제 후 제거
+    }
+}
+
+// 특정 채팅방에 WebSocket 연결 설정
+function connectWebSocket(chatroomId) {
+    // 이미 연결된 경우 해당 연결 사용
+    if (stompClients[chatroomId]) {
+        return;
+    }
+
+    const socket = new SockJS('/ws/chat');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+        // 채팅방 ID별로 구독 설정
+        stompClient.subscribe('/topic/messages/' + chatroomId, function (message) {
+            const messageData = JSON.parse(message.body);
+            // 메시지가 현재 열린 채팅방의 것인지 확인 후 표시
+            displayMessage(messageData, chatroomId);
+        });
+        stompClients[chatroomId] = stompClient; // 연결을 관리 객체에 저장
+    }, function (error) {
+        console.error('WebSocket connection error:', error);
+    });
+
+    // 전송 버튼 클릭 시 메시지 전송
+    document.getElementById('sendMessageButton').onclick = function () {
+        const messageInput = document.getElementById('messageInput');
+        const messageContent = messageInput.value;
+        const memberId = document.getElementById('chatroom-data').getAttribute('data-member-id');
+
+        if (messageContent.trim() !== '') {
+            const messageData = {
+                chatroomId: parseInt(chatroomId),
+                senderId: memberId,
+                messageContents: messageContent,
+                sendTime: new Date().toISOString()
+            };
+
+            stompClient.send('/app/send', {}, JSON.stringify(messageData));
+            messageInput.value = '';
+        }
+    };
+}
+
+// 메시지 화면에 표시하기
+function displayMessage(message, chatroomId) {
+    const currentChatroomId = document.getElementById('chatroom-data').getAttribute('data-chatroom-id');
+
+    // 현재 열린 채팅방의 메시지만 표시
+    if (message.chatroomId != currentChatroomId) {
+        return;
+    }
+
+    const messageContainer = document.getElementById('messages');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+
+    const memberId = document.getElementById('chatroom-data').getAttribute('data-member-id');
+
+    if (message.senderId === memberId) {
+        messageElement.classList.add('mine');
+    } else {
+        messageElement.classList.add('others');
+    }
+
+    messageElement.innerHTML = `<p class="sender">${message.senderId}</p>
+                                <p>${message.messageContents}</p>
+                                <p class="timestamp">${new Date(message.sendTime).toLocaleString()}</p>`;
+    messageContainer.appendChild(messageElement);
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+}
+
+// 이전 메시지 로드
+function loadPreviousMessages(chatroomId) {
+    fetch(`/chat/messages?chatroomId=${chatroomId}`)
+        .then(response => response.json())
+        .then(messages => {
+            // 해당 채팅방의 메시지 필터링
+            messages.forEach(message => displayMessage(message, chatroomId));
+        })
+        .catch(error => {
+            console.error('Failed to load messages:', error);
+        });
+}
+
+// 채팅방 만들기 모달 열기
+function openCreateChatRoomModal() {
+    document.getElementById('createChatOverlay').style.display = 'block';
+    document.getElementById('createChatRoomModal').style.display = 'block';
+    loadProjects(); // 프로젝트 목록 로드
+}
+
+// 채팅방 만들기 모달 닫기
+function closeModal() {
+    document.getElementById('createChatOverlay').style.display = 'none';
+    document.getElementById('createChatRoomModal').style.display = 'none';
+}
+
+// 프로젝트 목록 로드
+function loadProjects() {
+    fetch('/chat/getProjects')
+        .then(response => response.json())
+        .then(projects => {
+            const projectList = document.getElementById('projects');
+            projectList.innerHTML = '';
+
+            projects.forEach(project => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `프로젝트 번호: ${project.projectNum}, 프로젝트 이름: ${project.projectName}`;
+                listItem.onclick = () => {
+                    selectProject(project.projectNum, listItem);
+                };
+                projectList.appendChild(listItem);
+            });
+        })
+        .catch(error => {
+            console.error('Failed to load projects:', error);
+            alert('프로젝트 목록을 불러올 수 없습니다.');
+        });
+}
+
+// 프로젝트를 선택하는 함수
+function selectProject(projectNum, element) {
+    const projectListItems = document.querySelectorAll('#projects li');
+    projectListItems.forEach(item => item.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedProjectNum = projectNum;
+
+    // 선택된 프로젝트의 팀원 목록을 가져오기
+    loadTeamMembers(projectNum);
+}
+
+// 팀원 목록 로드
+function loadTeamMembers(projectNum) {
+    console.log(`Loading team members for project: ${projectNum}`);
+
+    fetch(`/chat/getTeamMembers?projectNum=${projectNum}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(members => {
+            console.log('Team members loaded:', members); // API 응답 데이터 출력
+
+            // 팀원 목록이 비어있을 때 알림 표시
+            if (members.length === 0) {
+                alert('해당 프로젝트에 팀원이 없습니다.');
+                return;
+            }
+
+            // 팀원 목록 UI 업데이트
+            document.getElementById('teamMemberList').style.display = 'block';
+            const memberList = document.getElementById('members');
+            memberList.innerHTML = '';
+
+            members.forEach(member => {
+                const memberName = member.memberName || member.name || member.fullName || member.username || 'Unknown Member'; // 필드명 수정
+                const memberId = member.memberId || member.id || member.userId;
+
+                const memberItem = document.createElement('li');
+                memberItem.textContent = memberName; // 멤버 이름 설정
+                memberItem.onclick = () => toggleMemberSelection(memberId, memberItem); // 멤버 선택 기능
+                memberList.appendChild(memberItem);
+            });
+
+            // 채팅방 생성 UI 표시
+            document.getElementById('chatRoomNameContainer').style.display = 'block';
+            document.getElementById('createChatRoomButton').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Failed to load team members:', error);
+            alert('팀원 목록을 불러오는 중 오류가 발생했습니다.');
+        });
+}
+
+// 팀원 선택/해제 함수
+function toggleMemberSelection(memberId, element) {
+    if (selectedMembers.includes(memberId)) {
+        selectedMembers = selectedMembers.filter(id => id !== memberId);
+        element.classList.remove('selected');
+    } else {
+        selectedMembers.push(memberId);
+        element.classList.add('selected');
+    }
+
+    // 팀원이 선택되면 채팅방 이름 입력 필드 표시
+    if (selectedMembers.length > 0) {
+        document.getElementById('chatRoomNameContainer').style.display = 'block'; // 채팅방 이름 입력 필드 표시
+        document.getElementById('createChatRoomButton').style.display = 'block'; // 생성 버튼 표시
+    } else {
+        document.getElementById('chatRoomNameContainer').style.display = 'none';
+        document.getElementById('createChatRoomButton').style.display = 'none';
+    }
+}
+
+// 채팅방 생성
+function createChatRoom() {
+    const chatRoomName = document.getElementById('chatRoomName').value.trim();
+
+    if (!chatRoomName) {
+        alert('채팅방 이름을 입력하세요.');
+        return;
+    }
+
+    fetch('/chat/createChatRoom', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            projectNum: selectedProjectNum,
+            selectedMemberIds: selectedMembers,
+            chatRoomName: chatRoomName
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('채팅방이 생성되었습니다.');
+            loadChatRooms(); // 채팅방 목록 새로고침
+            closeModal();
+        } else {
+            alert('채팅방 생성 실패');
+        }
+    })
+    .catch(error => {
+        console.error('채팅방 생성 중 오류 발생:', error);
+        alert('채팅방 생성 중 오류가 발생했습니다.');
+    });
+}
+</script>
+   
+
+
+</body>
+</html>
