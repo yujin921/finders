@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.domain.dto.BoardDTO;
+import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.entity.*;
 import net.datasa.finders.repository.*;
 import org.springframework.data.domain.Sort;
@@ -15,10 +15,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 게시판 서비스
@@ -28,24 +26,24 @@ import java.util.List;
 @Service
 @Transactional
 public class BoardService {
-    private final BoardRepository boardRepository;
+    private final ProjectPublishingRepository projectPublishingRepository;
     private final MemberRepository memberRepository;
-    private final Board_WorkScopeRepository workScopeRepository;
-    private final Board_CategoryRepository categoryRepository;
-    private final Board_SkillRepository skillRepository;
+    private final WorkScopeRepository workScopeRepository;
+    private final ProjectCategoryRepository categoryRepository;
+    private final ProjectRequiredSkillRepository skillRepository;
     private final PrequalificationQuestionRepository prequalificationQuestionRepository;
 
-    public void write(BoardDTO boardDTO, MultipartFile imageFile, String selectedSkills
+    public void write(ProjectPublishingDTO projectPublishingDTO, MultipartFile imageFile, String selectedSkills
             , String projectDescription, BigDecimal projectBudget
             , LocalDate projectStartDate, LocalDate projectEndDate
             , LocalDateTime recruitDeadline, List<String> roles
             , List<String> categories, List<Integer> teamSizes, List<String> questions) {
 
-        MemberEntity memberEntity = memberRepository.findById(boardDTO.getClientId())
+        MemberEntity memberEntity = memberRepository.findById(projectPublishingDTO.getClientId())
                 .orElseThrow(() -> new EntityNotFoundException("회원 아이디가 없습니다."));
 
-        boardDTO.setSelectedSkills(Arrays.asList(selectedSkills.split(",")));  // 콤마로 구분된 기술 리스트로 변환
-        boardDTO.setProjectDescription(projectDescription);
+        projectPublishingDTO.setSelectedSkills(Arrays.asList(selectedSkills.split(",")));  // 콤마로 구분된 기술 리스트로 변환
+        projectPublishingDTO.setProjectDescription(projectDescription);
 
         // 이미지 Base64 인코딩 처리
         String imageBase64 = null;
@@ -54,9 +52,9 @@ public class BoardService {
         }
 
         // BoardEntity 생성 후 저장
-        BoardEntity boardEntity = BoardEntity.builder()
+        ProjectPublishingEntity projectPublishingEntity = ProjectPublishingEntity.builder()
                 .clientId(memberEntity)
-                .projectTitle(boardDTO.getProjectTitle())
+                .projectTitle(projectPublishingDTO.getProjectTitle())
                 .recruitDeadline(recruitDeadline)
                 .projectStartDate(projectStartDate)
                 .projectEndDate(projectEndDate)
@@ -65,7 +63,7 @@ public class BoardService {
                 .projectImage(imageBase64) // Base64로 변환된 이미지 저장
                 .projectStatus(false)
                 .build();
-        boardRepository.save(boardEntity);
+        projectPublishingRepository.save(projectPublishingEntity);
     /*
         // 업무 범위 저장 로직
         for (String selectedWorkScopes : boardDTO.getSelectedWorkScopes()) {
@@ -86,9 +84,9 @@ public class BoardService {
         }
 */
         // 관련 기술 저장 로직
-        for (String skill : boardDTO.getSelectedSkills()) {
-            Board_SkillEntity skillEntity = Board_SkillEntity.builder()
-                    .boardEntity(boardEntity)
+        for (String skill : projectPublishingDTO.getSelectedSkills()) {
+            ProjectRequiredSkillEntity skillEntity = ProjectRequiredSkillEntity.builder()
+                    .projectPublishingEntity(projectPublishingEntity)
                     .skillText(skill)
                     .build();
             skillRepository.save(skillEntity);
@@ -96,8 +94,8 @@ public class BoardService {
 
         // 모집 인원 저장 로직 (roles, categories, teamSizes 저장)
         for (int i = 0; i < roles.size(); i++) {
-            Board_WorkScopeEntity workScopeEntity = Board_WorkScopeEntity.builder()
-                    .boardEntity(boardEntity)
+            WorkScopeEntity workScopeEntity = WorkScopeEntity.builder()
+                    .projectPublishingEntity(projectPublishingEntity)
                     .workType(roles.get(i))
                     .requiredNum(teamSizes.get(i))
                     .build();
@@ -105,8 +103,8 @@ public class BoardService {
         }
 
         for (int i = 0; i < categories.size(); i++) {
-            Board_CategoryEntity categoryEntity = Board_CategoryEntity.builder()
-                    .boardEntity(boardEntity)
+            ProjectCategoryEntity categoryEntity = ProjectCategoryEntity.builder()
+                    .projectPublishingEntity(projectPublishingEntity)
                     .category(categories.get(i))
                     .requiredNum(teamSizes.get(i))
                     .build();
@@ -116,7 +114,7 @@ public class BoardService {
         // 사전 질문 저장 로직
         for (String question : questions) {
             PrequalificationQuestionEntity questionEntity = PrequalificationQuestionEntity.builder()
-                    .boardEntity(boardEntity)
+                    .projectPublishingEntity(projectPublishingEntity)
                     .questionText(question)
                     .build();
             prequalificationQuestionRepository.save(questionEntity);
@@ -133,14 +131,14 @@ public class BoardService {
         }
     }
 	
-    public List<BoardDTO> getList(String id) {
+    public List<ProjectPublishingDTO> getList(String id) {
         
     	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
-    	List<BoardEntity> entityList = boardRepository.findAll(sort);
-    	List<BoardDTO> dtoList = new ArrayList<>();
+    	List<ProjectPublishingEntity> entityList = projectPublishingRepository.findAll(sort);
+    	List<ProjectPublishingDTO> dtoList = new ArrayList<>();
 
-        for (BoardEntity entity : entityList) {
-            BoardDTO dto = BoardDTO.builder()
+        for (ProjectPublishingEntity entity : entityList) {
+            ProjectPublishingDTO dto = ProjectPublishingDTO.builder()
                     .projectNum(entity.getProjectNum())
                     .clientId(entity.getClientId().getMemberId())
                     .projectTitle(entity.getProjectTitle())
@@ -158,8 +156,8 @@ public class BoardService {
         return dtoList;
     }
 
-    private BoardDTO convertToDTO(BoardEntity entity) {
-        return BoardDTO.builder()
+    private ProjectPublishingDTO convertToDTO(ProjectPublishingEntity entity) {
+        return ProjectPublishingDTO.builder()
                 .projectNum(entity.getProjectNum())
                 .clientId(entity.getClientId().getMemberId())
                 .projectTitle(entity.getProjectTitle())
@@ -173,16 +171,47 @@ public class BoardService {
                 .build();
     }
     
-    public BoardDTO getBoard(int pNum) {
-        BoardEntity entity = boardRepository.findById(pNum)
+    public ProjectPublishingDTO getBoard(int pNum) {
+        ProjectPublishingEntity entity = projectPublishingRepository.findById(pNum)
                 .orElseThrow(() -> new EntityNotFoundException("해당 번호의 글이 없습니다."));
 
-        BoardDTO dto = convertToDTO(entity);
+        // DTO로 변환 작업
+        ProjectPublishingDTO dto = convertToDTO(entity);
+
+        List<ProjectRequiredSkillEntity> skills = skillRepository.findByProjectPublishingEntity(entity);
+        List<ProjectCategoryEntity> categories = categoryRepository.findByProjectPublishingEntity(entity);
+        List<WorkScopeEntity> workScopes = workScopeRepository.findByProjectPublishingEntity(entity);
+
+        List<String> selectedSkills = skills.stream()
+                .map(ProjectRequiredSkillEntity::getSkillText)
+                .collect(Collectors.toList());
+
+        List<Map<String, Object>> matchedOutputs = new ArrayList<>();
+
+        // 카테고리와 업무 범위를 매칭할 때, required_num이 같은 경우 매칭
+        for (ProjectCategoryEntity category : categories) {
+            for (WorkScopeEntity workScope : workScopes) {
+                // required_num이 같은 경우 매칭
+                if (category.getRequiredNum() == workScope.getRequiredNum()) {
+                    Map<String, Object> output = new HashMap<>();
+                    output.put("category", category.getCategory());
+                    output.put("workScope", workScope.getWorkType());
+                    output.put("requiredNum", category.getRequiredNum());  // 동일한 required_num
+                    matchedOutputs.add(output);
+                } else {
+                    log.debug("매칭되지 않은 required_num: 카테고리 {}, 업무 범위 {}",
+                            category.getRequiredNum(), workScope.getRequiredNum());
+                }
+            }
+        }
+
+        dto.setOutputList(matchedOutputs);
+        dto.setSelectedSkills(selectedSkills);
 
         return dto;
     }
 
     public void deleteBoard(int pNum) {
-        boardRepository.deleteById(pNum);
+        projectPublishingRepository.deleteById(pNum);
     }
 }
