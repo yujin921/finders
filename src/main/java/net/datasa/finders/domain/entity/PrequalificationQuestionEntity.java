@@ -21,7 +21,7 @@ public class PrequalificationQuestionEntity {
 
     @ManyToOne
     @JoinColumn(name = "project_num", referencedColumnName = "project_num")
-    BoardEntity boardEntity;
+    ProjectPublishingEntity projectPublishingEntity;
 
     @Column(name = "question_text", nullable = false, length = 2000)
     String questionText;
