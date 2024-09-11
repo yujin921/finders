@@ -2,9 +2,11 @@ package net.datasa.finders.controller;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -143,4 +145,15 @@ public class MemberController {
     return "/member/myPage";
     }
     
+ // 현재 로그인한 사용자의 memberId를 반환하는 엔드포인트 추가
+    @GetMapping("/getMemberId")
+    public ResponseEntity<Map<String, String>> getMemberId(Principal principal) {
+        // Principal 객체를 통해 현재 로그인한 사용자의 이름을 가져옵니다. 
+        // 이는 일반적으로 memberId로 사용될 수 있습니다.
+        String memberId = principal.getName(); // 현재 로그인한 사용자의 ID를 가져옴
+        Map<String, String> response = new HashMap<>();
+        response.put("memberId", memberId);
+
+        return ResponseEntity.ok(response); // memberId를 JSON 형태로 반환
+    }
 }
