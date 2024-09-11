@@ -11,19 +11,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "project_category")
-public class Board_CategoryEntity{
+@Table(name = "work_scope")
+public class WorkScopeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_num")
-    Integer categoryNum;
+    @Column(name = "work_scope_num")
+    Integer workScopeNum;
 
     @ManyToOne
     @JoinColumn(name = "project_num", referencedColumnName = "project_num")
-    BoardEntity boardEntity;
+    ProjectPublishingEntity projectPublishingEntity;
 
-    @Column(name = "category", nullable = false)
-    String category;
+    @Column(name = "work_type", nullable = false)
+    String workType;
 
     @Column(name = "required_num", nullable = false)
     int requiredNum;

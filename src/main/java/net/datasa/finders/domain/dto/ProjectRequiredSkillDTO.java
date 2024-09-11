@@ -4,14 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.datasa.finders.domain.entity.BoardEntity;
+import net.datasa.finders.domain.entity.ProjectPublishingEntity;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Board_SkillDTO {
+public class ProjectRequiredSkillDTO {
 	private int skillNum;
-    BoardEntity boardEntity;
+    ProjectPublishingEntity projectPublishingEntity;
     private String skillText;
 }

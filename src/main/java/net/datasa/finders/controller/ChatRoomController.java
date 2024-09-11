@@ -1,8 +1,11 @@
 package net.datasa.finders.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +28,7 @@ import net.datasa.finders.domain.entity.ChatRoomEntity;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ChatRoomService;
 
+//채팅전용
 @Controller
 @RequestMapping("chat")
 public class ChatRoomController {
@@ -154,5 +158,18 @@ public class ChatRoomController {
     public ResponseEntity<String> inviteMemberToChatRoom(@RequestBody InviteRequestDTO request) {
         chatRoomService.inviteMember(request.getChatroomId(), request.getMemberId());
         return ResponseEntity.ok("초대가 완료되었습니다.");
+    }
+    
+    @GetMapping("/getProjectNum")
+    public ResponseEntity<Map<String, Object>> getProjectNum(@RequestParam("chatroomId") int chatroomId) {
+        // chatroomId에 맞는 projectNum 조회
+        Integer projectNum = chatRoomService.findProjectNumByChatroomId(chatroomId);
+        if (projectNum != null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("projectNum", projectNum);
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 }

@@ -5,42 +5,32 @@
 <head>
 	<meta charset="UTF-8">
 	<title>게시판</title>
-	<style>
-		
-	</style>
 	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-	<script>
-		
-	</script>
 </head>
 <body>
-	<h1>[ 판매상품 상세보기 ]</h1>
+    <h1 th:text="${board.projectTitle}">프로젝트 제목</h1>
 
-	<p>번호:	<span th:text="${board.boardNum}"></span></p>
-	<p>판매자: <span th:text="${board.memberId}"></span></p>
-	<p>카테고리: <span th:text="${board.category}"></span></p>
-    <p>제목: <span th:text="${board.title}"></span></p>
-    <p>내용: <span th:text="${board.contents}"></span></p>
-    <p>판매가격: <span th:text="${board.price}"></span></p>
-    <p>상태: <span th:text="${board.soldout == 0 ? '판매중' : '판매완료'}"></span></p>
-    <p>구매자: <span th:if="${board.soldout == 1}" th:text="${#authentication.name}"></span>
-        <span th:if="${board.soldout == 0}">-</span></p>
-    
-    <form th:if="${#authentication.name == board.memberId}" th:action="@{/board/delete}" method="post" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
-        <input type="hidden" name="boardNum" th:value="${board.boardNum}" />
-        <button type="submit">삭제하기</button>
-    </form>
+    <p>작성자: <span th:text="${board.clientId}">작성자</span></p>
+    <p>근무 시작일: <span th:text="${board.projectStartDate}">근무 시작일</span></p>
+    <p>모집 마감일: <span th:text="${#temporals.format(board.recruitDeadline, 'yyyy-MM-dd')}"></span></p>
+    <!-- 최종 출력 리스트 -->
+    <div>
+        <h3>카테고리 및 업무 범위별 인원수</h3>
+        <ul>
+            <li th:each="output : ${board.outputList}">
+                <p th:text="${output['workScope']} + ' - ' + ${output['category']} + ' (' + ${output['requiredNum']} + '명)'"></p>
+            </li>
+        </ul>
+    </div>
 
-    <form th:if="${#authentication.name != board.memberId && board.soldout == 0}" th:action="@{/board/buy}" method="post" onsubmit="return confirm('정말로 구매하시겠습니까?');">
-        <input type="hidden" name="boardNum" th:value="${board.boardNum}" />
-        <button type="submit">구매하기</button>
-    </form>
-    
-    <form th:action="@{/board/replywrite}" method="post">
-        <span>리플입력 <input type="text" name="replyText" id="replyText" required></span>
-        <input type="hidden" name="boardnum" th:value="${board.boardNum}">
-        <input type="hidden" name="member_id" th:value="${board.memberId}">
-        <button type="submit">저장</button>
-    </form>
+    <!-- 요구 기술 스택 출력 -->
+    <div>
+        <h3>요구 기술 스택</h3>
+        <ul>
+            <li>
+                <p th:text="${#strings.arrayJoin(board.selectedSkills, ', ')}">기술 스택</p>
+            </li>
+        </ul>
+    </div>
 </body>
 </html>

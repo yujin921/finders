@@ -4,133 +4,90 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finders</title>
-    <!-- Font Awesome 추가 -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <script th:src="@{/js/home.js}"></script>
+    <title>finders</title>
     <link rel="stylesheet" th:href="@{/css/home.css}">
+    <!-- Font Awesome 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script th:src="@{/js/home.js}"></script>
 </head>
 <body>
     <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                	<a href="/">
-        				<img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
-        			</a>
-                </div>
-                <div class="search-bar">
-                    <input type="text" placeholder="프로젝트 또는 프리랜서 검색">
-                    <button type="submit"><i class="fas fa-search"></i></button>
-                </div>
-                <div class="user-actions">
-                    <th:block sec:authorize="not isAuthenticated()">
-	            	<a th:href="@{/member/join}">회원가입</a>
-	        		<a th:href="@{/member/login}" class="btn">로그인</a>
-	    		</th:block>
-	
-	    		<th:block sec:authorize="isAuthenticated()">
-	    			<img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
-	        		<a th:href="@{/board/view}">프로젝트 게시판</a>
-	    		    <a th:href="@{/project/view}">프로젝트 관리</a>
-	    		    <a th:href="@{/member/myPage}">마이페이지</a>
-	    			<a th:href="@{/member/logout}" class="btn">로그아웃</a>
-	    		</th:block>
-                </div>
-            </div>
+        <div class="logo">
+        	<a href="/">
+        		<img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
+        	</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="검색...">
+            <button id="search-button"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="auth-buttons">
+            <th:block sec:authorize="not isAuthenticated()">
+            	<a th:href="@{/member/join}"><button>회원가입</button></a>
+        		<a th:href="@{/member/login}"><button>로그인</button></a>
+    		</th:block>
+
+    		<th:block sec:authorize="isAuthenticated()">
+    			<img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
+        		<a th:href="@{/member/logout}"><button>로그아웃</button></a>
+    		    <a th:href="@{/project/view}"><button>프로젝트 관리</button></a>
+    		    <a th:href="@{/member/myPage}"><button>마이페이지</button></a>
+    		
+    		</th:block>
         </div>
     </header>
-    
+
     <!-- Navigation Menu -->
     <nav>
-        <div class="container">
-            <ul>
-                <li><a href="#">프로젝트 찾기</a></li>
-                <li><a href="#">프리랜서 찾기</a></li>
-                <li><a href="#">서비스 안내</a></li>
-            	<li><a href="#">이용 사례</a></li>
-                <li><a href="#">커뮤니티</a></li>
-                <span>│</span>
-                <li><a th:href="@{/project/management}">프로젝트 관리</a></li>
-                <li><a href="#">미팅룸</a></li>
-            </ul>
-        </div>
+        <ul>
+            <li sec:authorize="hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN')"><a href="board/write">프로젝트 등록</a></li>
+            <li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
+            <li><a href="#">파트너스 찾기</a></li>
+            <li><a href="#">이용 사례</a></li>
+            <li><a th:href="@{/project/list}">내 프로젝트 목록</a></li>
+            <li><a th:href="@{/project/management}">프로젝트 관리(임시)</a></li>
+            <li><a href="#">미팅룸</a></li>
+        </ul>
     </nav>
-    <main>
-    	<!-- Image Slider -->
-	    <section class="slider">
-	        <div class="slides">
-	            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+1" alt="Slide 1"></div>
-	            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+2" alt="Slide 2"></div>
-	            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+3" alt="Slide 3"></div>
-	            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+4" alt="Slide 4"></div>
-	            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+5" alt="Slide 5"></div>
-	        </div>
-	        <button class="prev">‹</button>
-	        <button class="next">›</button>
-	    </section>
-        
-        <section class="featured-projects container">
-            <h2>주목받는 프로젝트</h2>
-            <div class="project-grid">
-                <div class="project-card">
-                    <h3>웹사이트 리디자인</h3>
-                    <p>현대적이고 반응형 웹사이트로 업그레이드가 필요합니다.</p>
-                    <a href="#" class="btn">상세보기</a>
-                </div>
-                <div class="project-card">
-                    <h3>모바일 앱 개발</h3>
-                    <p>혁신적인 건강관리 앱 개발 파트너를 찾습니다.</p>
-                    <a href="#" class="btn">상세보기</a>
-                </div>
-                <div class="project-card">
-                    <h3>로고 디자인</h3>
-                    <p>신선하고 현대적인 브랜드 로고가 필요합니다.</p>
-                    <a href="#" class="btn">상세보기</a>
-                </div>
-                <div class="project-card">
-                    <h3>콘텐츠 마케팅</h3>
-                    <p>블로그 포스팅 및 SNS 콘텐츠 제작을 도와주실 분을 찾습니다.</p>
-                    <a href="#" class="btn">상세보기</a>
-                </div>
-            </div>
-        </section>
-        
-        <section class="hero">
-            <div class="container">
-                <h1>당신의 프로젝트를 성공으로 이끌어줄 프리랜서를 만나보세요</h1>
-                <p>10,000+ 검증된 전문가들이 귀하의 프로젝트를 기다리고 있습니다</p>
-                <a href="#" class="cta-btn">프로젝트 등록하기</a>
-            </div>
-        </section>
-        
-        <!-- Featured Images -->
-	    <section class="featured">
-	        <div class="feature">
-	            <img src="https://via.placeholder.com/300x200?text=Feature+1" alt="Feature 1">
-	            <p>간단한 소개 1</p>
-	        </div>
-	        <div class="feature">
-	            <img src="https://via.placeholder.com/300x200?text=Feature+2" alt="Feature 2">
-	            <p>간단한 소개 2</p>
-	        </div>
-	        <div class="feature">
-	            <img src="https://via.placeholder.com/300x200?text=Feature+3" alt="Feature 3">
-	            <p>간단한 소개 3</p>
-	        </div>
-	        <div class="feature">
-	            <img src="https://via.placeholder.com/300x200?text=Feature+4" alt="Feature 4">
-	            <p>간단한 소개 4</p>
-	        </div>
-	    </section>
-    </main>
+
+    <!-- Image Slider -->
+    <section class="slider">
+        <div class="slides">
+            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+1" alt="Slide 1"></div>
+            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+2" alt="Slide 2"></div>
+            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+3" alt="Slide 3"></div>
+            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+4" alt="Slide 4"></div>
+            <div class="slide"><img src="https://via.placeholder.com/1200x400?text=Slide+5" alt="Slide 5"></div>
+        </div>
+        <button class="prev">‹</button>
+        <button class="next">›</button>
+    </section>
+
+    <!-- Featured Images -->
+    <section class="featured">
+        <div class="feature">
+            <img src="https://via.placeholder.com/300x200?text=Feature+1" alt="Feature 1">
+            <p>간단한 소개 1</p>
+        </div>
+        <div class="feature">
+            <img src="https://via.placeholder.com/300x200?text=Feature+2" alt="Feature 2">
+            <p>간단한 소개 2</p>
+        </div>
+        <div class="feature">
+            <img src="https://via.placeholder.com/300x200?text=Feature+3" alt="Feature 3">
+            <p>간단한 소개 3</p>
+        </div>
+        <div class="feature">
+            <img src="https://via.placeholder.com/300x200?text=Feature+4" alt="Feature 4">
+            <p>간단한 소개 4</p>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer>
-        <div class="container">
-            <p>&copy; 2024 프리랜서 마켓플레이스. All rights reserved.</p>
-            <p><a href="#">개인정보 처리방침</a> | <a href="#">이용 약관</a> | <a href="#">연락처</a></p>
-        </div>
+        <p>© 2024 회사 이름. All rights reserved.</p>
+        <p><a href="#">개인정보 처리방침</a> | <a href="#">이용 약관</a> | <a href="#">연락처</a></p>
     </footer>
+    
 </body>
 </html>

@@ -11,20 +11,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "work_scope")
-public class Board_WorkScopeEntity {
+@Table(name = "project_required_skills")
+public class ProjectRequiredSkillEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "work_scope_num")
-    Integer workScopeNum;
+    @Column(name = "skill_num")
+    Integer skillNum;
 
     @ManyToOne
     @JoinColumn(name = "project_num", referencedColumnName = "project_num")
-    BoardEntity boardEntity;
+    ProjectPublishingEntity projectPublishingEntity;
 
-    @Column(name = "work_type", nullable = false)
-    String workType;
-
-    @Column(name = "required_num", nullable = false)
-    int requiredNum;
+    @Column(name = "skill_text", nullable = false)
+    String skillText;
 }

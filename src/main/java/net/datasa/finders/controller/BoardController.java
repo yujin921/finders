@@ -2,7 +2,7 @@ package net.datasa.finders.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.domain.dto.BoardDTO;
+import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.BoardService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,15 +40,15 @@ public class BoardController {
 
     @ResponseBody
     @GetMapping("list")
-    public List<BoardDTO> list(@AuthenticationPrincipal AuthenticatedUser user) {
+    public List<ProjectPublishingDTO> list(@AuthenticationPrincipal AuthenticatedUser user) {
         //서비스로 사용자 아이디를 전달하여 해당 아이디의 수입,지출 내역을 목록으로 리턴한다.
-        List<BoardDTO> list = boardService.getList(user.getUsername());
+        List<ProjectPublishingDTO> list = boardService.getList(user.getUsername());
         return list;
     }
 
     @PostMapping("write")
     public String write(
-            @ModelAttribute BoardDTO boardDTO,
+            @ModelAttribute ProjectPublishingDTO projectPublishingDTO,
             @RequestParam("projectImageFile") MultipartFile projectImageFile, // 이미지 파일
             @RequestParam("selectedSkills") String selectedSkills,  // 관련 기술
             @RequestParam("projectDescription") String projectDescription,  // 상세 업무 내용
@@ -63,10 +63,10 @@ public class BoardController {
             @AuthenticationPrincipal AuthenticatedUser user) {
 
         // 작성한 글에 사용자 아이디 추가
-        boardDTO.setClientId(user.getUsername());
+        projectPublishingDTO.setClientId(user.getUsername());
 
         // BoardService 호출해서 프로젝트 및 관련 데이터 저장
-        boardService.write(boardDTO, projectImageFile, selectedSkills
+        boardService.write(projectPublishingDTO, projectImageFile, selectedSkills
                 , projectDescription, projectBudget, projectStartDate, projectEndDate, recruitDeadline, roles, categories, teamSizes, questions);
 
         return "redirect:view";
@@ -75,22 +75,23 @@ public class BoardController {
 	@GetMapping("read")
 	public String read(@RequestParam("projectNum") int pNum, Model model, @AuthenticationPrincipal AuthenticatedUser user) {
 	    try {
-	        BoardDTO boardDTO = boardService.getBoard(pNum);
-	        model.addAttribute("board", boardDTO);
+	        ProjectPublishingDTO projectPublishingDTO = boardService.getBoard(pNum);
+	        model.addAttribute("board", projectPublishingDTO);
 	        model.addAttribute("user", user);
 	        return "board/read";
 	    } catch (Exception e) {
-	        return "redirect:/board/view";
+            e.printStackTrace();
+            return "redirect:/board/view";
 	    }
 	}
 
 	@PostMapping("delete")
     public String deletePost(@RequestParam("projectNum") int pNum, @AuthenticationPrincipal AuthenticatedUser user) {
         try {
-            BoardDTO boardDTO = boardService.getBoard(pNum);
+            ProjectPublishingDTO projectPublishingDTO = boardService.getBoard(pNum);
 
             // 로그인된 사용자와 게시글 작성자가 같은지 확인
-            if (boardDTO.getClientId().equals(user.getUsername())) {
+            if (projectPublishingDTO.getClientId().equals(user.getUsername())) {
                 boardService.deleteBoard(pNum);
                 return "redirect:/board/view"; // 게시글 목록 페이지로 리다이렉트
             } else {

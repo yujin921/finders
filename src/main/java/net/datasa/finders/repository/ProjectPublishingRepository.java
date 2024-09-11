@@ -1,6 +1,6 @@
 package net.datasa.finders.repository;
 
-import net.datasa.finders.domain.entity.Board_SkillEntity;
+import net.datasa.finders.domain.entity.ProjectPublishingEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public interface Board_SkillRepository extends JpaRepository<Board_SkillEntity, Integer> {
+public interface ProjectPublishingRepository extends JpaRepository<ProjectPublishingEntity, Integer> {
 
 
 }

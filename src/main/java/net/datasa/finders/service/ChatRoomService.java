@@ -211,4 +211,12 @@ public class ChatRoomService {
             throw new IllegalArgumentException("이미 참가 중인 멤버입니다.");
         }
     }
+    
+    public Integer findProjectNumByChatroomId(int chatroomId) {
+        // chatroomId로 채팅방 엔티티를 찾고 projectNum을 반환합니다.
+        return chatRoomRepository.findById(chatroomId)
+                .map(ChatRoomEntity::getProjectNum)
+                .orElse(null); // 채팅방이 없을 경우 null 반환
+    }
+    
 }

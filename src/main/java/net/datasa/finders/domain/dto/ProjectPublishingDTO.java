@@ -10,12 +10,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BoardDTO {
+public class ProjectPublishingDTO {
     private Integer projectNum;
     private String clientId;
     private String projectTitle;
@@ -30,4 +31,6 @@ public class BoardDTO {
     private List<String> selectedSkills;
     private List<String> selectedCategories;
     private List<String> selectedWorkScopes;
+    private List<Map<String, Object>> outputList;
+    private List<Integer> requiredNum;
 }
