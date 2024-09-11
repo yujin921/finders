@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.io.Serializable;
 
+//채팅전용
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

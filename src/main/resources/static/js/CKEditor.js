@@ -193,7 +193,7 @@ const editorConfig = {
 			'resizeImage'
 		]
 	},
-	initialData: 'dfsdfsdfdsf',
+	initialData: '',
 	language: 'ko',
 	link: {
 		addTargetToExternalLinks: true,

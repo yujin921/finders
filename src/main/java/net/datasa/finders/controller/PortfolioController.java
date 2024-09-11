@@ -27,10 +27,10 @@ public class PortfolioController {
 	
 	private final FreelancerPortfoliosService FPService;
 
-	@GetMapping("edit")
+	@GetMapping("create")
     public String portfolio() {
 		
-        return "/portfolio/portfolio";
+        return "/portfolio/create";
     }
 	
 	@PostMapping("save")

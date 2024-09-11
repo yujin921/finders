@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import net.datasa.finders.domain.entity.ChatMessageEntity;
 
+//채팅전용
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, Integer> {
     List<ChatMessageEntity> findAllByChatroomId(int chatroomId);

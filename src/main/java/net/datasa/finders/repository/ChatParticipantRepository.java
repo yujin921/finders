@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import net.datasa.finders.domain.entity.ChatParticipantEntity;
 import net.datasa.finders.domain.entity.ChatParticipantId;
 
+//채팅전용
 @Repository
 public interface ChatParticipantRepository extends JpaRepository<ChatParticipantEntity, ChatParticipantId> {
 

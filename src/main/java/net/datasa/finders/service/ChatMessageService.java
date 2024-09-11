@@ -3,6 +3,8 @@ package net.datasa.finders.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,9 +13,8 @@ import net.datasa.finders.domain.dto.ChatMessageDTO;
 import net.datasa.finders.domain.entity.ChatMessageEntity;
 import net.datasa.finders.repository.ChatMessageRepository;
 import net.datasa.finders.repository.ChatRoomRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+//채팅전용
 @Service
 public class ChatMessageService {
 
@@ -73,5 +74,10 @@ public class ChatMessageService {
                         .sendTime(entity.getSendTime())
                         .build())
                 .collect(Collectors.toList());
+    }
+    
+    // 추가된 메서드: 특정 채팅방의 메시지 목록 조회
+    public List<ChatMessageEntity> getMessagesByChatroomId(Long chatroomId) {
+        return chatMessageRepository.findAllByChatroomId(chatroomId.intValue());
     }
 }
