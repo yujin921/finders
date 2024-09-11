@@ -239,42 +239,47 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 일정 상세 모달 열기
-    function openEventDetailModal(event) {
-        const modal = document.createElement('div');
-        modal.classList.add('modal');
+	// 일정 상세 모달 열기
+	function openEventDetailModal(event) {
+	    const modal = document.createElement('div');
+	    modal.classList.add('modal');
 
-        const modalContent = document.createElement('div');
-        modalContent.classList.add('modal-content');
+	    const modalContent = document.createElement('div');
+	    modalContent.classList.add('modal-content');
 
-        const title = document.createElement('h3');
-        title.textContent = event.title;
+	    const title = document.createElement('h3');
+	    title.textContent = event.title;
 
-        const details = document.createElement('p');
-        details.textContent = formatEventDetails(event);
+	    const details = document.createElement('p');
+	    details.textContent = formatEventDetails(event);
 
-        const closeButton = document.createElement('button');
-        closeButton.textContent = 'Close';
-        closeButton.classList.add('btn-close');
-        closeButton.addEventListener('click', () => {
-            document.body.removeChild(modal);
-        });
+	    const closeButton = document.createElement('button');
+	    closeButton.textContent = 'Close';
+	    closeButton.classList.add('btn-close');
+	    closeButton.addEventListener('click', () => {
+	        document.body.removeChild(modal);
+	    });
 
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.classList.add('btn-delete');
-        deleteButton.addEventListener('click', () => {
-            event.remove();
-            document.body.removeChild(modal);
-        });
+	    const deleteButton = document.createElement('button');
+	    deleteButton.textContent = 'Delete';
+	    deleteButton.classList.add('btn-delete');
+	    deleteButton.addEventListener('click', () => {
+	        event.remove();
+	        document.body.removeChild(modal);
+	    });
 
-        modalContent.appendChild(title);
-        modalContent.appendChild(details);
-        modalContent.appendChild(closeButton);
-        modalContent.appendChild(deleteButton);
-        modal.appendChild(modalContent);
-        document.body.appendChild(modal);
-    }
+	    const buttonsContainer = document.createElement('div');
+	    buttonsContainer.classList.add('modal-buttons');
+	    buttonsContainer.appendChild(closeButton);
+	    buttonsContainer.appendChild(deleteButton);
+
+	    modalContent.appendChild(title);
+	    modalContent.appendChild(details);
+	    modalContent.appendChild(buttonsContainer);
+	    modal.appendChild(modalContent);
+
+	    document.body.appendChild(modal);
+	}
 
     // 일정 상세 내용 포맷팅
     function formatEventDetails(event) {
