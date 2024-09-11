@@ -60,7 +60,18 @@
                 </div>
                 <div id="feed-content" class="tab-content">피드 내용</div>
                 <div id="gantt-content" class="tab-content">
-                    <div id="gantt-chart" style="height: 600px;"></div>
+                    <div id="gantt-chart"></div>
+                    
+                    <!-- 진행도 입력 필드 및 버튼 추가 -->
+					<div>
+					    <label for="progress-id">ID:</label>
+					    <input type="text" id="progress-id" placeholder="항목 ID">
+					    
+					    <label for="progress-value">진행도:</label>
+					    <input type="text" id="progress-value" placeholder="진행도 값 (예: 50%)">
+					    
+					    <button id="update-progress-button">진행도 업데이트</button>
+					</div>
                 </div>
                 <div id="calendar-content" class="tab-content calendar-content">
                     <div id="calendar"></div>

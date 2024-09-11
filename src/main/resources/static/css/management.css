@@ -317,6 +317,46 @@ h1 {
     }
 }
 
+/* 진행도 업데이트 스타일 */
+.progress-update {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.progress-update h3 {
+    margin-top: 0;
+}
+
+.progress-update label {
+    display: block;
+    margin: 5px 0;
+}
+
+.progress-update input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.progress-update button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.progress-update button:hover {
+    background-color: #2980b9;
+}
+
 /* 새로운 CSS 추가 */
 .modal {
     position: fixed;
