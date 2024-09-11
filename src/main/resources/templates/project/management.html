@@ -68,6 +68,47 @@
             </section>
         </main>
     </div>
+    
+    <!-- 캘린더 일정 추가 Modal 창 -->
+    <div id="event-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>일정 추가</h3>
+            <form id="event-form">
+                <div class="form-group">
+                    <label for="event-title">일정 제목</label>
+                    <input type="text" id="event-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-type">일정 형식</label>
+                    <select id="event-type" required>
+                        <option value="1">반복 일정</option>
+                        <option value="2">단일 기간</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="event-start-date">시작 날짜</label>
+                    <input type="date" id="event-start-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-end-date">종료 날짜</label>
+                    <input type="date" id="event-end-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-start-time">시작 시간</label>
+                    <input type="time" id="event-start-time" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-end-time">종료 시간</label>
+                    <input type="time" id="event-end-time" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-close">취소</button>
+                    <button type="submit" class="btn-save">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <!-- FullCalendar 스크립트 파일 -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <!-- AnyChart 스크립트 파일 -->
