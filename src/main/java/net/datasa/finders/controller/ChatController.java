@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import net.datasa.finders.domain.dto.ChatMessageDTO;
 import net.datasa.finders.service.ChatMessageService;
 
+//채팅전용
 @Controller
 public class ChatController {
 

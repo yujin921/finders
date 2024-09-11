@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+//채팅전용
 @Builder
 @Data
 @NoArgsConstructor
