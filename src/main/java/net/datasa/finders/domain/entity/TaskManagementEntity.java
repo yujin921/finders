@@ -31,7 +31,7 @@ public class TaskManagementEntity {
 
     @ManyToOne
     @JoinColumn(name = "project_num", referencedColumnName = "project_num")
-    private BoardEntity boardEntity;
+    private ProjectPublishingEntity projectPublishingEntity;
 
     @ManyToOne
     @JoinColumn(name = "freelancer_id", referencedColumnName = "member_id")
