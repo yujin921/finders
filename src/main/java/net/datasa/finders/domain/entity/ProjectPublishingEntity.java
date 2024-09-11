@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "project_publishing")
-public class BoardEntity {
+public class ProjectPublishingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

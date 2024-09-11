@@ -4,14 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.datasa.finders.domain.entity.BoardEntity;
+import net.datasa.finders.domain.entity.ProjectPublishingEntity;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Board_WorkScopeDTO {
-    BoardEntity boardEntity;
-    private String  workType;
+public class ProjectCategoryDTO {
+    ProjectPublishingEntity projectPublishingEntity;
+    private String category;
     private Integer requiredNum;
 }

@@ -12,19 +12,25 @@
 
     <p>작성자: <span th:text="${board.clientId}">작성자</span></p>
     <p>근무 시작일: <span th:text="${board.projectStartDate}">근무 시작일</span></p>
-    <p>모집 마감일: <span th:text="${board.recruitDeadline}">모집 마감일</span></p>
+    <p>모집 마감일: <span th:text="${#temporals.format(board.recruitDeadline, 'yyyy-MM-dd')}"></span></p>
     <!-- 최종 출력 리스트 -->
     <div>
-        <h3>업무 범위 및 카테고리별 인원수</h3>
+        <h3>카테고리 및 업무 범위별 인원수</h3>
         <ul>
-            <li th:each="output : ${board.outputList}" th:text="${output}"></li>
+            <li th:each="output : ${board.outputList}">
+                <p th:text="${output['workScope']} + ' - ' + ${output['category']} + ' (' + ${output['requiredNum']} + '명)'"></p>
+            </li>
         </ul>
     </div>
 
     <!-- 요구 기술 스택 출력 -->
     <div>
         <h3>요구 기술 스택</h3>
-        <p th:each="skill : ${board.selectedSkills}" th:text="${skill}"></p>
+        <ul>
+            <li>
+                <p th:text="${#strings.arrayJoin(board.selectedSkills, ', ')}">기술 스택</p>
+            </li>
+        </ul>
     </div>
 </body>
 </html>

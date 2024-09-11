@@ -40,7 +40,7 @@ public class PortfolioController {
     }
 	
 	// 이미지 업로드 경로 설정 (로컬 경로 예시)
-	private static final String UPLOAD_DIR = "C:/upload/";
+	private static final String UPLOAD_DIR = "C:/upload/portfolio/";
 
 	/*
 	 * @PostMapping("/upload-image") public ResponseEntity<Map<String, Object>>

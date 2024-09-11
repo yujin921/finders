@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+//채팅전용
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

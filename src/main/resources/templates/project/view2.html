@@ -136,32 +136,46 @@ h1 {
     z-index: 1000;
 }
 
-/* 모달 닫기 버튼 */
-.button-close {
+/* 공통 버튼 스타일 */
+.button, .button-close {
     padding: 10px 15px;
-    background-color: #dc3545;
-    color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
-    margin-top: 15px;
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    font-size: 1rem; /* 버튼 크기 동일하게 설정 */
+    min-width: 80px; /* 버튼의 최소 너비 설정 */
+}
+
+/* 멤버 보기 버튼 스타일 */
+.button {
+    background-color: #007bff;
+    color: white;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+/* 닫기 버튼 스타일 */
+.button-close {
+    background-color: #dc3545; /* 붉은색 */
+    color: white;
 }
 
 .button-close:hover {
-    background-color: #c82333;
+    background-color: #c82333; /* hover 시 더 진한 붉은색 */
 }
 
 /* 메시지 입력창 스타일 */
+
 .message-input {
     display: flex;
     gap: 10px;
-    margin-top: 15px;
+    padding: 10px;
+    background-color: #ffffff; /* 입력창 배경색 */
+    border-top: 1px solid #ddd; /* 입력창 상단 경계선 */
 }
-
 .message-input input {
     flex: 1;
     padding: 12px;
@@ -184,31 +198,109 @@ h1 {
     background-color: #218838;
 }
 
-/* 메시지 구별 스타일 */
+
+/* 채팅 메시지 컨테이너 스타일 */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+    max-height: 400px;
+    overflow: hidden;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 0;
+    width: 100%;
+}
+
+/* 메시지 영역 스타일 */
 .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+/* 메시지 스타일 */
+.message-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 70%;
+    margin-bottom: 20px;
+}
+
+/* 내 메시지 스타일 (오른쪽 정렬, 노란 배경) */
+.message-container.sent {
+    align-self: flex-end; /* 전체 컨테이너를 오른쪽 끝으로 정렬 */
 }
 
 .message {
     padding: 10px;
-    border-radius: 8px;
-    max-width: 70%;
+    border-radius: 10px;
     word-wrap: break-word;
-    color: #fff;
+    font-size: 1rem;
 }
 
-.message.sent {
-    background-color: #007bff;
-    align-self: flex-end;
+#messages .message-container.sent .message {
+    background-color: #ffeb3b !important; /* 내 메시지의 배경색 (노란색) */
+    border-top-right-radius: 0 !important;
+    margin-left: auto !important;
+    color: #000 !important;
+    text-align: right !important;
+    max-width: 100% !important;
+    width: fit-content !important;
 }
 
-.message.received {
-    background-color: #f1f1f1;
-    color: #333;
-    align-self: flex-start;
+#messages .message-container.received .message {
+    background-color: #e9ecef !important; /* 상대방 메시지의 배경색 (회색) */
+    border-top-left-radius: 0 !important;
+    margin-right: auto !important;
+    color: #333 !important;
 }
+
+/* 보낸 사람 이름 및 시간 표시 스타일 */
+.sender {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #555;
+    display: block;
+}
+
+/* 내 메시지에서 보낸 사람 이름 오른쪽에 표시 */
+.message-container.sent .sender {
+    text-align: right;
+}
+
+/* 상대방 메시지에서 보낸 사람 이름 왼쪽에 표시 */
+.message-container.received .sender {
+    text-align: left;
+}
+
+/* 시간 표시 스타일 */
+.timestamp {
+    font-size: 0.8rem;
+    color: #888;
+    display: block;
+}
+
+/* 내 메시지에서 시간 오른쪽에 표시 */
+.message-container.sent .timestamp {
+    text-align: right;
+}
+
+/* 상대방 메시지에서 시간 왼쪽에 표시 */
+.message-container.received .timestamp {
+    text-align: left;
+}
+
+
+
+
+
 
 /* 멤버 및 프로젝트 리스트 스타일 */
 .members-list,
@@ -310,9 +402,13 @@ h1 {
 	<!-- 채팅방 모달 -->
 	<div class="overlay" id="chatOverlay" onclick="closeChatModal()"></div>
 	<div id="chatModal" class="modal">
-	    <h3 id="chatroomTitle"></h3>
-	    <div class="button-container">
-	        <button class="button" onclick="openParticipantsModal()">멤버 보기</button>
+	    <!-- 제목과 버튼들을 같은 행에 배치 -->
+	    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+	        <h3 id="chatroomTitle" style="margin: 0;">채팅방 이름</h3>
+	        <div class="button-container" style="display: flex; gap: 10px;">
+	            <button class="button" onclick="openParticipantsModal()">멤버 보기</button>
+	            <button class="button-close" onclick="closeChatModal()">닫기</button>
+	        </div>
 	    </div>
 	    <div id="chatroom-data" data-chatroom-id="" data-member-id="" data-project-num=""></div>
 	    <div class="chat-container">
@@ -322,8 +418,8 @@ h1 {
 	            <button id="sendMessageButton" class="send-button">전송</button>
 	        </div>
 	    </div>
-	    <button class="button-close" onclick="closeChatModal()">닫기</button>
 	</div>
+	
 	
 	<!-- 멤버 보기 모달 -->
 	<div id="participantsModal" class="modal">
@@ -450,6 +546,22 @@ function openChatRoom(chatroomId, chatroomName) {
             console.error('Error fetching projectNum:', error);
         });
 
+    // memberId를 서버에서 받아오는 로직 추가 (로그인한 사용자 정보)
+    fetch('/member/getMemberId') // 서버에서 현재 로그인한 사용자의 memberId를 가져오는 API 엔드포인트
+        .then(response => response.json())
+        .then(data => {
+            const memberId = data.memberId; // 서버에서 받아온 memberId 설정
+            if (memberId) {
+                document.getElementById('chatroom-data').setAttribute('data-member-id', memberId);
+                console.log('Member ID set in chatroom-data:', memberId);
+            } else {
+                console.error('Could not fetch memberId');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching memberId:', error);
+        });
+
     document.getElementById('chatOverlay').style.display = 'block';
     document.getElementById('chatModal').style.display = 'block';
     document.getElementById('chatroomTitle').textContent = chatroomName;
@@ -525,7 +637,7 @@ document.getElementById('sendMessageButton').onclick = function () {
     }
 };
 
-// 메시지 표시
+//메시지 표시
 function displayMessage(message, chatroomId) {
     const currentChatroomId = document.getElementById('chatroom-data').getAttribute('data-chatroom-id');
     if (message.chatroomId != currentChatroomId) {
@@ -533,22 +645,44 @@ function displayMessage(message, chatroomId) {
     }
 
     const messageContainer = document.getElementById('messages');
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message');
 
+    // 메시지 전체를 감싸는 외부 컨테이너 생성
+    const messageWrapper = document.createElement('div');
+    messageWrapper.classList.add('message-container');
+
+    // 본인 메시지와 상대방 메시지 구분
     const memberId = document.getElementById('chatroom-data').getAttribute('data-member-id');
     if (message.senderId === memberId) {
-        messageElement.classList.add('mine');
+        messageWrapper.classList.add('sent'); // 본인 메시지 외부 컨테이너 스타일
     } else {
-        messageElement.classList.add('others');
+        messageWrapper.classList.add('received'); // 상대방 메시지 외부 컨테이너 스타일
     }
 
-    messageElement.innerHTML = `<p class="sender">${message.senderId}</p>
-                                <p>${message.messageContents}</p>
-                                <p class="timestamp">${new Date(message.sendTime).toLocaleString()}</p>`;
-    messageContainer.appendChild(messageElement);
+    // 보낸 사람 ID를 담을 요소 생성
+    const senderElement = document.createElement('div');
+    senderElement.classList.add('sender');
+    senderElement.textContent = message.senderId;
+
+    // 실제 메시지 박스 생성
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+    messageElement.innerHTML = `<p class="text">${message.messageContents}</p>`;
+
+    // 시간 표시 요소 생성
+    const timestampElement = document.createElement('span');
+    timestampElement.classList.add('timestamp');
+    timestampElement.textContent = new Date(message.sendTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // 메시지 요소들을 외부 컨테이너에 추가
+    messageWrapper.appendChild(senderElement);
+    messageWrapper.appendChild(messageElement);
+    messageWrapper.appendChild(timestampElement);
+
+    // 전체 메시지 컨테이너를 메시지 영역에 추가
+    messageContainer.appendChild(messageWrapper);
     messageContainer.scrollTop = messageContainer.scrollHeight;
 }
+
 
 // 이전 메시지 로드
 function loadPreviousMessages(chatroomId) {

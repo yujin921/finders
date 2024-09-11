@@ -13,6 +13,8 @@ import net.datasa.finders.repository.ChatRoomRepository;
 import net.datasa.finders.repository.MemberRepository;
 import net.datasa.finders.repository.ProjectRepository;
 
+//채팅전용
+//채팅에서 project를 활용할 때 쓰는 서비스
 @Service
 public class ProjectService {
 
