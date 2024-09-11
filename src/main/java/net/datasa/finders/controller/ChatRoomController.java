@@ -28,6 +28,7 @@ import net.datasa.finders.domain.entity.ChatRoomEntity;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ChatRoomService;
 
+//채팅전용
 @Controller
 @RequestMapping("chat")
 public class ChatRoomController {

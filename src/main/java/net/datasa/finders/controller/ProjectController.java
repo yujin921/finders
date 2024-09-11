@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+//채팅전용
+//테스트를 위한 project 관리
 @Slf4j
 @RequiredArgsConstructor
 @Controller

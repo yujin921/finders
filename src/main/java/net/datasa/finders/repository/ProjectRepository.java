@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+//채팅 전용
+//채팅에서 project entity, dto를 사용하는 repository
 @Repository
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Integer> {
 
