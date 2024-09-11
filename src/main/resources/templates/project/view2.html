@@ -378,6 +378,13 @@ h1 {
 .deletebutton:hover {
     background-color: #d32f2f;
 }
+
+/* 프로젝트 제목 스타일 */
+.project-title {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 5px; /* 채팅방 이름과의 간격 설정 */
+}
     </style>
 </head>
 <body>
@@ -405,10 +412,11 @@ h1 {
 	    <!-- 제목과 버튼들을 같은 행에 배치 -->
 	    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
 	        <h3 id="chatroomTitle" style="margin: 0;">채팅방 이름</h3>
-	        <div class="button-container" style="display: flex; gap: 10px;">
-	            <button class="button" onclick="openParticipantsModal()">멤버 보기</button>
-	            <button class="button-close" onclick="closeChatModal()">닫기</button>
-	        </div>
+		<div class="button-container" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 10px;">
+		    <button class="button" onclick="openParticipantsModal()">멤버 보기</button>
+		    <button class="button" onclick="downloadChat()">채팅 다운</button>
+		    <button class="button-close" onclick="closeChatModal()">닫기</button>
+		</div>
 	    </div>
 	    <div id="chatroom-data" data-chatroom-id="" data-member-id="" data-project-num=""></div>
 	    <div class="chat-container">
@@ -487,18 +495,18 @@ let selectedMembers = [];
 let selectedProjectNum = null;
 let stompClients = {};
 
-// 사이드바 열기
+//사이드바 열기
 function openSidebar() {
+    console.log('openSidebar 함수가 호출되었습니다.'); // 로그 추가
     document.getElementById("chatSidebar").style.width = "300px";
     updateChatRoomList();
 }
 
 // 사이드바 닫기
 function closeSidebar() {
+    console.log('closeSidebar 함수가 호출되었습니다.'); // 로그 추가
     document.getElementById("chatSidebar").style.width = "0";
 }
-
-// 채팅방 목록 업데이트
 function updateChatRoomList() {
     fetch('/chat/getChatRooms')
         .then(response => response.json())
@@ -506,6 +514,14 @@ function updateChatRoomList() {
             const chatRoomsContent = document.getElementById('chatRoomsContent');
             chatRoomsContent.innerHTML = '';
             chatrooms.forEach(room => {
+                const roomContainer = document.createElement('div');
+                roomContainer.classList.add('chat-room-container');
+
+                // 프로젝트 제목을 위한 span 생성
+                const projectTitle = document.createElement('span');
+                projectTitle.classList.add('project-title');
+                projectTitle.textContent = room.projectTitle || '제목 없음'; // 프로젝트 제목 설정
+
                 const roomLink = document.createElement('a');
                 roomLink.classList.add('chat-room-item');
                 roomLink.textContent = room.chatroomName;
@@ -514,7 +530,10 @@ function updateChatRoomList() {
                     event.preventDefault();
                     openChatRoom(room.chatroomId, room.chatroomName);
                 };
-                chatRoomsContent.appendChild(roomLink);
+
+                roomContainer.appendChild(projectTitle); // 프로젝트 제목 추가
+                roomContainer.appendChild(roomLink);     // 채팅방 링크 추가
+                chatRoomsContent.appendChild(roomContainer); // 컨테이너 추가
             });
         })
         .catch(error => {
@@ -523,7 +542,9 @@ function updateChatRoomList() {
         });
 }
 
+
 function openChatRoom(chatroomId, chatroomName) {
+    console.log(`openChatRoom 함수 호출됨 - chatroomId: ${chatroomId}, chatroomName: ${chatroomName}`); // 로그 추가
     if (!chatroomId) {
         console.error('Invalid chatroomId:', chatroomId);
         return;
@@ -534,6 +555,7 @@ function openChatRoom(chatroomId, chatroomName) {
         .then(response => response.json())
         .then(data => {
             const projectNum = data.projectNum; // 서버에서 받아온 projectNum 설정
+            console.log(`Fetched projectNum: ${projectNum}`); // 로그 추가
             if (projectNum) {
                 selectedProjectNum = projectNum; // 받아온 projectNum을 selectedProjectNum에 설정
                 document.getElementById('chatroom-data').setAttribute('data-project-num', selectedProjectNum);
@@ -544,22 +566,6 @@ function openChatRoom(chatroomId, chatroomName) {
         })
         .catch(error => {
             console.error('Error fetching projectNum:', error);
-        });
-
-    // memberId를 서버에서 받아오는 로직 추가 (로그인한 사용자 정보)
-    fetch('/member/getMemberId') // 서버에서 현재 로그인한 사용자의 memberId를 가져오는 API 엔드포인트
-        .then(response => response.json())
-        .then(data => {
-            const memberId = data.memberId; // 서버에서 받아온 memberId 설정
-            if (memberId) {
-                document.getElementById('chatroom-data').setAttribute('data-member-id', memberId);
-                console.log('Member ID set in chatroom-data:', memberId);
-            } else {
-                console.error('Could not fetch memberId');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching memberId:', error);
         });
 
     document.getElementById('chatOverlay').style.display = 'block';
@@ -694,6 +700,16 @@ function loadPreviousMessages(chatroomId) {
         .catch(error => {
             console.error('Failed to load messages:', error);
         });
+}
+
+function downloadChat() {
+    const chatroomId = document.getElementById('chatroom-data').getAttribute('data-chatroom-id');
+    if (!chatroomId) {
+        alert('채팅방이 선택되지 않았습니다.');
+        return;
+    }
+
+    window.location.href = `/chat/downloadChat?chatroomId=${chatroomId}`;
 }
 
 // 참가자 모달 열기

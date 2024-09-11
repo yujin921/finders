@@ -3,6 +3,7 @@ package net.datasa.finders.service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +16,14 @@ import net.datasa.finders.domain.dto.CreateChatRoomRequestDTO;
 import net.datasa.finders.domain.dto.ProjectDTO;
 import net.datasa.finders.domain.entity.ChatParticipantEntity;
 import net.datasa.finders.domain.entity.ChatRoomEntity;
+import net.datasa.finders.domain.entity.ProjectEntity;
 import net.datasa.finders.domain.entity.TeamEntity;
 import net.datasa.finders.repository.ChatParticipantRepository;
 import net.datasa.finders.repository.ChatRoomRepository;
+import net.datasa.finders.repository.ProjectRepository;
 import net.datasa.finders.repository.TeamRepository;
 
+//채팅전용
 @Service
 public class ChatRoomService {
 
@@ -27,16 +31,20 @@ public class ChatRoomService {
     private final ChatParticipantRepository chatParticipantRepository;
     private final TeamRepository teamRepository;
     private final ChatMessageService chatMessageService;
+    private final ProjectRepository projectRepository;
 
+    
     @Autowired
     public ChatRoomService(ChatRoomRepository chatRoomRepository, 
                            ChatParticipantRepository chatParticipantRepository,
                            TeamRepository teamRepository,
-                           ChatMessageService chatMessageService) {
+                           ChatMessageService chatMessageService,
+                           ProjectRepository projectRepository) { // ProjectRepository 추가
         this.chatRoomRepository = chatRoomRepository;
         this.chatParticipantRepository = chatParticipantRepository;
         this.teamRepository = teamRepository;
         this.chatMessageService = chatMessageService;
+        this.projectRepository = projectRepository; // 초기화
     }
 
     // 현재 사용자가 속한 채팅방만 조회
@@ -157,15 +165,18 @@ public class ChatRoomService {
                 .collect(Collectors.toList());
 
         // 해당 ID에 속하는 채팅방만 조회하고 DTO로 변환하여 반환
-        return chatRoomRepository.findAllById(userChatroomIds).stream()
-                .map(chatRoom -> ChatRoomDTO.builder()
+        List<ChatRoomEntity> chatRooms = chatRoomRepository.findAllById(userChatroomIds);
+
+        // map() 메서드에서 정확한 타입을 지정하여 변환
+        return chatRooms.stream()
+                .map((ChatRoomEntity chatRoom) -> ChatRoomDTO.builder()
                         .chatroomId(chatRoom.getChatroomId())
-                        .projectNum(chatRoom.getProjectNum())
                         .chatroomName(chatRoom.getChatroomName())
                         .createdTime(Timestamp.valueOf(chatRoom.getCreatedTime())) // LocalDateTime을 Timestamp로 변환
                         .build())
                 .collect(Collectors.toList());
     }
+
     
     public List<String> getParticipantsByChatroomId(int chatroomId) {
         // chatParticipantRepository를 이용하여 채팅방에 참가한 멤버의 아이디를 조회
@@ -218,5 +229,43 @@ public class ChatRoomService {
                 .map(ChatRoomEntity::getProjectNum)
                 .orElse(null); // 채팅방이 없을 경우 null 반환
     }
+    
+ // ChatRoomService.java
+    public ChatRoomDTO convertToDTO(ChatRoomEntity chatRoomEntity) {
+        return ChatRoomDTO.builder()
+            .chatroomId(chatRoomEntity.getChatroomId())
+            .chatroomName(chatRoomEntity.getChatroomName())
+            .createdTime(Timestamp.valueOf(chatRoomEntity.getCreatedTime()))
+            .projectTitle(chatRoomEntity.getProject().getProjectName()) // 프로젝트 제목 설정
+            .build();
+    }
+    
+    public List<ChatRoomDTO> getAllChatRooms() {
+        // ChatRoom과 Project 데이터를 JOIN하여 가져옴
+        List<ChatRoomEntity> chatRooms = chatRoomRepository.findAllWithProject();
+
+        // DTO 변환 시 projectTitle을 직접 가져옴
+        return chatRooms.stream()
+            .map(room -> {
+                // 프로젝트 제목을 직접 가져옴
+                String projectTitle = room.getProject() != null ? room.getProject().getProjectName() : "제목 없음";
+                System.out.println("ChatRoomId: " + room.getChatroomId() + ", ProjectNum: " + room.getProjectNum() + ", ProjectTitle: " + projectTitle);
+
+                return ChatRoomDTO.builder()
+                    .chatroomId(room.getChatroomId())
+                    .chatroomName(room.getChatroomName())
+                    .projectNum(room.getProjectNum())
+                    .projectTitle(projectTitle) // 프로젝트 제목 설정
+                    .createdTime(Timestamp.valueOf(room.getCreatedTime()))
+                    .build();
+            })
+            .collect(Collectors.toList());
+    }
+
+
+
+
+
+
     
 }
