@@ -217,5 +217,124 @@ public class MemberService {
     	}
 		return memberDTO;
     }
+    
+//    public void updateMember(MemberDTO dto, MultipartFile profileImg) throws IOException {
+//        MemberEntity member = memberRepository.findById(dto.getMemberId())
+//            .orElseThrow(() -> new RuntimeException("Member not found"));
+//
+//        member.setMemberName(dto.getMemberName());
+//        member.setEmail(dto.getEmail());
+//        
+//        // 비밀번호 처리
+//        if (dto.getMemberPw() != null && !dto.getMemberPw().trim().isEmpty()) {
+//            // 새 비밀번호가 제공된 경우에만 업데이트
+//            member.setMemberPw(passwordEncoder.encode(dto.getMemberPw()));
+//        }
+//        // 비밀번호 필드가 null이거나 공백인 경우 기존 비밀번호 유지
+//
+//        if (profileImg != null && !profileImg.isEmpty()) {
+//            String imageUrl = saveProfileImage(profileImg);
+//            member.setProfileImg(imageUrl);
+//        }
+//
+//        memberRepository.save(member);
+//    }
+    
+    public void updateMember(MemberDTO dto, MultipartFile profileImg, String uploadPath) throws IOException {
+        MemberEntity member = memberRepository.findById(dto.getMemberId())
+            .orElseThrow(() -> new RuntimeException("Member not found"));
+
+        // 이름과 이메일 업데이트
+        member.setMemberName(dto.getMemberName());
+        member.setEmail(dto.getEmail());
+
+        // 비밀번호 처리
+        if (dto.getMemberPw() != null && !dto.getMemberPw().trim().isEmpty()) {
+            member.setMemberPw(passwordEncoder.encode(dto.getMemberPw()));
+        }
+
+        // 프로필 이미지 처리
+        String newImagePath = saveProfileImage(dto.getMemberId(), profileImg, uploadPath);
+        if (newImagePath != null) {
+            member.setProfileImg(newImagePath);
+        }
+
+        memberRepository.save(member);
+    }
+    
+//    private String saveProfileImage(MultipartFile profileImg) throws IOException {
+//        // 파일이 비어있는지 확인
+//        if (profileImg == null || profileImg.isEmpty()) {
+//            throw new IllegalArgumentException("파일이 비어있습니다.");
+//        }
+//
+//        // 원본 파일명 가져오기
+//        String originalFilename = profileImg.getOriginalFilename();
+//        
+//        // 파일 확장자 추출
+//        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+//        
+//        // 현재 날짜를 문자열로 변환 (예: 20240912)
+//        String dateString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+//        
+//        // UUID 생성
+//        String uuid = UUID.randomUUID().toString();
+//        
+//        // 새 파일명 생성 (날짜_UUID.확장자)
+//        String newFilename = dateString + "_" + uuid + extension;
+//        
+//        // 저장할 경로 설정 (예: /path/to/upload/directory/)
+//        String uploadDir = "/path/to/upload/directory/";
+//        File dir = new File(uploadDir);
+//        if (!dir.exists()) {
+//            dir.mkdirs();
+//        }
+//        
+//        // 전체 파일 경로
+//        String filePath = uploadDir + newFilename;
+//        
+//        // 파일 저장
+//        File dest = new File(filePath);
+//        profileImg.transferTo(dest);
+//        
+//        // 저장된 파일의 상대 경로 또는 URL 반환
+//        // 예: /uploads/20240912_abcdef123456.jpg
+//        return "/uploads/" + newFilename;
+//    }
 	
+    private String saveProfileImage(String memberId, MultipartFile file, String uploadPath) throws IOException {
+        if (file == null || file.isEmpty()) {
+            return null; // 새 파일이 없으면 null 반환
+        }
+
+        // 기존 이미지 확인
+        MemberEntity member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new RuntimeException("Member not found"));
+        String oldImagePath = member.getProfileImg();
+
+        // 새 파일 저장
+        String originalName = file.getOriginalFilename();
+        String extension = originalName.substring(originalName.lastIndexOf("."));
+        String dateString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String uuidString = UUID.randomUUID().toString();
+        String newFileName = dateString + "_" + uuidString + extension;
+
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        File newFile = new File(uploadDir, newFileName);
+        file.transferTo(newFile);
+
+        // 기존 파일 삭제
+        if (oldImagePath != null && !oldImagePath.isEmpty()) {
+            File oldFile = new File(uploadPath, oldImagePath);
+            if (oldFile.exists()) {
+                oldFile.delete();
+            }
+        }
+
+        return newFileName;
+    }
 }

@@ -152,6 +152,20 @@ public class MemberController {
     return "/member/myPage";
     }
     
+    @PostMapping("/update")
+    public String updateMember(@ModelAttribute MemberDTO memberDTO,
+                               @RequestParam("profileImg") MultipartFile profileImg,
+                               Model model) {
+        try {
+            memberService.updateMember(memberDTO, profileImg, uploadPath);
+            return "redirect:/";
+        } catch (Exception e) {
+            model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
+            return "redirect:/member/myPage";
+        }
+    }
+    
+    
     
  // 현재 로그인한 사용자의 memberId를 반환하는 엔드포인트 추가
     @GetMapping("/getMemberId")
