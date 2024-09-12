@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.datasa.finders.domain.entity.RoleName;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
@@ -33,4 +34,7 @@ public class ProjectPublishingDTO {
     private List<String> selectedWorkScopes;
     private List<Map<String, Object>> outputList;
     private List<Integer> requiredNum;
+    private List<String> prequalificationQuestions;
+    private long estimatedDay;
+    private RoleName roleName;
 }

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,25 +65,7 @@ public class BoardService {
                 .projectStatus(false)
                 .build();
         projectPublishingRepository.save(projectPublishingEntity);
-    /*
-        // 업무 범위 저장 로직
-        for (String selectedWorkScopes : boardDTO.getSelectedWorkScopes()) {
-            Board_WorkScopeEntity workScopeEntity = Board_WorkScopeEntity.builder()
-                    .boardEntity(boardEntity)
-                    .workType(selectedWorkScopes)
-                    .build();
-            workScopeRepository.save(workScopeEntity);
-        }
 
-        // 카테고리 저장 로직
-        for (String category : boardDTO.getSelectedCategories()) {
-            Board_CategoryEntity categoryEntity = Board_CategoryEntity.builder()
-                    .boardEntity(boardEntity)
-                    .category(category)
-                    .build();
-            categoryRepository.save(categoryEntity);
-        }
-*/
         // 관련 기술 저장 로직
         for (String skill : projectPublishingDTO.getSelectedSkills()) {
             ProjectRequiredSkillEntity skillEntity = ProjectRequiredSkillEntity.builder()
@@ -171,19 +154,27 @@ public class BoardService {
                 .build();
     }
     
-    public ProjectPublishingDTO getBoard(int pNum) {
+    public ProjectPublishingDTO getBoard(int pNum, String memberId, RoleName roleName) {
         ProjectPublishingEntity entity = projectPublishingRepository.findById(pNum)
                 .orElseThrow(() -> new EntityNotFoundException("해당 번호의 글이 없습니다."));
 
         // DTO로 변환 작업
         ProjectPublishingDTO dto = convertToDTO(entity);
 
+        LocalDate projectStartDate = entity.getProjectStartDate();
+        LocalDate projectEndDate = entity.getProjectEndDate();
+        long estimatedDays = ChronoUnit.DAYS.between(projectStartDate, projectEndDate);
+
+        List<PrequalificationQuestionEntity> questions = prequalificationQuestionRepository.findByProjectPublishingEntity(entity);
         List<ProjectRequiredSkillEntity> skills = skillRepository.findByProjectPublishingEntity(entity);
         List<ProjectCategoryEntity> categories = categoryRepository.findByProjectPublishingEntity(entity);
         List<WorkScopeEntity> workScopes = workScopeRepository.findByProjectPublishingEntity(entity);
 
         List<String> selectedSkills = skills.stream()
                 .map(ProjectRequiredSkillEntity::getSkillText)
+                .collect(Collectors.toList());
+        List<String> questionTexts = questions.stream()
+                .map(PrequalificationQuestionEntity::getQuestionText)
                 .collect(Collectors.toList());
 
         List<Map<String, Object>> matchedOutputs = new ArrayList<>();
@@ -204,9 +195,14 @@ public class BoardService {
                 }
             }
         }
+        MemberEntity member = memberRepository.findByMemberIdAndRoleName(memberId, roleName);
+        RoleName role = member.getRoleName();
 
+        dto.setRoleName(role);
+        dto.setEstimatedDay(estimatedDays);
         dto.setOutputList(matchedOutputs);
         dto.setSelectedSkills(selectedSkills);
+        dto.setPrequalificationQuestions(questionTexts);
 
         return dto;
     }
