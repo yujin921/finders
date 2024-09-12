@@ -1,8 +1,12 @@
 package net.datasa.finders.repository;
 
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
+
+import jakarta.transaction.Transactional;
 import net.datasa.finders.domain.entity.ChatParticipantEntity;
 import net.datasa.finders.domain.entity.ChatParticipantId;
 
@@ -17,4 +21,12 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     List<ChatParticipantEntity> findByChatroomId(Integer chatroomId);
     // chatroomId와 participantId로 존재 여부 확인
     boolean existsByChatroomIdAndParticipantId(int chatroomId, String participantId);
+
+    // chatroomId와 participantId를 기준으로 삭제
+    @Modifying
+    @Transactional
+    int deleteByChatroomIdAndParticipantId(int chatroomId, String participantId);
+
+    // 채팅방의 참가자 수를 조회하는 메서드
+    int countByChatroomId(int chatroomId);  // 필드 이름과 메서드 이름이 일치해야 함
 }
