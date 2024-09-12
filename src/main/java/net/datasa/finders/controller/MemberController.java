@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import net.datasa.finders.domain.dto.ClientDTO;
 import net.datasa.finders.domain.dto.FreelancerDTO;
 import net.datasa.finders.domain.dto.MemberDTO;
 import net.datasa.finders.domain.entity.MemberEntity;
+import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.MemberService;
 
 @Slf4j
@@ -141,9 +144,28 @@ public class MemberController {
     
     // 클라이언트 마이페이지
     @GetMapping("myPage")
-    public String myPage() {
+    public String myPage(Model model, @AuthenticationPrincipal AuthenticatedUser user) {
+    	String memberId = user.getUsername();
+    	MemberDTO memberDTO = memberService.getMemberInfo(memberId);
+    	
+    	model.addAttribute("member", memberDTO);
     return "/member/myPage";
     }
+    
+    @PostMapping("/update")
+    public String updateMember(@ModelAttribute MemberDTO memberDTO,
+                               @RequestParam("profileImg") MultipartFile profileImg,
+                               Model model) {
+        try {
+            memberService.updateMember(memberDTO, profileImg, uploadPath);
+            return "redirect:/";
+        } catch (Exception e) {
+            model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
+            return "redirect:/member/myPage";
+        }
+    }
+    
+    
     
  // 현재 로그인한 사용자의 memberId를 반환하는 엔드포인트 추가
     @GetMapping("/getMemberId")

@@ -3,6 +3,8 @@ package net.datasa.finders.domain.dto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,20 +21,13 @@ public class MemberDTO {
     String memberPw;
     String memberName;
     String email;
+    MultipartFile profileImg;
+    String profileImgName;
     boolean enabled;
     RoleName roleName;
     LocalDateTime createdTime;
     LocalDateTime updatedTime;
-    // FreelancerDTO 내용
-    String freelancerId;
-	String freelancerPhone;
-	String country;
-	MemberEntity member;
-	// ClientDTO 내용
-	String clientId;
-	String clientPhone;
-	String industry;
-	LocalDate foundedDate;
-	Integer employeeCount;
-	String website;	
+
+    ClientDTO client;
+    FreelancerDTO freelancer;
 }

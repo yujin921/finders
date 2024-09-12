@@ -170,3 +170,30 @@ function remove(button) {
     const teamMember = button.parentNode;
     teamMember.remove();
 }
+
+document.addEventListener("scroll", function() {
+        // 각 섹션의 ID에 맞는 요소들을 선택합니다.
+        const sections = document.querySelectorAll(".section");
+        const menuItems = document.querySelectorAll("#step-list li");
+
+        // 현재 스크롤 위치
+        let scrollPosition = document.documentElement.scrollTop || document.body.scrollTop;
+
+        sections.forEach((section, index) => {
+            const sectionTop = section.offsetTop - 100; // 약간의 오프셋 추가
+            const sectionHeight = section.offsetHeight;
+
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                menuItems.forEach(item => item.classList.remove("active"));
+                menuItems[index].classList.add("active");
+            }
+        });
+    });
+
+    // 사이드바 항목을 클릭하면 해당 섹션으로 스크롤 이동
+    document.querySelectorAll("#step-list li").forEach(item => {
+        item.addEventListener("click", function() {
+            const target = document.getElementById(this.getAttribute("data-target"));
+            target.scrollIntoView({ behavior: "smooth" });
+        });
+    });

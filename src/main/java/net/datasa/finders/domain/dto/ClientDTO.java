@@ -20,7 +20,6 @@ public class ClientDTO {
 	LocalDate foundedDate;
 	Integer employeeCount;
 	String website;
-	MemberEntity member;
 	String postalCode;
 	String address;
 	String detailAddress;

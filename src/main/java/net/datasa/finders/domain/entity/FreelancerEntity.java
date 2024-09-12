@@ -32,16 +32,10 @@ public class FreelancerEntity {
 
     @ManyToOne
     @JoinColumn(name = "freelancer_id", referencedColumnName = "member_id", insertable = false, updatable = false)
-    private MemberEntity memberEntity;
+    private MemberEntity member;
 
 	@Column(name = "freelancer_phone", length = 100)
 	private String freelancerPhone;
-
-//	@Column(name = "address", columnDefinition = "TEXT")
-//	private String address;
-//
-//	@Column(name = "postal_code", length = 20)
-//	private String postalCode;
 	
 	@Column(name = "postal_code", length = 20)
 	private String postalCode;

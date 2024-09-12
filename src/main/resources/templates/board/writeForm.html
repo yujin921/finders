@@ -1,163 +1,211 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시글 작성</title>
-    <link rel="stylesheet" href="/css/writeForm.css">
-    <script src="/js/writeForm.js"></script>
+    <title>프로젝트 등록 - Finder</title>
+    <link rel="stylesheet" th:href="@{/css/writeForm.css}">
+    <script th:src="@{/js/writeForm.js}"></script>
 </head>
 <body>
-<form method="POST" action="/board/write" enctype="multipart/form-data">
+    <header>
+        <div class="header-content">
+            <div class="logo">Finder</div>
+            <nav>
+                <a href="#">프로젝트 등록</a>
+                <a href="#">프로젝트 찾기</a>
+                <a href="#">파트너스 찾기</a>
+                <a href="#">이용 사례</a>
+                <a href="#">프로젝트 관리</a>
+                <a href="#">미팅룸</a>
+            </nav>
+            <button class="login-button">회원가입</button>
+        </div>
+    </header>
+
     <div class="container">
-        <h2>기본 정보</h2>
-
-        <div class="project-title-container">
-            <label for="project-title">프로젝트 제목</label><br>
-            <input type="text" id="project-title" name="projectTitle" maxlength="30" placeholder="프로젝트 제목을 입력하세요">
-        </div>
-
-        <div class="scope-of-work">
-            <label for="project-title">업무범위</label><br>
-            <div class="scope-option" onclick="toggleSelect(this)" data-scope="개발">
-                <input type="checkbox" value="개발">
-                <img src="https://via.placeholder.com/50" alt="개발">
-                <p>개발</p>
-            </div>
-
-            <div class="scope-option" onclick="toggleSelect(this)" data-scope="디자인">
-                <input type="checkbox" value="디자인">
-                <img src="https://via.placeholder.com/50" alt="디자인">
-                <p>디자인</p>
-            </div>
-
-            <div class="scope-option" onclick="toggleSelect(this)" data-scope="기획">
-                <input type="checkbox" value="기획">
-                <img src="https://via.placeholder.com/50" alt="기획">
-                <p>기획</p>
-            </div>
-
-            <div class="scope-option" onclick="toggleSelect(this)" data-scope="기타">
-                <input type="checkbox" value="기타">
-                <img src="https://via.placeholder.com/50" alt="기타">
-                <p>기타</p>
-            </div>
-            <input type="hidden" id="selectedWorkScopes" name="selectedWorkScopes">
-        </div>
-
-        <!-- 카테고리 -->
-        <div class="category-container">
-            <div class="category-section">
-                <h3>카테고리</h3>
-                <p>해당하는 카테고리를 모두 선택해주세요.</p>
-                <div class="category-buttons">
-                    <div class="category-btn" onclick="toggleCategory(this)" data-category="웹">웹</div>
-                    <div class="category-btn" onclick="toggleCategory(this)" data-category="안드로이드">안드로이드</div>
-                    <div class="category-btn" onclick="toggleCategory(this)" data-category="iOS">iOS</div>
-                    <div class="category-btn" onclick="toggleCategory(this)" data-category="PC 프로그램">PC 프로그램</div>
-                    <div class="category-btn" onclick="toggleCategory(this)" data-category="임베디드">임베디드</div>
-                    <div class="category-btn" onclick="toggleCategory(this)" data-category="기타">기타</div>
+        <div class="content">
+            <div class="sidebar">
+                <div class="sidebar-menu">
+                    <ul id="step-list">
+				        <li class="action" data-target="section1">1. 프로젝트 제목</li>
+				        <li data-target="section2">2. 업무범위</li>
+				        <li data-target="section3">3. 카테고리</li>
+				        <li data-target="section4">4. 이미지 업로드</li>
+				        <li data-target="section5">5. 관련 기술</li>
+				        <li data-target="section6">6. 상세업무 내용</li>
+				        <li data-target="section7">7. 예산 및 일정</li>
+				        <li data-target="section8">8. 모집 정보</li>
+				    </ul>
                 </div>
-                <input type="hidden" id="selectedCategories" name="selectedCategories">
+            </div>
+
+            <div class="main-content">
+                <form method="POST" action="/board/write" enctype="multipart/form-data">
+					<div id="section1" class="section">
+				        <div class="project-title-container">
+				            <h2><label for="project-title">프로젝트 제목</label></h2><br>
+				            <input type="text" id="project-title" name="projectTitle" maxlength="30" placeholder="프로젝트 제목을 입력하세요">
+				        </div>
+					</div>
+					
+					<div id="section2" class="section">
+				        <div class="scope-of-work">
+				            <h2><label for="project-title">업무범위</label></h2><br>
+				            <div class="scope-option" onclick="toggleSelect(this)" data-scope="개발">
+				                <input type="checkbox" value="개발">
+				                <img src="https://via.placeholder.com/50" alt="개발">
+				                <p>개발</p>
+				            </div>
+				
+				            <div class="scope-option" onclick="toggleSelect(this)" data-scope="디자인">
+				                <input type="checkbox" value="디자인">
+				                <img src="https://via.placeholder.com/50" alt="디자인">
+				                <p>디자인</p>
+				            </div>
+				
+				            <div class="scope-option" onclick="toggleSelect(this)" data-scope="기획">
+				                <input type="checkbox" value="기획">
+				                <img src="https://via.placeholder.com/50" alt="기획">
+				                <p>기획</p>
+				            </div>
+				
+				            <div class="scope-option" onclick="toggleSelect(this)" data-scope="기타">
+				                <input type="checkbox" value="기타">
+				                <img src="https://via.placeholder.com/50" alt="기타">
+				                <p>기타</p>
+				            </div>
+				            <input type="hidden" id="selectedWorkScopes" name="selectedWorkScopes">
+				        </div>
+					</div>
+					
+					<div id="section3" class="section">
+				        <!-- 카테고리 -->
+				        <div class="category-container">
+				            <div class="category-section">
+				                <h2>카테고리</h2>
+				                <p>해당하는 카테고리를 모두 선택해주세요.</p>
+				                <div class="category-buttons">
+				                    <div class="category-btn" onclick="toggleCategory(this)" data-category="웹">웹</div>
+				                    <div class="category-btn" onclick="toggleCategory(this)" data-category="안드로이드">안드로이드</div>
+				                    <div class="category-btn" onclick="toggleCategory(this)" data-category="iOS">iOS</div>
+				                    <div class="category-btn" onclick="toggleCategory(this)" data-category="PC 프로그램">PC 프로그램</div>
+				                    <div class="category-btn" onclick="toggleCategory(this)" data-category="임베디드">임베디드</div>
+				                    <div class="category-btn" onclick="toggleCategory(this)" data-category="기타">기타</div>
+				                </div>
+				                <input type="hidden" id="selectedCategories" name="selectedCategories">
+				            </div>
+				        </div>
+					</div>
+					
+					<div id="section4" class="section">
+				        <!-- 이미지 업로드 -->
+				        <div class="image-upload-section">
+				            <h2>프로젝트 이미지</h2>
+				            <p>프로젝트 찾기 창에서 보일 프로젝트 대표 이미지를 넣어주세요. (최대 1개)</p>
+				            <input type="file" name="projectImageFile" accept="image/png, image/jpeg">
+				        </div>
+				    </div>
+				
+					
+					<div class="tech-container">
+						<div id="section5" class="section">
+					        <input type="hidden" id="selectedSkills" name="selectedSkills">
+					        <!-- 선택된 기술 표시 박스 -->
+					        <div class="selected-techs" id="selected-techs">
+					            <!-- 선택한 기술들이 여기에 표시됩니다. -->
+					        </div>
+					
+					        <!-- 관련 기술 선택 섹션 -->
+					        <div class="tech-section">
+					            <h2>관련 기술</h2>
+					            <p>프로젝트에서 활용될 기술에 대해 모두 선택해주세요.</p>
+					            <div class="tech-buttons">
+					                <div class="tech-button" data-tech="Python" onclick="toggleTech(this)">Python</div>
+					                <div class="tech-button" data-tech="Javascript" onclick="toggleTech(this)">Javascript</div>
+					                <div class="tech-button" data-tech="JAVA" onclick="toggleTech(this)">JAVA</div>
+					                <div class="tech-button" data-tech="C++" onclick="toggleTech(this)">C++</div>
+					                <div class="tech-button" data-tech="iOS" onclick="toggleTech(this)">iOS</div>
+					                <div class="tech-button" data-tech="안드로이드" onclick="toggleTech(this)">안드로이드</div>
+					            </div>
+					        </div>
+						</div>
+						
+						<div id="section6" class="section">
+					        <!-- 상세 업무 내용 섹션 -->
+					        <div class="detail-section">
+					            <h2>상세업무 내용</h2>
+					            <p>프로젝트와 관련된 상세한 내용들을 기입해주세요.</p>
+					            <textarea id="detail-text" name="projectDescription" rows="5" maxlength="5000" placeholder="5000자 이내로 작성해주세요."></textarea>
+					            <p class="char-count" id="char-count">0 / 5000</p>
+					        </div>
+					    
+					    </div>
+						<div id="section7" class="section">
+					    <div class="budget-container">
+					        <!-- 지출 가능 예산 -->
+					        <div class="budget-item">
+					            <label for="budget">지출 가능 예산</label>
+					            <input type="text" id="budget" name="projectBudget" placeholder="300,000 ￦">
+					            <div class="checkbox-container">
+					                <input type="checkbox" id="flexible">
+					                <label for="flexible">입력한 예산에서 조율이 가능합니다.</label>
+					            </div>
+					        </div>
+						</div>
+				        <!-- 프로젝트 시작일 -->
+				        <div class="budget-item">
+				            <label for="start-date">프로젝트 시작일</label>
+				            <input type="date" id="start-date" name="projectStartDate">
+				        </div>
+				
+				        <!-- 프로젝트 종료일 -->
+				        <div class="budget-item">
+				            <label for="end-date">프로젝트 종료일</label>
+				            <input type="date" id="end-date" name="projectEndDate">
+				        </div>
+				    </div>
+				</div>    
+				<div id="section8" class="section">
+				    <div class="recruit-container">
+				        <!-- 모집 마감일 -->
+				        <div class="recruit-section">
+				            <label for="recruit_deadline">모집 마감일</label>
+				            <input type="datetime-local" id="recruit_deadline" name="recruitDeadline">
+				        </div>
+				
+				        <!-- 모집 인원 -->
+				        <div class="recruit-section">
+				            <label>모집 인원</label>
+				            <div class="recruit-team-section">
+				                <select name="role"></select>
+				                <select name="category"></select>
+				                <input type="number" min="1" value="3" placeholder="명" name="teamSize[]">
+				                <span class="recruit-add-button" onclick="addTeamMember()">추가 +</span>
+				            </div>
+				            <div id="recruit-team-members"></div>
+				        </div>
+				
+				        <!-- 사전 검증 질문 -->
+				        <div class="recruit-section">
+				            <label>사전 검증 질문</label>
+				            <div class="recruit-question-section">
+				                <input type="text" class="recruit-question-input" placeholder="사전 질문을 입력해주세요." name="question[]">
+				                <span class="recruit-add-button" onclick="addQuestion()">추가 +</span>
+				            </div>
+				            <!-- 추가되는 질문 필드가 여기에 표시됨 -->
+				            <div id="recruit-questions"></div>
+				        </div>
+				    </div>
+				</div>
+				    <div>
+				        <button type="submit">저장</button>
+				    </div>
+				</form>
             </div>
         </div>
-
-        <!-- 이미지 업로드 -->
-        <div class="image-upload-section">
-            <h3>프로젝트 이미지</h3>
-            <p>프로젝트 찾기 창에서 보일 프로젝트 대표 이미지를 넣어주세요. (최대 1개)</p>
-            <input type="file" name="projectImageFile" accept="image/png, image/jpeg">
-        </div>
     </div>
-
-    <div class="tech-container">
-        <input type="hidden" id="selectedSkills" name="selectedSkills">
-        <!-- 선택된 기술 표시 박스 -->
-        <div class="selected-techs" id="selected-techs">
-            <!-- 선택한 기술들이 여기에 표시됩니다. -->
-        </div>
-
-        <!-- 관련 기술 선택 섹션 -->
-        <div class="tech-section">
-            <h3>관련 기술</h3>
-            <p>프로젝트에서 활용될 기술에 대해 모두 선택해주세요.</p>
-            <div class="tech-buttons">
-                <div class="tech-button" data-tech="Python" onclick="toggleTech(this)">Python</div>
-                <div class="tech-button" data-tech="Javascript" onclick="toggleTech(this)">Javascript</div>
-                <div class="tech-button" data-tech="JAVA" onclick="toggleTech(this)">JAVA</div>
-                <div class="tech-button" data-tech="C++" onclick="toggleTech(this)">C++</div>
-                <div class="tech-button" data-tech="iOS" onclick="toggleTech(this)">iOS</div>
-                <div class="tech-button" data-tech="안드로이드" onclick="toggleTech(this)">안드로이드</div>
-            </div>
-        </div>
-
-        <!-- 상세 업무 내용 섹션 -->
-        <div class="detail-section">
-            <h3>상세업무 내용</h3>
-            <p>프로젝트와 관련된 상세한 내용들을 기입해주세요.</p>
-            <textarea id="detail-text" name="projectDescription" rows="5" maxlength="5000" placeholder="5000자 이내로 작성해주세요."></textarea>
-            <p class="char-count" id="char-count">0 / 5000</p>
-        </div>
-    </div>
-
-    <div class="budget-container">
-        <!-- 지출 가능 예산 -->
-        <div class="budget-item">
-            <label for="budget">지출 가능 예산</label>
-            <input type="text" id="budget" name="projectBudget" placeholder="300,000 ￦">
-            <div class="checkbox-container">
-                <input type="checkbox" id="flexible">
-                <label for="flexible">입력한 예산에서 조율이 가능합니다.</label>
-            </div>
-        </div>
-
-        <!-- 프로젝트 시작일 -->
-        <div class="budget-item">
-            <label for="start-date">프로젝트 시작일</label>
-            <input type="date" id="start-date" name="projectStartDate">
-        </div>
-
-        <!-- 프로젝트 종료일 -->
-        <div class="budget-item">
-            <label for="end-date">프로젝트 종료일</label>
-            <input type="date" id="end-date" name="projectEndDate">
-        </div>
-    </div>
-
-    <div class="recruit-container">
-        <!-- 모집 마감일 -->
-        <div class="recruit-section">
-            <label for="recruit_deadline">모집 마감일</label>
-            <input type="datetime-local" id="recruit_deadline" name="recruitDeadline">
-        </div>
-
-        <!-- 모집 인원 -->
-        <div class="recruit-section">
-            <label>모집 인원</label>
-            <div class="recruit-team-section">
-                <select name="role"></select>
-                <select name="category"></select>
-                <input type="number" min="1" value="3" placeholder="명" name="teamSize[]">
-                <span class="recruit-add-button" onclick="addTeamMember()">추가 +</span>
-            </div>
-            <div id="recruit-team-members"></div>
-        </div>
-
-        <!-- 사전 검증 질문 -->
-        <div class="recruit-section">
-            <label>사전 검증 질문</label>
-            <div class="recruit-question-section">
-                <input type="text" class="recruit-question-input" placeholder="사전 질문을 입력해주세요." name="question[]">
-                <span class="recruit-add-button" onclick="addQuestion()">추가 +</span>
-            </div>
-            <!-- 추가되는 질문 필드가 여기에 표시됨 -->
-            <div id="recruit-questions"></div>
-        </div>
-    </div>
-
-    <div>
-        <button type="submit">저장</button>
-    </div>
-</form>
 </body>
 </html>

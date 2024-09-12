@@ -26,7 +26,7 @@ public class ClientEntity {
 
     @ManyToOne
     @JoinColumn(name = "client_id", referencedColumnName = "member_id", insertable = false, updatable = false)
-    private MemberEntity memberEntity;
+    private MemberEntity member;
 
     @Column(name = "client_phone", length = 20)
     private String clientPhone;

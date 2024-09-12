@@ -14,7 +14,6 @@ public class FreelancerDTO {
 	String freelancerId;
 	String freelancerPhone;
 	String country;
-	MemberEntity member;
 	String postalCode;
 	String address;
 	String detailAddress;

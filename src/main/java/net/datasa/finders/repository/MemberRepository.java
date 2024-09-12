@@ -25,5 +25,4 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
     List<Object[]> findTeamEntries();
 
     Optional<MemberEntity> findByMemberId(String memberId);
-
 }
