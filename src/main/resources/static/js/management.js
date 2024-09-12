@@ -5,6 +5,18 @@ document.addEventListener('DOMContentLoaded', function() {
 	let ganttChart = null; // Gantt 차트 인스턴스를 저장할 변수
 	let ganttChartData = []; // Gantt 차트 데이터 저장 변수
 	let ganttChartLoaded = false;
+	
+	// 간트차트 화면 상 표시 날짜 범위 지정을 위해 필요한 변수들
+	let startDateStr = null;
+	let endDateStr = null;
+	let startDate = null;
+	let endDate = null;
+	let startYear = null;
+	let startMonth = null;
+	let startDay = null;
+	let endYear = null;
+	let endMonth = null;
+	let endDay = null;
 
     tabs.forEach(tab => {
         tab.addEventListener('click', function(event) {
@@ -349,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         return new Intl.DateTimeFormat('en-US', options).format(date);
     }
-
+	
 	// 간트 차트 로드
     function loadGanttChart() {
         if (ganttChartLoaded) return; // 이미 간트 차트가 로드된 경우
@@ -357,16 +369,126 @@ document.addEventListener('DOMContentLoaded', function() {
         anychart.onDocumentReady(function() {
             // Gantt 차트 데이터 예시
             ganttChartData = [
-                { id: '1', name: '디자인', actualStart: '2024-09-01', actualEnd: '2024-09-07', progressValue: "20%" },
-                { id: '2', name: '개발', actualStart: '2024-09-08', actualEnd: '2024-09-20', progressValue: "50%" },
-                { id: '3', name: '테스트', actualStart: '2024-09-21', actualEnd: '2024-09-30', progressValue: "0%" }
-            ];
+                { id: '1', name: '디자인', actualStart: '2024-09-01', actualEnd: '2024-09-04', progressValue: "0%" },
+                { id: '2', name: '기획', actualStart: '2024-09-05', actualEnd: '2024-09-10', progressValue: "0%" },            
+				{
+				    id: "3",
+				    name: "개발",
+				    baselineStart: "2024-09-11",
+				    baselineEnd: "2024-09-14",
+				    actualStart: "2024-09-15",
+				    actualEnd: "2024-09-20",
+					progressValue: "0%",
+				    children: [
+				      {
+				        id: "3_1",
+				        name: "Analysis",
+				        baselineStart: "2024-09-15",
+				        baselineEnd: "2024-09-16",
+				        actualStart: "2024-09-15",
+				        actualEnd: "2024-09-17",
+						progressValue: "0%"
+				      },
+				      {
+				        id: "3_2",
+				        name: "Design",
+				        baselineStart: "2024-09-17",
+				        baselineEnd: "2024-09-18",
+				        actualStart: "2024-09-16",
+				        actualEnd: "2024-09-17",
+						progressValue: "0%"
+				      },
+				      {
+				        id: "3_3",
+				        name: "Implementation",
+				        baselineStart: "2024-09-18",
+				        baselineEnd: "2024-09-19",
+				        actualStart: "2024-09-17",
+				        actualEnd: "2024-09-18",
+						progressValue: "0%"
+				      }
+				  ]},
+				  { id: '4', name: '테스트', actualStart: '2024-09-19', actualEnd: '2024-09-30', progressValue: "0%" }
+			];
 
             ganttChart = anychart.ganttProject();
-            ganttChart.data(ganttChartData);
+            
+			// treeData 변수 정의
+			let treeData = anychart.data.tree(ganttChartData, 'as-tree');
+			ganttChart.data(treeData);
+
+            ganttChart.getTimeline().tasks().fill('#00bcd4');
+            ganttChart.getTimeline().tasks().stroke(null);
+
+            ganttChart.getTimeline().tasks().progress(function() {
+                return this.getData('progress') || 0;
+            });
+
+            let dataGrid = ganttChart.dataGrid();
+
+            dataGrid.column(0)
+                .title('ID')
+                .width(30)
+                .labels({ hAlign: 'center' });
+
+            dataGrid.column(1).labels().hAlign('left').width(180);
+
+            dataGrid.column(2)
+                .title('Start Time')
+                .width(70)
+                .labels()
+                .hAlign('right')
+                .format(function () {
+                    let date = new Date(this.actualStart);
+                    let month = date.getUTCMonth() + 1;
+                    let strMonth = month > 9 ? month : '0' + month;
+                    let utcDate = date.getUTCDate();
+                    let strDate = utcDate > 9 ? utcDate : '0' + utcDate;
+                    return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
+                });
+
+            dataGrid.column(3)
+                .title('End Time')
+                .width(70)
+                .labels()
+                .hAlign('right')
+                .format(function () {
+                    let date = new Date(this.actualEnd);
+                    let month = date.getUTCMonth() + 1;
+                    let strMonth = month > 9 ? month : '0' + month;
+                    let utcDate = date.getUTCDate();
+                    let strDate = utcDate > 9 ? utcDate : '0' + utcDate;
+                    return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
+                });
+				
+			console.log("시작일 형식: ", ganttChartData[0].actualStart);
+			console.log("종료일 형식: ", ganttChartData[ganttChartData.length - 1].actualEnd);
+
+			startDateStr = ganttChartData[0].actualStart;
+			endDateStr = ganttChartData[ganttChartData.length - 1].actualEnd;
+			
+			// 날짜 문자열을 Date 객체로 변환 (가정: 날짜 문자열은 "YYYY-MM-DD" 형식)
+			startDate = new Date(startDateStr);
+			endDate = new Date(endDateStr);
+			
+			// Date 객체에서 연도, 월, 일 추출
+			startYear = startDate.getUTCFullYear();
+			startMonth = startDate.getUTCMonth(); // 월은 0부터 시작
+			startDay = startDate.getUTCDate();
+
+			endYear = endDate.getUTCFullYear();
+			endMonth = endDate.getUTCMonth();
+			endDay = endDate.getUTCDate();
+			
             ganttChart.container('gantt-chart');
             ganttChart.draw();
-
+			
+			// 전체 데이터 표시
+			ganttChart.fitAll();
+			
+			// ex) ganttChart.zoomTo(Date.UTC(2024, 8, 1), Date.UTC(2024, 9, 30));
+			ganttChart.zoomTo(Date.UTC(startYear, startMonth, startDay), Date.UTC(endYear, endMonth, endDay));
+			
             ganttChartLoaded = true;
 
             // 진행도 업데이트 버튼 이벤트 리스너 추가
@@ -376,25 +498,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// 간트 차트 진행도 업데이트 함수
     function updateProgress() {
-        const id = document.getElementById('progress-id').value.trim(); // 입력값을 문자열로 처리
+        const id = document.getElementById('progress-id').value.trim(); 
         const progressValue = document.getElementById('progress-value').value.trim();
 
         if (ganttChart && id && progressValue) {
-            // 작업 데이터 배열에서 업데이트할 작업 찾기
-            const taskIndex = ganttChartData.findIndex(t => t.id === id);
-            
-            if (taskIndex !== -1) {
-                // ID가 문자열일 경우, progress 값을 업데이트
-                ganttChartData[taskIndex].progressValue = progressValue;
+            // 하위 작업을 포함하여 작업을 찾기 위한 재귀 함수
+            function findTaskById(tasks, id) {
+                for (let task of tasks) {
+                    if (task.id === id) {
+                        return task;
+                    }
+                    if (task.children) {
+                        const found = findTaskById(task.children, id);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            }
 
-				console.log("체크용: ", ganttChartData[taskIndex]);
-				
+            // 작업을 찾기
+            const taskToUpdate = findTaskById(ganttChartData, id);
+
+            if (taskToUpdate) {
+                taskToUpdate.progressValue = progressValue;
+
                 // Gantt 차트 데이터 업데이트
-                ganttChart.data(ganttChartData);
+                let updatedData = anychart.data.tree(ganttChartData, 'as-tree');
+                ganttChart.data(updatedData);
 
-                // 차트를 다시 그리기 전에 간트 차트의 데이터를 업데이트합니다.
-                ganttChart.draw(); // 차트 다시 그리기
-                console.log(`Updated task ID ${id} with progress ${progressValue}`);
+                // Gantt 차트 다시 그림
+                ganttChart.draw();
+
+                ganttChart.zoomTo(Date.UTC(startYear, startMonth, startDay), Date.UTC(endYear, endMonth, endDay));
+
+                console.log(`작업 ID ${id}의 진행도가 ${progressValue}로 업데이트되었습니다.`);
             } else {
                 alert('해당 ID의 작업을 찾을 수 없습니다.');
             }
