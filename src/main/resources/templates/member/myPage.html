@@ -9,7 +9,6 @@
 <body>
 	<div sec:authorize="isAuthenticated()">
 	<h1>안녕하세요, <span sec:authentication="name"></span>님!</h1>
-	<a th:href="@{/portfolio/create}">포트폴리오 생성</a>
 	</div>
 	
 	        <!-- 프리랜서 회원가입 폼 -->
@@ -28,29 +27,31 @@
                 <input type="password" id="freelancer-password" name="memberPw" placeholder="비밀번호는 8자 이상 20자 이하로 입력하세요." required><br>
                 <input type="password" id="freelancer-password-check" placeholder="동일한 비밀번호를 재입력하세요."><br>
                 <label for="freelancer-name">이름</label>
-                <input type="text" id="freelancer-name" name="memberName" required><br>
+                <input type="text" id="freelancer-name" name="memberName" th:value="${member.memberName}" readonly="readonly" required><br>
                 <label for="freelancer-email">이메일</label>
-                <input type="email" id="freelancer-email" name="email" required><br>
+                <input type="email" id="freelancer-email" name="email" th:value="${member.email}" required><br>
                 <input type="hidden" name="roleName" value="ROLE_FREELANCER" />
                 
                 <h1>상세 정보</h1>
                 <!-- 프리랜서 회원 상세 정보 -->
                 <label for="freelancer-phone">연락처</label>
-                <input type="text" id="freelancer-phone" name="freelancerPhone"><br>
+                <input type="text" id="freelancer-phone" name="freelancerPhone" th:value="${member.freelancer.freelancerPhone}"><br>
                  
                 <!-- 카카오 확인 -->
-                <input type="text" id="sample6_postcode" name="postalCode" placeholder="우편번호" readonly="readonly">
+                <input type="text" id="sample6_postcode" name="postalCode" placeholder="우편번호" readonly="readonly" th:value="${member.freelancer.postalCode}">
     			<input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
-    			<input type="text" id="sample6_address" name="address" placeholder="주소" readonly="readonly"><br>
-   				<input type="text" id="sample6_detailAddress" name="detailAddress" placeholder="상세주소">
-    			<input type="text" id="sample6_extraAddress" name="extraAddress" placeholder="참고항목">
+    			<input type="text" id="sample6_address" name="address" placeholder="주소" readonly="readonly" th:value="${member.freelancer.address}"><br>
+   				<input type="text" id="sample6_detailAddress" name="detailAddress" placeholder="상세주소" th:value="${member.freelancer.detailAddress}">
+    			<input type="text" id="sample6_extraAddress" name="extraAddress" placeholder="참고항목" th:value="${member.freelancer.extraAddress}">
                 <!-- 카카오 확인 끝-->
                 
                 <label for="freelancer-country">체류 중인 국가</label>
-                <input type="text" id="freelancer-country" name="country"><br>
-                <button type="submit">회원가입</button>
+                <input type="text" id="freelancer-country" name="country" th:value="${member.freelancer.country}"><br>
+                <button type="submit">회원 정보 수정</button>
                 <div class="errorMsg" th:if="${param.error}"><script>alert('회원가입에 실패했습니다.')</script></div>
             </form>
+            
+            <a th:href="@{/portfolio/create}">포트폴리오 생성</a>
         </div>
 
         <!-- client 회원가입 폼 -->
@@ -68,31 +69,31 @@
                 <input type="password" id="client-password" name="memberPw" placeholder="비밀번호는 8자 이상 20자 이하로 입력하세요." required><br>
                 <input type="password" id="client-password-check" placeholder="동일한 비밀번호를 재입력하세요."><br>
                 <label for="client-name">이름</label>
-                <input type="text" id="client-name" name="memberName" required><br>
+                <input type="text" id="client-name" name="memberName" required th:value="${member.memberName}"><br>
                 <label for="client-email">이메일</label>
-                <input type="email" id="client-email" name="email" required><br>
+                <input type="email" id="client-email" name="email" required th:value="${member.email}"><br>
                 <input type="hidden" name="roleName" value="ROLE_CLIENT" />
                 
                 <h1>상세 정보</h1>
                 <!-- client 회원 상세 정보 -->
                 <label for="client-phone">연락처</label>
-                <input type="text" id="client-phone" name="clientPhone"><br>
+                <input type="text" id="client-phone" name="clientPhone" th:value="${member.client.clientPhone}"><br>
                 <!-- 카카오 확인 -->
-                <input type="text" id="sample6_postcode_client" name="postalCode" placeholder="우편번호" readonly="readonly">
+                <input type="text" id="sample6_postcode_client" name="postalCode" placeholder="우편번호" readonly="readonly" th:value="${member.client.postalCode}">
     			<input type="button" onclick="sample6_execDaumPostcode_client()" value="우편번호 찾기"><br>
-    			<input type="text" id="sample6_address_client" name="address" placeholder="주소" readonly="readonly"><br>
-   				<input type="text" id="sample6_detailAddress_client" name="detailAddress" placeholder="상세주소">
-    			<input type="text" id="sample6_extraAddress_client" name="extraAddress" placeholder="참고항목">
+    			<input type="text" id="sample6_address_client" name="address" placeholder="주소" readonly="readonly" th:value="${member.client.address}"><br>
+   				<input type="text" id="sample6_detailAddress_client" name="detailAddress" placeholder="상세주소" th:value="${member.client.detailAddress}">
+    			<input type="text" id="sample6_extraAddress_client" name="extraAddress" placeholder="참고항목" th:value="${member.client.extraAddress}">
                 <!-- 카카오 확인 끝-->
                 <label for="client-industry">산업 분야</label>
-                <input type="text" id="client-industry" name="industry"><br>
+                <input type="text" id="client-industry" name="industry" th:value="${member.client.industry}"><br>
                 <label for="client-foundeddate">설립일</label>
-                <input type="date" id="client-foundeddate" name="foundedDate"><br>
+                <input type="date" id="client-foundeddate" name="foundedDate" th:value="${member.client.foundedDate}"><br>
                 <label for="client-employeecount">사원 수</label>
-                <input type="number" id="client-employeecount" name="employeeCount"><br>
+                <input type="number" id="client-employeecount" name="employeeCount" th:value="${member.client.employeeCount}"><br>
                 <label for="client-website">사이트 URL</label>
-                <input type="text" id="client-website" name="website"><br>
-                <button type="submit">회원가입</button>
+                <input type="text" id="client-website" name="website" th:value="${member.client.website}"><br>
+                <button type="submit">회원 정보 수정</button>
                 <div class="errorMsg" th:if="${param.error}"><script>alert('회원가입에 실패했습니다.')</script></div>
             </form>
         </div>

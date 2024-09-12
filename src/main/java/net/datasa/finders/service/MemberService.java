@@ -36,32 +36,40 @@ public class MemberService {
     private final ClientRepository clientRepository;
     
 //    public MemberEntity join(MemberDTO dto, String uploadPath, MultipartFile profileImg) throws IOException {
-//    	
-//    	LocalDateTime now = LocalDateTime.now();  // 회원가입 일시, 회원정보 수정 일시
-//    	
-//    	// 첨부파일이 있는지 확인
-//    	if (profileImg != null && !profileImg.isEmpty()) {
-//    		// 저장할 경로의 디렉토리가 있는지 확인 -> 없으면 생성
-//    		File directoryPath = new File(uploadPath);
-//    		
-//    		if (!directoryPath.isDirectory()) {
-//    			directoryPath.mkdirs();
-//    		}
-//    	}
-//    				
-//    	// 저장할 파일명 생성
-//    	// 내 이력서.doc -> 20240806_6156df53-a49b-4419-a336-cb6da0fa9640.doc
-//    	String originalName = profileImg.getOriginalFilename();
-//    	String extension = originalName.substring(originalName.lastIndexOf("."));  // 확장자를 가져옴
-//    	String dateString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-//    	String uuidString = UUID.randomUUID().toString();
-//    	String fileName = dateString + "_" + uuidString + extension;
-//    	
-//    	File file = new File(uploadPath, fileName);
-//    	profileImg.transferTo(file);
-//    	
-//    	MemberEntity entity = MemberEntity.builder()
-//    			.profileImg(fileName)
+//        
+//        LocalDateTime now = LocalDateTime.now();  // 회원가입 일시, 회원정보 수정 일시
+//        
+//        String imageUrl;
+//        
+//        // 첨부파일이 있는지 확인
+//        if (profileImg != null && !profileImg.isEmpty()) {
+//            // 저장할 경로의 디렉토리가 있는지 확인 -> 없으면 생성
+//            File directoryPath = new File(uploadPath);
+//            
+//            if (!directoryPath.isDirectory()) {
+//                directoryPath.mkdirs();
+//            }
+//            
+//            // 저장할 파일명 생성
+//            String originalName = profileImg.getOriginalFilename();
+//            String extension = originalName.substring(originalName.lastIndexOf("."));  // 확장자를 가져옴
+//            String dateString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+//            String uuidString = UUID.randomUUID().toString();
+//            String fileName = dateString + "_" + uuidString + extension;
+//            
+//            File file = new File(uploadPath, fileName);
+//            profileImg.transferTo(file);
+//            
+//            // 이미지가 업로드된 경우 서버 내 저장된 이미지 경로 설정
+//            imageUrl = fileName;  // 예시 URL 경로
+//        } else {
+//            // 이미지가 첨부되지 않았을 경우 기본 이미지 URL 설정
+//            imageUrl = null;  // 기본 이미지 URL
+//        }
+//        
+//        // MemberEntity 생성
+//        MemberEntity entity = MemberEntity.builder()
+//                .profileImg(imageUrl)  // 이미지 URL 설정
 //                .memberId(dto.getMemberId())
 //                .memberPw(passwordEncoder.encode(dto.getMemberPw()))        // Encrypt password
 //                .memberName(dto.getMemberName())
@@ -71,74 +79,51 @@ public class MemberService {
 //                .createdTime(now)
 //                .updatedTime(now)
 //                .build();
+//       
 //        
 //        // Special handling for admin account
 //        if (dto.getMemberId().equals("admin123")) {
-//            entity = MemberEntity.builder()
-//            		.profileImg(fileName)
-//                    .memberId(dto.getMemberId())
-//                    .memberPw(passwordEncoder.encode(dto.getMemberPw()))        // Encrypt password
-//                    .memberName(dto.getMemberName())
-//                    .email(dto.getEmail())
-//                    .enabled(true) // Account enabled
-//                    .roleName(RoleName.ROLE_ADMIN) // Set role to ADMIN
-//                    .createdTime(now)
-//                    .updatedTime(now)
-//                    .build();
+//        	entity.setRoleName(RoleName.ROLE_ADMIN);
 //        }
 //
 //        return memberRepository.save(entity);
 //    }
     
     public MemberEntity join(MemberDTO dto, String uploadPath, MultipartFile profileImg) throws IOException {
-        
-        LocalDateTime now = LocalDateTime.now();  // 회원가입 일시, 회원정보 수정 일시
-        
-        String imageUrl;
-        
-        // 첨부파일이 있는지 확인
-        if (profileImg != null && !profileImg.isEmpty()) {
-            // 저장할 경로의 디렉토리가 있는지 확인 -> 없으면 생성
+        LocalDateTime now = LocalDateTime.now();
+        String imageUrl = null;
+
+        if (dto.getProfileImg() != null && !dto.getProfileImg().isEmpty()) {
             File directoryPath = new File(uploadPath);
-            
-            if (!directoryPath.isDirectory()) {
+            if (!directoryPath.exists()) {
                 directoryPath.mkdirs();
             }
-            
-            // 저장할 파일명 생성
-            String originalName = profileImg.getOriginalFilename();
-            String extension = originalName.substring(originalName.lastIndexOf("."));  // 확장자를 가져옴
+
+            String originalName = dto.getProfileImg().getOriginalFilename();
+            String extension = originalName.substring(originalName.lastIndexOf("."));
             String dateString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             String uuidString = UUID.randomUUID().toString();
             String fileName = dateString + "_" + uuidString + extension;
-            
+
             File file = new File(uploadPath, fileName);
-            profileImg.transferTo(file);
-            
-            // 이미지가 업로드된 경우 서버 내 저장된 이미지 경로 설정
-            imageUrl = fileName;  // 예시 URL 경로
-        } else {
-            // 이미지가 첨부되지 않았을 경우 기본 이미지 URL 설정
-            imageUrl = null;  // 기본 이미지 URL
+            dto.getProfileImg().transferTo(file);
+            imageUrl = fileName;
         }
-        
-        // MemberEntity 생성
+
         MemberEntity entity = MemberEntity.builder()
-                .profileImg(imageUrl)  // 이미지 URL 설정
-                .memberId(dto.getMemberId())
-                .memberPw(passwordEncoder.encode(dto.getMemberPw()))        // Encrypt password
-                .memberName(dto.getMemberName())
-                .email(dto.getEmail())
-                .enabled(true) // Account enabled
-                .roleName(dto.getRoleName()) // Set role from DTO
-                .createdTime(now)
-                .updatedTime(now)
-                .build();
-       
-        
-        // Special handling for admin account
+            .profileImg(imageUrl)
+            .memberId(dto.getMemberId())
+            .memberPw(passwordEncoder.encode(dto.getMemberPw()))
+            .memberName(dto.getMemberName())
+            .email(dto.getEmail())
+            .enabled(true)
+            .roleName(dto.getRoleName())
+            .createdTime(now)
+            .updatedTime(now)
+            .build();
+
         if (dto.getMemberId().equals("admin123")) {
-        	entity.setRoleName(RoleName.ROLE_ADMIN);
+            entity.setRoleName(RoleName.ROLE_ADMIN);
         }
 
         return memberRepository.save(entity);
@@ -184,6 +169,53 @@ public class MemberService {
     public MemberEntity findByMemberId(String memberId) {
         return memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new RuntimeException("User not found with memberId: " + memberId));
+    }
+    
+
+    public MemberDTO getMemberInfo(String memberId) {
+    	MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(() -> 
+    			new IllegalArgumentException("No member found with ID: " + memberId));
+    	
+    	//기본적으로 MemberDTO 생성
+    	MemberDTO memberDTO = MemberDTO.builder()
+    			.memberId(memberEntity.getMemberId())
+    			.memberName(memberEntity.getMemberName())
+    			.email(memberEntity.getEmail())
+                .createdTime(memberEntity.getCreatedTime())
+                .updatedTime(memberEntity.getUpdatedTime())
+                .build();
+    	
+    	memberDTO.setProfileImgName(memberEntity.getProfileImg());
+    	
+    	if (memberEntity.getRoleName() == RoleName.ROLE_FREELANCER) {
+    		freelancerRepository.findByMember(memberEntity).ifPresent(freelancerEntity -> {
+    			FreelancerDTO freelancerDTO = FreelancerDTO.builder()
+    					.freelancerPhone(freelancerEntity.getFreelancerPhone())
+    					.country(freelancerEntity.getCountry())
+    					.postalCode(freelancerEntity.getPostalCode())
+    					.address(freelancerEntity.getAddress())
+    					.detailAddress(freelancerEntity.getDetailAddress())
+    					.extraAddress(freelancerEntity.getExtraAddress())
+    					.build();
+    			memberDTO.setFreelancer(freelancerDTO);
+    		});
+    	} else if (memberEntity.getRoleName() == RoleName.ROLE_CLIENT) {
+    		clientRepository.findByMember(memberEntity).ifPresent(clientEntity -> {
+    			ClientDTO clientDTO = ClientDTO.builder()
+    					.clientPhone(clientEntity.getClientPhone())
+    					.industry(clientEntity.getIndustry())
+    					.foundedDate(clientEntity.getFoundedDate())
+    					.employeeCount(clientEntity.getEmployeeCount())
+    					.website(clientEntity.getWebsite())
+    					.postalCode(clientEntity.getPostalCode())
+    					.address(clientEntity.getAddress())
+    					.detailAddress(clientEntity.getDetailAddress())
+    					.extraAddress(clientEntity.getExtraAddress())
+    					.build();
+    			memberDTO.setClient(clientDTO);
+    		});
+    	}
+		return memberDTO;
     }
 	
 }
