@@ -11,4 +11,7 @@ import net.datasa.finders.domain.entity.ChatMessageEntity;
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, Integer> {
     List<ChatMessageEntity> findAllByChatroomId(int chatroomId);
+
+    // 특정 채팅방의 모든 메시지를 삭제하는 메서드
+    void deleteByChatroomId(int chatroomId);
 }
