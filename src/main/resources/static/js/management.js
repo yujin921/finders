@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
     let calendar = null;
+    let ganttChart = null; // Gantt 차트 인스턴스를 저장할 변수
     let ganttChartLoaded = false;
 
     tabs.forEach(tab => {
@@ -30,79 +31,79 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 업무 모달 열기
-	function openTaskModal() {
-	    const modal = document.createElement('div');
-	    modal.classList.add('modal');
+    function openTaskModal() {
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
 
-	    const modalContent = document.createElement('div');
-	    modalContent.classList.add('modal-content');
+        const modalContent = document.createElement('div');
+        modalContent.classList.add('modal-content');
 
-	    const title = document.createElement('h3');
-	    title.textContent = '업무 등록';
+        const title = document.createElement('h3');
+        title.textContent = '업무 등록';
 
-	    const form = document.createElement('form');
-	    form.innerHTML = `
-	        <div class="form-group">
-	            <label for="task-name">업무명</label>
-	            <input type="text" id="task-name" required>
-	        </div>
-	        
-	        <div class="form-group">
-	            <label for="task-status">상태</label>
-	            <select id="task-status" required>
-	                <option value="요청">요청</option>
-	                <option value="진행">진행</option>
-	                <option value="피드백">피드백</option>
-	                <option value="보류">보류</option>
-	                <option value="완료">완료</option>
-	            </select>
-	        </div>
-	        
-	        <div class="form-group">
-	            <label for="task-priority">우선순위</label>
-	            <select id="task-priority" required>
-	                <option value="낮음">낮음</option>
-	                <option value="보통">보통</option>
-	                <option value="높음">높음</option>
-	                <option value="긴급">긴급</option>
-	            </select>
-	        </div>
+        const form = document.createElement('form');
+        form.innerHTML = `
+            <div class="form-group">
+                <label for="task-name">업무명</label>
+                <input type="text" id="task-name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="task-status">상태</label>
+                <select id="task-status" required>
+                    <option value="요청">요청</option>
+                    <option value="진행">진행</option>
+                    <option value="피드백">피드백</option>
+                    <option value="보류">보류</option>
+                    <option value="완료">완료</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="task-priority">우선순위</label>
+                <select id="task-priority" required>
+                    <option value="낮음">낮음</option>
+                    <option value="보통">보통</option>
+                    <option value="높음">높음</option>
+                    <option value="긴급">긴급</option>
+                </select>
+            </div>
 
-	        <div class="form-group">
-	            <label for="task-assignee">담당자</label>
-	            <input type="text" id="task-assignee" required>
-	        </div>
+            <div class="form-group">
+                <label for="task-assignee">담당자</label>
+                <input type="text" id="task-assignee" required>
+            </div>
 
-	        <div class="modal-buttons">
-	            <button type="button" class="btn-close">취소</button>
-	            <button type="submit" class="btn-save">저장</button>
-	        </div>
-	    `;
+            <div class="modal-buttons">
+                <button type="button" class="btn-close">취소</button>
+                <button type="submit" class="btn-save">저장</button>
+            </div>
+        `;
 
-	    modalContent.appendChild(title);
-	    modalContent.appendChild(form);
-	    modal.appendChild(modalContent);
+        modalContent.appendChild(title);
+        modalContent.appendChild(form);
+        modal.appendChild(modalContent);
 
-	    document.body.appendChild(modal);
+        document.body.appendChild(modal);
 
-	    const closeButton = modal.querySelector('.btn-close');
-	    const saveButton = modal.querySelector('.btn-save');
-	    
-	    closeButton.addEventListener('click', () => {
-	        document.body.removeChild(modal);
-	    });
+        const closeButton = modal.querySelector('.btn-close');
+        const saveButton = modal.querySelector('.btn-save');
+        
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
 
-	    form.addEventListener('submit', function(event) {
-	        event.preventDefault();
-	        const name = document.getElementById('task-name').value;
-	        const status = document.getElementById('task-status').value;
-	        const priority = document.getElementById('task-priority').value;
-	        const assignee = document.getElementById('task-assignee').value;
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('task-name').value;
+            const status = document.getElementById('task-status').value;
+            const priority = document.getElementById('task-priority').value;
+            const assignee = document.getElementById('task-assignee').value;
 
-	        addTaskToTable(name, status, priority, assignee);
-	        document.body.removeChild(modal);
-	    });
-	}
+            addTaskToTable(name, status, priority, assignee);
+            document.body.removeChild(modal);
+        });
+    }
 
     // 업무를 테이블에 추가하는 함수
     function addTaskToTable(name, status, priority, assignee) {
@@ -193,93 +194,138 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 일정 추가 모달 열기
     function openEventModal(dateStr) {
-        const title = prompt('새 일정 제목을 입력하세요:', '');
-        if (!title) return;
+        const eventModal = document.getElementById('event-modal');
+        const eventForm = document.getElementById('event-form');
 
-        const durationType = prompt('일정 입력 방식을 선택하세요. "1"은 반복 일정을 생성하고, "2"는 하나의 기간으로 표시합니다:', '1');
-        const startDate = prompt('일정 시작 날짜를 입력하세요 (예: 2024-09-10):', dateStr);
-        const endDate = prompt('일정 종료 날짜를 입력하세요 (예: 2024-09-12):', startDate);
+        eventModal.classList.remove('hidden');
+        document.getElementById('event-start-date').value = dateStr;
+        document.getElementById('event-end-date').value = dateStr;
 
-        const startTime = prompt('일정 시작 시간을 입력하세요 (예: 09:00):', '09:00');
-        const endTime = prompt('일정 종료 시간을 입력하세요 (예: 17:00):', '17:00');
+        const closeButton = eventModal.querySelector('.btn-close');
+        closeButton.addEventListener('click', () => {
+            eventModal.classList.add('hidden');
+        });
 
-        if (startDate && endDate && startTime && endTime) {
-            if (durationType === '1') {
-                const startDateTime = `${startDate}T${startTime}:00`;
-                const endDateTime = `${endDate}T${endTime}:00`;
+        // 기존의 이벤트 리스너를 제거하고 새로운 리스너를 추가
+        eventForm.removeEventListener('submit', handleEventFormSubmit);
+        eventForm.addEventListener('submit', handleEventFormSubmit);
+    }
 
-                const start = new Date(startDate);
-                const end = new Date(endDate);
+    // 이벤트 폼 제출 핸들러
+    function handleEventFormSubmit(event) {
+        event.preventDefault();
+        const title = document.getElementById('event-title').value;
+        const type = document.getElementById('event-type').value;
+        const startDate = document.getElementById('event-start-date').value;
+        const endDate = document.getElementById('event-end-date').value;
+        const startTime = document.getElementById('event-start-time').value;
+        const endTime = document.getElementById('event-end-time').value;
 
-                let currentDate = start;
-                while (currentDate <= end) {
-                    const eventStart = new Date(currentDate);
-                    const eventEnd = new Date(currentDate);
-                    eventStart.setHours(new Date(startDateTime).getHours(), new Date(startDateTime).getMinutes());
-                    eventEnd.setHours(new Date(endDateTime).getHours(), new Date(endDateTime).getMinutes());
+        if (title && startDate && endDate) {
+            let startDateTime, endDateTime;
 
-                    calendar.addEvent({
-                        title: title,
-                        start: eventStart.toISOString(),
-                        end: eventEnd.toISOString()
-                    });
+            // 중복 일정 체크
+            const events = calendar.getEvents();
+            const isDuplicate = (start, end) => {
+                return events.some(event =>
+                    (event.title === title && 
+                    event.startStr === start && 
+                    event.endStr === end)
+                );
+            };
 
+            if (type === '1') {
+                // 일일 일정 (반복 일정)
+                const startOfDayTime = `${startDate}T${startTime}:00`;
+                const endOfDayTime = `${endDate}T${endTime}:00`;
+
+                let currentDate = new Date(startDate);
+                const endDateObj = new Date(endDate);
+
+                while (currentDate <= endDateObj) {
+                    const eventStart = `${currentDate.toISOString().split('T')[0]}T${startTime}:00`;
+                    const eventEnd = `${currentDate.toISOString().split('T')[0]}T${endTime}:00`;
+
+                    if (!isDuplicate(eventStart, eventEnd)) {
+                        calendar.addEvent({
+                            title: title,
+                            start: eventStart,
+                            end: eventEnd
+                        });
+                    }
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
-            } else if (durationType === '2') {
-                const startDateTime = `${startDate}T${startTime}:00`;
-                const endDateTime = `${endDate}T${endTime}:00`;
+            } else if (type === '2') {
+                // 시간 기반 일정
+                startDateTime = `${startDate}T${startTime}:00`;
+                endDateTime = `${endDate}T${endTime}:00`;
 
-                calendar.addEvent({
-                    title: title,
-                    start: startDateTime,
-                    end: endDateTime
-                });
+                if (!isDuplicate(startDateTime, endDateTime)) {
+                    calendar.addEvent({
+                        title: title,
+                        start: startDateTime,
+                        end: endDateTime
+                    });
+                }
             }
+
+            // 모달 닫기 및 폼 리셋
+            document.getElementById('event-modal').classList.add('hidden');
+            document.getElementById('event-form').reset();
         }
     }
 
-	// 일정 상세 모달 열기
-	function openEventDetailModal(event) {
-	    const modal = document.createElement('div');
-	    modal.classList.add('modal');
+    // 모달 내용 초기화
+    function resetEventForm() {
+        document.getElementById('event-title').value = '';
+        document.getElementById('event-type').value = '1';
+        document.getElementById('event-start-date').value = '';
+        document.getElementById('event-end-date').value = '';
+        document.getElementById('event-start-time').value = '';
+        document.getElementById('event-end-time').value = '';
+    }
 
-	    const modalContent = document.createElement('div');
-	    modalContent.classList.add('modal-content');
+    // 일정 상세 모달 열기
+    function openEventDetailModal(event) {
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
 
-	    const title = document.createElement('h3');
-	    title.textContent = event.title;
+        const modalContent = document.createElement('div');
+        modalContent.classList.add('modal-content');
 
-	    const details = document.createElement('p');
-	    details.textContent = formatEventDetails(event);
+        const title = document.createElement('h3');
+        title.textContent = event.title;
 
-	    const closeButton = document.createElement('button');
-	    closeButton.textContent = 'Close';
-	    closeButton.classList.add('btn-close');
-	    closeButton.addEventListener('click', () => {
-	        document.body.removeChild(modal);
-	    });
+        const details = document.createElement('p');
+        details.textContent = formatEventDetails(event);
 
-	    const deleteButton = document.createElement('button');
-	    deleteButton.textContent = 'Delete';
-	    deleteButton.classList.add('btn-delete');
-	    deleteButton.addEventListener('click', () => {
-	        event.remove();
-	        document.body.removeChild(modal);
-	    });
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Close';
+        closeButton.classList.add('btn-close');
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
 
-	    const buttonsContainer = document.createElement('div');
-	    buttonsContainer.classList.add('modal-buttons');
-	    buttonsContainer.appendChild(closeButton);
-	    buttonsContainer.appendChild(deleteButton);
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('btn-delete');
+        deleteButton.addEventListener('click', () => {
+            event.remove();
+            document.body.removeChild(modal);
+        });
 
-	    modalContent.appendChild(title);
-	    modalContent.appendChild(details);
-	    modalContent.appendChild(buttonsContainer);
-	    modal.appendChild(modalContent);
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.classList.add('modal-buttons');
+        buttonsContainer.appendChild(closeButton);
+        buttonsContainer.appendChild(deleteButton);
 
-	    document.body.appendChild(modal);
-	}
+        modalContent.appendChild(title);
+        modalContent.appendChild(details);
+        modalContent.appendChild(buttonsContainer);
+        modal.appendChild(modalContent);
+
+        document.body.appendChild(modal);
+    }
 
     // 일정 상세 내용 포맷팅
     function formatEventDetails(event) {
@@ -317,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 {
                     "id": "1",
                     "name": "프로젝트 시작",
-                    "progressValue": "30%",
+                    "progressValue": "0%", // 기본 진행도 설정
                     "actualStart": "2024-09-01",
                     "actualEnd": "2024-09-08",
                     "connectTo": "5",
@@ -327,6 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 {
                     "id": "2",
                     "name": "중간 점검",
+                    "progressValue": "0%", // 기본 진행도 설정
                     "actualStart": "2024-09-15",
                     "actualEnd": "2024-09-15",
                     "connectorType": "FinishStart",
@@ -335,6 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 {
                     "id": "3",
                     "name": "프로젝트 마감",
+                    "progressValue": "0%", // 기본 진행도 설정
                     "actualStart": "2024-09-30",
                     "actualEnd": "2024-09-30",
                     "connectorType": "FinishStart",
@@ -343,6 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 {
                     "id": "4",
                     "name": "미팅",
+                    "progressValue": "0%", // 기본 진행도 설정
                     "actualStart": "2024-09-10T10:00:00",
                     "actualEnd": "2024-09-10T12:00:00",
                     "connectorType": "FinishStart",
@@ -351,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 {
                     "id": "5",
                     "name": "휴가",
-                    "progressValue": "80%",
+                    "progressValue": "0%", // 기본 진행도 설정
                     "actualStart": "2024-09-20",
                     "actualEnd": "2024-09-22",
                     "connectorType": "FinishStart",
@@ -359,19 +408,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             ];
 
-            let chart = anychart.ganttProject();
+            ganttChart = anychart.ganttProject(); // 수정된 부분
 
             let treeData = anychart.data.tree(data, 'as-table');
-            chart.data(treeData);
+            ganttChart.data(treeData);
 
-            chart.getTimeline().tasks().fill('#00bcd4');
-            chart.getTimeline().tasks().stroke(null);
+            ganttChart.getTimeline().tasks().fill('#00bcd4');
+            ganttChart.getTimeline().tasks().stroke(null);
 
-            chart.getTimeline().tasks().progress(function() {
+            ganttChart.getTimeline().tasks().progress(function() {
                 return this.getData('progress') || 0;
             });
 
-            let dataGrid = chart.dataGrid();
+            let dataGrid = ganttChart.dataGrid();
 
             dataGrid.column(0)
                 .title('#')
@@ -408,10 +457,50 @@ document.addEventListener('DOMContentLoaded', function() {
                     return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
                 });
 
-            chart.container('gantt-chart');
-            chart.draw();
+            ganttChart.container('gantt-chart');
+            ganttChart.draw();
 
-            chart.zoomTo(Date.UTC(2024, 8, 1), Date.UTC(2024, 9, 30));
+            ganttChart.zoomTo(Date.UTC(2024, 8, 1), Date.UTC(2024, 9, 30));
+        });
+		
+		// 진행도 업데이트 기능
+        document.getElementById('update-progress-button').addEventListener('click', function () {
+            const id = document.getElementById('progress-id').value;
+            const progressValue = document.getElementById('progress-value').value;
+            const progressNumber = parseFloat(progressValue.replace('%', '').trim()) / 100;
+
+            if (!id || isNaN(progressNumber)) {
+                alert('유효한 ID와 진행도 값을 입력해 주세요.');
+                return;
+            }
+
+            // 간트 차트가 로드된 경우
+            if (ganttChart) {
+                // 현재 데이터 가져오기
+                let data = ganttChart.data().get();
+                let taskUpdated = false;
+
+                // 데이터에서 특정 항목을 업데이트
+                data.forEach(item => {
+                    if (item.id === id) {
+                        item.progressValue = progressValue; // 데이터 업데이트
+                        taskUpdated = true;
+                    }
+                });
+
+                if (taskUpdated) {
+                    // 업데이트된 데이터로 차트 업데이트
+                    let updatedData = anychart.data.tree(data, 'as-table');
+                    ganttChart.data(updatedData);
+                    ganttChart.draw();
+                } else {
+                    alert('해당 ID를 가진 항목이 없습니다.');
+                }
+            } else {
+                alert('간트 차트가 아직 로드되지 않았습니다.');
+            }
         });
     }
+
+    loadGanttChart();
 });

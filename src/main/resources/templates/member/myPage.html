@@ -9,6 +9,7 @@
 <body>
 	<div sec:authorize="isAuthenticated()">
 	<h1>안녕하세요, <span sec:authentication="name"></span>님!</h1>
+	<a th:href="@{/portfolio/create}">포트폴리오 생성</a>
 	</div>
 	
 	        <!-- 프리랜서 회원가입 폼 -->

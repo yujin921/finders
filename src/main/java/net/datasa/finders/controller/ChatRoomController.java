@@ -1,8 +1,10 @@
 package net.datasa.finders.controller;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +26,12 @@ import net.datasa.finders.domain.dto.ChatRoomDTO;
 import net.datasa.finders.domain.dto.CreateChatRoomRequestDTO;
 import net.datasa.finders.domain.dto.InviteRequestDTO;
 import net.datasa.finders.domain.dto.ProjectDTO;
+import net.datasa.finders.domain.entity.ChatParticipantEntity;
 import net.datasa.finders.domain.entity.ChatRoomEntity;
+import net.datasa.finders.domain.entity.ProjectEntity;
+import net.datasa.finders.repository.ChatParticipantRepository;
+import net.datasa.finders.repository.ChatRoomRepository;
+import net.datasa.finders.repository.ProjectRepository;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ChatRoomService;
 
@@ -34,10 +41,19 @@ import net.datasa.finders.service.ChatRoomService;
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
-
+    private final ChatParticipantRepository chatParticipantRepository;
+    private final ChatRoomRepository chatRoomRepository; // 이 레포지토리도 정의되어야 함
+    private final ProjectRepository projectRepository; // 이 레포지토리도 정의되어야 함
+  
     @Autowired
-    public ChatRoomController(ChatRoomService chatRoomService) {
+    public ChatRoomController(ChatRoomService chatRoomService, 
+                              ChatParticipantRepository chatParticipantRepository, 
+                              ChatRoomRepository chatRoomRepository, 
+                              ProjectRepository projectRepository) {
         this.chatRoomService = chatRoomService;
+        this.chatParticipantRepository = chatParticipantRepository;
+        this.chatRoomRepository = chatRoomRepository;
+        this.projectRepository = projectRepository;
     }
 
     // 현재 사용자가 속한 채팅방 목록 페이지
@@ -171,5 +187,37 @@ public class ChatRoomController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+    
+    // 현재 로그인한 사용자가 속한 채팅방만 가져오는 메서드
+    public List<ChatRoomDTO> getChatRoomsForLoggedInUser(String userId) {
+        List<Integer> userChatroomIds = chatParticipantRepository.findByParticipantId(userId)
+                .stream()
+                .map(ChatParticipantEntity::getChatroomId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<ChatRoomEntity> chatRooms = chatRoomRepository.findAllById(userChatroomIds);
+
+        // 프로젝트 데이터를 조회하고 map에 저장
+        List<ProjectEntity> projects = projectRepository.findAll();
+        Map<Integer, String> projectMap = projects.stream()
+            .collect(Collectors.toMap(ProjectEntity::getProjectNum, ProjectEntity::getProjectName));
+
+        return chatRooms.stream()
+            .map(room -> {
+                // projectNum으로 프로젝트 제목을 가져옴
+                String projectTitle = projectMap.get(room.getProjectNum());
+                System.out.println("ChatRoomId: " + room.getChatroomId() + ", ProjectNum: " + room.getProjectNum() + ", ProjectTitle: " + projectTitle);
+
+                return ChatRoomDTO.builder()
+                    .chatroomId(room.getChatroomId())
+                    .chatroomName(room.getChatroomName())
+                    .projectNum(room.getProjectNum())
+                    .projectTitle(projectTitle != null ? projectTitle : "제목 없음") // null일 경우 "제목 없음" 설정
+                    .createdTime(Timestamp.valueOf(room.getCreatedTime()))
+                    .build();
+            })
+            .collect(Collectors.toList());
     }
 }

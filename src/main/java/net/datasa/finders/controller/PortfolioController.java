@@ -27,10 +27,10 @@ public class PortfolioController {
 	
 	private final FreelancerPortfoliosService FPService;
 
-	@GetMapping("edit")
+	@GetMapping("create")
     public String portfolio() {
 		
-        return "/portfolio/portfolio";
+        return "/portfolio/create";
     }
 	
 	@PostMapping("save")
@@ -40,7 +40,7 @@ public class PortfolioController {
     }
 	
 	// 이미지 업로드 경로 설정 (로컬 경로 예시)
-	private static final String UPLOAD_DIR = "C:/upload/";
+	private static final String UPLOAD_DIR = "C:/upload/portfolio/";
 
 	/*
 	 * @PostMapping("/upload-image") public ResponseEntity<Map<String, Object>>

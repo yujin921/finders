@@ -6,6 +6,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+//채팅전용
 @Entity
 @Table(name = "chat_participant")
 @IdClass(ChatParticipantId.class)

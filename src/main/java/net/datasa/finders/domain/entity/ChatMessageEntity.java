@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor; // 기본 생성자 추가를 위한 Lombok 주석
 
+//채팅전용
 @Entity
 @Table(name = "CHAT_TEXT")
 @Data
