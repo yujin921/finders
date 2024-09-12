@@ -76,7 +76,7 @@
 
 						let html = `
 							<div class="post">
-								<img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" class="thumbnail"/>
+								<img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" class="thumbnail">
 								<div class="post-info">
 									<a href="/board/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a>
 									<span>평점들어갈 자리</span><br>
@@ -108,15 +108,13 @@
 </head>
 <body>
 	<h1>[ 프로젝트 게시판 ]</h1>
-
-	<input type="button" onclick="window.location.href='/board/write';" value="글쓰기">
-	<br><br>
-
-	<div class="table-container" id="output">
-
-
+	<div sec:authorize="hasRole('ROLE_CLIENT')">
+		<input type="button" onclick="window.location.href='/board/write';" value="글쓰기">
 	</div>
 
+	<br><br>
+
+	<div class="table-container" id="output"></div>
 
 </body>
 </html>

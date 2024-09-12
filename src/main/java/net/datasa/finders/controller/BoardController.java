@@ -3,6 +3,7 @@ package net.datasa.finders.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
+import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.BoardService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -75,9 +76,13 @@ public class BoardController {
 	@GetMapping("read")
 	public String read(@RequestParam("projectNum") int pNum, Model model, @AuthenticationPrincipal AuthenticatedUser user) {
 	    try {
-	        ProjectPublishingDTO projectPublishingDTO = boardService.getBoard(pNum);
+            RoleName roleName = RoleName.valueOf(user.getRoleName());
+
+            log.debug("현재 사용자의 역할: {}", roleName);
+	        ProjectPublishingDTO projectPublishingDTO = boardService.getBoard(pNum, user.getUsername(), roleName);
 	        model.addAttribute("board", projectPublishingDTO);
-	        model.addAttribute("user", user);
+            model.addAttribute("user", user);
+            model.addAttribute("roleName", projectPublishingDTO.getRoleName());
 	        return "board/read";
 	    } catch (Exception e) {
             e.printStackTrace();
@@ -88,7 +93,8 @@ public class BoardController {
 	@PostMapping("delete")
     public String deletePost(@RequestParam("projectNum") int pNum, @AuthenticationPrincipal AuthenticatedUser user) {
         try {
-            ProjectPublishingDTO projectPublishingDTO = boardService.getBoard(pNum);
+            RoleName roleName = RoleName.valueOf(user.getRoleName());
+            ProjectPublishingDTO projectPublishingDTO = boardService.getBoard(pNum, user.getUsername(), roleName);
 
             // 로그인된 사용자와 게시글 작성자가 같은지 확인
             if (projectPublishingDTO.getClientId().equals(user.getUsername())) {

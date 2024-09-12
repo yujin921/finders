@@ -3,7 +3,6 @@ package net.datasa.finders.service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,8 @@ import net.datasa.finders.domain.dto.CreateChatRoomRequestDTO;
 import net.datasa.finders.domain.dto.ProjectDTO;
 import net.datasa.finders.domain.entity.ChatParticipantEntity;
 import net.datasa.finders.domain.entity.ChatRoomEntity;
-import net.datasa.finders.domain.entity.ProjectEntity;
 import net.datasa.finders.domain.entity.TeamEntity;
+import net.datasa.finders.repository.ChatMessageRepository;
 import net.datasa.finders.repository.ChatParticipantRepository;
 import net.datasa.finders.repository.ChatRoomRepository;
 import net.datasa.finders.repository.ProjectRepository;
@@ -32,6 +31,7 @@ public class ChatRoomService {
     private final TeamRepository teamRepository;
     private final ChatMessageService chatMessageService;
     private final ProjectRepository projectRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     
     @Autowired
@@ -39,12 +39,14 @@ public class ChatRoomService {
                            ChatParticipantRepository chatParticipantRepository,
                            TeamRepository teamRepository,
                            ChatMessageService chatMessageService,
-                           ProjectRepository projectRepository) { // ProjectRepository 추가
+                           ProjectRepository projectRepository,
+                           ChatMessageRepository chatMessageRepository) { // ProjectRepository 추가
         this.chatRoomRepository = chatRoomRepository;
         this.chatParticipantRepository = chatParticipantRepository;
         this.teamRepository = teamRepository;
         this.chatMessageService = chatMessageService;
-        this.projectRepository = projectRepository; // 초기화
+        this.projectRepository = projectRepository; 
+        this.chatMessageRepository = chatMessageRepository;// 초기화
     }
 
     // 현재 사용자가 속한 채팅방만 조회
@@ -262,7 +264,21 @@ public class ChatRoomService {
             .collect(Collectors.toList());
     }
 
-
+    // 채팅방과 메시지 삭제 메서드
+    @Transactional
+    public void deleteChatRoomIfNoParticipants(int chatRoomId) {
+        // 참가자 수 확인
+        int participantCount = chatParticipantRepository.countByChatroomId(chatRoomId);
+        
+        // 참가자가 0명인 경우 삭제 로직 실행
+        if (participantCount == 0) {
+            // 먼저 메시지를 삭제합니다.
+            chatMessageRepository.deleteByChatroomId(chatRoomId);
+            // 그런 다음 채팅방을 삭제합니다.
+            chatRoomRepository.deleteById(chatRoomId);
+            System.out.println("참가자가 없는 채팅방과 메시지를 삭제했습니다.");
+        }
+    }
 
 
 

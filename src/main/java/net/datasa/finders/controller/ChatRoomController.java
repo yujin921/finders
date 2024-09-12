@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -219,5 +220,29 @@ public class ChatRoomController {
                     .build();
             })
             .collect(Collectors.toList());
+    }
+    
+ // ChatRoomController.java
+    @PostMapping("/leave")
+    public ResponseEntity<String> leaveChatRoom(@RequestParam("chatroomId") int chatroomId) {
+        // 현재 로그인한 사용자 ID 가져오기
+        String currentUserId = getCurrentUserId();
+
+        // chatroomId와 currentUserId에 해당하는 참여 기록을 삭제
+        int deletedCount = chatParticipantRepository.deleteByChatroomIdAndParticipantId(chatroomId, currentUserId);
+
+        if (deletedCount > 0) {
+            // 참가자가 나간 후 참가자 수 확인 및 삭제 메서드 호출
+            chatRoomService.deleteChatRoomIfNoParticipants(chatroomId);
+            return ResponseEntity.ok("채팅방을 나갔습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("채팅방 나가기 실패");
+        }
+    }
+    
+    @DeleteMapping("/deleteIfNoParticipants")
+    public ResponseEntity<Void> deleteIfNoParticipants(@RequestParam int chatRoomId) {
+        chatRoomService.deleteChatRoomIfNoParticipants(chatRoomId);
+        return ResponseEntity.ok().build();
     }
 }

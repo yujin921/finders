@@ -10,15 +10,17 @@
 <body>
     <h1 th:text="${board.projectTitle}">프로젝트 제목</h1>
 
-    <p>작성자: <span th:text="${board.clientId}">작성자</span></p>
-    <p>근무 시작일: <span th:text="${board.projectStartDate}">근무 시작일</span></p>
-    <p>모집 마감일: <span th:text="${#temporals.format(board.recruitDeadline, 'yyyy-MM-dd')}"></span></p>
+    <span>작성자: <span th:text="${board.clientId}"></span></span><br>
+    <span>근무 시작일: <span th:text="${board.projectStartDate}"></span></span><br>
+    <span>모집 마감일: <span th:text="${#temporals.format(board.recruitDeadline, 'yyyy-MM-dd')}"></span></span><br>
+    <span class="estimatedDays">예상일수 : <span th:text="${board.estimatedDay} + '일'"></span></span><br>
+    <span>지출 가능 예산: <span th:text="${board.projectBudget}"></span>원</span>
     <!-- 최종 출력 리스트 -->
     <div>
         <h3>카테고리 및 업무 범위별 인원수</h3>
         <ul>
             <li th:each="output : ${board.outputList}">
-                <p th:text="${output['workScope']} + ' - ' + ${output['category']} + ' (' + ${output['requiredNum']} + '명)'"></p>
+                <span th:text="${output['workScope']} + ' - ' + ${output['category']} + ' (' + ${output['requiredNum']} + '명)'"></span>
             </li>
         </ul>
     </div>
@@ -32,5 +34,35 @@
             </li>
         </ul>
     </div>
+
+    <!-- 사전 검증 질문 -->
+    <div>
+        <h3>사전 검증 질문</h3>
+        <ul>
+            <li th:each="question, iterStat : ${board.prequalificationQuestions}">
+                <span th:text="${iterStat.count} + '. ' + ${question}"></span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 게시판 작성자와 로그인한 사용자가 같을 경우 삭제 버튼 표시 -->
+    <span th:if="${board.clientId == user.username}">
+        <form action="/board/delete" method="post">
+            <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
+            <button type="submit">삭제하기</button>
+        </form>
+    </span>
+    <!-- ROLE_FREELANCER일 경우 신청하기 버튼 표시 -->
+    <span th:if="${roleName.name() == 'ROLE_FREELANCER'}">
+        <form action="/board/apply" method="post">
+            <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
+            <button type="submit">신청하기</button>
+        </form>
+    </span>
+
+    <!-- ROLE_CLIENT일 경우 신청하기 버튼 숨김 -->
+    <span th:if="${roleName.name() == 'ROLE_CLIENT'}">
+        <!-- 아무 것도 표시하지 않음 -->
+    </span>
 </body>
 </html>
