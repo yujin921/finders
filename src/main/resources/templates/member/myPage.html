@@ -16,7 +16,9 @@
             <form id="freelancer-update-form" th:action="@{/member/update}" method="post" enctype="multipart/form-data">
                 <!-- 프로필 이미지 업로드 -->
                 <label for="freelancer-profile-img">프로필 이미지</label>
-                <input type="file" id="freelancer-profile-img" name="profileImg"><br>
+                <input type="file" id="freelancer-profile-img" name="profileImg" 
+                accept="image/*" onchange="previewImage(this, 'freelancer-preview')"><br>
+                <img id="freelancer-preview" src="#" alt="프로필 이미지 미리보기" style="display:none; width:100px; height:100px; border-radius:50%;">
 
                 <!-- 프리랜서 회원 기본 정보 -->
                 <h1>기본 정보</h1>
@@ -58,7 +60,9 @@
         <div sec:authorize="hasRole('ROLE_CLIENT')" id="client-update">
             <form id="client-update-form" th:action="@{/member/update}" method="post" enctype="multipart/form-data">
                 <label for="client-profile-img">프로필 이미지</label>
-                <input type="file" id="client-profile-img" name="profileImg"><br>
+                <input type="file" id="client-profile-img" name="profileImg"
+                accept="image/*" onchange="previewImage(this, 'client-preview')"><br>
+				<img id="client-preview" src="#" alt="프로필 이미지 미리보기" style="display:none; width:100px; height:100px; border-radius:50%;">
 
                 <h1>기본 정보</h1>
                 <!-- client 회원 기본 정보 -->
@@ -97,5 +101,24 @@
                 <div class="errorMsg" th:if="${param.error}"><script>alert('회원가입에 실패했습니다.')</script></div>
             </form>
         </div>
+        <script>
+function previewImage(input, previewId) {
+    var preview = document.getElementById(previewId);
+    var file = input.files[0];
+    var reader = new FileReader();
+
+    reader.onloadend = function () {
+        preview.src = reader.result;
+        preview.style.display = 'block';
+    }
+
+    if (file) {
+        reader.readAsDataURL(file);
+    } else {
+        preview.src = "";
+        preview.style.display = 'none';
+    }
+}
+</script>
 </body>
 </html>
