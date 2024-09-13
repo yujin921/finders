@@ -5,7 +5,7 @@
     --secondary-color: #2ecc71;
     --bg-color: #f4f4f4;
     --text-color: #333;
-    --btn-color: #27ae60;
+    --btn-color: #2980b9;
     --header-height: 70px;
 }
 
@@ -20,6 +20,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
+    min-width:1200px; 
 }
 
 header {
