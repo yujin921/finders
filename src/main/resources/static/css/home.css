@@ -15,6 +15,7 @@
           background-color: var(--bg-color);
           color: var(--text-color);
           line-height: 1.6;
+    	  min-width:1200px; 
       }
       .container {
           max-width: 1200px;
@@ -65,11 +66,21 @@
           cursor: pointer;
           font-size: 20px;
       }
-      .user-actions a {
+      
+      .login-actions {
+      	display: flex;
+      	align-items: center;
+      }
+      .login-actions a {
           text-decoration: none;
           color: var(--text-color);
           margin-left: 25px;
       }
+      
+      .login-actions .btn {
+          color: white;
+      }
+      
       .btn {
           background-color: var(--primary-color);
           color: #fff;

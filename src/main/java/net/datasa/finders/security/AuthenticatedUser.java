@@ -27,6 +27,7 @@ public class AuthenticatedUser implements UserDetails {
     private String password;
     private String roleName;   // 로그인 유형 구분을 위해 추가함
     private boolean enabled;
+    private String profileImg;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

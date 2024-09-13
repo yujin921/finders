@@ -11,8 +11,11 @@
 </head>
 <body>
     <header>
-        <div class="header-content">
-            <div class="logo">Finder</div>
+            <div class="logo">
+	        	<a href="/">
+					<img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
+				</a>
+	        </div>
             <nav>
                 <a href="#">프로젝트 등록</a>
                 <a href="#">프로젝트 찾기</a>
@@ -21,16 +24,27 @@
                 <a href="#">프로젝트 관리</a>
                 <a href="#">미팅룸</a>
             </nav>
-            <button class="login-button">회원가입</button>
-        </div>
+            
+            <div class="login-actions">
+	            <th:block sec:authorize="not isAuthenticated()">
+		           	<a th:href="@{/member/join}">회원가입</a>
+		       		<a th:href="@{/member/login}" class="btn">로그인</a>
+		   		</th:block>
+		
+		   		<th:block sec:authorize="isAuthenticated()">
+		   			<img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
+		   		    <a th:href="@{/project/view}">프로젝트 관리</a>
+		   		    <a th:href="@{/member/myPage}">마이페이지</a>
+		   			<a th:href="@{/member/logout}" class="btn">로그아웃</a>
+		   		</th:block>
+	        </div>
     </header>
 
     <div class="container">
         <div class="content">
             <div class="sidebar">
-                <div class="sidebar-menu">
                     <ul id="step-list">
-				        <li class="action" data-target="section1">1. 프로젝트 제목</li>
+				        <li class="active" data-target="section1">1. 프로젝트 제목</li>
 				        <li data-target="section2">2. 업무범위</li>
 				        <li data-target="section3">3. 카테고리</li>
 				        <li data-target="section4">4. 이미지 업로드</li>
@@ -39,21 +53,20 @@
 				        <li data-target="section7">7. 예산 및 일정</li>
 				        <li data-target="section8">8. 모집 정보</li>
 				    </ul>
-                </div>
             </div>
 
             <div class="main-content">
                 <form method="POST" action="/board/write" enctype="multipart/form-data">
 					<div id="section1" class="section">
+						<h2>프로젝트 제목</h2>
 				        <div class="project-title-container">
-				            <h2><label for="project-title">프로젝트 제목</label></h2><br>
 				            <input type="text" id="project-title" name="projectTitle" maxlength="30" placeholder="프로젝트 제목을 입력하세요">
 				        </div>
 					</div>
 					
 					<div id="section2" class="section">
+						<h2>업무범위</h2>
 				        <div class="scope-of-work">
-				            <h2><label for="project-title">업무범위</label></h2><br>
 				            <div class="scope-option" onclick="toggleSelect(this)" data-scope="개발">
 				                <input type="checkbox" value="개발">
 				                <img src="https://via.placeholder.com/50" alt="개발">
@@ -83,9 +96,9 @@
 					
 					<div id="section3" class="section">
 				        <!-- 카테고리 -->
+				        <h2>카테고리</h2>
 				        <div class="category-container">
 				            <div class="category-section">
-				                <h2>카테고리</h2>
 				                <p>해당하는 카테고리를 모두 선택해주세요.</p>
 				                <div class="category-buttons">
 				                    <div class="category-btn" onclick="toggleCategory(this)" data-category="웹">웹</div>
@@ -102,59 +115,58 @@
 					
 					<div id="section4" class="section">
 				        <!-- 이미지 업로드 -->
+				        <h2>프로젝트 이미지</h2>
 				        <div class="image-upload-section">
-				            <h2>프로젝트 이미지</h2>
 				            <p>프로젝트 찾기 창에서 보일 프로젝트 대표 이미지를 넣어주세요. (최대 1개)</p>
 				            <input type="file" name="projectImageFile" accept="image/png, image/jpeg">
 				        </div>
 				    </div>
 				
+					<div id="section5" class="section">
+				        <input type="hidden" id="selectedSkills" name="selectedSkills">
+				        <!-- 선택된 기술 표시 박스 -->
+				        <div class="selected-techs" id="selected-techs">
+				            <!-- 선택한 기술들이 여기에 표시됩니다. -->
+				        </div>
+				
+				        <!-- 관련 기술 선택 섹션 -->
+				        <div class="tech-section">
+				            <h2>관련 기술</h2>
+				            <p>프로젝트에서 활용될 기술에 대해 모두 선택해주세요.</p>
+				            <div class="tech-buttons">
+				                <div class="tech-button" data-tech="Python" onclick="toggleTech(this)">Python</div>
+				                <div class="tech-button" data-tech="Javascript" onclick="toggleTech(this)">Javascript</div>
+				                <div class="tech-button" data-tech="JAVA" onclick="toggleTech(this)">JAVA</div>
+				                <div class="tech-button" data-tech="C++" onclick="toggleTech(this)">C++</div>
+				                <div class="tech-button" data-tech="iOS" onclick="toggleTech(this)">iOS</div>
+				                <div class="tech-button" data-tech="안드로이드" onclick="toggleTech(this)">안드로이드</div>
+				            </div>
+				        </div>
+					</div>
 					
-					<div class="tech-container">
-						<div id="section5" class="section">
-					        <input type="hidden" id="selectedSkills" name="selectedSkills">
-					        <!-- 선택된 기술 표시 박스 -->
-					        <div class="selected-techs" id="selected-techs">
-					            <!-- 선택한 기술들이 여기에 표시됩니다. -->
-					        </div>
-					
-					        <!-- 관련 기술 선택 섹션 -->
-					        <div class="tech-section">
-					            <h2>관련 기술</h2>
-					            <p>프로젝트에서 활용될 기술에 대해 모두 선택해주세요.</p>
-					            <div class="tech-buttons">
-					                <div class="tech-button" data-tech="Python" onclick="toggleTech(this)">Python</div>
-					                <div class="tech-button" data-tech="Javascript" onclick="toggleTech(this)">Javascript</div>
-					                <div class="tech-button" data-tech="JAVA" onclick="toggleTech(this)">JAVA</div>
-					                <div class="tech-button" data-tech="C++" onclick="toggleTech(this)">C++</div>
-					                <div class="tech-button" data-tech="iOS" onclick="toggleTech(this)">iOS</div>
-					                <div class="tech-button" data-tech="안드로이드" onclick="toggleTech(this)">안드로이드</div>
-					            </div>
-					        </div>
-						</div>
-						
-						<div id="section6" class="section">
-					        <!-- 상세 업무 내용 섹션 -->
-					        <div class="detail-section">
-					            <h2>상세업무 내용</h2>
-					            <p>프로젝트와 관련된 상세한 내용들을 기입해주세요.</p>
-					            <textarea id="detail-text" name="projectDescription" rows="5" maxlength="5000" placeholder="5000자 이내로 작성해주세요."></textarea>
-					            <p class="char-count" id="char-count">0 / 5000</p>
-					        </div>
-					    
-					    </div>
-						<div id="section7" class="section">
-					    <div class="budget-container">
-					        <!-- 지출 가능 예산 -->
-					        <div class="budget-item">
-					            <label for="budget">지출 가능 예산</label>
-					            <input type="text" id="budget" name="projectBudget" placeholder="300,000 ￦">
-					            <div class="checkbox-container">
-					                <input type="checkbox" id="flexible">
-					                <label for="flexible">입력한 예산에서 조율이 가능합니다.</label>
-					            </div>
-					        </div>
-						</div>
+					<div id="section6" class="section">
+				        <!-- 상세 업무 내용 섹션 -->
+				        <h2>상세업무 내용</h2>
+				        <div class="detail-section">
+				            <p>프로젝트와 관련된 상세한 내용들을 기입해주세요.</p>
+				            <textarea id="detail-text" name="projectDescription" rows="5" maxlength="5000" placeholder="5000자 이내로 작성해주세요."></textarea>
+				            <p class="char-count" id="char-count">0 / 5000</p>
+				        </div>
+				    
+				    </div>
+					<div id="section7" class="section">
+					<h2>예산 및 일정</h2>
+				    <div class="budget-container">
+				        <!-- 지출 가능 예산 -->
+				        <div class="budget-item">
+				            <label for="budget">지출 가능 예산</label>
+				            <input type="text" id="budget" name="projectBudget" placeholder="300,000 ￦">
+				            <div class="checkbox-container">
+				                <input type="checkbox" id="flexible">
+				                <label for="flexible">입력한 예산에서 조율이 가능합니다.</label>
+				            </div>
+				        </div>
+					</div>
 				        <!-- 프로젝트 시작일 -->
 				        <div class="budget-item">
 				            <label for="start-date">프로젝트 시작일</label>
@@ -167,8 +179,9 @@
 				            <input type="date" id="end-date" name="projectEndDate">
 				        </div>
 				    </div>
-				</div>    
+				    
 				<div id="section8" class="section">
+				<h2>모집 정보</h2>
 				    <div class="recruit-container">
 				        <!-- 모집 마감일 -->
 				        <div class="recruit-section">

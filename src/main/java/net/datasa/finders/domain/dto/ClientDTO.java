@@ -13,6 +13,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ClientDTO {
 
+    String memberId;
+    String memberPw;
+    String memberName;
+    String email;
+	
 	String clientId;
 	String clientPhone;
 	String industry;

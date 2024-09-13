@@ -52,12 +52,18 @@
             <button type="submit">삭제하기</button>
         </form>
     </span>
-    <!-- ROLE_FREELANCER일 경우 신청하기 버튼 표시 -->
+
+    <!-- ROLE_FREELANCER일 경우 신청하기 버튼 또는 지원 상태 표시 -->
     <span th:if="${roleName.name() == 'ROLE_FREELANCER'}">
-        <form action="/board/apply" method="post">
-            <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
-            <button type="submit">신청하기</button>
-        </form>
+        <div th:if="${applied}">
+            <p>지원 결과: <span th:text="${applicationStatus}">pending</span></p>
+        </div>
+        <div th:unless="${applied}">
+            <form action="/board/apply" method="post">
+                <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
+                <button type="submit">신청하기</button>
+            </form>
+        </div>
     </span>
 
     <!-- ROLE_CLIENT일 경우 신청하기 버튼 숨김 -->
