@@ -6,115 +6,82 @@
 	<meta charset="UTF-8">
 	<title>프로젝트 게시판</title>
 	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-	<style>
-		.table-container {
-			display: grid;
-			grid-template-columns: repeat(3, 1fr); /* 3개의 열을 균등하게 나누기 */
-			grid-auto-rows: auto; /* 행의 높이는 자동으로 설정 */
-			gap: 20px; /* 각 게시글 사이 간격 */
-			width: 100%; /* 부모 컨테이너의 너비를 100%로 설정 */
-			max-width: 1200px; /* 최대 너비를 1200px로 제한 */
-			margin: 0 auto; /* 가운데 정렬 */
-		}
-
-		.post {
-			border: 1px solid #ddd;
-			padding: 20px;
-			box-sizing: border-box;
-			background-color: #fff;
-			display: flex;
-			flex-direction: column;
-			/*align-items: center;*/
-			width: 100%;
-		}
-
-		.thumbnail {
-			width: 300px;
-			height: auto;
-			margin-bottom: 15px;
-		}
-
-		.post-info {
-			text-align: left;
-		}
-
-		.post-info .author,
-		.post-info .date,
-		.post-info .status,
-		.post-info a {
-			display: block;
-		}
-
-		.post-info a {
-			font-weight: bold;
-			font-size: 1.1em;
-			color: #000;
-			text-decoration: none;
-		}
-
-		.post-info a:hover {
-			color: #007bff;
-		}
-	</style>
-	<script>
-		$(document).ready(function() {
-			list();
-		});
-
-		function list() {
-		    $.ajax({
-		        url: 'list',
-		        type: 'get',
-		        success: function(list) {
-		            $('#output').empty();
-
-					$(list).each(function(i, obj) {
-						const formattedDate = new Date(obj.recruitDeadline).toISOString().split('T')[0];
-						let status = obj.projectStatus ? "모집완료" : "모집중";
-
-						let remainingDays = calculateRemainingDays(obj.projectStartDate, obj.projectEndDate);
-
-						let html = `
-							<div class="post">
-								<img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" class="thumbnail">
-								<div class="post-info">
-									<a href="/board/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a>
-									<span>평점들어갈 자리</span><br>
-									<span class="startdate">시작일 : ${obj.projectStartDate}</span><br>
-									<span class="budget">금액 : ${obj.projectBudget}</span>
-									<span class="author">작성자 : ${obj.clientId}</span>
-									<span class="date">예상 기간 : ${remainingDays}일</span>
-									<span class="status">${status}</span>
-								</div>
-							</div>
-						`;
-						$('#output').append(html);
-					});
-		        },
-		        error: function(e) {
-		            alert('조회 실패');
-		        }
-		    });
-		}
-
-		function calculateRemainingDays(StartDate, EndDate) {
-			const start = new Date(StartDate); // 시작 날짜
-			const end = new Date(EndDate); // 끝날짜
-			const differenceInTime = end - start; // 시간 차이 (밀리초)
-			const differenceInDays = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24)); // 일로 변환 후 올림
-			return differenceInDays >= 0 ? differenceInDays : 0; // 음수일 경우 0일로 표시
-		}
-	</script>
+	<link rel="stylesheet" th:href="@{/css/board/list.css}">
+    <script th:src="@{/js/board/list.js}"></script>
 </head>
 <body>
-	<h1>[ 프로젝트 게시판 ]</h1>
-	<div sec:authorize="hasRole('ROLE_CLIENT')">
-		<input type="button" onclick="window.location.href='/board/write';" value="글쓰기">
-	</div>
+	<header>
+        <div class="logo">
+        	<a href="/">
+				<img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
+			</a>
+        </div>
+        <nav>
+            <a sec:authorize="hasRole('ROLE_CLIENT')" href="/board/write">프로젝트 등록</a>
+            <a href="#">프로젝트 찾기</a>
+            <a href="#">파트너스 찾기</a>
+            <a href="#">이용 후기</a>
+        </nav>
+        <div class="login-actions">
+            <th:block sec:authorize="not isAuthenticated()">
+	           	<a th:href="@{/member/join}">회원가입</a>
+	       		<a th:href="@{/member/login}" class="btn">로그인</a>
+	   		</th:block>
+	
+	   		<th:block sec:authorize="isAuthenticated()">
+	   			<img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
+	   		    <a th:href="@{/project/view}">프로젝트 관리</a>
+	   		    <a th:href="@{/member/myPage}">마이페이지</a>
+	   			<a th:href="@{/member/logout}" class="btn">로그아웃</a>
+	   		</th:block>
+        </div>
+    </header>
 
-	<br><br>
+	
+	
+	
 
+
+    <div class="search-bar">
+        <input type="text" placeholder="프로젝트 또는 프리랜서 검색">
+        <button>검색</button>
+    </div>
+
+    <div class="filter-bar">
+        <button>전체 필터</button>
+        <select>
+            <option>추천순</option>
+            <option>최신순</option>
+            <option>가격순</option>
+        </select>
+    </div>
+    
 	<div class="table-container" id="output"></div>
+    <section class="project-list">
+        <div class="project-card">
+            <h3>웹사이트 리디자인</h3>
+            <p>4.9 ★ | 000 회사</p>
+            <p class="price">300,000원~</p>
+        </div>
+        <div class="project-card">
+            <h3>모바일 앱 개발</h3>
+            <p>4.9 ★ | 000 회사</p>
+            <p class="price">500,000원~</p>
+        </div>
+        <div class="project-card">
+            <h3>로고 디자인</h3>
+            <p>4.8 ★ | 000 회사</p>
+            <p class="price">150,000원~</p>
+        </div>
+        <div class="project-card">
+            <h3>콘텐츠 마케팅</h3>
+            <p>4.7 ★ | 000 회사</p>
+            <p class="price">200,000원~</p>
+        </div>
+    </section>
 
+    <footer>
+        <p>&copy; 2024 프리랜서 마켓플레이스. All rights reserved.</p>
+    </footer>
 </body>
 </html>
