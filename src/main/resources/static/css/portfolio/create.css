@@ -61,6 +61,30 @@ nav a:hover {
     color: var(--primary-color);
 }
 
+.login-actions {
+	display: flex;
+	align-items: center;
+}
+
+.login-actions a {
+    text-decoration: none;
+    color: var(--text-color);
+    margin-left: 25px;
+}
+.login-actions .btn {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+.btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-3px);
+}
+
 .main-container {
     display: flex;
     flex-grow: 1;

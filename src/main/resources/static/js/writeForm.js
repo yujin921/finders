@@ -171,16 +171,17 @@ function remove(button) {
     teamMember.remove();
 }
 
-document.addEventListener("scroll", function() {
-        // 각 섹션의 ID에 맞는 요소들을 선택합니다.
-        const sections = document.querySelectorAll(".section");
-        const menuItems = document.querySelectorAll("#step-list li");
+// DOM이 완전히 로드된 후 실행
+document.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll(".section");
+    const menuItems = document.querySelectorAll("#step-list li");
 
-        // 현재 스크롤 위치
-        let scrollPosition = document.documentElement.scrollTop || document.body.scrollTop;
+    // 스크롤 이벤트 리스너
+    window.addEventListener("scroll", function() {
+        let scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
 
         sections.forEach((section, index) => {
-            const sectionTop = section.offsetTop - 100; // 약간의 오프셋 추가
+            const sectionTop = section.offsetTop - 100; // 오프셋 조정
             const sectionHeight = section.offsetHeight;
 
             if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
@@ -190,10 +191,20 @@ document.addEventListener("scroll", function() {
         });
     });
 
-    // 사이드바 항목을 클릭하면 해당 섹션으로 스크롤 이동
-    document.querySelectorAll("#step-list li").forEach(item => {
-        item.addEventListener("click", function() {
-            const target = document.getElementById(this.getAttribute("data-target"));
-            target.scrollIntoView({ behavior: "smooth" });
+    // 사이드바 항목 클릭 이벤트
+    menuItems.forEach(item => {
+        item.addEventListener("click", function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute("data-target");
+            const targetSection = document.getElementById(targetId);
+            
+            if (targetSection) {
+                // 부드러운 스크롤 구현
+                window.scrollTo({
+                    top: targetSection.offsetTop - 100, // 헤더 높이 등을 고려한 오프셋
+                    behavior: 'smooth'
+                });
+            }
         });
     });
+});
