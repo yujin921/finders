@@ -21,10 +21,10 @@ public class ProjectController {
         return "/project/view";
     }
 	
-	@GetMapping("list")
-    public String list() {
+	@GetMapping("myProjectList")
+    public String myProjectList() {
 		
-        return "/project/list";
+        return "/project/myProjectList";
 	}
 
 	@GetMapping("view2")

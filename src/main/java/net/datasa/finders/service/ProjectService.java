@@ -1,17 +1,43 @@
 package net.datasa.finders.service;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.persistence.EntityNotFoundException;
+import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.entity.ChatRoomEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
+import net.datasa.finders.domain.entity.PrequalificationQuestionEntity;
+import net.datasa.finders.domain.entity.ProjectCategoryEntity;
 import net.datasa.finders.domain.entity.ProjectEntity;
+import net.datasa.finders.domain.entity.ProjectPublishingEntity;
+import net.datasa.finders.domain.entity.ProjectRequiredSkillEntity;
+import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.domain.entity.WorkScopeEntity;
 import net.datasa.finders.repository.ChatRoomRepository;
 import net.datasa.finders.repository.MemberRepository;
+import net.datasa.finders.repository.PrequalificationQuestionRepository;
+import net.datasa.finders.repository.ProjectCategoryRepository;
+import net.datasa.finders.repository.ProjectPublishingRepository;
 import net.datasa.finders.repository.ProjectRepository;
+import net.datasa.finders.repository.ProjectRequiredSkillRepository;
+import net.datasa.finders.repository.WorkScopeRepository;
 
 //채팅전용
 //채팅에서 project를 활용할 때 쓰는 서비스
@@ -68,4 +94,5 @@ public class ProjectService {
         System.out.println("프로젝트 멤버 조회 결과: " + members);
         return !members.isEmpty();
     }
+    
 }
