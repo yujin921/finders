@@ -60,12 +60,13 @@ public class MemberEntity {
     @Column(name = "updated_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
 	private LocalDateTime updatedTime;
 
-    // 프로젝트와의 다대다 관계 설정 (즉시 로딩으로 변경)
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "team",
         joinColumns = @JoinColumn(name = "member_id"),
         inverseJoinColumns = @JoinColumn(name = "project_num")
     )
     private Set<ProjectEntity> projects = new HashSet<>();
+    
+    
 }

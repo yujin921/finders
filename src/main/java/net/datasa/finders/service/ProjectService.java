@@ -1,7 +1,10 @@
 package net.datasa.finders.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,8 +16,6 @@ import net.datasa.finders.repository.ChatRoomRepository;
 import net.datasa.finders.repository.MemberRepository;
 import net.datasa.finders.repository.ProjectRepository;
 
-//채팅전용
-//채팅에서 project를 활용할 때 쓰는 서비스
 @Service
 public class ProjectService {
 
@@ -25,10 +26,10 @@ public class ProjectService {
     private ProjectRepository projectRepository;
 
     @Autowired
-    private ChatRoomRepository chatRoomRepository; // ChatRoomRepository 주입 추가
+    private ChatRoomRepository chatRoomRepository;
 
     @Autowired
-    private ChatParticipantService chatParticipantService; // ChatParticipantService 주입
+    private ChatParticipantService chatParticipantService;
 
     @Transactional
     public void addMemberToProject(String userId, int projectNum) {
@@ -49,7 +50,7 @@ public class ProjectService {
 
         // 관계 저장
         System.out.println("Saving member-project relationship...");
-        memberRepository.save(member);  // 이 단계에서 team 테이블에 데이터가 삽입됩니다.
+        memberRepository.save(member); // 이 단계에서 team 테이블에 데이터가 삽입됩니다.
 
         // 팀 추가 후 chat_participant 업데이트 로직 추가
         ChatRoomEntity chatRoom = chatRoomRepository.findByProjectNum(projectNum)
@@ -68,4 +69,15 @@ public class ProjectService {
         System.out.println("프로젝트 멤버 조회 결과: " + members);
         return !members.isEmpty();
     }
+
+    // 특정 멤버가 참여하고 있는 프로젝트 리스트를 조회하는 메서드
+    @Transactional
+    public List<ProjectEntity> getProjectsByMemberId(String memberId) {
+        List<ProjectEntity> projects = projectRepository.findProjectsByMemberId(memberId);
+        System.out.println("Projects retrieved: " + projects.size());
+        projects.forEach(project -> System.out.println("Project ID: " + project.getProjectNum() + ", Name: " + project.getProjectName()));
+
+        return projects;
+    }
+
 }
