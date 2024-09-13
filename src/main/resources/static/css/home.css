@@ -66,12 +66,17 @@
           cursor: pointer;
           font-size: 20px;
       }
-      .user-actions a {
+      
+      .login-actions {
+      	display: flex;
+      	align-items: center;
+      }
+      .login-actions a {
           text-decoration: none;
           color: var(--text-color);
           margin-left: 25px;
       }
-      .user-actions .btn {
+      .login-actions .btn {
           background-color: var(--primary-color);
           color: #fff;
           padding: 12px 24px;
