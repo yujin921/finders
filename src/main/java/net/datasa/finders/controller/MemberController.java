@@ -152,12 +152,30 @@ public class MemberController {
     return "/member/myPage";
     }
     
-    @PostMapping("/update")
-    public String updateMember(@ModelAttribute MemberDTO memberDTO,
+    @PostMapping("/update/freelancer")
+    public String updateFreelancer(@ModelAttribute FreelancerDTO freelancerDTO,
+    							
                                @RequestParam("profileImg") MultipartFile profileImg,
                                Model model) {
         try {
-            memberService.updateMember(memberDTO, profileImg, uploadPath);
+        	log.debug("{}",freelancerDTO);
+            memberService.updateFreelancer(freelancerDTO, profileImg, uploadPath);
+            
+            return "redirect:/";
+        } catch (Exception e) {
+            model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
+            return "redirect:/member/myPage";
+        }
+    }
+    
+    @PostMapping("/update/client")
+    public String updateClient(@ModelAttribute ClientDTO clientDTO,
+                               @RequestParam("profileImg") MultipartFile profileImg,
+                               Model model) {
+        try {
+        	log.debug("{}",clientDTO);
+            memberService.updateClient(clientDTO, profileImg, uploadPath);
+            
             return "redirect:/";
         } catch (Exception e) {
             model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
