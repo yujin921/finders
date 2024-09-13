@@ -23,7 +23,7 @@
                     <input type="text" placeholder="프로젝트 또는 프리랜서 검색">
                     <button type="submit"><i class="fas fa-search"></i></button>
                 </div>
-                <div class="user-actions">
+                <div class="login-actions">
                     <th:block sec:authorize="not isAuthenticated()">
 		            	<a th:href="@{/member/join}">회원가입</a>
 		        		<a th:href="@{/member/login}" class="btn">로그인</a>
@@ -45,7 +45,7 @@
         <ul>
             <li sec:authorize="hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN')"><a href="board/write">프로젝트 등록</a></li>
             <li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
-            <li><a href="#">프리랜서 찾기</a></li>
+            <li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
             <li><a href="#">서비스 안내</a></li>
         	<li><a href="#">이용 사례</a></li>
             <li><a href="#">커뮤니티</a></li>

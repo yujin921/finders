@@ -5,15 +5,19 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/validation.js}"></script>
+    <script th:src="@{/js/joinForm.js}" defer></script>
+    <script th:src="@{/js/popup_2.js}"></script>
 </head>
 <body>
 	<div sec:authorize="isAuthenticated()">
 	<h1>안녕하세요, <span sec:authentication="name"></span>님!</h1>
 	</div>
 	
-	        <!-- 프리랜서 회원가입 폼 -->
+	        <!-- 프리랜서 수정 폼 -->
         <div sec:authorize="hasRole('ROLE_FREELANCER')" id="freelancer-update">
-            <form id="freelancer-update-form" th:action="@{/member/update}" method="post" enctype="multipart/form-data">
+            <form id="freelancer-update-form" th:action="@{/member/update/freelancer}" method="post" enctype="multipart/form-data">
                 <!-- 프로필 이미지 업로드 -->
                 <label for="freelancer-profile-img">프로필 이미지</label>
                 <input type="file" id="freelancer-profile-img" name="profileImg" 
@@ -56,9 +60,9 @@
             <a th:href="@{/portfolio/create}">포트폴리오 생성</a>
         </div>
 
-        <!-- client 회원가입 폼 -->
+        <!-- client 수정 폼 -->
         <div sec:authorize="hasRole('ROLE_CLIENT')" id="client-update">
-            <form id="client-update-form" th:action="@{/member/update}" method="post" enctype="multipart/form-data">
+            <form id="client-update-form" th:action="@{/member/update/client}" method="post" enctype="multipart/form-data">
                 <label for="client-profile-img">프로필 이미지</label>
                 <input type="file" id="client-profile-img" name="profileImg"
                 accept="image/*" onchange="previewImage(this, 'client-preview')"><br>
@@ -121,4 +125,6 @@ function previewImage(input, previewId) {
 }
 </script>
 </body>
+
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </html>

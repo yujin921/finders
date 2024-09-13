@@ -11,6 +11,12 @@ import net.datasa.finders.domain.entity.MemberEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FreelancerDTO {
+	
+    String memberId;
+    String memberPw;
+    String memberName;
+    String email;
+	
 	String freelancerId;
 	String freelancerPhone;
 	String country;
