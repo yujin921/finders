@@ -1,17 +1,5 @@
 package net.datasa.finders.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.datasa.finders.domain.dto.ClientDTO;
@@ -24,6 +12,16 @@ import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.repository.ClientRepository;
 import net.datasa.finders.repository.FreelancerRepository;
 import net.datasa.finders.repository.MemberRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -165,12 +163,23 @@ public class MemberService {
     			clientRepository.save(clientEntity);
     }
 
-
     public MemberEntity findByMemberId(String memberId) {
         return memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new RuntimeException("User not found with memberId: " + memberId));
     }
-    
+
+    // 새 메서드 사용
+    public MemberDTO findByCustomMemberId(String memberId) {
+        MemberEntity member = memberRepository.findByCustomMemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("User not found with custom memberId: " + memberId));
+
+        // Entity -> DTO 변환
+        MemberDTO memberDTO = new MemberDTO();
+        memberDTO.setMemberId(member.getMemberId());
+        memberDTO.setMemberName(member.getMemberName());
+        memberDTO.setRoleName(member.getRoleName());
+        return memberDTO;
+    }
 
     public MemberDTO getMemberInfo(String memberId) {
     	MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(() -> 

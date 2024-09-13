@@ -3,9 +3,12 @@ package net.datasa.finders.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
+import net.datasa.finders.domain.entity.ApplicationResult;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.BoardService;
+import net.datasa.finders.service.MemberService;
+import net.datasa.finders.service.ProjectApplicationService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +32,8 @@ import java.util.List;
 public class BoardController {
 	
 	private final BoardService boardService;
+    private final MemberService memberService;
+    private final ProjectApplicationService projectApplicationService;
 	
 	@GetMapping("view")
 	public String view() {
@@ -73,22 +79,36 @@ public class BoardController {
         return "redirect:view";
     }
 
-	@GetMapping("read")
-	public String read(@RequestParam("projectNum") int pNum, Model model, @AuthenticationPrincipal AuthenticatedUser user) {
-	    try {
+    @GetMapping("read")
+    public String read(@RequestParam("projectNum") int projectNum, Model model, @AuthenticationPrincipal AuthenticatedUser user, Principal principal) {
+        try {
+            // 사용자 역할 확인
             RoleName roleName = RoleName.valueOf(user.getRoleName());
-
             log.debug("현재 사용자의 역할: {}", roleName);
-	        ProjectPublishingDTO projectPublishingDTO = boardService.getBoard(pNum, user.getUsername(), roleName);
-	        model.addAttribute("board", projectPublishingDTO);
+
+            // 게시물 정보 불러오기
+            ProjectPublishingDTO projectPublishingDTO = boardService.getBoard(projectNum, user.getUsername(), roleName);
+            model.addAttribute("board", projectPublishingDTO);
             model.addAttribute("user", user);
             model.addAttribute("roleName", projectPublishingDTO.getRoleName());
-	        return "board/read";
-	    } catch (Exception e) {
+
+            // 프리랜서의 신청 상태 조회
+            String freelancerUsername = principal.getName();  // 현재 로그인한 사용자 (프리랜서)
+            boolean applied = projectApplicationService.hasApplied(projectNum, freelancerUsername);
+            model.addAttribute("applied", applied);
+
+            // 지원 상태가 있으면 설정
+            if (applied) {
+                String applicationStatus = projectApplicationService.getApplicationStatus(projectNum, freelancerUsername);
+                model.addAttribute("applicationStatus", applicationStatus);
+            }
+
+            return "board/read";  // 'read.html'로 반환
+        } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/board/view";
-	    }
-	}
+            return "redirect:/board/view";  // 오류 발생 시 목록으로 리다이렉트
+        }
+    }
 
 	@PostMapping("delete")
     public String deletePost(@RequestParam("projectNum") int pNum, @AuthenticationPrincipal AuthenticatedUser user) {
@@ -106,5 +126,30 @@ public class BoardController {
         } catch (Exception e) {
             return "redirect:/board/view?error=deleteFailed"; // 삭제 실패 페이지로 리다이렉트
         }
+    }
+
+    @PostMapping("apply")
+    public String applyToProject(@RequestParam("projectNum") int projectNum, Principal principal) {
+        String freelancerUsername = principal.getName();  // 로그인한 프리랜서의 사용자 이름 (ID)
+        log.debug("{}", freelancerUsername);
+        projectApplicationService.applyToProject(projectNum, freelancerUsername);  // 프리랜서와 프로젝트 번호를 사용하여 신청 저장
+        log.debug("{}", projectApplicationService);
+        return "redirect:/board/read?projectNum=" + projectNum;  // 신청 후 페이지 리디렉션
+    }
+
+    @PostMapping("update-status")
+    public String updateApplicationStatus(@RequestParam("projectNum") int projectNum
+            , @RequestParam("freelancerUsername") String freelancerUsername
+            , @RequestParam("status") String status) {
+        if (status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Status is missing or empty");
+        }
+
+        log.debug("Received status value: {}", status);
+        ApplicationResult result = ApplicationResult.valueOf(status.toUpperCase());  // 'accepted', 'rejected' 등 입력값을 ENUM으로 변환
+
+        projectApplicationService.updateApplicationStatus(projectNum, freelancerUsername, result);  // 상태 업데이트
+
+        return "redirect:/board/read?projectNum=" + projectNum;  // 업데이트 후 페이지 리디렉션
     }
 }

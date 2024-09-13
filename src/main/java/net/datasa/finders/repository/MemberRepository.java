@@ -4,6 +4,7 @@ import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,4 +26,8 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
     List<Object[]> findTeamEntries();
 
     Optional<MemberEntity> findByMemberId(String memberId);
+
+    // 새로운 쿼리 메서드 - JPQL 사용
+    @Query("SELECT m FROM MemberEntity m WHERE m.memberId = :memberId")
+    Optional<MemberEntity> findByCustomMemberId(@Param("memberId") String memberId);
 }
