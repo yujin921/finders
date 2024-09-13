@@ -30,7 +30,9 @@ public class BoardController {
 	private final BoardService boardService;
 	
 	@GetMapping("view")
-	public String view() {
+	public String view(@AuthenticationPrincipal AuthenticatedUser user
+			,Model model) {
+		model.addAttribute("profileImgUrl", user.getProfileImg());
 		return "board/list";
 	}
 	

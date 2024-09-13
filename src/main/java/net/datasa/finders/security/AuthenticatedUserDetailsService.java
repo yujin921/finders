@@ -40,6 +40,7 @@ public class AuthenticatedUserDetailsService implements UserDetailsService {
         AuthenticatedUser user = AuthenticatedUser.builder()
         		.id(memberEntity.getMemberId())
         		.password(memberEntity.getMemberPw())
+        		.profileImg(memberEntity.getProfileImg())
         		.roleName(roleName)
         		.enabled(true)
         		.build();

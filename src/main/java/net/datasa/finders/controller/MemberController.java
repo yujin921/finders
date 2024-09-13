@@ -66,9 +66,8 @@ public class MemberController {
     }
 
     @PostMapping("join")
-    public String join(@RequestParam("roleName") String roleName,
-                       @ModelAttribute MemberDTO member,
-                       @RequestParam("profileImg") MultipartFile profileImg,
+    public String join(@ModelAttribute MemberDTO member,
+    					@RequestParam("profileImg") MultipartFile profileImg,
                        @ModelAttribute FreelancerDTO freelancer,
                        @ModelAttribute ClientDTO client,
                        Model model) {
@@ -83,15 +82,17 @@ public class MemberController {
 
         try {
             // 회원 가입 처리
-            MemberEntity memberEntity = memberService.join(member, uploadPath, profileImg);
-
-            log.debug("회원가입 내용 체크용: {}", memberEntity);
-
-            // 역할에 따라 Freelancer 또는 Client 추가
-            if ("ROLE_FREELANCER".equals(roleName)) {
-                memberService.joinFreelancer(freelancer, memberEntity);
-            } else if ("ROLE_CLIENT".equals(roleName)) {
-                memberService.joinClient(client, memberEntity);
+            memberService.join(member, uploadPath, profileImg);
+            log.debug("{}",member);
+            switch (member.getRoleName()) {
+                case ROLE_FREELANCER:
+                    memberService.joinFreelancer(freelancer, member);
+                    break;
+                case ROLE_CLIENT:
+                    memberService.joinClient(client, member);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid role: " + member.getRoleName());
             }
 
         } catch (IOException e) {
@@ -112,34 +113,11 @@ public class MemberController {
         return "/member/loginForm";
     }
     
-    // 프리랜서 회원 페이지
-    @GetMapping("freelancer/view")
-    public String view1() {
-        return "/member/freelancerView";
-    }
-
-    // 고객(기업) 회원 페이지
-    @GetMapping("client/view")
-    public String view2() {
-        return "/member/clientView";
-    }
     
     // 관리자 페이지
     @GetMapping("admin/view")
     public String view3() {
         return "/member/adminView";
-    }
-    
-    // 프리랜서 마이페이지
-    @GetMapping("mypageFree")
-    public String mypageFree() {
-    	return "/member/mypageFree";
-    }
-    
-    // 클라이언트 마이페이지
-    @GetMapping("mypageClient")
-    public String mypageClient() {
-    	return "/member/mypageClient";
     }
     
     // 클라이언트 마이페이지
