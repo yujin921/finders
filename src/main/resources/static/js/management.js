@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	let endYear = null;
 	let endMonth = null;
 	let endDay = null;
+	let zoomStart;
+	let zoomEnd;
 
     tabs.forEach(tab => {
         tab.addEventListener('click', function(event) {
@@ -415,21 +417,21 @@ document.addEventListener('DOMContentLoaded', function() {
 		    ]
 		  }
 		];
-	
+		
 	    // 프로젝트 Gantt 차트 생성
 	    ganttChart = anychart.ganttProject();
 	
 		// 데이터 트리 생성
-		let treeData = anychart.data.tree(ganttChartData, 'as-tree');
+		let treeData = anychart.data.tree(ganttChartData, "as-tree");
 		
 	    // 차트에 데이터 설정
 	    ganttChart.data(treeData);
 		
 		console.log("ganttChart 확인: ", ganttChart);
 	
-	    // 분할기 위치 설정
-	    ganttChart.splitterPosition(460);
-	
+		// 분할기 위치 설정
+		ganttChart.splitterPosition(550); // 분할기 위치를 550px로 설정하여 고정
+		
 	    // 차트 데이터 그리드 링크를 가져와서 열 설정
 	    let dataGrid = ganttChart.dataGrid();
 	
@@ -450,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    dataGrid
 	      .column(2)
 	      .title('Baseline Start')
-	      .width(100)
+	      .width(150)
 	      .labelsOverrider(labelTextSettingsFormatter)
 	      .labels()
 	      .format(thirdColumnTextFormatter);
@@ -459,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    dataGrid
 	      .column(3)
 	      .title('Baseline End')
-	      .width(100)
+	      .width(150)
 	      .labelsOverrider(labelTextSettingsFormatter)
 	      .labels()
 	      .format(fourthColumnTextFormatter);
@@ -513,18 +515,21 @@ document.addEventListener('DOMContentLoaded', function() {
 	    // 차트 그리기 시작
 	    ganttChart.draw();
 	
-		// 전체 데이터를 보이도록 날짜 범위 조정
-		// let minDate = new Date("2024-08-28T00:00:00Z"); // 데이터 시작일
-		// let maxDate = new Date("2024-09-20T00:00:00Z"); // 데이터 종료일
-		// ganttChart.zoomTo(minDate, maxDate);
+		zoomStart = Date.UTC(startYear, startMonth, startDay);
+		zoomEnd = Date.UTC(endYear, endMonth, endDay);
+		
+		console.log(`zoomStart 체크1: `, zoomStart);
+		console.log(`zoomEnd 체크1: `, zoomEnd);
 		
 		// 전체 데이터를 보이도록 날짜 범위 조정
 		// ex) ganttChart.zoomTo(Date.UTC(2024, 8, 1), Date.UTC(2024, 12, 30));
-		ganttChart.zoomTo(Date.UTC(startYear, startMonth, startDay), Date.UTC(endYear, endMonth, endDay));
+		ganttChart.zoomTo(zoomStart, zoomEnd);
 		
 		// 날짜 범위 조정 (scale 사용)
-		timeline.scale().minimum(Date.UTC(startYear, startMonth, startDay));
-		timeline.scale().maximum(Date.UTC(endYear, endMonth, endDay));
+		timeline.scale().minimum(zoomStart);
+		timeline.scale().maximum(zoomEnd);
+		
+		ganttChart.fitAll();
 		
 		ganttChartLoaded = true;
 		
@@ -535,60 +540,59 @@ document.addEventListener('DOMContentLoaded', function() {
 	  
 	  // 간트 차트 진행도 업데이트 함수
 	  function updateProgress() {
-	    const id = document.getElementById('progress-id').value.trim(); 
-	    const progressValue = document.getElementById('progress-value').value.trim();
+	      const id = document.getElementById('progress-id').value.trim(); 
+	      const progressValue = document.getElementById('progress-value').value.trim();
+		  
+		  // 분할기 위치 설정
+		  ganttChart.splitterPosition(550); // 분할기 위치를 550px로 설정하여 고정
 
-	    // 디버깅 로그 추가
-	    console.log(`id: ${id}`);
-	    console.log(`Progress Value: ${progressValue}`);
-	    console.log(`Current Gantt Chart Data:`, ganttChartData);
+	      // 디버깅 로그 추가
+	      console.log(`id: ${id}`);
+	      console.log(`Progress Value: ${progressValue}`);
+	      console.log(`Current Gantt Chart Data:`, ganttChartData);
 
-	    if (ganttChart && id && progressValue) {
-	      // 데이터 업데이트 로직
-	      function findTaskById(tasks, id) {
-	        console.log(`Searching for ID: ${id} in tasks`, tasks);
-	        
-	        for (let task of tasks) {
-	          console.log(`Checking task ID: ${task.id}`);
-	          if (task.id === id) {
-	            console.log(`Found task with ID: ${id}`);
-	            return task;
+	      if (ganttChart && id && progressValue) {
+	          // 데이터 업데이트 로직
+	          function findTaskById(tasks, id) {
+	              console.log(`Searching for ID: ${id} in tasks`, tasks);
+	              
+	              for (let task of tasks) {
+	                  console.log(`Checking task ID: ${task.id}`);
+	                  if (task.id === id) {
+	                      console.log(`Found task with ID: ${id}`);
+	                      return task;
+	                  }
+	                  if (task.children) {
+	                      const found = findTaskById(task.children, id);
+	                      if (found) return found;
+	                  }
+	              }
+	              return null;
 	          }
-	          if (task.children) {
-	            const found = findTaskById(task.children, id);
-	            if (found) return found;
+
+	          // 작업을 찾기
+	          const taskToUpdate = findTaskById(ganttChartData, id);
+	          
+	          if (taskToUpdate) {
+	              taskToUpdate.progressValue = progressValue;
+				  
+	              // Gantt 차트 데이터 업데이트
+	              let updatedData = anychart.data.tree(ganttChartData, 'as-tree');
+	              ganttChart.data(updatedData);
+	              
+				  console.log(`zoomStart 체크2: `, zoomStart);
+				  console.log(`zoomEnd 체크2: `, zoomEnd);
+				  
+	              // 차트 다시 그리기
+	              ganttChart.draw();
+
+	              // 전체 데이터가 보이도록 날짜 범위 조정
+				  ganttChart.zoomTo(zoomStart, zoomEnd);
+				  
+	          } else {
+	              console.log('해당 ID의 작업을 찾을 수 없습니다.');
 	          }
-	        }
-	        return null;
 	      }
-
-	      // 작업을 찾기
-		  const taskToUpdate = findTaskById(ganttChartData, id);
-	      
-		  if (taskToUpdate) {
-			taskToUpdate.progressValue = progressValue; 
-			
-	        // Gantt 차트 데이터 업데이트
-	        let updatedData = anychart.data.tree(ganttChartData, 'as-tree');
-	        ganttChart.data(updatedData);
-            
-			// 현재 줌 및 레이아웃 설정을 저장
-			const zoomStart = ganttChart.getTimeline().scale().minimum();
-			const zoomEnd = ganttChart.getTimeline().scale().maximum();
-			
-            // 차트 다시 그리기
-			ganttChart.draw();
-				
-			ganttChart.zoomTo(Date.UTC(startYear, startMonth, startDay), Date.UTC(endYear, endMonth, endDay));
-				
-			// 저장된 줌 및 레이아웃 설정 복원
-			// ganttChart.getTimeline().scale().minimum(zoomStart);
-			// ganttChart.getTimeline().scale().maximum(zoomEnd);
-				
-	        } else {
-	            console.log('해당 ID의 작업을 찾을 수 없습니다.');
-	        }
-	     }
 	  }
 
 	  // 모든 부모 항목에 굵고 기울임꼴 텍스트 설정 추가
