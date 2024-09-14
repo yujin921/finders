@@ -7,7 +7,6 @@ import net.datasa.finders.domain.entity.ApplicationResult;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.BoardService;
-import net.datasa.finders.service.MemberService;
 import net.datasa.finders.service.ProjectApplicationService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -21,10 +20,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 거래 게시판 관련 콘트롤러
- */
-
 @Slf4j
 @RequiredArgsConstructor
 @Controller
@@ -32,7 +27,6 @@ import java.util.List;
 public class BoardController {
 	
 	private final BoardService boardService;
-    private final MemberService memberService;
     private final ProjectApplicationService projectApplicationService;
 	
 	@GetMapping("view")

@@ -15,4 +15,5 @@ public class ProjectApplicationDTO {
     private int projectNum;
     private String freelancerId;
     private ApplicationResult applicationResult;
+    private String projectTitle;
 }

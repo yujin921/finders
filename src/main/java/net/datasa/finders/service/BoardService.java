@@ -210,18 +210,4 @@ public class BoardService {
     public void deleteBoard(int pNum) {
         projectPublishingRepository.deleteById(pNum);
     }
-
-    public ProjectPublishingDTO getProjectByNum(int projectNum) {
-        // 프로젝트 번호로 프로젝트 정보를 데이터베이스에서 조회
-        ProjectPublishingEntity project = projectPublishingRepository.findById(projectNum)
-                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트를 찾을 수 없습니다."));
-
-        // Entity -> DTO 변환 (필요한 필드만 변환)
-        ProjectPublishingDTO dto = new ProjectPublishingDTO();
-        dto.setProjectNum(project.getProjectNum());
-        dto.setProjectTitle(project.getProjectTitle());
-        dto.setProjectDescription(project.getProjectDescription());
-        // 필요한 필드만 추가로 변환
-        return dto;
-    }
 }

@@ -56,7 +56,11 @@
     <!-- ROLE_FREELANCER일 경우 신청하기 버튼 또는 지원 상태 표시 -->
     <span th:if="${roleName.name() == 'ROLE_FREELANCER'}">
         <div th:if="${applied}">
-            <p>지원 결과: <span th:text="${applicationStatus}">pending</span></p>
+            <p>지원 결과:
+                <span th:if="${applicationStatus == 'PENDING'}">지원중</span>
+                <span th:if="${applicationStatus == 'ACCEPTED'}">합격</span>
+                <span th:if="${applicationStatus == 'REJECTED'}">불합격</span>
+            </p>
         </div>
         <div th:unless="${applied}">
             <form action="/board/apply" method="post">

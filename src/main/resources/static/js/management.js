@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	let ganttChart = null; // Gantt 차트 인스턴스를 저장할 변수
 	let ganttChartData = []; // Gantt 차트 데이터 저장 변수
 	let ganttChartLoaded = false;
-	
+
 	// 간트차트 화면 상 표시 날짜 범위 지정을 위해 필요한 변수들
 	let startDateStr = null;
 	let endDateStr = null;
@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadCalendar();
             } else if (targetId === 'gantt-content') {
                 loadGanttChart();
+            } else if (targetId === 'application-content') {
+                loadApplicationList();
             }
         });
     });
@@ -101,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const closeButton = modal.querySelector('.btn-close');
         const saveButton = modal.querySelector('.btn-save');
-        
+
         closeButton.addEventListener('click', () => {
             document.body.removeChild(modal);
         });
@@ -241,8 +243,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const events = calendar.getEvents();
             const isDuplicate = (start, end) => {
                 return events.some(event =>
-                    (event.title === title && 
-                    event.startStr === start && 
+                    (event.title === title &&
+                    event.startStr === start &&
                     event.endStr === end)
                 );
             };
@@ -361,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         return new Intl.DateTimeFormat('en-US', options).format(date);
     }
-	
+
 	// 간트 차트 로드
     function loadGanttChart() {
         if (ganttChartLoaded) return; // 이미 간트 차트가 로드된 경우
@@ -370,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Gantt 차트 데이터 예시
             ganttChartData = [
                 { id: '1', name: '디자인', actualStart: '2024-09-01', actualEnd: '2024-09-04', progressValue: "0%" },
-                { id: '2', name: '기획', actualStart: '2024-09-05', actualEnd: '2024-09-10', progressValue: "0%" },            
+                { id: '2', name: '기획', actualStart: '2024-09-05', actualEnd: '2024-09-10', progressValue: "0%" },
 				{
 				    id: "3",
 				    name: "개발",
@@ -412,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			];
 
             ganttChart = anychart.ganttProject();
-            
+
 			// treeData 변수 정의
 			let treeData = anychart.data.tree(ganttChartData, 'as-tree');
 			ganttChart.data(treeData);
@@ -460,17 +462,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     let strDate = utcDate > 9 ? utcDate : '0' + utcDate;
                     return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
                 });
-				
+
 			console.log("시작일 형식: ", ganttChartData[0].actualStart);
 			console.log("종료일 형식: ", ganttChartData[ganttChartData.length - 1].actualEnd);
 
 			startDateStr = ganttChartData[0].actualStart;
 			endDateStr = ganttChartData[ganttChartData.length - 1].actualEnd;
-			
+
 			// 날짜 문자열을 Date 객체로 변환 (가정: 날짜 문자열은 "YYYY-MM-DD" 형식)
 			startDate = new Date(startDateStr);
 			endDate = new Date(endDateStr);
-			
+
 			// Date 객체에서 연도, 월, 일 추출
 			startYear = startDate.getUTCFullYear();
 			startMonth = startDate.getUTCMonth(); // 월은 0부터 시작
@@ -479,16 +481,16 @@ document.addEventListener('DOMContentLoaded', function() {
 			endYear = endDate.getUTCFullYear();
 			endMonth = endDate.getUTCMonth();
 			endDay = endDate.getUTCDate();
-			
+
             ganttChart.container('gantt-chart');
             ganttChart.draw();
-			
+
 			// 전체 데이터 표시
 			ganttChart.fitAll();
-			
+
 			// ex) ganttChart.zoomTo(Date.UTC(2024, 8, 1), Date.UTC(2024, 9, 30));
 			ganttChart.zoomTo(Date.UTC(startYear, startMonth, startDay), Date.UTC(endYear, endMonth, endDay));
-			
+
             ganttChartLoaded = true;
 
             // 진행도 업데이트 버튼 이벤트 리스너 추가
@@ -498,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// 간트 차트 진행도 업데이트 함수
     function updateProgress() {
-        const id = document.getElementById('progress-id').value.trim(); 
+        const id = document.getElementById('progress-id').value.trim();
         const progressValue = document.getElementById('progress-value').value.trim();
 
         if (ganttChart && id && progressValue) {
@@ -539,5 +541,81 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('올바른 작업 ID와 진행도 값을 입력해 주세요.');
         }
     }
-		
 });
+
+function loadApplicationList() {
+    fetch('/project/application-list')  // 서버에서 클라이언트의 지원자 목록을 가져옴
+        .then(response => response.json())
+        .then(applications => {
+            let contentHtml = `
+            <h3>지원자 목록</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>프리랜서 ID</th>
+                        <th>게시물 제목</th>
+                        <th>상태</th>
+                        <th>동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            applications.forEach(application => {
+                let statusText = application.applicationResult;
+
+                if (application.applicationResult === 'PENDING') {
+                    // PENDING일 경우 상태에 "지원 신청 중" 표시
+                    statusText = '지원 신청 중';
+                }
+
+                // 동작 버튼은 항상 표시
+                let actionHtml = `
+                    <button onclick="updateApplicationStatus(${application.projectNum}, '${application.freelancerId}', 'ACCEPTED')">찬성</button>
+                    <button onclick="updateApplicationStatus(${application.projectNum}, '${application.freelancerId}', 'REJECTED')">반대</button>
+                `;
+
+                contentHtml += `
+                <tr>
+                    <td>${application.freelancerId}</td>
+                    <td>${application.projectTitle}</td>
+                    <td>${statusText}</td> <!-- 상태란에 지원 신청 중 또는 다른 상태 표시 -->
+                    <td>${actionHtml}</td> <!-- 동작란에 찬성/반대 버튼 표시 -->
+                </tr>
+                `;
+            });
+
+            contentHtml += `</tbody></table>`;
+            document.getElementById('application-content').innerHTML = contentHtml;
+        })
+        .catch(error => {
+            console.error('Error fetching applications:', error);
+        });
+}
+
+function updateApplicationStatus(projectNum, freelancerId, status) {
+    fetch('/project/update-application-status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `projectNum=${projectNum}&freelancerId=${freelancerId}&status=${status}`
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('상태 업데이트에 실패했습니다.');
+            }
+            return response.text();
+        })
+        .then(data => {
+            alert('상태가 성공적으로 업데이트되었습니다.');
+            loadApplicationList();  // 상태 업데이트 후 목록 새로고침
+        })
+        .catch(error => {
+            console.error('Error updating application status:', error);
+            alert('상태 업데이트 중 오류가 발생했습니다.');
+        })
+        .finally(() => {
+            isUpdating = false;  // 업데이트 완료 후 플래그 해제
+        });
+}
