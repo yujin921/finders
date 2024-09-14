@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    // 직접 포함된 데이터
 		ganttChartData = [
 		  {
-		    "id": "1",
+		    "id": 1,
 		    "name": "Pre-planning",
 		    "actualStart": "2024-09-01T08:00:00Z",
 		    "actualEnd": "2024-09-07T18:00:00Z",
@@ -383,7 +383,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		    "rowHeight": 35,
 		    "children": [
 		      {
-		        "id": "2",
+		        "id": 2,
 		        "name": "Investigate the task",
 		        "actualStart": "2024-09-01T07:00:00Z",
 		        "actualEnd": "2024-09-05T19:00:00Z",
@@ -391,10 +391,14 @@ document.addEventListener('DOMContentLoaded', function() {
 		        "baselineStart": "2024-09-02T08:00:00Z",
 		        "baselineEnd": "2024-09-04T20:00:00Z",
 		        "rowHeight": 35,
-		        "connectTo": "distribute"
+				"connector": [
+					{
+						"connectTo": 3
+					}
+				]
 		      },
 		      {
-		        "id": "3",
+		        "id": 3,
 		        "name": "Distribute roles and resources",
 		        "actualStart": "2024-09-06T07:00:00Z",
 		        "actualEnd": "2024-09-10T16:00:00Z",
@@ -402,10 +406,14 @@ document.addEventListener('DOMContentLoaded', function() {
 		        "baselineStart": "2024-09-07T10:00:00Z",
 		        "baselineEnd": "2024-09-11T21:00:00Z",
 		        "rowHeight": 35,
-		        "connectTo": "documents"
+				"connector": [
+					{
+						"connectTo": 4
+					}
+				]
 		      },
 		      {
-		        "id": "4",
+		        "id": 4,
 		        "name": "Gather technical documentation",
 		        "actualStart": "2024-09-11T09:00:00Z",
 		        "actualEnd": "2024-09-15T18:00:00Z",
@@ -451,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    // 세 번째 열 설정
 	    dataGrid
 	      .column(2)
-	      .title('Baseline Start')
+	      .title('Planned Start')
 	      .width(150)
 	      .labelsOverrider(labelTextSettingsFormatter)
 	      .labels()
@@ -460,7 +468,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    // 네 번째 열 설정
 	    dataGrid
 	      .column(3)
-	      .title('Baseline End')
+	      .title('Planned End')
 	      .width(150)
 	      .labelsOverrider(labelTextSettingsFormatter)
 	      .labels()
@@ -540,7 +548,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	  
 	  // 간트 차트 진행도 업데이트 함수
 	  function updateProgress() {
-	      const id = document.getElementById('progress-id').value.trim(); 
+	      const idElement = document.getElementById('progress-id');
+		  const progressElement = document.getElementById('progress-value');
+		  const id = document.getElementById('progress-id').value.trim(); 
 	      const progressValue = document.getElementById('progress-value').value.trim();
 		  
 		  // 분할기 위치 설정
@@ -551,6 +561,34 @@ document.addEventListener('DOMContentLoaded', function() {
 	      console.log(`Progress Value: ${progressValue}`);
 	      console.log(`Current Gantt Chart Data:`, ganttChartData);
 
+		  // 정규 표현식을 사용하여 진행도 형식 검증
+		  const progressValuePattern = /^\d{1,3}%$/;
+
+		  // 진행도 값이 올바른 형식인지 확인
+		  if (!progressValuePattern.test(progressValue)) {
+			alert('진행도 값은 0%에서 100% 사이의 형식으로 입력해야 합니다. 예: 50%');
+			
+			progressElement.focus();
+			progressElement.value = null;
+			idElement.focus();
+			idElement.value = null;
+			
+		    return; // 올바른 형식이 아닐 경우 함수 실행 중지
+		  }
+		  
+		  // 입력 ID가 숫자형인지 확인하고 숫자로 변환
+		  const numericId = Number(id);
+		  if (isNaN(numericId)) {
+		    alert('ID는 유효한 숫자여야 합니다.');
+			
+			progressElement.focus();
+			progressElement.value = null;
+			idElement.focus();
+			idElement.value = null;
+			
+		    return; // ID가 숫자가 아닐 경우 함수 실행 중지
+		  }
+		  
 	      if (ganttChart && id && progressValue) {
 	          // 데이터 업데이트 로직
 	          function findTaskById(tasks, id) {
@@ -558,7 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	              
 	              for (let task of tasks) {
 	                  console.log(`Checking task ID: ${task.id}`);
-	                  if (task.id === id) {
+	                  if (task.id == id) {
 	                      console.log(`Found task with ID: ${id}`);
 	                      return task;
 	                  }
@@ -590,7 +628,12 @@ document.addEventListener('DOMContentLoaded', function() {
 				  ganttChart.zoomTo(zoomStart, zoomEnd);
 				  
 	          } else {
-	              console.log('해당 ID의 작업을 찾을 수 없습니다.');
+	              alert('해당 ID의 작업을 찾을 수 없습니다.');
+				  
+				  progressElement.focus();
+				  progressElement.value = null;
+				  idElement.focus();
+				  idElement.value = null;
 	          }
 	      }
 	  }
