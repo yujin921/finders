@@ -172,43 +172,58 @@
     </div>
 
     <script>
-        // 페이지 로드 시 서버에서 필요한 데이터를 가져오는 함수
-        function loadReviewData() {
-            fetch('/review/getReviewData?projectNum=1') // 실제 프로젝트 번호 사용
-                .then(response => response.json())
-                .then(data => {
-                    const { projectNum, clientId, freelancerData } = data;
+ // URL에서 파라미터 추출 함수
+    function getParameterByName(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+    }
 
-                    const reviewDataDiv = document.getElementById('review-data');
-                    reviewDataDiv.dataset.projectNum = projectNum;
-                    reviewDataDiv.dataset.clientId = clientId;
+    // 페이지 로드 시 서버에서 필요한 데이터를 가져오는 함수
+    function loadFreelancerData() {
+        const projectNum = getParameterByName('projectNum'); // URL에서 projectNum을 가져옴
 
-                    const freelancerSelect = document.getElementById('freelancerSelect');
-
-                    if (Array.isArray(freelancerData)) {
-                        freelancerData.forEach(freelancer => {
-                            const option = document.createElement('option');
-                            option.value = freelancer.id;
-                            option.textContent = freelancer.name;
-
-                            // 작성 완료된 프리랜서인지 확인
-                            if (freelancer.reviewCompleted) {
-                                option.textContent += ' (작성 완료)';
-                                option.disabled = true; // 작성 완료된 경우 선택 불가
-                            }
-
-                            freelancerSelect.appendChild(option);
-                        });
-                    } else {
-                        console.error('Invalid freelancers data format.');
-                        alert('프리랜서 데이터를 불러오는 중 오류가 발생했습니다.');
-                    }
-                })
-                .catch(error => {
-                    console.error('리뷰 데이터 로드 중 오류:', error);
-                    alert('리뷰 데이터를 불러오는 중 오류가 발생했습니다.');
-                });
+        if (!projectNum) {
+            alert('프로젝트 번호가 없습니다.');
+            return;
         }
+
+        fetch(`/review/getFreelancers?projectNum=${projectNum}`) // 프로젝트 번호를 서버로 전달
+            .then(response => {
+                console.log('서버 응답 상태:', response.status); // 응답 상태 확인
+                return response.json();
+            })
+            .then(data => {
+                console.log('서버로부터 받은 프리랜서 데이터:', data); // 받은 데이터 로그 출력
+                const freelancerSelect = document.getElementById('freelancerSelect');
+
+                if (Array.isArray(data)) {
+                    freelancerSelect.innerHTML = ''; // 기존 옵션 초기화
+                    data.forEach(freelancer => {
+                        const option = document.createElement('option');
+                        option.value = freelancer.id;
+                        option.textContent = freelancer.name;
+
+                        if (freelancer.reviewCompleted) {
+                            option.textContent += ' (작성 완료)';
+                            option.disabled = true; // 작성 완료된 경우 선택 불가
+                        }
+
+                        freelancerSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Invalid freelancers data format.');
+                    alert('프리랜서 데이터를 불러오는 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('프리랜서 데이터 로드 중 오류:', error);
+                alert('프리랜서 데이터를 불러오는 중 오류가 발생했습니다.');
+            });
+    }
+
+    // 페이지 로드 시 데이터 로드
+    document.addEventListener('DOMContentLoaded', loadFreelancerData);
+
 
         // 별점 선택 기능
         document.querySelectorAll('.star').forEach(star => {

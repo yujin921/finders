@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,15 +32,7 @@ public class ReviewService {
         FreelancerReviewsEntity savedReviewEntity = saveReviewEntity(reviewDTO);
         saveReviewItems(reviewDTO.getReviewItems(), savedReviewEntity);
 
-        return FreelancerReviewDTO.builder()
-                .reviewId(savedReviewEntity.getReviewId())
-                .projectNum(savedReviewEntity.getProjectNum())
-                .clientId(savedReviewEntity.getClientId())
-                .freelancerId(savedReviewEntity.getFreelancerId())
-                .rating(savedReviewEntity.getRating())
-                .comment(savedReviewEntity.getComment())
-                .reviewItems(reviewDTO.getReviewItems())
-                .build();
+        return convertToDTO(savedReviewEntity, reviewDTO.getReviewItems());
     }
 
     private FreelancerReviewsEntity saveReviewEntity(FreelancerReviewDTO reviewDTO) {
@@ -69,6 +60,18 @@ public class ReviewService {
         reviewItemRepository.saveAll(items);
     }
 
+    private FreelancerReviewDTO convertToDTO(FreelancerReviewsEntity reviewEntity, List<ReviewItemDTO> reviewItems) {
+        return FreelancerReviewDTO.builder()
+                .reviewId(reviewEntity.getReviewId())
+                .projectNum(reviewEntity.getProjectNum())
+                .clientId(reviewEntity.getClientId())
+                .freelancerId(reviewEntity.getFreelancerId())
+                .rating(reviewEntity.getRating())
+                .comment(reviewEntity.getComment())
+                .reviewItems(reviewItems)
+                .build();
+    }
+
     public List<MemberEntity> getTeamFreelancers(int projectNum, String clientId) {
         List<MemberEntity> teamMembers = memberRepository.findByProjects_ProjectNum(projectNum);
 
@@ -80,27 +83,20 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public FreelancerReviewDTO getReviewData(int projectNum, String clientId) {
-        // 프로젝트 번호와 클라이언트 ID를 기반으로 평가할 프리랜서 목록을 조회
         List<MemberEntity> freelancers = getTeamFreelancers(projectNum, clientId);
 
-        // 프리랜서 데이터를 DTO로 변환하면서, 각 프로젝트별로 리뷰 완료 여부 확인
         List<FreelancerDataDTO> freelancerDTOs = freelancers.stream()
             .map(freelancer -> {
-                // 프로젝트별로 리뷰 존재 여부 확인
                 boolean isReviewCompleted = reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
                         projectNum, clientId, freelancer.getMemberId());
-
-                // DTO 생성 시 작성 완료 상태 설정
                 return new FreelancerDataDTO(freelancer.getMemberId(), freelancer.getMemberName(), isReviewCompleted);
             })
             .collect(Collectors.toList());
 
-        // 예상되는 데이터 구조로 반환
         return FreelancerReviewDTO.builder()
             .projectNum(projectNum)
             .clientId(clientId)
-            .freelancerData(freelancerDTOs) // 프리랜서 리스트를 DTO에 추가
+            .freelancerData(freelancerDTOs)
             .build();
     }
-
 }

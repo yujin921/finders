@@ -1,6 +1,6 @@
 package net.datasa.finders.controller;
 
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.FreelancerDataDTO;
 import net.datasa.finders.domain.dto.FreelancerReviewDTO;
+import net.datasa.finders.service.FreelancerReviewService;
 import net.datasa.finders.service.ReviewService;
 
 @Slf4j
@@ -25,7 +27,8 @@ import net.datasa.finders.service.ReviewService;
 public class ReviewController {
 
     private final ReviewService reviewService;
-
+    private final FreelancerReviewService freelancerReviewService;
+   
     @PostMapping("/submitReview")
     public ResponseEntity<String> submitReview(@RequestBody FreelancerReviewDTO reviewDTO) {
         try {
@@ -50,6 +53,24 @@ public class ReviewController {
         } catch (Exception e) {
             log.error("리뷰 데이터를 가져오는 중 오류 발생: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/getFreelancers")
+    public ResponseEntity<?> getFreelancers(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("projectNum") int projectNum) {
+        String clientId = userDetails.getUsername();
+        log.info("getFreelancers 메서드 호출됨: projectNum = {}, clientId = {}", projectNum, clientId);
+
+        try {
+            // FreelancerReviewService의 getFreelancersByProject 호출
+            List<FreelancerDataDTO> freelancers = freelancerReviewService.getFreelancersByProject(projectNum, clientId);
+            log.info("프리랜서 목록: {}", freelancers);
+            return ResponseEntity.ok(freelancers);
+        } catch (Exception e) {
+            log.error("프리랜서 목록을 가져오는 중 오류 발생: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("프리랜서 목록을 가져오는 중 오류가 발생했습니다.");
         }
     }
 }

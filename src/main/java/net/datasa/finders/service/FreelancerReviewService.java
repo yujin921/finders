@@ -1,100 +1,60 @@
 package net.datasa.finders.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import net.datasa.finders.domain.dto.FreelancerDataDTO;
-import net.datasa.finders.domain.dto.FreelancerReviewDTO;
-import net.datasa.finders.domain.dto.ReviewItemDTO;
-import net.datasa.finders.domain.entity.FreelancerReviewItemEntity;
-import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
-import net.datasa.finders.repository.FreelancerReviewItemRepository;
-import net.datasa.finders.repository.FreelancerReviewsRepository;
+import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
 public class FreelancerReviewService {
 
-    private final FreelancerReviewsRepository freelancerReviewsRepository;
-    private final FreelancerReviewItemRepository freelancerReviewItemRepository;
+    private static final Logger logger = LoggerFactory.getLogger(FreelancerReviewService.class);
     private final MemberRepository memberRepository;
 
-    @Transactional
-    public FreelancerReviewDTO createFreelancerReview(FreelancerReviewDTO reviewDTO) {
-        // 리뷰 생성
-        FreelancerReviewsEntity savedReviewEntity = saveReviewEntity(reviewDTO);
+    /**
+     * 특정 프로젝트에 참여 중인 프리랜서 목록을 조회합니다.
+     * @param projectNum 프로젝트 번호
+     * @param clientId 클라이언트 ID
+     * @return 프리랜서 목록
+     */
+    @Transactional(readOnly = true)
+    public List<FreelancerDataDTO> getFreelancersByProject(int projectNum, String clientId) {
+        // 프로젝트 번호로 팀 참가자 가져오기
+        List<MemberEntity> teamMembers = memberRepository.findByProjects_ProjectNum(projectNum);
+        
+        // 로그 추가: 가져온 팀 참가자 확인
+        logger.info("프로젝트 번호 {} 에 해당하는 팀 참가자 수: {}", projectNum, teamMembers.size());
+        teamMembers.forEach(member -> logger.info("참가자 ID: {}, 이름: {}, 역할: {}", 
+            member.getMemberId(), member.getMemberName(), member.getRoleName()));
 
-        // 평가 항목 저장
-        saveReviewItems(reviewDTO.getReviewItems(), savedReviewEntity);
-
-        // 저장된 데이터를 DTO로 변환하여 반환
-        return FreelancerReviewDTO.builder()
-                .reviewId(savedReviewEntity.getReviewId())
-                .projectNum(savedReviewEntity.getProjectNum())
-                .clientId(savedReviewEntity.getClientId())
-                .freelancerId(savedReviewEntity.getFreelancerId())
-                .rating(savedReviewEntity.getRating())
-                .comment(savedReviewEntity.getComment())
-                .reviewItems(reviewDTO.getReviewItems())
-                .build();
-    }
-
-    private FreelancerReviewsEntity saveReviewEntity(FreelancerReviewDTO reviewDTO) {
-        return freelancerReviewsRepository.save(
-                FreelancerReviewsEntity.builder()
-                        .projectNum(reviewDTO.getProjectNum())
-                        .clientId(reviewDTO.getClientId())
-                        .freelancerId(reviewDTO.getFreelancerId())
-                        .rating(reviewDTO.getRating())
-                        .comment(reviewDTO.getComment())
-                        .reviewDate(LocalDateTime.now())
-                        .build()
-        );
-    }
-
-    private void saveReviewItems(List<ReviewItemDTO> reviewItems, FreelancerReviewsEntity reviewEntity) {
-        List<FreelancerReviewItemEntity> items = reviewItems.stream()
-                .map(item -> FreelancerReviewItemEntity.builder()
-                        .freelancerReview(reviewEntity)
-                        .itemName(item.getItemName())
-                        .itemValue(item.isSelected())
-                        .build())
+        // 클라이언트 본인은 제외하고 프리랜서만 필터링
+        return teamMembers.stream()
+                .filter(member -> !member.getMemberId().equals(clientId)) // 클라이언트 본인 제외
+                .filter(member -> member.getRoleName() == RoleName.ROLE_FREELANCER) // 프리랜서만 포함
+                .map(member -> new FreelancerDataDTO(member.getMemberId(), member.getMemberName(), false))
                 .collect(Collectors.toList());
-
-        freelancerReviewItemRepository.saveAll(items);
     }
 
-    // 수정된 getReviewData 메서드
-    public FreelancerReviewDTO getReviewData(int projectNum, String clientId) {
-        // 프로젝트 번호와 클라이언트 ID를 받아서, 해당 프로젝트의 프리랜서 목록을 가져온다.
-        List<MemberEntity> freelancers = memberRepository.findByMemberIdAndProjects_ProjectNum(clientId, projectNum);
-
-        // 프리랜서 데이터를 FreelancerDataDTO로 변환하여 리스트 생성
-        List<FreelancerDataDTO> freelancerData = freelancers.stream()
-            .map(member -> {
-                // 중복된 리뷰가 있을 가능성이 있으므로 List로 받아서 처리
-                List<FreelancerReviewsEntity> reviews = freelancerReviewsRepository.findByProjectNumAndClientIdAndFreelancerId(
-                        projectNum, clientId, member.getMemberId());
-
-                boolean isReviewCompleted = !reviews.isEmpty(); // 리뷰가 존재하는지 확인
-
-                // DTO 생성 시 작성 완료 상태 설정
-                return new FreelancerDataDTO(member.getMemberId(), member.getMemberName(), isReviewCompleted);
-            })
-            .collect(Collectors.toList());
-
-        // 필요한 초기 데이터 세팅하여 반환
-        return FreelancerReviewDTO.builder()
-            .projectNum(projectNum)
-            .clientId(clientId)
-            .freelancerData(freelancerData)
-            .build();
+    /**
+     * 프리랜서의 리뷰 점수를 계산하는 예시 메서드입니다.
+     * @param freelancerId 프리랜서 ID
+     * @return 리뷰 점수 계산 결과
+     */
+    @Transactional(readOnly = true)
+    public double calculateFreelancerRating(String freelancerId) {
+        // 리뷰 데이터를 활용하여 특정 프리랜서의 평균 점수를 계산하는 로직을 작성합니다.
+        // 예를 들어, reviewRepository를 사용하여 리뷰 데이터를 가져오고 평균 점수를 계산합니다.
+        // return calculatedRating;
+        return 0.0; // 예시로 빈 값을 반환하고 실제 로직을 작성합니다.
     }
 }
