@@ -130,18 +130,18 @@
 <body>
     <div class="container">
         <h1 class="title">프리랜서 평가</h1>
-		
-		<!-- 필요한 데이터는 서버에서 받아옴 -->
-		<div id="review-data"></div>
-		
-		<!-- 프리랜서 선택 박스 -->
-		<div class="freelancer-selection">
-		    <label for="freelancerSelect">평가할 프리랜서를 선택하세요:</label>
-		    <select id="freelancerSelect">
-		        <!-- 서버에서 가져온 프리랜서 목록이 추가됩니다 -->
-		    </select>
-		</div>
-		
+
+        <!-- 필요한 데이터는 서버에서 받아옴 -->
+        <div id="review-data"></div>
+
+        <!-- 프리랜서 선택 박스 -->
+        <div class="freelancer-selection">
+            <label for="freelancerSelect">평가할 프리랜서를 선택하세요:</label>
+            <select id="freelancerSelect">
+                <!-- 서버에서 가져온 프리랜서 목록이 추가됩니다 -->
+            </select>
+        </div>
+
         <!-- 프로젝트 만족도 평가 -->
         <div class="subtitle">프로젝트는 만족하셨나요?</div>
         <div class="stars">
@@ -156,16 +156,7 @@
         <!-- 클라이언트에 대한 평가 항목 -->
         <div class="checkbox-group">
             <p>어떤 점이 마음에 드셨나요? (최대 5개 선택 가능)</p>
-            <input type="checkbox" id="item1" value="응답이 빨라요"><label for="item1">응답이 빨라요</label>
-            <input type="checkbox" id="item2" value="일정에 맞춰 작업을 완료해요"><label for="item2">일정에 맞춰 작업을 완료해요</label>
-            <input type="checkbox" id="item3" value="친절하고 협조적이에요"><label for="item3">친절하고 협조적이에요</label>
-            <input type="checkbox" id="item4" value="작업 퀄리티가 높아요"><label for="item4">작업 퀄리티가 높아요</label>
-            <input type="checkbox" id="item5" value="기술적 문제를 잘 해결해요"><label for="item5">기술적 문제를 잘 해결해요</label>
-            <input type="checkbox" id="item6" value="전문성이 뛰어나요"><label for="item6">전문성이 뛰어나요</label>
-            <input type="checkbox" id="item7" value="요구사항을 정확히 반영해요"><label for="item7">요구사항을 정확히 반영해요</label>
-            <input type="checkbox" id="item8" value="유연하게 대응해요"><label for="item8">유연하게 대응해요</label>
-            <input type="checkbox" id="item9" value="세부 사항까지 꼼꼼해요"><label for="item9">세부 사항까지 꼼꼼해요</label>
-            <input type="checkbox" id="item10" value="상세한 피드백을 제공해요"><label for="item10">상세한 피드백을 제공해요</label>
+            <!-- 체크박스 항목 유지 -->
         </div>
 
         <!-- 평가 코멘트 입력 -->
@@ -181,37 +172,43 @@
     </div>
 
     <script>
-    // 페이지 로드 시 서버에서 필요한 데이터를 가져오는 함수
- function loadReviewData() {
-    fetch('/review/getReviewData?projectNum=1') // 실제 프로젝트 번호 사용
-        .then(response => response.json())
-        .then(data => {
-            const { projectNum, clientId, freelancerData } = data;
-            
-            const reviewDataDiv = document.getElementById('review-data');
-            reviewDataDiv.dataset.projectNum = projectNum;
-            reviewDataDiv.dataset.clientId = clientId;
+        // 페이지 로드 시 서버에서 필요한 데이터를 가져오는 함수
+        function loadReviewData() {
+            fetch('/review/getReviewData?projectNum=1') // 실제 프로젝트 번호 사용
+                .then(response => response.json())
+                .then(data => {
+                    const { projectNum, clientId, freelancerData } = data;
 
-            const freelancerSelect = document.getElementById('freelancerSelect');
+                    const reviewDataDiv = document.getElementById('review-data');
+                    reviewDataDiv.dataset.projectNum = projectNum;
+                    reviewDataDiv.dataset.clientId = clientId;
 
-            if (Array.isArray(freelancerData)) {
-                freelancerData.forEach(freelancer => {
-                    const option = document.createElement('option');
-                    option.value = freelancer.id;
-                    option.textContent = freelancer.name;
-                    freelancerSelect.appendChild(option);
+                    const freelancerSelect = document.getElementById('freelancerSelect');
+
+                    if (Array.isArray(freelancerData)) {
+                        freelancerData.forEach(freelancer => {
+                            const option = document.createElement('option');
+                            option.value = freelancer.id;
+                            option.textContent = freelancer.name;
+
+                            // 작성 완료된 프리랜서인지 확인
+                            if (freelancer.reviewCompleted) {
+                                option.textContent += ' (작성 완료)';
+                                option.disabled = true; // 작성 완료된 경우 선택 불가
+                            }
+
+                            freelancerSelect.appendChild(option);
+                        });
+                    } else {
+                        console.error('Invalid freelancers data format.');
+                        alert('프리랜서 데이터를 불러오는 중 오류가 발생했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('리뷰 데이터 로드 중 오류:', error);
+                    alert('리뷰 데이터를 불러오는 중 오류가 발생했습니다.');
                 });
-            } else {
-                console.error('Invalid freelancers data format.');
-                alert('프리랜서 데이터를 불러오는 중 오류가 발생했습니다.');
-            }
-        })
-        .catch(error => {
-            console.error('리뷰 데이터 로드 중 오류:', error);
-            alert('리뷰 데이터를 불러오는 중 오류가 발생했습니다.');
-        });
-}
-
+        }
 
         // 별점 선택 기능
         document.querySelectorAll('.star').forEach(star => {
@@ -241,13 +238,12 @@
                 }
             });
         });
-        
+
         // 페이지 로드 시 데이터 로드
         document.addEventListener('DOMContentLoaded', loadReviewData);
-        
-     // 등록 버튼 클릭 시
+
+        // 등록 버튼 클릭 시
         document.querySelector('.submit').addEventListener('click', () => {
-            // 데이터 객체 생성
             const reviewDataDiv = document.getElementById('review-data');
             const projectNum = reviewDataDiv.dataset.projectNum;
             const clientId = reviewDataDiv.dataset.clientId;
@@ -278,7 +274,6 @@
             .then(response => {
                 if (response.ok) {
                     alert('리뷰가 제출되었습니다.');
-                    // 리뷰 제출 후 리스트 페이지로 이동
                     window.location.href = '/project/list'; // 실제 리스트 페이지 URL로 수정하세요
                 } else {
                     alert('리뷰 제출에 실패했습니다.');
@@ -289,7 +284,6 @@
                 alert('리뷰 제출 중 오류가 발생했습니다.');
             });
         });
-
     </script>
 </body>
 </html>

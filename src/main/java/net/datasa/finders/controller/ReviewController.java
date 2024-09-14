@@ -29,7 +29,8 @@ public class ReviewController {
     @PostMapping("/submitReview")
     public ResponseEntity<String> submitReview(@RequestBody FreelancerReviewDTO reviewDTO) {
         try {
-            reviewService.saveReview(reviewDTO);
+            // createFreelancerReview로 호출 변경
+            reviewService.createFreelancerReview(reviewDTO);
             return ResponseEntity.ok("리뷰가 성공적으로 저장되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();

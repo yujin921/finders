@@ -26,7 +26,6 @@ public class FreelancerReviewService {
     private final FreelancerReviewItemRepository freelancerReviewItemRepository;
     private final MemberRepository memberRepository;
 
-    
     @Transactional
     public FreelancerReviewDTO createFreelancerReview(FreelancerReviewDTO reviewDTO) {
         // 리뷰 생성
@@ -43,12 +42,11 @@ public class FreelancerReviewService {
                 .freelancerId(savedReviewEntity.getFreelancerId())
                 .rating(savedReviewEntity.getRating())
                 .comment(savedReviewEntity.getComment())
-                .reviewItems(reviewDTO.getReviewItems()) // 항목 리스트 그대로 사용
+                .reviewItems(reviewDTO.getReviewItems())
                 .build();
     }
 
     private FreelancerReviewsEntity saveReviewEntity(FreelancerReviewDTO reviewDTO) {
-        // 리뷰를 저장하는 메서드
         return freelancerReviewsRepository.save(
                 FreelancerReviewsEntity.builder()
                         .projectNum(reviewDTO.getProjectNum())
@@ -62,7 +60,6 @@ public class FreelancerReviewService {
     }
 
     private void saveReviewItems(List<ReviewItemDTO> reviewItems, FreelancerReviewsEntity reviewEntity) {
-        // 리뷰 항목을 저장하는 메서드
         List<FreelancerReviewItemEntity> items = reviewItems.stream()
                 .map(item -> FreelancerReviewItemEntity.builder()
                         .freelancerReview(reviewEntity)
@@ -73,22 +70,31 @@ public class FreelancerReviewService {
 
         freelancerReviewItemRepository.saveAll(items);
     }
-    
- // getReviewData 메서드 예시
+
+    // 수정된 getReviewData 메서드
     public FreelancerReviewDTO getReviewData(int projectNum, String clientId) {
         // 프로젝트 번호와 클라이언트 ID를 받아서, 해당 프로젝트의 프리랜서 목록을 가져온다.
         List<MemberEntity> freelancers = memberRepository.findByMemberIdAndProjects_ProjectNum(clientId, projectNum);
 
         // 프리랜서 데이터를 FreelancerDataDTO로 변환하여 리스트 생성
         List<FreelancerDataDTO> freelancerData = freelancers.stream()
-            .map(member -> new FreelancerDataDTO(member.getMemberId(), member.getMemberName()))
+            .map(member -> {
+                // 중복된 리뷰가 있을 가능성이 있으므로 List로 받아서 처리
+                List<FreelancerReviewsEntity> reviews = freelancerReviewsRepository.findByProjectNumAndClientIdAndFreelancerId(
+                        projectNum, clientId, member.getMemberId());
+
+                boolean isReviewCompleted = !reviews.isEmpty(); // 리뷰가 존재하는지 확인
+
+                // DTO 생성 시 작성 완료 상태 설정
+                return new FreelancerDataDTO(member.getMemberId(), member.getMemberName(), isReviewCompleted);
+            })
             .collect(Collectors.toList());
 
         // 필요한 초기 데이터 세팅하여 반환
         return FreelancerReviewDTO.builder()
             .projectNum(projectNum)
             .clientId(clientId)
-            .freelancerData(freelancerData) // 프리랜서 리스트를 DTO에 추가
+            .freelancerData(freelancerData)
             .build();
     }
 }
