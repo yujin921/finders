@@ -63,12 +63,13 @@
 
 		function list() {
 		    $.ajax({
-		        url: 'list',
+		        url: 'projectList',
 		        type: 'get',
 		        success: function(list) {
 		            $('#output').empty();
 
 					$(list).each(function(i, obj) {
+						
 						const formattedDate = new Date(obj.recruitDeadline).toISOString().split('T')[0];
 						let status = obj.projectStatus ? "모집완료" : "모집중";
 
@@ -78,7 +79,8 @@
 							<div class="post">
 								<img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" class="thumbnail">
 								<div class="post-info">
-									<a href="/myProject/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a>
+									<a href="/myProject/management?projectNum=${obj.projectNum}">${obj.projectTitle}</a>
+									<!-- <a href="/myProject/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a> -->
 									<span>평점들어갈 자리</span><br>
 									<span class="startdate">시작일 : ${obj.projectStartDate}</span><br>
 									<span class="budget">금액 : ${obj.projectBudget}</span>
@@ -108,9 +110,11 @@
 </head>
 <body>
 	<h1>[ My Project List ]</h1>
+	<!-- 
 	<div sec:authorize="hasRole('ROLE_CLIENT')">
 		<input type="button" onclick="window.location.href='/myProject/write';" value="글쓰기">
 	</div>
+	 -->
 
 	<br><br>
 

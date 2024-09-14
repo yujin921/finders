@@ -1,21 +1,21 @@
 package net.datasa.finders.controller;
 
+import java.util.List;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
-import net.datasa.finders.service.BoardService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import net.datasa.finders.service.ProjectManagementService;
 
 /**
  * 거래 게시판 관련 콘트롤러
@@ -27,26 +27,48 @@ import java.util.List;
 @RequestMapping("myProject")
 public class ProjectManagementController {
 	
-	private final BoardService boardService;
+	private final ProjectManagementService projectManagementService;
 	
 	@GetMapping("view")
 	public String view() {
 		return "project/listView";
 	}
 	
-	@GetMapping("write")
+	@ResponseBody
+    @GetMapping("projectList")
+    public List<ProjectPublishingDTO> projectList(@AuthenticationPrincipal AuthenticatedUser user) {
+        //서비스로 사용자 아이디를 전달하여 해당 아이디의 수입,지출 내역을 목록으로 리턴한다.
+        List<ProjectPublishingDTO> projectList = projectManagementService.getMyList(user.getUsername());
+        
+        return projectList;
+    }
+    
+    @GetMapping("management")
+	public String read(@RequestParam("projectNum") int pNum
+			, Model model
+			, @AuthenticationPrincipal AuthenticatedUser user) {
+	    try {
+            RoleName roleName = RoleName.valueOf(user.getRoleName());
+
+            log.debug("현재 사용자의 역할: {}", roleName);
+	        ProjectPublishingDTO projectPublishingDTO = projectManagementService.getBoard(pNum, user.getUsername(), roleName);
+	        model.addAttribute("board", projectPublishingDTO);
+            model.addAttribute("user", user);
+            model.addAttribute("roleName", projectPublishingDTO.getRoleName());
+	        return "project/management";
+	    } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/myProject/view";
+	    }
+	}
+
+    // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Controller 코드
+    /*
+    @GetMapping("write")
     public String write() {
         return "project/writeForm";
     }
-
-    @ResponseBody
-    @GetMapping("list")
-    public List<ProjectPublishingDTO> list(@AuthenticationPrincipal AuthenticatedUser user) {
-        //서비스로 사용자 아이디를 전달하여 해당 아이디의 수입,지출 내역을 목록으로 리턴한다.
-        List<ProjectPublishingDTO> list = boardService.getList(user.getUsername());
-        return list;
-    }
-
+     
     @PostMapping("write")
     public String write(
             @ModelAttribute ProjectPublishingDTO projectPublishingDTO,
@@ -107,4 +129,5 @@ public class ProjectManagementController {
             return "redirect:/myProject/view?error=deleteFailed"; // 삭제 실패 페이지로 리다이렉트
         }
     }
+    */
 }

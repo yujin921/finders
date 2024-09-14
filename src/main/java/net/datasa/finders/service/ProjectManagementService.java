@@ -52,87 +52,7 @@ public class ProjectManagementService {
     private final ProjectRequiredSkillRepository skillRepository;
     private final PrequalificationQuestionRepository prequalificationQuestionRepository;
 
-    public void write(ProjectPublishingDTO projectPublishingDTO, MultipartFile imageFile, String selectedSkills
-            , String projectDescription, BigDecimal projectBudget
-            , LocalDate projectStartDate, LocalDate projectEndDate
-            , LocalDateTime recruitDeadline, List<String> roles
-            , List<String> categories, List<Integer> teamSizes, List<String> questions) {
-
-        MemberEntity memberEntity = memberRepository.findById(projectPublishingDTO.getClientId())
-                .orElseThrow(() -> new EntityNotFoundException("회원 아이디가 없습니다."));
-
-        projectPublishingDTO.setSelectedSkills(Arrays.asList(selectedSkills.split(",")));  // 콤마로 구분된 기술 리스트로 변환
-        projectPublishingDTO.setProjectDescription(projectDescription);
-
-        // 이미지 Base64 인코딩 처리
-        String imageBase64 = null;
-        if (imageFile != null && !imageFile.isEmpty()) {
-            imageBase64 = convertToBase64(imageFile);  // Base64로 변환된 이미지 저장
-        }
-
-        // BoardEntity 생성 후 저장
-        ProjectPublishingEntity projectPublishingEntity = ProjectPublishingEntity.builder()
-                .clientId(memberEntity)
-                .projectTitle(projectPublishingDTO.getProjectTitle())
-                .recruitDeadline(recruitDeadline)
-                .projectStartDate(projectStartDate)
-                .projectEndDate(projectEndDate)
-                .projectBudget(projectBudget)
-                .projectDescription(projectDescription)
-                .projectImage(imageBase64) // Base64로 변환된 이미지 저장
-                .projectStatus(false)
-                .build();
-        projectPublishingRepository.save(projectPublishingEntity);
-
-        // 관련 기술 저장 로직
-        for (String skill : projectPublishingDTO.getSelectedSkills()) {
-            ProjectRequiredSkillEntity skillEntity = ProjectRequiredSkillEntity.builder()
-                    .projectPublishingEntity(projectPublishingEntity)
-                    .skillText(skill)
-                    .build();
-            skillRepository.save(skillEntity);
-        }
-
-        // 모집 인원 저장 로직 (roles, categories, teamSizes 저장)
-        for (int i = 0; i < roles.size(); i++) {
-            WorkScopeEntity workScopeEntity = WorkScopeEntity.builder()
-                    .projectPublishingEntity(projectPublishingEntity)
-                    .workType(roles.get(i))
-                    .requiredNum(teamSizes.get(i))
-                    .build();
-            workScopeRepository.save(workScopeEntity);
-        }
-
-        for (int i = 0; i < categories.size(); i++) {
-            ProjectCategoryEntity categoryEntity = ProjectCategoryEntity.builder()
-                    .projectPublishingEntity(projectPublishingEntity)
-                    .category(categories.get(i))
-                    .requiredNum(teamSizes.get(i))
-                    .build();
-            categoryRepository.save(categoryEntity);
-        }
-
-        // 사전 질문 저장 로직
-        for (String question : questions) {
-            PrequalificationQuestionEntity questionEntity = PrequalificationQuestionEntity.builder()
-                    .projectPublishingEntity(projectPublishingEntity)
-                    .questionText(question)
-                    .build();
-            prequalificationQuestionRepository.save(questionEntity);
-        }
-    }
-
-    // Base64 변환 유틸리티 메서드
-    private String convertToBase64(MultipartFile file) {
-        try {
-            byte[] fileContent = file.getBytes(); // MultipartFile을 바이트 배열로 변환
-            return Base64.getEncoder().encodeToString(fileContent); // Base64로 인코딩
-        } catch (IOException e) {
-            throw new RuntimeException("파일을 Base64로 변환하는 데 실패했습니다.", e);
-        }
-    }
-	
-    public List<ProjectPublishingDTO> getList(String id) {
+    public List<ProjectPublishingDTO> getMyList(String id) {
         
     	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
     	List<ProjectPublishingEntity> entityList = projectPublishingRepository.findAll(sort);
@@ -227,9 +147,191 @@ public class ProjectManagementService {
 
         return dto;
     }
+    
+    
+    // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Service 코드
+    /*
+    public void write(ProjectPublishingDTO projectPublishingDTO, MultipartFile imageFile, String selectedSkills
+            , String projectDescription, BigDecimal projectBudget
+            , LocalDate projectStartDate, LocalDate projectEndDate
+            , LocalDateTime recruitDeadline, List<String> roles
+            , List<String> categories, List<Integer> teamSizes, List<String> questions) {
+
+        MemberEntity memberEntity = memberRepository.findById(projectPublishingDTO.getClientId())
+                .orElseThrow(() -> new EntityNotFoundException("회원 아이디가 없습니다."));
+
+        projectPublishingDTO.setSelectedSkills(Arrays.asList(selectedSkills.split(",")));  // 콤마로 구분된 기술 리스트로 변환
+        projectPublishingDTO.setProjectDescription(projectDescription);
+
+        // 이미지 Base64 인코딩 처리
+        String imageBase64 = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imageBase64 = convertToBase64(imageFile);  // Base64로 변환된 이미지 저장
+        }
+
+        // BoardEntity 생성 후 저장
+        ProjectPublishingEntity projectPublishingEntity = ProjectPublishingEntity.builder()
+                .clientId(memberEntity)
+                .projectTitle(projectPublishingDTO.getProjectTitle())
+                .recruitDeadline(recruitDeadline)
+                .projectStartDate(projectStartDate)
+                .projectEndDate(projectEndDate)
+                .projectBudget(projectBudget)
+                .projectDescription(projectDescription)
+                .projectImage(imageBase64) // Base64로 변환된 이미지 저장
+                .projectStatus(false)
+                .build();
+        projectPublishingRepository.save(projectPublishingEntity);
+
+        // 관련 기술 저장 로직
+        for (String skill : projectPublishingDTO.getSelectedSkills()) {
+            ProjectRequiredSkillEntity skillEntity = ProjectRequiredSkillEntity.builder()
+                    .projectPublishingEntity(projectPublishingEntity)
+                    .skillText(skill)
+                    .build();
+            skillRepository.save(skillEntity);
+        }
+
+        // 모집 인원 저장 로직 (roles, categories, teamSizes 저장)
+        for (int i = 0; i < roles.size(); i++) {
+            WorkScopeEntity workScopeEntity = WorkScopeEntity.builder()
+                    .projectPublishingEntity(projectPublishingEntity)
+                    .workType(roles.get(i))
+                    .requiredNum(teamSizes.get(i))
+                    .build();
+            workScopeRepository.save(workScopeEntity);
+        }
+
+        for (int i = 0; i < categories.size(); i++) {
+            ProjectCategoryEntity categoryEntity = ProjectCategoryEntity.builder()
+                    .projectPublishingEntity(projectPublishingEntity)
+                    .category(categories.get(i))
+                    .requiredNum(teamSizes.get(i))
+                    .build();
+            categoryRepository.save(categoryEntity);
+        }
+
+        // 사전 질문 저장 로직
+        for (String question : questions) {
+            PrequalificationQuestionEntity questionEntity = PrequalificationQuestionEntity.builder()
+                    .projectPublishingEntity(projectPublishingEntity)
+                    .questionText(question)
+                    .build();
+            prequalificationQuestionRepository.save(questionEntity);
+        }
+    }
+
+    // Base64 변환 유틸리티 메서드
+    private String convertToBase64(MultipartFile file) {
+        try {
+            byte[] fileContent = file.getBytes(); // MultipartFile을 바이트 배열로 변환
+            return Base64.getEncoder().encodeToString(fileContent); // Base64로 인코딩
+        } catch (IOException e) {
+            throw new RuntimeException("파일을 Base64로 변환하는 데 실패했습니다.", e);
+        }
+    }
+    
+    public List<ProjectPublishingDTO> getList(String id) {
+        
+    	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
+    	List<ProjectPublishingEntity> entityList = projectPublishingRepository.findAll(sort);
+    	
+    	List<ProjectPublishingDTO> dtoList = new ArrayList<>();
+    	
+    	log.debug("현재 로그인한 Client ID 체크용: ", id);
+
+        for (ProjectPublishingEntity entity : entityList) {
+            if (entity.getClientId().getMemberId().equals(id)) {
+            	ProjectPublishingDTO dto = ProjectPublishingDTO.builder()
+                        .projectNum(entity.getProjectNum())
+                        .clientId(entity.getClientId().getMemberId())
+                        .projectTitle(entity.getProjectTitle())
+                        .recruitDeadline(entity.getRecruitDeadline())
+                        .projectStartDate(entity.getProjectStartDate())
+                        .projectEndDate(entity.getProjectEndDate())
+                        .projectBudget(entity.getProjectBudget())
+                        .projectDescription(entity.getProjectDescription())
+                        .projectImage(entity.getProjectImage())
+                        .projectStatus(entity.getProjectStatus())
+                        .build();
+                dtoList.add(dto);
+            }
+        }
+
+        return dtoList;
+    }
+    
+    private ProjectPublishingDTO convertToDTO(ProjectPublishingEntity entity) {
+        return ProjectPublishingDTO.builder()
+                .projectNum(entity.getProjectNum())
+                .clientId(entity.getClientId().getMemberId())
+                .projectTitle(entity.getProjectTitle())
+                .recruitDeadline(entity.getRecruitDeadline())
+                .projectStartDate(entity.getProjectStartDate())
+                .projectEndDate(entity.getProjectEndDate())
+                .projectBudget(entity.getProjectBudget())
+                .projectDescription(entity.getProjectDescription())
+                .projectImage(entity.getProjectImage())  // 조회 시 Base64로 저장된 이미지 데이터
+                .projectStatus(entity.getProjectStatus())
+                .build();
+    }
+    
+    public ProjectPublishingDTO getBoard(int pNum, String memberId, RoleName roleName) {
+        ProjectPublishingEntity entity = projectPublishingRepository.findById(pNum)
+                .orElseThrow(() -> new EntityNotFoundException("해당 번호의 글이 없습니다."));
+
+        // DTO로 변환 작업
+        ProjectPublishingDTO dto = convertToDTO(entity);
+
+        LocalDate projectStartDate = entity.getProjectStartDate();
+        LocalDate projectEndDate = entity.getProjectEndDate();
+        long estimatedDays = ChronoUnit.DAYS.between(projectStartDate, projectEndDate);
+
+        List<PrequalificationQuestionEntity> questions = prequalificationQuestionRepository.findByProjectPublishingEntity(entity);
+        List<ProjectRequiredSkillEntity> skills = skillRepository.findByProjectPublishingEntity(entity);
+        List<ProjectCategoryEntity> categories = categoryRepository.findByProjectPublishingEntity(entity);
+        List<WorkScopeEntity> workScopes = workScopeRepository.findByProjectPublishingEntity(entity);
+
+        List<String> selectedSkills = skills.stream()
+                .map(ProjectRequiredSkillEntity::getSkillText)
+                .collect(Collectors.toList());
+        List<String> questionTexts = questions.stream()
+                .map(PrequalificationQuestionEntity::getQuestionText)
+                .collect(Collectors.toList());
+
+        List<Map<String, Object>> matchedOutputs = new ArrayList<>();
+
+        // 카테고리와 업무 범위를 매칭할 때, required_num이 같은 경우 매칭
+        for (ProjectCategoryEntity category : categories) {
+            for (WorkScopeEntity workScope : workScopes) {
+                // required_num이 같은 경우 매칭
+                if (category.getRequiredNum() == workScope.getRequiredNum()) {
+                    Map<String, Object> output = new HashMap<>();
+                    output.put("category", category.getCategory());
+                    output.put("workScope", workScope.getWorkType());
+                    output.put("requiredNum", category.getRequiredNum());  // 동일한 required_num
+                    matchedOutputs.add(output);
+                } else {
+                    log.debug("매칭되지 않은 required_num: 카테고리 {}, 업무 범위 {}",
+                            category.getRequiredNum(), workScope.getRequiredNum());
+                }
+            }
+        }
+        MemberEntity member = memberRepository.findByMemberIdAndRoleName(memberId, roleName);
+        RoleName role = member.getRoleName();
+
+        dto.setRoleName(role);
+        dto.setEstimatedDay(estimatedDays);
+        dto.setOutputList(matchedOutputs);
+        dto.setSelectedSkills(selectedSkills);
+        dto.setPrequalificationQuestions(questionTexts);
+
+        return dto;
+    }
 
     public void deleteBoard(int pNum) {
         projectPublishingRepository.deleteById(pNum);
     }
+    */
 	
 }
