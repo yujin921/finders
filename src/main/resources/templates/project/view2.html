@@ -426,10 +426,10 @@ h1 {
         </div>
     </div>
 
-	<!-- HTML: 컨텍스트 메뉴 추가 -->
-	<div id="contextMenu" class="context-menu" style="display: none;">
-	    <button id="leaveChatRoomButton" class="context-menu-item">채팅방 나가기</button>
-	</div>
+   <!-- HTML: 컨텍스트 메뉴 추가 -->
+   <div id="contextMenu" class="context-menu" style="display: none;">
+       <button id="leaveChatRoomButton" class="context-menu-item">채팅방 나가기</button>
+   </div>
    <!-- 채팅방 모달 -->
    <div class="overlay" id="chatOverlay" onclick="closeChatModal()"></div>
    <div id="chatModal" class="modal">
@@ -437,12 +437,12 @@ h1 {
        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
            <h3 id="chatroomTitle" style="margin: 0;">채팅방 이름</h3>
                <div class="button-container" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 10px;">
-          			<button class="button" onclick="openParticipantsModal()">멤버 보기</button>
-          			<button class="button" onclick="downloadChat()">채팅 다운</button>
-         			 <button class="button-close" onclick="closeChatModal()">닫기</button>
-      			</div>
+                   <button class="button" onclick="openParticipantsModal()">멤버 보기</button>
+                   <button class="button" onclick="downloadChat()">채팅 다운</button>
+                   <button class="button-close" onclick="closeChatModal()">닫기</button>
+               </div>
 
-       	</div>
+          </div>
        <div id="chatroom-data" data-chatroom-id="" data-member-id="" data-project-num=""></div>
        <div class="chat-container">
            <div id="messages" class="messages"></div>
@@ -514,7 +514,6 @@ h1 {
 
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
-
 <script>
 //전역 변수 선언
 let selectedMembers = [];
@@ -1114,7 +1113,6 @@ function downloadChat() {
 }
 
 </script>
-
 
    
 

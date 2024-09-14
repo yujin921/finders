@@ -70,14 +70,23 @@ public class ProjectService {
         return !members.isEmpty();
     }
 
-    // 특정 멤버가 참여하고 있는 프로젝트 리스트를 조회하는 메서드
     @Transactional
     public List<ProjectEntity> getProjectsByMemberId(String memberId) {
-        List<ProjectEntity> projects = projectRepository.findProjectsByMemberId(memberId);
-        System.out.println("Projects retrieved: " + projects.size());
-        projects.forEach(project -> System.out.println("Project ID: " + project.getProjectNum() + ", Name: " + project.getProjectName()));
-
-        return projects;
+        try {
+            System.out.println("getProjectsByMemberId method called with memberId: " + memberId);
+            List<ProjectEntity> projects = projectRepository.findProjectsByMemberId(memberId);
+            if (projects == null || projects.isEmpty()) {
+                System.out.println("No projects found for member: " + memberId);
+            } else {
+                projects.forEach(project -> System.out.println("Project ID: " + project.getProjectNum() + ", Name: " + project.getProjectName()));
+            }
+            return projects;
+        } catch (Exception e) {
+            System.out.println("Exception occurred: " + e.getMessage());
+            e.printStackTrace(); // 예외가 발생한 경우 스택 트레이스를 출력하여 확인합니다.
+            return new ArrayList<>();
+        }
     }
+    
 
 }

@@ -23,6 +23,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//MemberEntity.java
 @Entity
 @Table(name = "member")
 @Data
@@ -31,44 +32,43 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberEntity {
 
-    @Id
-    @Column(name = "member_id", length = 20)
-    private String memberId;
+ @Id
+ @Column(name = "member_id", length = 20)
+ private String memberId;
 
-    @Column(name = "member_password", nullable = false, length = 100)
-    private String memberPw;
+ @Column(name = "member_password", nullable = false, length = 100)
+ private String memberPw;
 
-    @Column(name = "member_name", nullable = false, length = 100)
-    private String memberName;
+ @Column(name = "member_name", nullable = false, length = 100)
+ private String memberName;
 
-    @Column(name = "email", nullable = false, length = 100)
-    private String email;
-    
-    @Column(name = "profile_img", columnDefinition = "mediumtext")
-    private String profileImg;
+ @Column(name = "email", nullable = false, length = 100)
+ private String email;
+ 
+ @Column(name = "profile_img", columnDefinition = "mediumtext")
+ private String profileImg;
 
+ @Column(name = "enabled", nullable = false, columnDefinition = "tinyint(1) default 0")
+ private boolean enabled;
 
-    @Column(name = "enabled", nullable = false, columnDefinition = "tinyint(1) default 0")
-    private boolean enabled;
+ @Enumerated(EnumType.STRING)
+ @Column(name = "rolename", nullable = false)
+ private RoleName roleName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "rolename", nullable = false)
-    private RoleName roleName;
+ @CreatedDate
+ @Column(name = "created_time", columnDefinition = "timestamp default current_timestamp")
+ private LocalDateTime createdTime;
+ 
+ @Column(name = "updated_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+ private LocalDateTime updatedTime;
 
-    @CreatedDate
-    @Column(name = "created_time", columnDefinition = "timestamp default current_timestamp")
-    private LocalDateTime createdTime;
-    
-    @Column(name = "updated_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-	private LocalDateTime updatedTime;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "team",
-        joinColumns = @JoinColumn(name = "member_id"),
-        inverseJoinColumns = @JoinColumn(name = "project_num")
-    )
-    private Set<ProjectEntity> projects = new HashSet<>();
-    
-    
-}
+//MemberEntity.java
+@ManyToMany(fetch = FetchType.EAGER)
+@JoinTable(
+  name = "team",
+  joinColumns = @JoinColumn(name = "member_id"),
+  inverseJoinColumns = @JoinColumn(name = "project_num")
+)
+private Set<ProjectEntity> projects = new HashSet<>();
+ 
+}    

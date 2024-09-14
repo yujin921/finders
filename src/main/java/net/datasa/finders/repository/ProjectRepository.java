@@ -18,8 +18,9 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Integer>
     // 프로젝트 제목으로 프로젝트 검색 (필요 시 커스텀 메서드 추가 가능)
     Optional<ProjectEntity> findByProjectName(String projectName);
 
-    // 특정 멤버가 참여하고 있는 프로젝트를 가져오는 JPQL 쿼리
-    @Query("SELECT p FROM ProjectEntity p JOIN p.members m WHERE m.memberId = :memberId")
+    @Query(value = "SELECT p.* FROM project_publishing p JOIN team t ON p.project_num = t.project_num WHERE t.member_id = :memberId", nativeQuery = true)
     List<ProjectEntity> findProjectsByMemberId(@Param("memberId") String memberId);
-
+    // ProjectRepository.java
+    @Query(value = "SELECT p.* FROM project_publishing p JOIN team t ON p.project_num = t.project_num WHERE t.member_id = :memberId", nativeQuery = true)
+    List<ProjectEntity> findProjectsByMemberIdNative(@Param("memberId") String memberId);
 }
