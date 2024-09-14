@@ -37,21 +37,23 @@ public class MemberService {
         LocalDateTime now = LocalDateTime.now();
         String imageUrl = null;
 
-        if (dto.getProfileImg() != null && !dto.getProfileImg().isEmpty()) {
-            File directoryPath = new File(uploadPath);
-            if (!directoryPath.exists()) {
-                directoryPath.mkdirs();
-            }
+        // 이미지파일 경로 설정 및 이름 저장
+        File directoryPath = new File(uploadPath);
+        if (!directoryPath.exists()) {
+            directoryPath.mkdirs();
+        } 
+        if (!dto.getProfileImg().isEmpty()) {
+        	 String originalName = dto.getProfileImg().getOriginalFilename();
+             String extension = originalName.substring(originalName.lastIndexOf("."));
+             String dateString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+             String uuidString = UUID.randomUUID().toString();
+             String fileName = dateString + "_" + uuidString + extension;
 
-            String originalName = dto.getProfileImg().getOriginalFilename();
-            String extension = originalName.substring(originalName.lastIndexOf("."));
-            String dateString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            String uuidString = UUID.randomUUID().toString();
-            String fileName = dateString + "_" + uuidString + extension;
-
-            File file = new File(uploadPath, fileName);
-            dto.getProfileImg().transferTo(file);
-            imageUrl = fileName;
+             File file = new File(uploadPath, fileName);
+             dto.getProfileImg().transferTo(file);
+             imageUrl = "http://localhost:8888/images/profile/" + fileName;
+        } else {
+        	imageUrl = "https://i.namu.wiki/i/Bge3xnYd4kRe_IKbm2uqxlhQJij2SngwNssjpjaOyOqoRhQlNwLrR2ZiK-JWJ2b99RGcSxDaZ2UCI7fiv4IDDQ.webp";
         }
 
         MemberEntity entity = MemberEntity.builder()
@@ -69,7 +71,7 @@ public class MemberService {
         if (dto.getMemberId().equals("admin123")) {
             entity.setRoleName(RoleName.ROLE_ADMIN);
         }
-
+        
         return memberRepository.save(entity);
     }
     
@@ -78,7 +80,7 @@ public class MemberService {
     }
 
     
-    public void joinFreelancer(FreelancerDTO dto, MemberEntity member) {
+    public void joinFreelancer(FreelancerDTO dto, MemberDTO member) {
     	
     	FreelancerEntity freelancerEntity = FreelancerEntity.builder()
     			.freelancerId(member.getMemberId())
@@ -92,7 +94,7 @@ public class MemberService {
     			freelancerRepository.save(freelancerEntity);
     }
     
-    public void joinClient(ClientDTO dto, MemberEntity member) {
+    public void joinClient(ClientDTO dto, MemberDTO member) {
     	
     	ClientEntity clientEntity = ClientEntity.builder()
     			.clientId(member.getMemberId())
@@ -216,7 +218,6 @@ public class MemberService {
         member.setMemberName(dto.getMemberName());
         member.setEmail(dto.getEmail());
        
-
         // 비밀번호 처리
         if (dto.getMemberPw() != null && !dto.getMemberPw().trim().isEmpty()) {
             member.setMemberPw(passwordEncoder.encode(dto.getMemberPw()));
@@ -279,6 +280,6 @@ public class MemberService {
             }
         }
 
-        return newFileName;
+        return "http://localhost:8888/images/profile/" + newFileName;
     }
 }

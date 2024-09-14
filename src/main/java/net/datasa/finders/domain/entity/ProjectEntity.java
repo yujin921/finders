@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
-
-//채팅 전용
-//채팅에서 project_publishing 테이블을 사용할 때 쓰는 entity, 따로 만들었음
-
 @Entity
 @Table(name = "project_publishing")
 @Data
@@ -28,7 +24,16 @@ public class ProjectEntity {
     @Column(name = "project_title", nullable = false, length = 100)
     private String projectName;
 
-    // 멤버와의 다대다 관계 설정
-    @ManyToMany(mappedBy = "projects")
+    // MemberEntity와의 다대다 관계 설정
+    @ManyToMany
+    @JoinTable(
+        name = "team", // 조인 테이블 이름
+        joinColumns = @JoinColumn(name = "project_num"), // 프로젝트 번호와 연결
+        inverseJoinColumns = @JoinColumn(name = "member_id") // 멤버 ID와 연결
+    )
     private Set<MemberEntity> members = new HashSet<>();
+
+    // TeamEntity와의 일대다 관계 유지
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    private Set<TeamEntity> teams = new HashSet<>();
 }

@@ -76,7 +76,12 @@
           color: var(--text-color);
           margin-left: 25px;
       }
+      
       .login-actions .btn {
+          color: white;
+      }
+      
+      .btn {
           background-color: var(--primary-color);
           color: #fff;
           padding: 12px 24px;

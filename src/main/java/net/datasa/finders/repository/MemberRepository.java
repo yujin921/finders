@@ -30,4 +30,12 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
     // 새로운 쿼리 메서드 - JPQL 사용
     @Query("SELECT m FROM MemberEntity m WHERE m.memberId = :memberId")
     Optional<MemberEntity> findByCustomMemberId(@Param("memberId") String memberId);
+
+    // 프로젝트 번호와 클라이언트 ID를 제외한 프리랜서 목록 조회
+    @Query("SELECT m FROM MemberEntity m JOIN TeamEntity t ON m.memberId = t.memberId WHERE t.projectNum = :projectNum AND m.memberId != :clientId")
+    List<MemberEntity> findByProjectNumAndNotClientId(@Param("projectNum") int projectNum, @Param("clientId") String clientId);
+
+    // 프로젝트 번호를 기준으로 팀 멤버를 조회하는 쿼리
+    @Query("SELECT m FROM MemberEntity m JOIN TeamEntity t ON m.memberId = t.memberId WHERE t.projectNum = :projectNum")
+    List<MemberEntity> findByProjectNum(@Param("projectNum") int projectNum);
 }

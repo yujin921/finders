@@ -8,6 +8,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamEntityId implements Serializable {
-    private Integer projectNum;
+    private int projectNum;
     private String memberId;
 }

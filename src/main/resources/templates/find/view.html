@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파트너스 찾기</title>
+    <link rel="stylesheet" href="/css/find/view.css">
+</head>
+<body>
+    <header>
+        <h1>파트너스 찾기</h1>
+        <button class="cta-button">포트폴리오 등록하기</button>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>파트너스 필터</h2>
+            <div class="filter-section">
+                <h3>파트너 등급</h3>
+                <label><input type="checkbox"> PRIME+</label>
+                <label><input type="checkbox"> PRO</label>
+            </div>
+            <div class="filter-section">
+                <h3>선호 프로젝트 형태</h3>
+                <label><input type="checkbox"> 외주(도급)</label>
+                <label><input type="checkbox"> 기간제(상주)</label>
+            </div>
+            <div class="filter-section">
+                <h3>파트너 직종</h3>
+                <label><input type="checkbox"> 개발</label>
+                <label><input type="checkbox"> 디자인</label>
+                <label><input type="checkbox"> 기획</label>
+            </div>
+            <div class="filter-section">
+                <h3>파트너 업태</h3>
+                <label><input type="checkbox"> 법인사업자</label>
+                <label><input type="checkbox"> 개인사업자</label>
+                <label><input type="checkbox"> 팀</label>
+                <label><input type="checkbox"> 개인</label>
+            </div>
+            <div class="filter-section">
+                <h3>파트너 지역</h3>
+                <select>
+                    <option>전체 선택</option>
+                </select>
+            </div>
+        </aside>
+        <main>
+            <div class="search-bar">
+                <input type="text" placeholder="파트너스 찾기">
+                <button>검색</button>
+            </div>
+            <div class="sort-options">
+                <label><input type="radio" name="sort" checked> 기본 정렬순</label>
+                <label><input type="radio" name="sort"> 평점 높은순</label>
+                <label><input type="radio" name="sort"> 포트폴리오 많은순</label>
+                <label><input type="radio" name="sort"> 최근 업데이트순</label>
+            </div>
+            <div class="partner-list">
+                <!-- 파트너 카드 예시 -->
+                <div class="partner-card">
+                    <img src="partner-logo.jpg" alt="파트너 로고">
+                    <h3>파트너 이름</h3>
+                    <p class="partner-description">파트너 설명...</p>
+                    <div class="partner-info">
+                        <span class="rating">평점: 4.98</span>
+                        <span class="projects">계약한 프로젝트: 333건</span>
+                        <span class="portfolio">포트폴리오: 1,471개</span>
+                    </div>
+                    <div class="skills">
+                        <span>PHP</span>
+                        <span>Java</span>
+                        <span>React Native</span>
+                        <!-- 추가 스킬... -->
+                    </div>
+                </div>
+                <!-- 추가 파트너 카드... -->
+            </div>
+        </main>
+    </div>
+</body>
+</html>
