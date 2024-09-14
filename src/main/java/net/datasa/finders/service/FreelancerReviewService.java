@@ -77,7 +77,7 @@ public class FreelancerReviewService {
  // getReviewData 메서드 예시
     public FreelancerReviewDTO getReviewData(int projectNum, String clientId) {
         // 프로젝트 번호와 클라이언트 ID를 받아서, 해당 프로젝트의 프리랜서 목록을 가져온다.
-        List<MemberEntity> freelancers = memberRepository.findByProjectNumAndNotClientId(projectNum, clientId);
+        List<MemberEntity> freelancers = memberRepository.findByMemberIdAndProjects_ProjectNum(clientId, projectNum);
 
         // 프리랜서 데이터를 FreelancerDataDTO로 변환하여 리스트 생성
         List<FreelancerDataDTO> freelancerData = freelancers.stream()

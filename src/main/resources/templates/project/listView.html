@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<meta charset="UTF-8">
+	<title>My Project List</title>
+	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+	<style>
+		.table-container {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr); /* 3개의 열을 균등하게 나누기 */
+			grid-auto-rows: auto; /* 행의 높이는 자동으로 설정 */
+			gap: 20px; /* 각 게시글 사이 간격 */
+			width: 100%; /* 부모 컨테이너의 너비를 100%로 설정 */
+			max-width: 1200px; /* 최대 너비를 1200px로 제한 */
+			margin: 0 auto; /* 가운데 정렬 */
+		}
+
+		.post {
+			border: 1px solid #ddd;
+			padding: 20px;
+			box-sizing: border-box;
+			background-color: #fff;
+			display: flex;
+			flex-direction: column;
+			/*align-items: center;*/
+			width: 100%;
+		}
+
+		.thumbnail {
+			width: 300px;
+			height: auto;
+			margin-bottom: 15px;
+		}
+
+		.post-info {
+			text-align: left;
+		}
+
+		.post-info .author,
+		.post-info .date,
+		.post-info .status,
+		.post-info a {
+			display: block;
+		}
+
+		.post-info a {
+			font-weight: bold;
+			font-size: 1.1em;
+			color: #000;
+			text-decoration: none;
+		}
+
+		.post-info a:hover {
+			color: #007bff;
+		}
+	</style>
+	<script>
+		$(document).ready(function() {
+			list();
+		});
+
+		function list() {
+		    $.ajax({
+		        url: 'list',
+		        type: 'get',
+		        success: function(list) {
+		            $('#output').empty();
+
+					$(list).each(function(i, obj) {
+						const formattedDate = new Date(obj.recruitDeadline).toISOString().split('T')[0];
+						let status = obj.projectStatus ? "모집완료" : "모집중";
+
+						let remainingDays = calculateRemainingDays(obj.projectStartDate, obj.projectEndDate);
+
+						let html = `
+							<div class="post">
+								<img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" class="thumbnail">
+								<div class="post-info">
+									<a href="/myProject/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a>
+									<span>평점들어갈 자리</span><br>
+									<span class="startdate">시작일 : ${obj.projectStartDate}</span><br>
+									<span class="budget">금액 : ${obj.projectBudget}</span>
+									<span class="author">작성자 : ${obj.clientId}</span>
+									<span class="date">예상 기간 : ${remainingDays}일</span>
+									<span class="status">${status}</span>
+								</div>
+							</div>
+						`;
+						$('#output').append(html);
+					});
+		        },
+		        error: function(e) {
+		            alert('조회 실패');
+		        }
+		    });
+		}
+
+		function calculateRemainingDays(StartDate, EndDate) {
+			const start = new Date(StartDate); // 시작 날짜
+			const end = new Date(EndDate); // 끝날짜
+			const differenceInTime = end - start; // 시간 차이 (밀리초)
+			const differenceInDays = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24)); // 일로 변환 후 올림
+			return differenceInDays >= 0 ? differenceInDays : 0; // 음수일 경우 0일로 표시
+		}
+	</script>
+</head>
+<body>
+	<h1>[ My Project List ]</h1>
+	<div sec:authorize="hasRole('ROLE_CLIENT')">
+		<input type="button" onclick="window.location.href='/myProject/write';" value="글쓰기">
+	</div>
+
+	<br><br>
+
+	<div class="table-container" id="output"></div>
+
+</body>
+</html>

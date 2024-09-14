@@ -62,7 +62,7 @@ public class ReviewService {
  // 프리랜서만 필터링하는 메서드 수정
     public List<MemberEntity> getTeamFreelancers(int projectNum, String clientId) {
         // 프로젝트 번호로 팀 참가자 가져오기
-        List<MemberEntity> teamMembers = memberRepository.findByProjectNum(projectNum);
+        List<MemberEntity> teamMembers = memberRepository.findByProjects_ProjectNum(projectNum);
 
         // 클라이언트 본인은 제외하고 프리랜서만 필터링
         return teamMembers.stream()

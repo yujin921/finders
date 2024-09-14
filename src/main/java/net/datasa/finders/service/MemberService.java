@@ -218,7 +218,6 @@ public class MemberService {
         member.setMemberName(dto.getMemberName());
         member.setEmail(dto.getEmail());
        
-
         // 비밀번호 처리
         if (dto.getMemberPw() != null && !dto.getMemberPw().trim().isEmpty()) {
             member.setMemberPw(passwordEncoder.encode(dto.getMemberPw()));
