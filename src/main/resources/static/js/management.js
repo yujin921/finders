@@ -36,6 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadCalendar();
             } else if (targetId === 'gantt-content') {
                 createGanttChart();
+            } else if (targetId === 'application-content') {
+                loadApplicationList();
             }
         });
     });
@@ -364,11 +366,11 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         return new Intl.DateTimeFormat('en-US', options).format(date);
     }
-	
+
 	// 간트 차트 생성(로드)
 	function createGanttChart() {
 	  if (ganttChartLoaded) return; // 이미 간트 차트가 로드된 경우
-		
+
 	  anychart.onDocumentReady(function () {
 	    // 직접 포함된 데이터
 		ganttChartData = [
@@ -425,37 +427,37 @@ document.addEventListener('DOMContentLoaded', function() {
 		    ]
 		  }
 		];
-		
+
 	    // 프로젝트 Gantt 차트 생성
 	    ganttChart = anychart.ganttProject();
-	
+
 		// 데이터 트리 생성
 		let treeData = anychart.data.tree(ganttChartData, "as-tree");
-		
+
 	    // 차트에 데이터 설정
 	    ganttChart.data(treeData);
-		
+
 		console.log("ganttChart 확인: ", ganttChart);
-	
+
 		// 분할기 위치 설정
 		ganttChart.splitterPosition(550); // 분할기 위치를 550px로 설정하여 고정
-		
+
 	    // 차트 데이터 그리드 링크를 가져와서 열 설정
 	    let dataGrid = ganttChart.dataGrid();
-	
+
 	    // 첫 번째 열 설정
 		dataGrid
 			.column(0)
 			.title('ID')
 			.width(30)
 			.labels({ hAlign: 'center' });
-	
+
 	    // 두 번째 열 설정
 	    dataGrid
 	      .column(1)
 	      .width(200)
 	      .labelsOverrider(labelTextSettingsFormatter);
-	
+
 	    // 세 번째 열 설정
 	    dataGrid
 	      .column(2)
@@ -464,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	      .labelsOverrider(labelTextSettingsFormatter)
 	      .labels()
 	      .format(thirdColumnTextFormatter);
-	
+
 	    // 네 번째 열 설정
 	    dataGrid
 	      .column(3)
@@ -473,28 +475,28 @@ document.addEventListener('DOMContentLoaded', function() {
 	      .labelsOverrider(labelTextSettingsFormatter)
 	      .labels()
 	      .format(fourthColumnTextFormatter);
-	
+
 	    timeline = ganttChart.getTimeline();
-	
+
 	    // 기준선이 행 위에 위치하도록 설정
 	    timeline.baselines().above(true);
-	
+
 	    // 이정표 미리보기 활성화
 	    timeline.milestones().preview().enabled(true);
 	    timeline.baselineMilestones().preview().enabled(true);
-		
+
 		let chartLastElement = ganttChartData[ganttChartData.length - 1];
-		
+
 		console.log("시작일 형식: ", ganttChartData[0].actualStart);
 		console.log("종료일 형식: ", chartLastElement.children[chartLastElement.children.length - 1].actualEnd);
-	
+
 		startDateStr = ganttChartData[0].actualStart;
 		endDateStr = chartLastElement.children[chartLastElement.children.length - 1].actualEnd;
-		
+
 		// 날짜 문자열을 Date 객체로 변환 (가정: 날짜 문자열은 "YYYY-MM-DD" 형식)
 		startDate = new Date(startDateStr);
 		endDate = new Date(endDateStr);
-		
+
 		// 여유 기간을 추가할 일수 (1주일 = 7일)
 		const bufferDays = 7;
 
@@ -516,43 +518,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		console.log("조정된 시작일: ", adjustedStartDate.toISOString());
 		console.log("조정된 종료일: ", adjustedEndDate.toISOString());
-		
+
 	    // 차트 컨테이너 ID 설정
 	    ganttChart.container('gantt-chart'); // 컨테이너 ID를 수정하세요
-	
+
 	    // 차트 그리기 시작
 	    ganttChart.draw();
-	
+
 		zoomStart = Date.UTC(startYear, startMonth, startDay);
 		zoomEnd = Date.UTC(endYear, endMonth, endDay);
-		
+
 		console.log(`zoomStart 체크1: `, zoomStart);
 		console.log(`zoomEnd 체크1: `, zoomEnd);
-		
+
 		// 전체 데이터를 보이도록 날짜 범위 조정
 		// ex) ganttChart.zoomTo(Date.UTC(2024, 8, 1), Date.UTC(2024, 12, 30));
 		ganttChart.zoomTo(zoomStart, zoomEnd);
-		
+
 		// 날짜 범위 조정 (scale 사용)
 		timeline.scale().minimum(zoomStart);
 		timeline.scale().maximum(zoomEnd);
-		
+
 		ganttChart.fitAll();
-		
+
 		ganttChartLoaded = true;
-		
+
 		// 진행도 업데이트 버튼 이벤트 리스너 추가
 		document.getElementById('update-progress-button').addEventListener('click', updateProgress);
-		
+
 	  });
-	  
+
 	  // 간트 차트 진행도 업데이트 함수
 	  function updateProgress() {
 	      const idElement = document.getElementById('progress-id');
 		  const progressElement = document.getElementById('progress-value');
-		  const id = document.getElementById('progress-id').value.trim(); 
+		  const id = document.getElementById('progress-id').value.trim();
 	      const progressValue = document.getElementById('progress-value').value.trim();
-		  
+
 		  // 분할기 위치 설정
 		  ganttChart.splitterPosition(550); // 분할기 위치를 550px로 설정하여 고정
 
@@ -567,33 +569,33 @@ document.addEventListener('DOMContentLoaded', function() {
 		  // 진행도 값이 올바른 형식인지 확인
 		  if (!progressValuePattern.test(progressValue)) {
 			alert('진행도 값은 0%에서 100% 사이의 형식으로 입력해야 합니다. 예: 50%');
-			
+
 			progressElement.focus();
 			progressElement.value = null;
 			idElement.focus();
 			idElement.value = null;
-			
+
 		    return; // 올바른 형식이 아닐 경우 함수 실행 중지
 		  }
-		  
+
 		  // 입력 ID가 숫자형인지 확인하고 숫자로 변환
 		  const numericId = Number(id);
 		  if (isNaN(numericId)) {
 		    alert('ID는 유효한 숫자여야 합니다.');
-			
+
 			progressElement.focus();
 			progressElement.value = null;
 			idElement.focus();
 			idElement.value = null;
-			
+
 		    return; // ID가 숫자가 아닐 경우 함수 실행 중지
 		  }
-		  
+
 	      if (ganttChart && id && progressValue) {
 	          // 데이터 업데이트 로직
 	          function findTaskById(tasks, id) {
 	              console.log(`Searching for ID: ${id} in tasks`, tasks);
-	              
+
 	              for (let task of tasks) {
 	                  console.log(`Checking task ID: ${task.id}`);
 	                  if (task.id == id) {
@@ -610,26 +612,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	          // 작업을 찾기
 	          const taskToUpdate = findTaskById(ganttChartData, id);
-	          
+
 	          if (taskToUpdate) {
 	              taskToUpdate.progressValue = progressValue;
-				  
+
 	              // Gantt 차트 데이터 업데이트
 	              let updatedData = anychart.data.tree(ganttChartData, 'as-tree');
 	              ganttChart.data(updatedData);
-	              
+
 				  console.log(`zoomStart 체크2: `, zoomStart);
 				  console.log(`zoomEnd 체크2: `, zoomEnd);
-				  
+
 	              // 차트 다시 그리기
 	              ganttChart.draw();
 
 	              // 전체 데이터가 보이도록 날짜 범위 조정
 				  ganttChart.zoomTo(zoomStart, zoomEnd);
-				  
+
 	          } else {
 	              alert('해당 ID의 작업을 찾을 수 없습니다.');
-				  
+
 				  progressElement.focus();
 				  progressElement.value = null;
 				  idElement.focus();
@@ -711,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    return dateUnit + '';
 	  }
 	}
-		
+
 });
 
 
@@ -847,17 +849,17 @@ document.addEventListener('DOMContentLoaded', function() {
 			// 특정 날짜 범위로 확대할 경우 사용
 			// ex) ganttChart.zoomTo(Date.UTC(2024, 8, 1), Date.UTC(2024, 12, 30));
 			// ganttChart.zoomTo(Date.UTC(startYear, startMonth, startDay), Date.UTC(endYear, endMonth, endDay));
-			
+
             // ganttChartLoaded = true;
 
             // 진행도 업데이트 버튼 이벤트 리스너 추가
             document.getElementById('update-progress-button').addEventListener('click', updateProgress);
         });
     }
-	
+
 	// 간트 차트 진행도 업데이트 함수
   function updateProgress() {
-    const id = document.getElementById('progress-id').value.trim(); 
+    const id = document.getElementById('progress-id').value.trim();
     const progressValue = document.getElementById('progress-value').value.trim();
 
     // 디버깅 로그 추가
@@ -869,7 +871,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 데이터 업데이트 로직
       function updateTaskProgress(tasks, id, progressValue) {
         console.log(`Searching for ID: ${id} in tasks`, tasks);
-        
+
         for (let task of tasks) {
           console.log(`Checking task ID: ${task.id}`);
           if (task.id === id) {
@@ -889,31 +891,31 @@ document.addEventListener('DOMContentLoaded', function() {
       const updated = updateTaskProgress(ganttChartData, id, progressValue);
 
       console.log(`Update successful: ${updated}`);
-      
+
 	  if (updated) {
         try {
           // Gantt 차트 데이터 업데이트
           ganttChart.data(anychart.data.tree(ganttChartData, 'as-tree'));
-          
+
           // Gantt 차트 그리기 전에 타임라인과 관련된 설정을 확인
           const timeline = ganttChart.getTimeline();
           if (timeline) {
 			// 현재 줌 및 레이아웃 설정을 저장
             const zoomStart = ganttChart.getTimeline().scale().minimum();
             const zoomEnd = ganttChart.getTimeline().scale().maximum();
-            
+
             // Gantt 차트 데이터 업데이트
             ganttChart.data(anychart.data.tree(ganttChartData, 'as-tree'));
-			
+
 			// 차트 다시 그리기
 			ganttChart.draw(false);
-			
+
 			ganttChart.zoomTo(Date.UTC(startYear, startMonth, startDay), Date.UTC(endYear, endMonth, endDay));
-			
+
 			// 저장된 줌 및 레이아웃 설정 복원
 			ganttChart.getTimeline().scale().minimum(zoomStart);
 			ganttChart.getTimeline().scale().maximum(zoomEnd);
-			
+
           } else {
             console.log("Timeline 설정을 가져오는 데 실패했습니다.");
           }
@@ -929,3 +931,80 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 	*/
+
+function loadApplicationList() {
+    fetch('/project/application-list')  // 서버에서 클라이언트의 지원자 목록을 가져옴
+        .then(response => response.json())
+        .then(applications => {
+            let contentHtml = `
+            <h3>지원자 목록</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>프리랜서 ID</th>
+                        <th>게시물 제목</th>
+                        <th>상태</th>
+                        <th>동작</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            applications.forEach(application => {
+                let statusText = application.applicationResult;
+
+                if (application.applicationResult === 'PENDING') {
+                    // PENDING일 경우 상태에 "지원 신청 중" 표시
+                    statusText = '지원 신청 중';
+                }
+
+                // 동작 버튼은 항상 표시
+                let actionHtml = `
+                    <button onclick="updateApplicationStatus(${application.projectNum}, '${application.freelancerId}', 'ACCEPTED')">찬성</button>
+                    <button onclick="updateApplicationStatus(${application.projectNum}, '${application.freelancerId}', 'REJECTED')">반대</button>
+                `;
+
+                contentHtml += `
+                <tr>
+                    <td>${application.freelancerId}</td>
+                    <td>${application.projectTitle}</td>
+                    <td>${statusText}</td> <!-- 상태란에 지원 신청 중 또는 다른 상태 표시 -->
+                    <td>${actionHtml}</td> <!-- 동작란에 찬성/반대 버튼 표시 -->
+                </tr>
+                `;
+            });
+
+            contentHtml += `</tbody></table>`;
+            document.getElementById('application-content').innerHTML = contentHtml;
+        })
+        .catch(error => {
+            console.error('Error fetching applications:', error);
+        });
+}
+
+function updateApplicationStatus(projectNum, freelancerId, status) {
+    fetch('/project/update-application-status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `projectNum=${projectNum}&freelancerId=${freelancerId}&status=${status}`
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('상태 업데이트에 실패했습니다.');
+            }
+            return response.text();
+        })
+        .then(data => {
+            alert('상태가 성공적으로 업데이트되었습니다.');
+            loadApplicationList();  // 상태 업데이트 후 목록 새로고침
+        })
+        .catch(error => {
+            console.error('Error updating application status:', error);
+            alert('상태 업데이트 중 오류가 발생했습니다.');
+        })
+        .finally(() => {
+            isUpdating = false;  // 업데이트 완료 후 플래그 해제
+        });
+}

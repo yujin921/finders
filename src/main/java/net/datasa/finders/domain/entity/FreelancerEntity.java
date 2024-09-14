@@ -1,20 +1,11 @@
 package net.datasa.finders.domain.entity;
 
-import java.time.LocalDateTime;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Builder
 @Data
@@ -23,7 +14,6 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "freelancer_member")
-
 public class FreelancerEntity {
 
     @Id
@@ -48,9 +38,7 @@ public class FreelancerEntity {
 	
 	@Column(name = "extra_address", length = 100)
 	private String extraAddress;
-	
 
 	@Column(name = "country", length = 100)
 	private String country;
-
 }

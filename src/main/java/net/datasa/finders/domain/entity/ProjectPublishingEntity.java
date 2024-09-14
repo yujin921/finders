@@ -11,9 +11,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * 판매글 Entity
- */
 @Builder
 @Data
 @NoArgsConstructor
