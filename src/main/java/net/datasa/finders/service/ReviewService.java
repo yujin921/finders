@@ -18,6 +18,7 @@ import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.repository.FreelancerReviewItemRepository;
 import net.datasa.finders.repository.FreelancerReviewsRepository;
 import net.datasa.finders.repository.MemberRepository;
+import net.datasa.finders.repository.ProjectPublishingRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -26,15 +27,46 @@ public class ReviewService {
     private final FreelancerReviewsRepository reviewRepository;
     private final FreelancerReviewItemRepository reviewItemRepository;
     private final MemberRepository memberRepository;
+    private final ProjectPublishingRepository projectPublishingRepository;
+    
 
     @Transactional
     public FreelancerReviewDTO createFreelancerReview(FreelancerReviewDTO reviewDTO) {
+        // clientId가 제대로 설정되어 있는지 확인
+        if (reviewDTO.getClientId() == null || reviewDTO.getClientId().isEmpty()) {
+            throw new IllegalArgumentException("Client ID가 설정되지 않았습니다.");
+        }
+
+        // project_num이 실제로 project_publishing 테이블에 존재하는지 확인
+        boolean projectExists = projectPublishingRepository.existsById(reviewDTO.getProjectNum());
+        if (!projectExists) {
+            throw new IllegalArgumentException("유효하지 않은 프로젝트 번호입니다: " + reviewDTO.getProjectNum());
+        }
+
+        // client_id가 실제로 member 테이블에 존재하는지 확인
+        boolean clientExists = memberRepository.existsById(reviewDTO.getClientId());
+        if (!clientExists) {
+            throw new IllegalArgumentException("유효하지 않은 클라이언트 ID입니다: " + reviewDTO.getClientId());
+        }
+
+        // 리뷰 생성
         FreelancerReviewsEntity savedReviewEntity = saveReviewEntity(reviewDTO);
+
+        // 평가 항목 저장
         saveReviewItems(reviewDTO.getReviewItems(), savedReviewEntity);
 
-        return convertToDTO(savedReviewEntity, reviewDTO.getReviewItems());
+        // 저장된 데이터를 DTO로 변환하여 반환
+        return FreelancerReviewDTO.builder()
+                .reviewId(savedReviewEntity.getReviewId())
+                .projectNum(savedReviewEntity.getProjectNum())
+                .clientId(savedReviewEntity.getClientId())
+                .freelancerId(savedReviewEntity.getFreelancerId())
+                .rating(savedReviewEntity.getRating())
+                .comment(savedReviewEntity.getComment())
+                .reviewItems(reviewDTO.getReviewItems())
+                .build();
     }
-
+    // saveReviewEntity 메서드 추가
     private FreelancerReviewsEntity saveReviewEntity(FreelancerReviewDTO reviewDTO) {
         return reviewRepository.save(
                 FreelancerReviewsEntity.builder()
@@ -58,18 +90,6 @@ public class ReviewService {
                 .collect(Collectors.toList());
 
         reviewItemRepository.saveAll(items);
-    }
-
-    private FreelancerReviewDTO convertToDTO(FreelancerReviewsEntity reviewEntity, List<ReviewItemDTO> reviewItems) {
-        return FreelancerReviewDTO.builder()
-                .reviewId(reviewEntity.getReviewId())
-                .projectNum(reviewEntity.getProjectNum())
-                .clientId(reviewEntity.getClientId())
-                .freelancerId(reviewEntity.getFreelancerId())
-                .rating(reviewEntity.getRating())
-                .comment(reviewEntity.getComment())
-                .reviewItems(reviewItems)
-                .build();
     }
 
     public List<MemberEntity> getTeamFreelancers(int projectNum, String clientId) {

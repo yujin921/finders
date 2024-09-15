@@ -130,18 +130,18 @@
 <body>
     <div class="container">
         <h1 class="title">프리랜서 평가</h1>
-
-        <!-- 필요한 데이터는 서버에서 받아옴 -->
-        <div id="review-data"></div>
-
-        <!-- 프리랜서 선택 박스 -->
-        <div class="freelancer-selection">
-            <label for="freelancerSelect">평가할 프리랜서를 선택하세요:</label>
-            <select id="freelancerSelect">
-                <!-- 서버에서 가져온 프리랜서 목록이 추가됩니다 -->
-            </select>
-        </div>
-
+		
+		<!-- 필요한 데이터는 서버에서 받아옴 -->
+		<div id="review-data"></div>
+		
+		<!-- 프리랜서 선택 박스 -->
+		<div class="freelancer-selection">
+		    <label for="freelancerSelect">평가할 프리랜서를 선택하세요:</label>
+		    <select id="freelancerSelect">
+		        <!-- 서버에서 가져온 프리랜서 목록이 추가됩니다 -->
+		    </select>
+		</div>
+		
         <!-- 프로젝트 만족도 평가 -->
         <div class="subtitle">프로젝트는 만족하셨나요?</div>
         <div class="stars">
@@ -156,7 +156,16 @@
         <!-- 클라이언트에 대한 평가 항목 -->
         <div class="checkbox-group">
             <p>어떤 점이 마음에 드셨나요? (최대 5개 선택 가능)</p>
-            <!-- 체크박스 항목 유지 -->
+            <input type="checkbox" id="item1" value="응답이 빨라요"><label for="item1">응답이 빨라요</label>
+            <input type="checkbox" id="item2" value="일정에 맞춰 작업을 완료해요"><label for="item2">일정에 맞춰 작업을 완료해요</label>
+            <input type="checkbox" id="item3" value="친절하고 협조적이에요"><label for="item3">친절하고 협조적이에요</label>
+            <input type="checkbox" id="item4" value="작업 퀄리티가 높아요"><label for="item4">작업 퀄리티가 높아요</label>
+            <input type="checkbox" id="item5" value="기술적 문제를 잘 해결해요"><label for="item5">기술적 문제를 잘 해결해요</label>
+            <input type="checkbox" id="item6" value="전문성이 뛰어나요"><label for="item6">전문성이 뛰어나요</label>
+            <input type="checkbox" id="item7" value="요구사항을 정확히 반영해요"><label for="item7">요구사항을 정확히 반영해요</label>
+            <input type="checkbox" id="item8" value="유연하게 대응해요"><label for="item8">유연하게 대응해요</label>
+            <input type="checkbox" id="item9" value="세부 사항까지 꼼꼼해요"><label for="item9">세부 사항까지 꼼꼼해요</label>
+            <input type="checkbox" id="item10" value="상세한 피드백을 제공해요"><label for="item10">상세한 피드백을 제공해요</label>
         </div>
 
         <!-- 평가 코멘트 입력 -->
@@ -170,15 +179,10 @@
             <button class="button submit">등록</button>
         </div>
     </div>
+   
 
     <script>
- // URL에서 파라미터 추출 함수
-    function getParameterByName(name) {
-        const url = new URL(window.location.href);
-        return url.searchParams.get(name);
-    }
-
-    // 페이지 로드 시 서버에서 필요한 데이터를 가져오는 함수
+ // 페이지 로드 시 서버에서 필요한 데이터를 가져오는 함수
     function loadFreelancerData() {
         const projectNum = getParameterByName('projectNum'); // URL에서 projectNum을 가져옴
 
@@ -187,33 +191,51 @@
             return;
         }
 
-        fetch(`/review/getFreelancers?projectNum=${projectNum}`) // 프로젝트 번호를 서버로 전달
+        // 서버로 프리랜서 데이터를 요청
+        fetch(`/review/getFreelancers?projectNum=${projectNum}`)
             .then(response => {
-                console.log('서버 응답 상태:', response.status); // 응답 상태 확인
-                return response.json();
+                console.log('서버 응답 상태:', response.status); // 응답 상태 로그
+                if (!response.ok) {
+                    throw new Error(`서버 오류: ${response.status}`); // 응답이 실패할 경우 오류 발생
+                }
+                return response.json(); // 응답을 JSON으로 파싱
             })
             .then(data => {
-                console.log('서버로부터 받은 프리랜서 데이터:', data); // 받은 데이터 로그 출력
-                const freelancerSelect = document.getElementById('freelancerSelect');
+                console.log('서버로부터 받은 프리랜서 데이터:', data); // 받은 데이터 출력
 
-                if (Array.isArray(data)) {
-                    freelancerSelect.innerHTML = ''; // 기존 옵션 초기화
-                    data.forEach(freelancer => {
-                        const option = document.createElement('option');
-                        option.value = freelancer.id;
-                        option.textContent = freelancer.name;
+                // 서버에서 현재 로그인된 사용자 ID를 가져옴
+                fetch('/member/getMemberId') // member controller의 엔드포인트 사용
+                    .then(res => res.json())
+                    .then(userData => {
+                        const reviewDataDiv = document.getElementById('review-data');
+                        reviewDataDiv.dataset.projectNum = projectNum; // URL에서 가져온 projectNum 설정
+                        reviewDataDiv.dataset.clientId = userData.memberId; // 로그인된 사용자 ID 설정
 
-                        if (freelancer.reviewCompleted) {
-                            option.textContent += ' (작성 완료)';
-                            option.disabled = true; // 작성 완료된 경우 선택 불가
+                        const freelancerSelect = document.getElementById('freelancerSelect');
+
+                        if (Array.isArray(data)) {
+                            freelancerSelect.innerHTML = ''; // 기존 옵션 초기화
+                            data.forEach(freelancer => {
+                                const option = document.createElement('option');
+                                option.value = freelancer.id;
+                                option.textContent = freelancer.name;
+
+                                if (freelancer.reviewCompleted) {
+                                    option.textContent += ' (작성 완료)';
+                                    option.disabled = true; // 작성 완료된 경우 선택 불가
+                                }
+
+                                freelancerSelect.appendChild(option);
+                            });
+                        } else {
+                            console.error('Invalid freelancers data format:', data); // 예상과 다른 데이터 형식
+                            alert('프리랜서 데이터를 불러오는 중 오류가 발생했습니다.');
                         }
-
-                        freelancerSelect.appendChild(option);
+                    })
+                    .catch(error => {
+                        console.error('사용자 데이터 로드 중 오류:', error);
+                        alert('사용자 데이터를 불러오는 중 오류가 발생했습니다.');
                     });
-                } else {
-                    console.error('Invalid freelancers data format.');
-                    alert('프리랜서 데이터를 불러오는 중 오류가 발생했습니다.');
-                }
             })
             .catch(error => {
                 console.error('프리랜서 데이터 로드 중 오류:', error);
@@ -221,84 +243,99 @@
             });
     }
 
+    // URL에서 파라미터 추출 함수
+    function getParameterByName(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+    }
+
     // 페이지 로드 시 데이터 로드
     document.addEventListener('DOMContentLoaded', loadFreelancerData);
 
+    // 별점 선택 기능
+    document.querySelectorAll('.star').forEach(star => {
+        star.addEventListener('click', () => {
+            let rating = parseFloat(star.getAttribute('data-value'));
+            document.getElementById('rating-text').textContent = `${rating}점`;
 
-        // 별점 선택 기능
-        document.querySelectorAll('.star').forEach(star => {
-            star.addEventListener('click', () => {
-                let rating = parseFloat(star.getAttribute('data-value'));
-                document.getElementById('rating-text').textContent = `${rating}점`;
+            // 모든 별을 비활성화
+            document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
 
-                // 모든 별을 비활성화
-                document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
-
-                // 선택한 별까지 활성화
-                document.querySelectorAll('.star').forEach(s => {
-                    if (parseFloat(s.getAttribute('data-value')) <= rating) {
-                        s.classList.add('selected');
-                    }
-                });
-            });
-        });
-
-        // 체크박스 선택 제한 (최대 5개까지)
-        const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                if (document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').length > 5) {
-                    checkbox.checked = false;
-                    alert('최대 5개 항목만 선택할 수 있습니다.');
+            // 선택한 별까지 활성화
+            document.querySelectorAll('.star').forEach(s => {
+                if (parseFloat(s.getAttribute('data-value')) <= rating) {
+                    s.classList.add('selected');
                 }
             });
         });
+    });
 
-        // 페이지 로드 시 데이터 로드
-        document.addEventListener('DOMContentLoaded', loadReviewData);
-
-        // 등록 버튼 클릭 시
-        document.querySelector('.submit').addEventListener('click', () => {
-            const reviewDataDiv = document.getElementById('review-data');
-            const projectNum = reviewDataDiv.dataset.projectNum;
-            const clientId = reviewDataDiv.dataset.clientId;
-            const freelancerId = document.getElementById('freelancerSelect').value;
-
-            const rating = parseFloat(document.getElementById('rating-text').textContent.replace('점', ''));
-            const comment = document.querySelector('.comment-box textarea').value;
-            const selectedItems = Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'))
-                .map(checkbox => ({ itemName: checkbox.value, selected: true }));
-
-            const reviewData = {
-                projectNum: parseInt(projectNum, 10),
-                clientId: clientId,
-                freelancerId: freelancerId,
-                rating: rating || 0,
-                comment: comment,
-                reviewItems: selectedItems
-            };
-
-            // 서버로 데이터 전송
-            fetch('/review/submitReview', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(reviewData)
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('리뷰가 제출되었습니다.');
-                    window.location.href = '/project/list'; // 실제 리스트 페이지 URL로 수정하세요
-                } else {
-                    alert('리뷰 제출에 실패했습니다.');
-                }
-            })
-            .catch(error => {
-                console.error('리뷰 제출 오류:', error);
-                alert('리뷰 제출 중 오류가 발생했습니다.');
-            });
+    // 체크박스 선택 제한 (최대 5개까지)
+    const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            if (document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').length > 5) {
+                checkbox.checked = false;
+                alert('최대 5개 항목만 선택할 수 있습니다.');
+            }
         });
+    });
+
+ // 등록 버튼 클릭 시 리뷰 데이터 제출
+    document.querySelector('.submit').addEventListener('click', () => {
+        const reviewDataDiv = document.getElementById('review-data');
+        const projectNum = reviewDataDiv.dataset.projectNum;
+        const clientId = reviewDataDiv.dataset.clientId;
+        const freelancerId = document.getElementById('freelancerSelect').value;
+
+        // 각 변수가 올바르게 설정되었는지 확인
+        console.log('Project Number:', projectNum);
+        console.log('Client ID:', clientId);
+        console.log('Freelancer ID:', freelancerId);
+
+        if (!projectNum || !clientId || !freelancerId) {
+            alert('리뷰를 제출하는데 필요한 정보가 부족합니다.');
+            return;
+        }
+
+        const rating = parseFloat(document.getElementById('rating-text').textContent.replace('점', ''));
+        const comment = document.querySelector('.comment-box textarea').value;
+        const selectedItems = Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'))
+            .map(checkbox => ({ itemName: checkbox.value, selected: true }));
+
+        const reviewData = {
+            projectNum: parseInt(projectNum, 10),
+            clientId: clientId,
+            freelancerId: freelancerId,
+            rating: rating || 0,
+            comment: comment,
+            reviewItems: selectedItems
+        };
+
+        // 서버로 데이터 전송
+        fetch('/review/submitReview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(reviewData)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('리뷰가 제출되었습니다.');
+                window.location.href = '/project/list'; // 실제 리스트 페이지 URL로 수정하세요
+            } else {
+                alert('리뷰 제출에 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('리뷰 제출 오류:', error);
+            alert('리뷰 제출 중 오류가 발생했습니다.');
+        });
+    });
+
+    // 페이지 로드 시 데이터 로드
+    document.addEventListener('DOMContentLoaded', loadFreelancerData);
     </script>
 </body>
 </html>
