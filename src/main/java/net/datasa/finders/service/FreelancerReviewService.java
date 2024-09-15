@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import net.datasa.finders.domain.dto.FreelancerDataDTO;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.repository.FreelancerReviewsRepository;
 import net.datasa.finders.repository.MemberRepository;
 
 @Service
@@ -20,6 +21,7 @@ public class FreelancerReviewService {
 
     private static final Logger logger = LoggerFactory.getLogger(FreelancerReviewService.class);
     private final MemberRepository memberRepository;
+    private final FreelancerReviewsRepository reviewRepository;  // 추가된 부분
 
     /**
      * 특정 프로젝트에 참여 중인 프리랜서 목록을 조회합니다.
@@ -31,17 +33,16 @@ public class FreelancerReviewService {
     public List<FreelancerDataDTO> getFreelancersByProject(int projectNum, String clientId) {
         // 프로젝트 번호로 팀 참가자 가져오기
         List<MemberEntity> teamMembers = memberRepository.findByProjects_ProjectNum(projectNum);
-        
-        // 로그 추가: 가져온 팀 참가자 확인
-        logger.info("프로젝트 번호 {} 에 해당하는 팀 참가자 수: {}", projectNum, teamMembers.size());
-        teamMembers.forEach(member -> logger.info("참가자 ID: {}, 이름: {}, 역할: {}", 
-            member.getMemberId(), member.getMemberName(), member.getRoleName()));
 
-        // 클라이언트 본인은 제외하고 프리랜서만 필터링
+        // 프리랜서 목록 생성 시 리뷰 작성 여부를 확인하여 DTO에 반영
         return teamMembers.stream()
                 .filter(member -> !member.getMemberId().equals(clientId)) // 클라이언트 본인 제외
                 .filter(member -> member.getRoleName() == RoleName.ROLE_FREELANCER) // 프리랜서만 포함
-                .map(member -> new FreelancerDataDTO(member.getMemberId(), member.getMemberName(), false))
+                .map(member -> {
+                    boolean isReviewCompleted = reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
+                            projectNum, clientId, member.getMemberId());
+                    return new FreelancerDataDTO(member.getMemberId(), member.getMemberName(), isReviewCompleted);
+                })
                 .collect(Collectors.toList());
     }
 

@@ -1,5 +1,6 @@
 package net.datasa.finders.service;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.controller.ReviewController;
 import net.datasa.finders.domain.dto.FreelancerDataDTO;
 import net.datasa.finders.domain.dto.FreelancerReviewDTO;
 import net.datasa.finders.domain.dto.ReviewItemDTO;
@@ -20,6 +23,7 @@ import net.datasa.finders.repository.FreelancerReviewsRepository;
 import net.datasa.finders.repository.MemberRepository;
 import net.datasa.finders.repository.ProjectPublishingRepository;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -32,30 +36,18 @@ public class ReviewService {
 
     @Transactional
     public FreelancerReviewDTO createFreelancerReview(FreelancerReviewDTO reviewDTO) {
-        // clientId가 제대로 설정되어 있는지 확인
-        if (reviewDTO.getClientId() == null || reviewDTO.getClientId().isEmpty()) {
-            throw new IllegalArgumentException("Client ID가 설정되지 않았습니다.");
+        // 클라이언트 ID, 프로젝트 번호, 프리랜서 ID로 이미 작성된 리뷰가 있는지 확인
+        boolean isReviewCompleted = reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
+                reviewDTO.getProjectNum(), reviewDTO.getClientId(), reviewDTO.getFreelancerId());
+
+        // 이미 리뷰가 작성되었다면 예외 발생
+        if (isReviewCompleted) {
+            throw new IllegalStateException("이미 이 프리랜서에 대한 리뷰가 작성되었습니다.");
         }
 
-        // project_num이 실제로 project_publishing 테이블에 존재하는지 확인
-        boolean projectExists = projectPublishingRepository.existsById(reviewDTO.getProjectNum());
-        if (!projectExists) {
-            throw new IllegalArgumentException("유효하지 않은 프로젝트 번호입니다: " + reviewDTO.getProjectNum());
-        }
-
-        // client_id가 실제로 member 테이블에 존재하는지 확인
-        boolean clientExists = memberRepository.existsById(reviewDTO.getClientId());
-        if (!clientExists) {
-            throw new IllegalArgumentException("유효하지 않은 클라이언트 ID입니다: " + reviewDTO.getClientId());
-        }
-
-        // 리뷰 생성
         FreelancerReviewsEntity savedReviewEntity = saveReviewEntity(reviewDTO);
-
-        // 평가 항목 저장
         saveReviewItems(reviewDTO.getReviewItems(), savedReviewEntity);
 
-        // 저장된 데이터를 DTO로 변환하여 반환
         return FreelancerReviewDTO.builder()
                 .reviewId(savedReviewEntity.getReviewId())
                 .projectNum(savedReviewEntity.getProjectNum())
@@ -66,6 +58,7 @@ public class ReviewService {
                 .reviewItems(reviewDTO.getReviewItems())
                 .build();
     }
+    
     // saveReviewEntity 메서드 추가
     private FreelancerReviewsEntity saveReviewEntity(FreelancerReviewDTO reviewDTO) {
         return reviewRepository.save(
@@ -103,20 +96,35 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public FreelancerReviewDTO getReviewData(int projectNum, String clientId) {
-        List<MemberEntity> freelancers = getTeamFreelancers(projectNum, clientId);
+        // 프로젝트 번호와 클라이언트 ID를 기반으로 평가할 프리랜서 목록을 조회
+        List<MemberEntity> freelancers = memberRepository.findByProjects_ProjectNum(projectNum)
+                .stream()
+                .filter(member -> member.getRoleName() == RoleName.ROLE_FREELANCER)
+                .collect(Collectors.toList());
 
+        // 프리랜서 데이터를 DTO로 변환하면서, 각 프로젝트별로 리뷰 완료 여부 확인
         List<FreelancerDataDTO> freelancerDTOs = freelancers.stream()
             .map(freelancer -> {
+                // 특정 프로젝트와 프리랜서 ID로 리뷰 존재 여부 확인
                 boolean isReviewCompleted = reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
                         projectNum, clientId, freelancer.getMemberId());
+
+                // 로그 추가: 각 프리랜서의 작성 완료 상태 출력
+                log.info("Freelancer ID: {}, isReviewCompleted: {}", freelancer.getMemberId(), isReviewCompleted);
+
+                // DTO 생성 시 작성 완료 상태 설정
                 return new FreelancerDataDTO(freelancer.getMemberId(), freelancer.getMemberName(), isReviewCompleted);
             })
             .collect(Collectors.toList());
 
+        // 리뷰 데이터 반환
         return FreelancerReviewDTO.builder()
             .projectNum(projectNum)
             .clientId(clientId)
-            .freelancerData(freelancerDTOs)
+            .freelancerData(freelancerDTOs) // 프리랜서 리스트를 DTO에 추가
             .build();
     }
+
+
+
 }
