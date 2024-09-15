@@ -24,6 +24,7 @@ public class WebSecurityConfig {
             , "/js/**"              //JavaSCript 파일들
             , "/member/join"        //회원가입
             , "/member/idCheck"		//중복체크
+            , "/board/view"
     };
     
     // 프리랜서 회원 접근 가능
