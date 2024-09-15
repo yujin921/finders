@@ -17,11 +17,12 @@ public class TaskManagementDTO {
 	private Integer taskId;
     private Integer projectNum;
     private String freelancerId;
-    private String functionTitle;
+    private Integer functionTitleId; // 기존 기능 선택 시
+    private String functionTitleName; // 새 기능 입력 시
     private String taskTitle;
     private String taskDescription;
-    private TaskStatus taskStatus;
-    private TaskPriority taskPriority;
-    private LocalDate taskStartDate;
-    private LocalDate taskEndDate;
+    private String taskStatus;
+    private String taskPriority;
+    private String taskStartDate;
+    private String taskEndDate;
 }

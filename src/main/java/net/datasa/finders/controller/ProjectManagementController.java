@@ -1,18 +1,25 @@
 package net.datasa.finders.controller;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
+import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ProjectManagementService;
@@ -61,6 +68,69 @@ public class ProjectManagementController {
             return "redirect:/myProject/view";
 	    }
 	}
+    
+    @ResponseBody
+    @PostMapping("saveFunction")
+    public FunctionTitleDTO saveFunction(@RequestBody FunctionTitleDTO functionTitleDTO) {
+        try {
+        	FunctionTitleDTO dto = projectManagementService.saveFunction(functionTitleDTO.getTitleName());
+            return dto;
+            
+        } catch (Exception e) {
+        	log.error("Error saving task", e);
+            return null;
+        }
+    }
+    
+    @ResponseBody
+    @GetMapping("loadFunctionTitles")
+    public ResponseEntity<List<FunctionTitleDTO>> loadFunctionTitles() {
+        try {
+            
+        	List<FunctionTitleDTO> functionTitles = projectManagementService.getAllFunctionTitles();
+            
+        	return ResponseEntity.ok(functionTitles);
+        
+        } catch (Exception e) {
+            
+        	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        
+        }
+    }
+    
+    @ResponseBody
+    @PostMapping("saveTask")
+    public TaskManagementDTO saveTask(@RequestParam("projectNum") int projectNum,
+            @RequestBody TaskManagementDTO taskDTO) {
+    	
+    	try {
+    		log.debug("projectNum controller 체크용: ", projectNum);
+    		log.debug("taskDTO controller 체크용: ", taskDTO);
+
+    		TaskManagementDTO savedTask = projectManagementService.saveTask(projectNum, taskDTO);
+            
+        	log.debug("taskManagementDTO controller 체크용2: ", savedTask);
+        	
+        	return savedTask;
+        
+        } catch (Exception e) {	
+        	log.error("Error saving task", e);
+        	return null;
+        
+        }
+
+    }
+    
+    @ResponseBody
+    @GetMapping("getTasks")
+    public List<TaskManagementDTO> getTasks(@RequestParam("projectNum") int projectNum) {
+        try {
+            return projectManagementService.getTasks(projectNum);
+        } catch (Exception e) {
+            log.error("Error retrieving tasks", e);
+            return Collections.emptyList();
+        }
+    }
 
     // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Controller 코드
     /*

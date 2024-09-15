@@ -437,3 +437,72 @@ h1 {
 .hidden {
     display: none;
 }
+
+/* 여기서 부터는 업무 등록 모달창 */
+/* 업무 등록 모달 스타일 */
+.task-modal {
+    display: none; /* 기본적으로 숨겨진 상태 */
+    position: fixed; /* 화면의 위치에 고정 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    z-index: 1000; /* 최상위 레이어 */
+    overflow: hidden; /* 스크롤 방지 */
+}
+
+/* 업무 등록 모달 콘텐츠 스타일 */
+.task-modal .modal-content {
+    background: #fff; /* 흰색 배경 */
+    margin: 5% auto; /* 화면 중앙에 위치 */
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%; /* 너비 설정 */
+    max-height: 80vh; /* 최대 높이 설정 */
+    overflow-y: auto; /* 세로 스크롤 추가 */
+}
+
+/* 업무 등록 모달 버튼 스타일 */
+.task-modal .btn-close {
+    background-color: #ccc; /* 회색 배경 */
+    border: none; /* 테두리 없음 */
+    padding: 10px 20px; /* 여백 */
+    cursor: pointer; /* 커서 모양 변경 */
+}
+
+.task-modal .btn-save {
+    background-color: #2ecc71; /* 저장 버튼 색상 */
+    color: white;
+    border: none; /* 테두리 없음 */
+    padding: 10px 20px; /* 여백 */
+    cursor: pointer; /* 커서 모양 변경 */
+}
+
+.task-modal .btn-save:hover {
+    background-color: #27ae60; /* 저장 버튼 호버 색상 */
+}
+
+.task-table {
+	width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.task-table th, .task-table td {
+	border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.task-table th {
+	background-color: #f2f2f2;
+}
+
+.task-table tr:nth-child(even) {
+	background-color: #f9f9f9;
+}
+
+.task-table tr:hover {
+	background-color: #ddd;
+}

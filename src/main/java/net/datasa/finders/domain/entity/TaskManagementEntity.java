@@ -37,8 +37,9 @@ public class TaskManagementEntity {
     @JoinColumn(name = "freelancer_id", referencedColumnName = "member_id")
     private MemberEntity memberEntity;
     
-    @Column(name = "function_title", nullable = false, length = 100)
-    private String functionTitle;
+    @ManyToOne
+    @JoinColumn(name = "function_title_id", referencedColumnName = "function_title_id")
+    private FunctionTitleEntity functionTitleEntity;
     
     @Column(name = "task_title", nullable = false, length = 100)
     private String taskTitle;

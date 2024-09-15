@@ -1,13 +1,9 @@
 package net.datasa.finders.service;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,26 +11,32 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
-import net.datasa.finders.domain.dto.TeamDTO;
+import net.datasa.finders.domain.dto.TaskManagementDTO;
+import net.datasa.finders.domain.entity.FunctionTitleEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.PrequalificationQuestionEntity;
 import net.datasa.finders.domain.entity.ProjectCategoryEntity;
 import net.datasa.finders.domain.entity.ProjectPublishingEntity;
 import net.datasa.finders.domain.entity.ProjectRequiredSkillEntity;
 import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.domain.entity.TaskManagementEntity;
+import net.datasa.finders.domain.entity.TaskPriority;
+import net.datasa.finders.domain.entity.TaskStatus;
 import net.datasa.finders.domain.entity.WorkScopeEntity;
+import net.datasa.finders.repository.FunctionTitleRepository;
 import net.datasa.finders.repository.MemberRepository;
 import net.datasa.finders.repository.PrequalificationQuestionRepository;
 import net.datasa.finders.repository.ProjectCategoryRepository;
 import net.datasa.finders.repository.ProjectPublishingRepository;
 import net.datasa.finders.repository.ProjectRequiredSkillRepository;
+import net.datasa.finders.repository.TaskManagementRepository;
 import net.datasa.finders.repository.TeamRepository;
 import net.datasa.finders.repository.WorkScopeRepository;
 
@@ -51,6 +53,8 @@ public class ProjectManagementService {
     private final ProjectCategoryRepository categoryRepository;
     private final ProjectRequiredSkillRepository skillRepository;
     private final PrequalificationQuestionRepository prequalificationQuestionRepository;
+    private final FunctionTitleRepository functionTitleRepository;
+    private final TaskManagementRepository taskManagementRepository;
 
     public List<ProjectPublishingDTO> getMyList(String id) {
         
@@ -146,6 +150,101 @@ public class ProjectManagementService {
         dto.setPrequalificationQuestions(questionTexts);
 
         return dto;
+    }
+    
+    public FunctionTitleDTO saveFunction(String functionTitleName) {
+    	FunctionTitleEntity functionTitleEntity = FunctionTitleEntity.builder()
+                .titleName(functionTitleName)
+                .build();
+        
+        functionTitleRepository.save(functionTitleEntity);
+        
+        return new FunctionTitleDTO(functionTitleEntity.getFunctionTitleId(), functionTitleEntity.getTitleName());
+	}
+    
+    public List<FunctionTitleDTO> getAllFunctionTitles() {
+        List<FunctionTitleEntity> entities = functionTitleRepository.findAll();
+        return entities.stream()
+                .map(entity -> new FunctionTitleDTO(entity.getFunctionTitleId(), entity.getTitleName()))
+                .collect(Collectors.toList());
+    }
+    
+    private LocalDate parseDate(String date) {
+        try {
+            return LocalDate.parse(date);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format: " + date, e);
+        }
+    }
+
+	public TaskManagementDTO saveTask(int projectNum, TaskManagementDTO taskDTO) {
+		
+		ProjectPublishingEntity projectPublishing = projectPublishingRepository.findById(projectNum)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
+		
+		MemberEntity member = memberRepository.findById(taskDTO.getFreelancerId())
+                .orElseThrow(() -> new EntityNotFoundException("프리랜서 회원 아이디가 없습니다."));
+		
+		FunctionTitleEntity functionTitle = taskDTO.getFunctionTitleId() != null
+                ? functionTitleRepository.findById(taskDTO.getFunctionTitleId())
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 기능 분류 항목입니다."))
+                : null;
+		
+		TaskStatus status = TaskStatus.valueOf(taskDTO.getTaskStatus().toUpperCase());
+		TaskPriority priority = TaskPriority.valueOf(taskDTO.getTaskPriority().toUpperCase());
+		LocalDate startDate = parseDate(taskDTO.getTaskStartDate());
+        LocalDate endDate = parseDate(taskDTO.getTaskEndDate());
+		
+		TaskManagementEntity taskManagementEntity = TaskManagementEntity.builder()
+				.projectPublishingEntity(projectPublishing)
+				.memberEntity(member)
+				.functionTitleEntity(functionTitle)
+				.taskTitle(taskDTO.getTaskTitle())
+				.taskDescription(taskDTO.getTaskDescription())
+				.taskStatus(status)
+				.taskPriority(priority)
+				.taskStartDate(startDate) // 변환된 LocalDate 사용
+				.taskEndDate(endDate)     // 변환된 LocalDate 사용
+				.build();
+
+        taskManagementRepository.save(taskManagementEntity);
+		
+        return taskDTO;
+	}
+
+	public List<TaskManagementDTO> getTasks(int projectNum) {
+		// 프로젝트 번호로 업무를 조회
+        List<TaskManagementEntity> tasks = taskManagementRepository.findByProjectPublishingEntity_ProjectNum(projectNum);
+        
+        // DTO 리스트로 변환
+        return tasks.stream()
+                .map(task -> {
+                    // FunctionTitleEntity가 존재하는 경우 functionTitleId와 functionTitleName 가져오기
+                    Integer functionTitleId = (task.getFunctionTitleEntity() != null) ? task.getFunctionTitleEntity().getFunctionTitleId() : null;
+                    String functionTitleName = (task.getFunctionTitleEntity() != null) ? task.getFunctionTitleEntity().getTitleName() : null;
+
+                    // MemberEntity가 존재하는 경우 freelancerId 가져오기
+                    String freelancerId = (task.getMemberEntity() != null) ? task.getMemberEntity().getMemberId() : null;
+
+                    // ProjectPublishingEntity가 존재하는 경우 projectNumber 가져오기
+                    Integer projectNumber = (task.getProjectPublishingEntity() != null) ? task.getProjectPublishingEntity().getProjectNum() : null;
+
+                    // TaskManagementDTO 객체 생성
+                    return new TaskManagementDTO(
+                        task.getTaskId(), // 업무 ID
+                        projectNumber, // 프로젝트 번호
+                        freelancerId, // 프리랜서 ID
+                        functionTitleId, // 기능 제목 ID
+                        functionTitleName, // 기능 제목 이름
+                        task.getTaskTitle(), // 업무 제목
+                        task.getTaskDescription(), // 업무 설명
+                        task.getTaskStatus().name(), // 업무 상태 (Enum을 문자열로 변환)
+                        task.getTaskPriority().name(), // 업무 우선순위 (Enum을 문자열로 변환)
+                        task.getTaskStartDate().toString(), // 업무 시작 날짜 (LocalDate를 문자열로 변환)
+                        task.getTaskEndDate().toString() // 업무 종료 날짜 (LocalDate를 문자열로 변환)
+                    );
+                })
+                .collect(Collectors.toList()); // 변환된 DTO 리스트를 반환
     }
     
     

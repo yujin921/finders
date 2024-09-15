@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+	/*
     // 업무 등록 버튼 이벤트 리스너
     const addTaskButton = document.getElementById('add-task-button');
     if (addTaskButton) {
@@ -152,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         taskTableBody.appendChild(newRow);
     }
+	*/
 
     // 캘린더 로드
     function loadCalendar() {
@@ -159,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const calendarEl = document.getElementById('calendar');
         if (!calendarEl) return;
-
+		
         calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             headerToolbar: {
@@ -212,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 일정 추가 모달 열기
     function openEventModal(dateStr) {
+		
         const eventModal = document.getElementById('event-modal');
         const eventForm = document.getElementById('event-form');
 
@@ -227,11 +230,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // 기존의 이벤트 리스너를 제거하고 새로운 리스너를 추가
         eventForm.removeEventListener('submit', handleEventFormSubmit);
         eventForm.addEventListener('submit', handleEventFormSubmit);
+
     }
 
     // 이벤트 폼 제출 핸들러
     function handleEventFormSubmit(event) {
         event.preventDefault();
+		
         const title = document.getElementById('event-title').value;
         const type = document.getElementById('event-type').value;
         const startDate = document.getElementById('event-start-date').value;
@@ -239,6 +244,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const startTime = document.getElementById('event-start-time').value;
         const endTime = document.getElementById('event-end-time').value;
 
+		console.log(`Event submitted - Title: ${title}, Type: ${type}, Start Date: ${startDate}, End Date: ${endDate}, Start Time: ${startTime}, End Time: ${endTime}`);
+		
         if (title && startDate && endDate) {
             let startDateTime, endDateTime;
 

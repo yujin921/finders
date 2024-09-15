@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +12,246 @@
     <link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css">
     <link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css"/>
     <!-- Custom 스타일 시트 -->
-    <link rel="stylesheet" href="/css/management.css">
+    <link rel="stylesheet" th:href="@{/css/management.css}">
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script>
+	    $(document).ready(function() {
+	        let funcTitleId = null; // 전역 변수 초기화
+	
+	        // 업무 등록 버튼 클릭 시 모달 창 열기
+	        $('#add-task-button').on('click', function() {
+	            $('#task-modal').removeClass('hidden').show();
+	            $('#task-form')[0].reset(); // 폼 초기화
+	
+	            // 첫 번째 업무 등록 여부 확인
+	            const isFirstTask = !localStorage.getItem('firstTaskRegistered');
+	
+	            // 기능 분류 목록 로드
+	            loadFunctionTitles(isFirstTask);
+	
+	            // 첫 번째 업무 등록 이후 상태 저장
+	            if (isFirstTask) {
+	                localStorage.setItem('firstTaskRegistered', 'true');
+	            }
+	        });
+	
+	        // 모달 닫기 버튼 클릭 시
+	        $('#close-task-modal').on('click', function() {
+	            $('#task-modal').addClass('hidden').hide();
+	        });
+	
+	        // URL에서 쿼리 파라미터를 추출하는 함수
+	        function getQueryParam(param) {
+	            const urlParams = new URLSearchParams(window.location.search);
+	            return urlParams.get(param);
+	        }
+	
+	        // 페이지 로드 시 projectNum 값을 추출하여 input 태그에 설정
+	        const projectNum = getQueryParam('projectNum');
+	        if (projectNum) {
+	            $('#project-num').val(projectNum);
+	        }
+	
+	        console.log("projectNum 체크용: ", projectNum);
+	
+	        // 기능 분류 목록 로드 함수
+	        function loadFunctionTitles(isFirstTask) {
+	            $.ajax({
+	                url: 'loadFunctionTitles',
+	                type: 'get',
+	                success: function(response) {
+	                    const $select = $('#function-select');
+	                    $select.empty().append('<option value="">기존 기능 선택</option>');
+	                    response.forEach(function(item) {
+	                        $select.append(`<option value="${item.functionTitleId}">${item.titleName}</option>`);
+	                    });
+	
+	                    if (isFirstTask) {
+	                        // 첫 번째 업무 등록 시
+	                        $('#function-select').hide();
+	                        $('#new-function-name').show();
+	                        $('#add-new-function-btn').show();
+	                    } else {
+	                        // 두 번째 이후 업무 등록 시
+	                        $('#function-select').show();
+	                        $('#new-function-name').show();
+	                        $('#add-new-function-btn').show();
+	                    }
+	                },
+	                error: function() {
+	                    alert('기능 분류 목록을 불러오는 데 실패했습니다.');
+	                }
+	            });
+	        }
+	
+	        // 기능 분류 선택에 따라 새 기능 입력 필드 표시/숨기기
+	        $('#function-select').on('change', function() {
+	            if ($(this).val() === '') {
+	                $('#new-function-name').show();
+	                $('#add-new-function-btn').show(); // 새 기능 추가 버튼 표시
+	            } else {
+	                $('#new-function-name').hide();
+	                $('#add-new-function-btn').hide(); // 새 기능 추가 버튼 숨기기
+	            }
+	            // 선택한 기능 분류 ID를 전역 변수에 저장
+	            funcTitleId = $(this).val();
+	        });
+	
+	        // 새 기능 추가 버튼 클릭 시
+	        $('#add-new-function-btn').on('click', function() {
+	            const newFunctionName = $('#new-function-name').val();
+	            
+	            console.log("newFunctionName check용: ", newFunctionName);
+	            
+	            if (newFunctionName.trim() === '') {
+	                alert('기능 이름을 입력해 주세요.');
+	                return;
+	            }
+	            
+	            $.ajax({
+	                url: 'saveFunction',
+	                type: 'post',
+	                data: JSON.stringify({ titleName: newFunctionName }), // JSON 객체의 key가 DTO의 필드 이름과 일치해야 함.
+	                contentType: 'application/json',
+	                dataType: 'json',
+	                success: function(response) {
+	                	console.log('서버 응답:', response); // 응답 내용 로그
+	                	
+	                    // 응답에서 functionTitleId를 가져옴
+	                    const newFuncTitleId = response.functionTitleId;
+	                    
+	                    // 새 기능 추가 후 기능 분류 목록 갱신
+	                    $('#function-select').append(`<option value="${newFuncTitleId}">${newFunctionName}</option>`);
+	                    $('#function-select').val(newFuncTitleId); // 새로 추가한 기능을 선택된 값으로 설정
+	                    $('#new-function-name').hide();
+	                    $('#add-new-function-btn').hide();
+	                    alert('새 기능이 추가되었습니다.');
+	                    
+	                    // 선택한 기능 분류 ID를 전역 변수에 저장
+	                    funcTitleId = newFuncTitleId;
+	                },
+	                error: function() {
+	                    alert('새 기능 추가에 실패했습니다.');
+	                }
+	            });
+	        });
+	
+	        // 폼 제출 이벤트 핸들러
+	        $('#task-form').on('submit', function(event) {
+	            event.preventDefault();
+	
+	            const newFunctionName = $('#new-function-name').val();
+	            const taskData = {
+	                functionTitleId: funcTitleId ? funcTitleId : null, // 전역 변수 사용
+	                functionTitleName: newFunctionName,
+	                taskTitle: $('#task-title').val(),
+	                taskDescription: $('#task-description').val(),
+	                taskStatus: $('#task-status').val(),
+	                taskPriority: $('#task-priority').val(),
+	                taskStartDate: $('#task-start-date').val(),
+	                taskEndDate: $('#task-end-date').val(),
+	                freelancerId: $('#task-assignee').val()
+	            };
+	            
+	            console.log('taskData 체크용: ', taskData)
+	
+	            $.ajax({
+	                url: 'saveTask?projectNum=' + projectNum, // URL 쿼리 파라미터로 전송
+	                type: 'post',
+	                contentType: 'application/json', // JSON 형식으로 데이터 전송
+	                data: JSON.stringify(taskData), // 데이터는 JSON 문자열로 변환
+	                dataType: 'json',
+	                success: function(response) {
+	                    // 새 기능 추가 후 기능 분류 목록 갱신
+	                    if (newFunctionName.trim() !== '') {
+	                        $('#function-select').append(`<option value="${response.functionTitleId}">${newFunctionName}</option>`);
+	                        $('#function-select').val(response.functionTitleId);
+	                        $('#new-function-name').hide();
+	                        $('#add-new-function-btn').hide();
+	                    }
+	
+	                    alert('업무가 성공적으로 등록되었습니다.');
+	                    $('#task-modal').addClass('hidden').hide();
+	                    // TODO: 업무 목록 업데이트
+	                },
+	                error: function() {
+	                    alert('업무 등록에 실패했습니다.');
+	                }
+	            });
+	        });
+	        
+	     	// 프로젝트 번호로 업무를 조회하여 리스트를 로드하는 함수
+	        function loadTasks() {
+	            $.ajax({
+	                url: 'getTasks',
+	                type: 'get',
+	                data: { projectNum: projectNum }, // 쿼리 파라미터로 projectNum 전송
+	                success: function(response) {
+	                    // 응답에서 업무 리스트를 처리
+	                    console.log('업무 목록:', response);
+
+	                    // 업무 목록을 화면에 표시
+	                    const $taskList = $('#task-list');
+	                    $taskList.empty(); // 기존 목록 초기화
+
+	                    if (response.length === 0) {
+	                        $taskList.append('<p>업무가 없습니다.</p>');
+	                    } else {
+	                        // 테이블 생성
+	                        const table = $('<table></table>').addClass('task-table');
+	                        const thead = $('<thead></thead>');
+	                        const tbody = $('<tbody></tbody>');
+
+	                        // 테이블 헤더 생성
+	                        thead.append(`
+	                            <tr>
+	                                <th>업무 제목</th>
+	                                <th>설명</th>
+	                                <th>상태</th>
+	                                <th>우선순위</th>
+	                                <th>시작 날짜</th>
+	                                <th>종료 날짜</th>
+	                                <th>기능 제목 ID</th>
+	                                <th>기능 제목 이름</th>
+	                                <th>프리랜서 ID</th>
+	                            </tr>
+	                        `);
+
+	                        // 테이블 바디 생성
+	                        response.forEach(task => {
+	                            const row = $(`
+	                                <tr>
+	                                    <td>${task.taskTitle}</td>
+	                                    <td>${task.taskDescription}</td>
+	                                    <td>${task.taskStatus}</td>
+	                                    <td>${task.taskPriority}</td>
+	                                    <td>${task.taskStartDate}</td>
+	                                    <td>${task.taskEndDate}</td>
+	                                    <td>${task.functionTitleId}</td>
+	                                    <td>${task.functionTitleName}</td>
+	                                    <td>${task.freelancerId}</td>
+	                                </tr>
+	                            `);
+	                            tbody.append(row);
+	                        });
+
+	                        // 테이블에 헤더와 바디 추가
+	                        table.append(thead).append(tbody);
+	                        $taskList.append(table);
+	                    }
+	                },
+	                error: function() {
+	                    alert('업무 목록을 불러오는 데 실패했습니다.');
+	                }
+	            });
+	        }
+
+	        // 페이지 로드 시 업무 목록 로드
+	        if (projectNum) {
+	            loadTasks();
+	        }
+	    });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -45,19 +286,11 @@
             <section class="content">
                 <div id="task-content" class="tab-content active">
                     <button id="add-task-button">업무 등록</button>
-                    <table id="task-table">
-                        <thead>
-                            <tr>
-                                <th>업무명</th>
-                                <th>상태</th>
-                                <th>우선순위</th>
-                                <th>담당자</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- 업무 내용이 동적으로 추가됨 -->
-                        </tbody>
-                    </table>
+                    <div id="task-table">
+                        <div id="task-list">
+    						<!-- 업무 목록이 여기에 추가됩니다 -->
+						</div>
+                    </div>
                 </div>
                 <div id="feed-content" class="tab-content">피드 내용</div>
                 <div id="gantt-content" class="tab-content">
@@ -83,6 +316,71 @@
                 </div>
             </section>
         </main>
+    </div>
+    
+    <!-- 업무 등록 Modal 창 -->
+    <div id="task-modal" class="modal task-modal hidden">
+        <div class="modal-content">
+            <h3>업무 등록</h3>
+            <form id="task-form">
+                <input type="hidden" id="project-num" name="projectNum" readonly> <!-- projectNum 값을 동적으로 설정할 태그 -->
+            
+                <!-- 기능 분류 선택 및 새 기능 추가 -->
+                <div class="form-group">
+                    <label for="function-select">기능 분류</label>
+                    <select id="function-select">
+                        <option value="">새 기능 추가</option>
+                        <!-- 기능 분류 목록이 여기에 동적으로 삽입됩니다 -->
+                    </select>
+                    
+                    <input type="text" id="new-function-name" placeholder="새 기능 입력" style="display: none;">
+                    <button type="button" id="add-new-function-btn" style="display: none;">확인</button>
+                </div>
+                <div class="form-group">
+                    <label for="task-title">업무명</label>
+                    <input type="text" id="task-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">업무 설명</label>
+                    <textarea id="task-description" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-start-date">시작 날짜</label>
+                    <input type="date" id="task-start-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-end-date">종료 날짜</label>
+                    <input type="date" id="task-end-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-status">상태</label>
+                    <select id="task-status" required>
+                        <option value="request">요청</option>
+                        <option value="in_progress">진행</option>
+                        <option value="feedback">피드백</option>
+                        <option value="completed">완료</option>
+                        <option value="hold">보류</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">우선순위</label>
+                    <select id="task-priority" required>
+                        <option value="low">낮음</option>
+                        <option value="medium">보통</option>
+                        <option value="high">높음</option>
+                        <option value="emergency">긴급</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-assignee">담당자</label>
+                    <input type="text" id="task-assignee" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-close" id="close-task-modal">취소</button>
+                    <button type="submit" class="btn-save">저장</button>
+                </div>
+            </form>
+        </div>
     </div>
     
     <!-- 캘린더 일정 추가 Modal 창 -->
