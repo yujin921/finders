@@ -85,11 +85,12 @@
             <td th:text="${project.projectName}">프로젝트 A</td>
             <td>
                 <!-- 후기 작성 버튼: freelancerreview 페이지로 이동 -->
-                <a th:href="@{/project/freelancerreview(projectNum=${project.projectNum})}" class="button">후기 작성</a>
+  			 <a th:href="@{/review/writefreelancerreview(projectNum=${project.projectNum})}" class="button">후기 작성</a>
             </td>
         </tr>
         </tbody>
     </table>
 </div>
 </body>
+
 </html>

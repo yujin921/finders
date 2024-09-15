@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,9 +31,15 @@ public class ReviewController {
     private final FreelancerReviewService freelancerReviewService;
    
     @PostMapping("/submitReview")
-    public ResponseEntity<String> submitReview(@RequestBody FreelancerReviewDTO reviewDTO) {
+    public ResponseEntity<String> submitReview(
+            @RequestBody FreelancerReviewDTO reviewDTO, 
+            @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            // createFreelancerReview로 호출 변경
+            // 클라이언트 ID를 UserDetails에서 가져와 설정
+            String clientId = userDetails.getUsername();
+            reviewDTO.setClientId(clientId); // DTO에 클라이언트 ID 설정
+
+            // createFreelancerReview 호출
             reviewService.createFreelancerReview(reviewDTO);
             return ResponseEntity.ok("리뷰가 성공적으로 저장되었습니다.");
         } catch (Exception e) {
@@ -40,6 +47,7 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 저장 실패");
         }
     }
+
 
     @GetMapping("/getReviewData")
     public ResponseEntity<FreelancerReviewDTO> getReviewData(
@@ -73,4 +81,6 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("프리랜서 목록을 가져오는 중 오류가 발생했습니다.");
         }
     }
+    
+    
 }
