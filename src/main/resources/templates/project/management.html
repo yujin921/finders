@@ -181,75 +181,83 @@
 	        });
 	        
 	     	// 프로젝트 번호로 업무를 조회하여 리스트를 로드하는 함수
-	        function loadTasks() {
-	            $.ajax({
-	                url: 'getTasks',
-	                type: 'get',
-	                data: { projectNum: projectNum }, // 쿼리 파라미터로 projectNum 전송
-	                success: function(response) {
-	                    // 응답에서 업무 리스트를 처리
-	                    console.log('업무 목록:', response);
+            function loadTasks() {
+                $.ajax({
+                    url: 'getTasks',
+                    type: 'get',
+                    data: { projectNum: projectNum }, // 쿼리 파라미터로 projectNum 전송
+                    success: function(response) {
+                        console.log('업무 목록:', response);
 
-	                    // 업무 목록을 화면에 표시
-	                    const $taskList = $('#task-list');
-	                    $taskList.empty(); // 기존 목록 초기화
+                        const $taskList = $('#task-list');
+                        $taskList.empty(); // 기존 목록 초기화
 
-	                    if (response.length === 0) {
-	                        $taskList.append('<p>업무가 없습니다.</p>');
-	                    } else {
-	                        // 테이블 생성
-	                        const table = $('<table></table>').addClass('task-table');
-	                        const thead = $('<thead></thead>');
-	                        const tbody = $('<tbody></tbody>');
+                        if (response.length === 0) {
+                            $taskList.append('<p>업무가 없습니다.</p>');
+                        } else {
+                            const uniqueFunctionTitles = [...new Set(response.map(task => task.functionTitleName))];
 
-	                        // 테이블 헤더 생성
-	                        thead.append(`
-	                            <tr>
-	                                <th>업무 제목</th>
-	                                <th>설명</th>
-	                                <th>상태</th>
-	                                <th>우선순위</th>
-	                                <th>시작 날짜</th>
-	                                <th>종료 날짜</th>
-	                                <th>기능 제목 ID</th>
-	                                <th>기능 제목 이름</th>
-	                                <th>프리랜서 ID</th>
-	                            </tr>
-	                        `);
+                            uniqueFunctionTitles.forEach(title => {
+                                const filteredTasks = response.filter(task => task.functionTitleName === title);
 
-	                        // 테이블 바디 생성
-	                        response.forEach(task => {
-	                            const row = $(`
-	                                <tr>
-	                                    <td>${task.taskTitle}</td>
-	                                    <td>${task.taskDescription}</td>
-	                                    <td>${task.taskStatus}</td>
-	                                    <td>${task.taskPriority}</td>
-	                                    <td>${task.taskStartDate}</td>
-	                                    <td>${task.taskEndDate}</td>
-	                                    <td>${task.functionTitleId}</td>
-	                                    <td>${task.functionTitleName}</td>
-	                                    <td>${task.freelancerId}</td>
-	                                </tr>
-	                            `);
-	                            tbody.append(row);
-	                        });
+                                if (filteredTasks.length > 0) {
+                                    const dropdownContainer = $('<div class="dropdown-container"></div>');
+                                    const dropdownToggle = $(`<button class="dropdown-toggle">${title}</button>`);
+                                    const dropdownContent = $('<div class="dropdown-content"></div>');
 
-	                        // 테이블에 헤더와 바디 추가
-	                        table.append(thead).append(tbody);
-	                        $taskList.append(table);
-	                    }
-	                },
-	                error: function() {
-	                    alert('업무 목록을 불러오는 데 실패했습니다.');
-	                }
-	            });
-	        }
+                                    const table = $('<table class="task-table"></table>');
+                                    const thead = $(`<thead>
+                                        <tr>
+                                            <th>업무 제목</th>
+                                            <th>설명</th>
+                                            <th>상태</th>
+                                            <th>우선순위</th>
+                                            <th>시작 날짜</th>
+                                            <th>종료 날짜</th>
+                                            <th>프리랜서 ID</th>
+                                        </tr>
+                                    </thead>`);
+                                    const tbody = $('<tbody></tbody>');
 
-	        // 페이지 로드 시 업무 목록 로드
-	        if (projectNum) {
-	            loadTasks();
-	        }
+                                    filteredTasks.forEach(task => {
+                                        tbody.append(`
+                                            <tr>
+                                                <td>${task.taskTitle}</td>
+                                                <td>${task.taskDescription}</td>
+                                                <td>${task.taskStatus}</td>
+                                                <td>${task.taskPriority}</td>
+                                                <td>${task.taskStartDate}</td>
+                                                <td>${task.taskEndDate}</td>
+                                                <td>${task.freelancerId}</td>
+                                            </tr>
+                                        `);
+                                    });
+
+                                    table.append(thead).append(tbody);
+                                    dropdownContent.append(table);
+                                    dropdownContainer.append(dropdownToggle).append(dropdownContent);
+                                    $taskList.append(dropdownContainer);
+                                }
+                            });
+
+                         	// 드롭다운 메뉴 클릭 시 열리고 닫히는 기능
+                            $('.dropdown-toggle').on('click', function() {
+                                const $content = $(this).siblings('.dropdown-content');
+                                $content.slideToggle(); // 클릭한 메뉴 열기/닫기
+                            });
+
+                            // 페이지 로드 시 모든 드롭다운 메뉴 열기
+                            $('.dropdown-content').show();
+                        }
+                    },
+                    error: function() {
+                        alert('업무 목록을 불러오는 데 실패했습니다.');
+                    }
+                });
+            }
+
+            // 페이지 로드 시 업무 목록을 불러옴
+            loadTasks();
 	    });
     </script>
 </head>
@@ -286,11 +294,32 @@
             <section class="content">
                 <div id="task-content" class="tab-content active">
                     <button id="add-task-button">업무 등록</button>
-                    <div id="task-table">
-                        <div id="task-list">
-    						<!-- 업무 목록이 여기에 추가됩니다 -->
-						</div>
-                    </div>
+                    
+                    <div id="task-list">
+					    <div class="dropdown-container">
+					        <button class="dropdown-toggle">기능 제목</button>
+					        <div class="dropdown-content">
+					            <table class="task-table">
+					                <thead>
+					                    <tr>
+					                        <th>업무 제목</th>
+					                        <th>설명</th>
+					                        <th>상태</th>
+					                        <th>우선순위</th>
+					                        <th>시작 날짜</th>
+					                        <th>종료 날짜</th>
+					                        <th>프리랜서 ID</th>
+					                    </tr>
+					                </thead>
+					                <tbody>
+					                    <!-- 업무 목록이 여기에 추가됩니다 -->
+					                </tbody>
+					            </table>
+					        </div>
+					    </div>
+					    <!-- 추가 드롭다운 컨테이너... -->
+					</div>
+                    
                 </div>
                 <div id="feed-content" class="tab-content">피드 내용</div>
                 <div id="gantt-content" class="tab-content">
