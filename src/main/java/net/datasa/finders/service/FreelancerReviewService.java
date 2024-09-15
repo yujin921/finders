@@ -5,11 +5,16 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import net.datasa.finders.domain.dto.FreelancerDataDTO;
+import net.datasa.finders.domain.dto.FreelancerReviewDTO;
+import net.datasa.finders.domain.dto.ReviewItemDTO;
+import net.datasa.finders.domain.entity.FreelancerReviewItemEntity;
+import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.repository.FreelancerReviewsRepository;
@@ -18,10 +23,11 @@ import net.datasa.finders.repository.MemberRepository;
 @Service
 @RequiredArgsConstructor
 public class FreelancerReviewService {
-
+	@Autowired
     private static final Logger logger = LoggerFactory.getLogger(FreelancerReviewService.class);
     private final MemberRepository memberRepository;
     private final FreelancerReviewsRepository reviewRepository;  // 추가된 부분
+    
 
     /**
      * 특정 프로젝트에 참여 중인 프리랜서 목록을 조회합니다.
@@ -58,4 +64,39 @@ public class FreelancerReviewService {
         // return calculatedRating;
         return 0.0; // 예시로 빈 값을 반환하고 실제 로직을 작성합니다.
     }
+    
+    
+ 
+
+    // 프리랜서가 받은 리뷰 목록을 가져오는 메서드
+    public List<FreelancerReviewDTO> getReceivedReviews(String freelancerId) {
+        // 프리랜서 ID를 사용하여 리뷰를 조회하고 DTO로 변환
+        return reviewRepository.findByFreelancerId(freelancerId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+ // Entity를 DTO로 변환하는 메서드
+    private FreelancerReviewDTO convertToDTO(FreelancerReviewsEntity entity) {
+        return FreelancerReviewDTO.builder()
+                .reviewId(entity.getReviewId())
+                .projectNum(entity.getProjectNum())
+                .clientId(entity.getClientId())
+                .freelancerId(entity.getFreelancerId())
+                .rating(entity.getRating())
+                .comment(entity.getComment())
+                .reviewDate(entity.getReviewDate())
+                .reviewItems(entity.getReviewItems().stream()
+                        .map(this::convertReviewItemToDTO) // Entity를 DTO로 변환
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    private ReviewItemDTO convertReviewItemToDTO(FreelancerReviewItemEntity entity) {
+        return ReviewItemDTO.builder()
+                .itemName(entity.getItemName())
+                .selected(entity.isItemValue()) // boolean으로 설정
+                .build();
+    }
+
 }

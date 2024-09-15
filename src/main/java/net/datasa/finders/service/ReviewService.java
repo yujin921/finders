@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.controller.ReviewController;
 import net.datasa.finders.domain.dto.FreelancerDataDTO;
 import net.datasa.finders.domain.dto.FreelancerReviewDTO;
 import net.datasa.finders.domain.dto.ReviewItemDTO;
@@ -125,6 +124,17 @@ public class ReviewService {
             .build();
     }
 
-
+    // 평균 평점을 계산하는 메소드
+    public double calculateAverageRating() {
+        List<FreelancerReviewsEntity> reviews = reviewRepository.findAll();
+        if (reviews.isEmpty()) {
+            return 0.0;
+        }
+        double totalRating = 0;
+        for (FreelancerReviewsEntity review : reviews) {
+            totalRating += review.getRating();
+        }
+        return totalRating / reviews.size();
+    }
 
 }

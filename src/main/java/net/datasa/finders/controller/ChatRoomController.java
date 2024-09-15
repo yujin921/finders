@@ -68,6 +68,12 @@ public class ChatRoomController {
         model.addAttribute("chatrooms", chatRooms);
         return "chat/chatrooms"; // chatrooms.html로 이동
     }
+    
+	@GetMapping("view")
+    public String chatview() {
+		
+        return "/chat/view";
+    }
 
 //    @GetMapping("/create")
 //    public String createChatRoomPage(Model model) {

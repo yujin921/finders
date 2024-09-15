@@ -44,11 +44,6 @@ public class ProjectController {
 	}
 
 
-	@GetMapping("view2")
-    public String protfolio2() {
-		
-        return "/project/view2";
-    }
 	
 	@GetMapping("management")
     public String management() {
@@ -56,13 +51,5 @@ public class ProjectController {
         return "/project/management";
     }
 	
-	@GetMapping("freelancerreview")
-	public String freelancerReview(@RequestParam("projectNum") int projectNum, Model model) {
-	    // 프로젝트 번호를 이용해 필요한 데이터를 가져와서 모델에 추가
-	    model.addAttribute("projectNum", projectNum);
-	    // 다른 필요한 데이터도 추가 가능
 
-	    // freelancerreview 페이지로 이동
-	    return "/project/freelancerreview";
-	}
 }
