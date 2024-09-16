@@ -1,64 +1,39 @@
 package net.datasa.finders.service;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.persistence.EntityNotFoundException;
-import net.datasa.finders.domain.dto.ProjectPublishingDTO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.entity.ChatRoomEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
-import net.datasa.finders.domain.entity.PrequalificationQuestionEntity;
-import net.datasa.finders.domain.entity.ProjectCategoryEntity;
 import net.datasa.finders.domain.entity.ProjectEntity;
-import net.datasa.finders.domain.entity.ProjectPublishingEntity;
-import net.datasa.finders.domain.entity.ProjectRequiredSkillEntity;
-import net.datasa.finders.domain.entity.RoleName;
-import net.datasa.finders.domain.entity.WorkScopeEntity;
 import net.datasa.finders.repository.ChatRoomRepository;
+import net.datasa.finders.repository.FunctionTitleRepository;
 import net.datasa.finders.repository.MemberRepository;
 import net.datasa.finders.repository.PrequalificationQuestionRepository;
 import net.datasa.finders.repository.ProjectCategoryRepository;
 import net.datasa.finders.repository.ProjectPublishingRepository;
 import net.datasa.finders.repository.ProjectRepository;
 import net.datasa.finders.repository.ProjectRequiredSkillRepository;
+import net.datasa.finders.repository.TaskManagementRepository;
+import net.datasa.finders.repository.TeamRepository;
 import net.datasa.finders.repository.WorkScopeRepository;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
+@Transactional
 public class ProjectService {
+	
+    private final MemberRepository memberRepository;
+    private final ProjectRepository projectRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatParticipantService chatParticipantService;
 
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private ProjectRepository projectRepository;
-
-    @Autowired
-    private ChatRoomRepository chatRoomRepository;
-
-    @Autowired
-    private ChatParticipantService chatParticipantService;
-
-    @Transactional
     public void addMemberToProject(String userId, int projectNum) {
         // 사용자와 프로젝트 엔티티 조회
         MemberEntity member = memberRepository.findById(userId)
@@ -97,7 +72,6 @@ public class ProjectService {
         return !members.isEmpty();
     }
 
-    @Transactional
     public List<ProjectEntity> getProjectsByMemberId(String memberId) {
         try {
             System.out.println("getProjectsByMemberId method called with memberId: " + memberId);
@@ -115,5 +89,4 @@ public class ProjectService {
         }
     }
     
-
 }

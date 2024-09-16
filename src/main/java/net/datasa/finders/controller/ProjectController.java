@@ -41,15 +41,6 @@ public class ProjectController {
 
 	    model.addAttribute("projects", projects);
 	    return "/project/list";
-	}
-
-
-	
-	@GetMapping("management")
-    public String management() {
-		
-        return "/project/management";
-    }
-	
+	}	
 
 }
