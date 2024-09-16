@@ -172,7 +172,9 @@
 	
 	                    alert('업무가 성공적으로 등록되었습니다.');
 	                    $('#task-modal').addClass('hidden').hide();
-	                    // TODO: 업무 목록 업데이트
+	                    
+	                 	// 업무 목록 업데이트
+	                    loadTasks();
 	                },
 	                error: function() {
 	                    alert('업무 등록에 실패했습니다.');
@@ -362,24 +364,24 @@
                         <!-- 기능 분류 목록이 여기에 동적으로 삽입됩니다 -->
                     </select>
                     
-                    <input type="text" id="new-function-name" placeholder="새 기능 입력" style="display: none;">
+                    <input type="text" id="new-function-name" placeholder="새 기능 입력" style="display: none;" autocomplete='off'>
                     <button type="button" id="add-new-function-btn" style="display: none;">확인</button>
                 </div>
                 <div class="form-group">
                     <label for="task-title">업무명</label>
-                    <input type="text" id="task-title" required>
+                    <input type="text" id="task-title" autocomplete='off' required>
                 </div>
                 <div class="form-group">
                     <label for="task-description">업무 설명</label>
-                    <textarea id="task-description" rows="4" required></textarea>
+                    <textarea id="task-description" rows="4" autocomplete='off' required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="task-start-date">시작 날짜</label>
-                    <input type="date" id="task-start-date" required>
+                    <input type="date" id="task-start-date" autocomplete='off' required>
                 </div>
                 <div class="form-group">
                     <label for="task-end-date">종료 날짜</label>
-                    <input type="date" id="task-end-date" required>
+                    <input type="date" id="task-end-date" autocomplete='off' required>
                 </div>
                 <div class="form-group">
                     <label for="task-status">상태</label>
@@ -402,7 +404,7 @@
                 </div>
                 <div class="form-group">
                     <label for="task-assignee">담당자</label>
-                    <input type="text" id="task-assignee" required>
+                    <input type="text" id="task-assignee" autocomplete='off' required>
                 </div>
                 <div class="modal-buttons">
                     <button type="button" class="btn-close" id="close-task-modal">취소</button>
