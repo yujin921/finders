@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
+import net.datasa.finders.domain.dto.ProjectManagementDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.entity.RoleName;
@@ -130,6 +131,20 @@ public class ProjectManagementController {
             log.error("Error retrieving tasks", e);
             return Collections.emptyList();
         }
+    }
+    
+    @ResponseBody
+    @PostMapping("completeProject")
+    public String completeProject(@RequestParam("projectNum") int projectNum) {
+    	
+    	try {
+            projectManagementService.projectCompletion(projectNum);
+            return "success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "failure";
+        }
+
     }
 
     // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Controller 코드

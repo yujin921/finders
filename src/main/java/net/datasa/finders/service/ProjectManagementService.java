@@ -1,6 +1,7 @@
 package net.datasa.finders.service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -18,11 +19,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
+import net.datasa.finders.domain.dto.TaskDateRangeDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.entity.FunctionTitleEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.PrequalificationQuestionEntity;
 import net.datasa.finders.domain.entity.ProjectCategoryEntity;
+import net.datasa.finders.domain.entity.ProjectManagementEntity;
 import net.datasa.finders.domain.entity.ProjectPublishingEntity;
 import net.datasa.finders.domain.entity.ProjectRequiredSkillEntity;
 import net.datasa.finders.domain.entity.RoleName;
@@ -34,6 +37,7 @@ import net.datasa.finders.repository.FunctionTitleRepository;
 import net.datasa.finders.repository.MemberRepository;
 import net.datasa.finders.repository.PrequalificationQuestionRepository;
 import net.datasa.finders.repository.ProjectCategoryRepository;
+import net.datasa.finders.repository.ProjectManagementRepository;
 import net.datasa.finders.repository.ProjectPublishingRepository;
 import net.datasa.finders.repository.ProjectRequiredSkillRepository;
 import net.datasa.finders.repository.TaskManagementRepository;
@@ -55,6 +59,7 @@ public class ProjectManagementService {
     private final PrequalificationQuestionRepository prequalificationQuestionRepository;
     private final FunctionTitleRepository functionTitleRepository;
     private final TaskManagementRepository taskManagementRepository;
+    private final ProjectManagementRepository projectManagementRepository;
 
     public List<ProjectPublishingDTO> getMyList(String id) {
         
@@ -246,6 +251,41 @@ public class ProjectManagementService {
                 })
                 .collect(Collectors.toList()); // 변환된 DTO 리스트를 반환
     }
+
+	public void projectCompletion(int projectNum) {
+		TaskDateRangeDTO taskDateRange = taskManagementRepository.findTaskDateRangeByProjectNum(projectNum)
+                .orElseThrow(() -> new EntityNotFoundException("업무가 존재하지 않아 일정 조회가 불가합니다."));
+		
+		ProjectPublishingEntity project = projectPublishingRepository.findById(projectNum)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
+		
+		if (taskDateRange.getLatestEndDate().isAfter(project.getProjectEndDate())) {
+			// 지연 기간 계산
+            Period period = Period.between(project.getProjectEndDate(), taskDateRange.getLatestEndDate());
+            int delayedDays = period.getDays() + (period.getMonths() * 30) + (period.getYears() * 365);
+			
+			ProjectManagementEntity projectManagementEntity = ProjectManagementEntity.builder()
+					.projectPublishing(project)
+					.actualStartDate(taskDateRange.getEarliestStartDate())
+					.actualEndDate(taskDateRange.getLatestEndDate())
+					.delayedStatus(true)
+					.delayedDate(delayedDays)
+					.build();
+			
+			projectManagementRepository.save(projectManagementEntity);
+		} else {
+			ProjectManagementEntity projectManagementEntity = ProjectManagementEntity.builder()
+					.projectPublishing(project)
+					.actualStartDate(taskDateRange.getEarliestStartDate())
+					.actualEndDate(taskDateRange.getLatestEndDate())
+					.delayedStatus(false)
+					.delayedDate(0)
+					.build();
+			
+			projectManagementRepository.save(projectManagementEntity);
+		}
+		
+	}
     
     
     // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Service 코드

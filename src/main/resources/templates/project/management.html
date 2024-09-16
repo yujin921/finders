@@ -17,6 +17,18 @@
     <script>
 	    $(document).ready(function() {
 	        let funcTitleId = null; // 전역 변수 초기화
+	        
+	     	// URL에서 쿼리 파라미터를 추출하는 함수
+	        function getQueryParam(param) {
+	            const urlParams = new URLSearchParams(window.location.search);
+	            return urlParams.get(param);
+	        }
+	
+	        // 페이지 로드 시 projectNum 값을 추출하여 input 태그에 설정
+	        const projectNum = getQueryParam('projectNum');
+	        if (projectNum) {
+	            $('#project-num').val(projectNum);
+	        }
 	
 	        // 업무 등록 버튼 클릭 시 모달 창 열기
 	        $('#add-task-button').on('click', function() {
@@ -40,6 +52,7 @@
 	            $('#task-modal').addClass('hidden').hide();
 	        });
 	
+	        /*
 	        // URL에서 쿼리 파라미터를 추출하는 함수
 	        function getQueryParam(param) {
 	            const urlParams = new URLSearchParams(window.location.search);
@@ -51,6 +64,7 @@
 	        if (projectNum) {
 	            $('#project-num').val(projectNum);
 	        }
+	        */
 	
 	        console.log("projectNum 체크용: ", projectNum);
 	
@@ -257,6 +271,39 @@
                     }
                 });
             }
+	     	
+         	// 프로젝트 완료 버튼 클릭 시
+	        $('#project-completion-button').on('click', function() {
+                
+                if (!projectNum) {
+                    alert('프로젝트 번호를 찾을 수 없습니다.');
+                    return;
+                }
+                
+                console.log('프로젝트 완료 - projectNum 체크용: ', projectNum);
+	        	
+	        	$.ajax({
+	                url: 'completeProject?projectNum=' + projectNum, // URL 쿼리 파라미터로 전송
+	                type: 'post',
+	                contentType: 'application/json', // JSON 형식으로 데이터 전송
+	                data: JSON.stringify({ projectNum: projectNum }), // 데이터는 JSON 문자열로 변환
+	                dataType: 'text',
+	                success: function(response) {
+                        if (response === 'success') {
+                            alert('프로젝트가 완료되었습니다.');
+                            
+                            // 목록 화면 업데이트
+                            loadTasks();
+                        } else {
+                            alert('프로젝트 완료 처리에 실패했습니다.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', status, error);
+                        alert('서버 요청 중 오류가 발생했습니다.');
+                    }
+	        	});
+	        });
 
             // 페이지 로드 시 업무 목록을 불러옴
             loadTasks();
@@ -296,6 +343,7 @@
             <section class="content">
                 <div id="task-content" class="tab-content active">
                     <button id="add-task-button">업무 등록</button>
+                    <button id="project-completion-button">프로젝트 완료</button>
                     
                     <div id="task-list">
 					    <div class="dropdown-container">
