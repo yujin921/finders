@@ -1,13 +1,9 @@
 package net.datasa.finders.domain.dto;
 
-import java.time.LocalDate;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.datasa.finders.domain.entity.TaskPriority;
-import net.datasa.finders.domain.entity.TaskStatus;
 
 @Builder
 @Data
@@ -25,4 +21,7 @@ public class TaskManagementDTO {
     private String taskPriority;
     private String taskStartDate;
     private String taskEndDate;
+    private String actualStartDate;
+    private String actualEndDate;
+    private String taskProcessivity;
 }

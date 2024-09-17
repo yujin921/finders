@@ -25,5 +25,8 @@ public class FunctionTitleEntity {
     
     @Column(name = "title_name", nullable = false, length = 500)
     private String titleName;
+    
+    @Column(name = "function_processivity", nullable = false, columnDefinition = "DEFAULT '0%'")
+    private String functionProcessivity;
 
 }

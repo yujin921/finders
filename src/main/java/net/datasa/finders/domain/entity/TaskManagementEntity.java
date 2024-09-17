@@ -60,5 +60,13 @@ public class TaskManagementEntity {
 	
 	@Column(name = "task_end_date", nullable = false)
     private LocalDate taskEndDate;
+	
+	@Column(name = "actual_start_date")
+    private LocalDate actualStartDate;
+	
+	@Column(name = "actual_end_date")
+    private LocalDate actualEndDate;
     
+	@Column(name = "task_processivity", nullable = false, columnDefinition = "DEFAULT '0%'")
+    private String taskProcessivity;
 }

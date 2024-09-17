@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class FunctionTitleDTO {
 	private Integer functionTitleId;
     private String titleName;
+    private String functionProcessivity;
 }

@@ -2,6 +2,7 @@ package net.datasa.finders.controller;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +19,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
-import net.datasa.finders.domain.dto.ProjectManagementDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.domain.entity.TaskManagementEntity;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ProjectManagementService;
 
@@ -85,10 +86,10 @@ public class ProjectManagementController {
     
     @ResponseBody
     @GetMapping("loadFunctionTitles")
-    public ResponseEntity<List<FunctionTitleDTO>> loadFunctionTitles() {
+    public ResponseEntity<List<FunctionTitleDTO>> loadFunctionTitles(@RequestParam(name = "projectNum") int projectNum) {
         try {
             
-        	List<FunctionTitleDTO> functionTitles = projectManagementService.getAllFunctionTitles();
+        	List<FunctionTitleDTO> functionTitles = projectManagementService.getAllFunctionTitles(projectNum);
             
         	return ResponseEntity.ok(functionTitles);
         
@@ -146,6 +147,44 @@ public class ProjectManagementController {
         }
 
     }
+    
+    @ResponseBody
+    @GetMapping("getGanttChartData")
+    public Map<String, Object> getGanttChartData(@RequestParam("projectNum") int projectNum) {
+        return projectManagementService.getGanttChartData(projectNum);
+    }
+    
+    @ResponseBody
+    @GetMapping("loadEntityNames")
+    public List<?> loadEntityNames(@RequestParam("projectNum") int projectNum
+    		, @RequestParam("entityType") String entityType) {
+    	
+    	// entityType에 따라 다른 데이터 반환 로직
+        if ("task".equalsIgnoreCase(entityType)) {
+            // TaskManagementEntity 리스트 반환
+            return projectManagementService.getTasks(projectNum);
+        } else if ("function".equalsIgnoreCase(entityType)) {
+            // FunctionTitleEntity 리스트 반환
+            return projectManagementService.getFunctions(projectNum);
+        }
+        // 유효하지 않은 entityType일 경우 빈 리스트 반환
+        return Collections.emptyList();
+    }
+    
+    @ResponseBody
+    @PostMapping("updateProgress")
+    public String updateProgress(@RequestParam("entityType") String entityType,
+    							 @RequestParam("id") int dbId,
+                                 @RequestParam("progressValue") String progressValue) {
+        try {
+        	projectManagementService.updateProgress(entityType, dbId, progressValue);
+            return "success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "failure";
+        }
+    }
+    
 
     // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Controller 코드
     /*

@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const contents = document.querySelectorAll('.tab-content');
     let calendar;
 	let ganttChart; // Gantt 차트 인스턴스를 저장할 변수
-	let ganttChartData = []; // Gantt 차트 데이터 저장 변수
+	// let ganttChartData = []; // Gantt 차트 데이터 저장 변수
 	let timeline;
 	let ganttChartLoaded = false;
 	
@@ -12,12 +12,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	let endDateStr = null;
 	let startDate = null;
 	let endDate = null;
-	let startYear = null;
-	let startMonth = null;
-	let startDay = null;
-	let endYear = null;
-	let endMonth = null;
-	let endDay = null;
 	let zoomStart;
 	let zoomEnd;
 
@@ -35,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (targetId === 'calendar-content') {
                 loadCalendar();
             } else if (targetId === 'gantt-content') {
-                createGanttChart();
+				importGanttChartData();
             } else if (targetId === 'application-content') {
                 loadApplicationList();
             }
@@ -373,8 +367,403 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         return new Intl.DateTimeFormat('en-US', options).format(date);
     }
+	
+	// URL에서 쿼리 파라미터를 추출하는 함수
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
 
-	// 간트 차트 생성(로드)
+    // 페이지 로드 시 projectNum 값을 추출하여 input 태그에 설정
+    const projectNum = getQueryParam('projectNum');
+    if (projectNum) {
+        $('#project-num').val(projectNum);
+    }
+	
+	// 간트차트 데이터 로드
+	function importGanttChartData() {
+		
+		// 페이지 로드 시 자동으로 데이터 로드 및 차트 생성
+		$.ajax({
+		    url: 'getGanttChartData?projectNum=' + projectNum, // URL 쿼리 파라미터로 전송
+		    type: 'GET',
+		    dataType: 'json',
+		    success: function(response) {
+		        if (response && response.data) {
+		            if (Array.isArray(response.data)) {
+		                createGanttChart(response.data, response.adjustedStartDate, response.adjustedEndDate);
+		            } else {
+		                alert('간트 차트 데이터를 로드하는 데 실패했습니다. 데이터 형식이 올바르지 않습니다.');
+		            }
+		        } else {
+		            alert('간트 차트 데이터를 로드하는 데 실패했습니다. 서버에서 데이터를 받지 못했습니다.');
+		        }
+		    },
+		    error: function(xhr, status, error) {
+		        console.error('AJAX Error:', status, error);
+		        alert('서버 요청 중 오류가 발생했습니다.');
+		    }
+		});
+	}
+	
+	// 간트차트 생성(로드)
+	function createGanttChart(ganttChartData, adjustedStartDate, adjustedEndDate) {
+		
+		if (ganttChartLoaded) {
+			// 기존 차트가 로드되어 있으면 제거
+			ganttChart.dispose();
+		}
+
+	    anychart.onDocumentReady(function () {
+
+	        // 프로젝트 Gantt 차트 생성
+	        ganttChart = anychart.ganttProject();
+
+	        // 데이터 트리 생성
+	        let treeData = anychart.data.tree(ganttChartData, "as-tree");
+
+	        // 차트에 데이터 설정
+	        ganttChart.data(treeData);
+
+	        console.log("ganttChart 확인: ", ganttChart);
+
+	        // 분할기 위치 설정
+	        ganttChart.splitterPosition(550); // 분할기 위치를 550px로 설정하여 고정
+
+	        // 차트 데이터 그리드 링크를 가져와서 열 설정
+	        let dataGrid = ganttChart.dataGrid();
+
+	        // 첫 번째 열 설정
+	        dataGrid
+	            .column(0)
+	            .title('ID')
+	            .width(30)
+	            .labels({ hAlign: 'center' });
+				
+	        // 두 번째 열 설정
+	        dataGrid
+	            .column(1)
+	            .width(200)
+	            .labelsOverrider(labelTextSettingsFormatter);
+
+	        // 세 번째 열 설정
+	        dataGrid
+	            .column(2)
+	            .title('Planned Start')
+	            .width(150)
+	            .labelsOverrider(labelTextSettingsFormatter)
+	            .labels()
+	            .format(thirdColumnTextFormatter);
+
+	        // 네 번째 열 설정
+	        dataGrid
+	            .column(3)
+	            .title('Planned End')
+	            .width(150)
+	            .labelsOverrider(labelTextSettingsFormatter)
+	            .labels()
+	            .format(fourthColumnTextFormatter);
+
+	        // 타임라인 객체를 가져옵니다
+	        timeline = ganttChart.getTimeline();
+	        timeline.baselines().above(true); // 기준선이 행 위에 위치하도록 설정합니다
+	        timeline.milestones().preview().enabled(true); // 이정표 미리보기를 활성화합니다
+	        timeline.baselineMilestones().preview().enabled(true); // 기준선 이정표 미리보기를 활성화합니다
+
+	        // Gantt 데이터에서 시작일과 종료일 추출
+	        let chartFirstElement = ganttChartData[0];
+	        let chartLastElement = ganttChartData[ganttChartData.length - 1];
+
+	        console.log("시작일 형식: ", chartFirstElement.actualStart);
+	        console.log("종료일 형식: ", chartLastElement.children[chartLastElement.children.length - 1].actualEnd);
+
+	        // 날짜 문자열을 Date 객체로 변환 (가정: 날짜 문자열은 "YYYY-MM-DD" 형식)
+	        startDateStr = chartFirstElement.actualStart;
+	        endDateStr = chartLastElement.children[chartLastElement.children.length - 1].actualEnd;
+
+	        // 날짜 문자열을 Date 객체로 변환합니다
+	        startDate = new Date(startDateStr);
+	        endDate = new Date(endDateStr);
+
+	        // 유효한 날짜인지 확인
+	        if (isNaN(startDate.getTime())) {
+	            console.warn('유효하지 않은 시작일:', startDateStr);
+	            startDate = new Date(); // 기본값을 현재 날짜로 설정
+	        }
+	        if (isNaN(endDate.getTime())) {
+	            console.warn('유효하지 않은 종료일:', endDateStr);
+	            endDate = new Date(); // 기본값을 현재 날짜로 설정
+	        }
+
+	        // 여유 기간을 설정합니다
+	        const bufferDays = 7;
+
+	        // 날짜 문자열을 Date 객체로 변환
+	        let adjustedStartDateObj = new Date(adjustedStartDate);
+	        let adjustedEndDateObj = new Date(adjustedEndDate);
+
+	        // 날짜가 유효한지 확인
+	        if (isNaN(adjustedStartDateObj.getTime())) {
+	            console.warn('유효하지 않은 조정된 시작일:', adjustedStartDate);
+	            adjustedStartDateObj = startDate;
+	        }
+	        if (isNaN(adjustedEndDateObj.getTime())) {
+	            console.warn('유효하지 않은 조정된 종료일:', adjustedEndDate);
+	            adjustedEndDateObj = endDate;
+	        }
+
+	        // 여유 기간을 추가합니다
+	        adjustedStartDateObj.setUTCDate(adjustedStartDateObj.getUTCDate() - bufferDays);
+	        adjustedEndDateObj.setUTCDate(adjustedEndDateObj.getUTCDate() + bufferDays);
+
+	        console.log("조정된 시작일:", adjustedStartDateObj.toISOString());
+	        console.log("조정된 종료일:", adjustedEndDateObj.toISOString());
+
+	        // Gantt 차트를 HTML 컨테이너에 렌더링합니다
+	        ganttChart.container('gantt-chart'); // 컨테이너 ID를 수정하세요
+	        ganttChart.draw();
+
+	        // 날짜가 올바른지 확인하고 순서를 맞춤
+	        zoomStart = Math.min(adjustedStartDateObj.getTime(), adjustedEndDateObj.getTime());
+	        zoomEnd = Math.max(adjustedStartDateObj.getTime(), adjustedEndDateObj.getTime());
+
+	        console.log("Zoom Start:", zoomStart);
+	        console.log("Zoom End:", zoomEnd);
+
+	        // 차트의 날짜 범위를 조정합니다
+	        ganttChart.zoomTo(zoomStart, zoomEnd);
+	        timeline.scale().minimum(zoomStart);
+	        timeline.scale().maximum(zoomEnd);
+
+	        ganttChart.fitAll();
+	        ganttChartLoaded = true;
+
+	    });
+		
+		// 이름 로드 함수
+		function loadNames(projectNum, entityType) {
+			console.log(`Loading names for projectNum: ${projectNum}, entityType: ${entityType}`); // 디버깅용 로그
+			
+		    $.ajax({
+		        url: 'loadEntityNames',
+		        type: 'GET',
+		        data: { projectNum: projectNum, entityType: entityType },
+		        success: function(response) {
+					console.log('Response:', response); // 디버깅용 로그
+					
+		            const $select = $('#name-select');
+		            $select.empty().append('<option value="">선택</option>'); // 초기화 후 기본 옵션 추가
+		            response.forEach(function(item) {
+		                $select.append(`<option value="${item.functionTitleId}">${item.titleName}</option>`);
+		            });
+		        },
+		        error: function(xhr, status, error) {
+					console.error('Error:', error); // 디버깅용 로그
+					
+		            alert('이름 목록을 불러오는 데 실패했습니다.');
+		        }
+		    });
+		}
+
+		// Entity Type select box 변경 시 처리
+		$('#entityType-select').change(function() {
+		    const entityType = $(this).val();
+		    const projectNum = getQueryParam('projectNum'); // URL 쿼리 스트링에서 projectNum을 가져옴
+
+			console.log(`Entity Type Selected: ${entityType}`); // 디버깅용 로그
+			console.log(`Project Num: ${projectNum}`); // 디버깅용 로그
+			
+		    if (entityType && projectNum) {
+		        // 엔티티 유형이 선택되면, 해당 엔티티에 맞는 항목을 로드
+		        loadNames(projectNum, entityType);
+		        $('#name-select').prop('disabled', false);
+		    } else {
+		        // 엔티티 유형이 선택되지 않으면, 'Name' select box 비활성화
+		        $('#name-select').prop('disabled', true);
+		        $('#name-select').empty().append('<option value="">선택</option>');
+		    }
+		});
+
+		// 페이지 로드 시 기본값으로 'function'을 선택하여 이름을 로드
+		$(document).ready(function() {
+		    const projectNum = new URLSearchParams(window.location.search).get('projectNum');
+		    if (projectNum) {
+		        $('#entityType-select').val('function');  // 기본값으로 'function' 선택
+				loadNames(projectNum, 'function');  // 기본값으로 'function' 로드
+			}
+
+		    // Entity Type 선택 변경 시 이름 로드
+		    $('#entityType-select').change(function() {
+		        const selectedType = $(this).val();
+		        if (projectNum) {
+		            loadNames(projectNum, selectedType);
+		        }
+		    });
+		});
+
+		// 진행도 업데이트 함수
+		function updateProgress() {
+		    let ganttId = $('#name-select').val();
+		    let entityType = $('#entityType-select').val();
+		    let progressValue = $('#progress-value-input').val();
+
+		    // 입력 값 유효성 검사
+		    if (!ganttId || !entityType || !progressValue) {
+		        alert('ID, Entity Type, and Progress Value are required.');
+		        return;
+		    }
+
+		    // AJAX 요청을 통해 서버에 진행도 업데이트 요청
+		    $.ajax({
+		        url: 'updateProgress',
+		        type: 'POST',
+		        data: {
+		            entityType: entityType,
+		            id: ganttId,  // 실제 DB ID
+		            progressValue: progressValue
+		        },
+		        success: function(response) {
+		            if (response === 'success') {
+		                alert('진행도가 업데이트되었습니다.');
+
+		                // 간트차트를 새로고침하여 반영된 진행도 확인
+		                refreshGanttChart();
+		            } else {
+		                alert('진행도 업데이트에 실패했습니다.');
+		            }
+		        },
+		        error: function(xhr, status, error) {
+		            console.error('AJAX Error:', status, error);
+		            alert('서버 요청 중 오류가 발생했습니다.');
+		        }
+		    });
+		}
+		
+		// 페이지 로드 시 버튼 클릭 이벤트 리스너 추가
+		$(document).ready(function() {
+		    // 기존 이벤트 리스너를 제거하고 새로운 리스너를 추가
+		    $('#update-progress-button').off('click').on('click', updateProgress);
+		});
+
+		// 간트차트 새로고침 함수
+		function refreshGanttChart() {
+		    const projectNum = new URLSearchParams(window.location.search).get('projectNum');
+		    if (!projectNum) {
+		        alert('프로젝트 번호가 없습니다.');
+		        return;
+		    }
+
+		    $.ajax({
+		        url: 'getGanttChartData',  // 간트차트 데이터를 가져오는 API URL
+		        type: 'GET',
+		        data: { projectNum: projectNum },
+		        success: function(data) {
+		            // 응답 데이터 검증
+		            if (data && Array.isArray(data.data) && data.data.length > 0 &&
+		                data.adjustedStartDate && data.adjustedEndDate) {
+		                
+		                // 날짜 유효성 검사
+		                const adjustedStartDate = new Date(data.adjustedStartDate);
+		                const adjustedEndDate = new Date(data.adjustedEndDate);
+
+		                if (isNaN(adjustedStartDate.getTime()) || isNaN(adjustedEndDate.getTime())) {
+		                    alert('조정된 날짜 형식이 잘못되었습니다.');
+		                    console.error('잘못된 날짜 형식:', data.adjustedStartDate, data.adjustedEndDate);
+		                    return;
+		                }
+
+		                // 간트차트 생성 함수 호출
+		                createGanttChart(data.data, data.adjustedStartDate, data.adjustedEndDate);
+		            } else {
+		                alert('간트차트 데이터를 불러오는 데 필요한 정보가 부족합니다.');
+		                console.error('잘못된 데이터:', data);
+		            }
+		        },
+		        error: function(xhr, status, error) {
+		            console.error('AJAX Error:', status, error);
+		            alert('간트차트 데이터를 불러오는 데 실패했습니다.');
+		        }
+		    });
+		}
+	
+	    // 모든 부모 항목에 굵고 기울임꼴 텍스트 설정 추가
+	    function labelTextSettingsFormatter(label, dataItem) {
+	        if (dataItem.numChildren()) {
+	        	label.fontWeight('bold').fontStyle('italic');
+	    	}
+		}
+	
+		// 세 번째 열의 날짜를 예쁘게 포맷팅
+		function thirdColumnTextFormatter(data) {
+		    let field = data.baselineStart;
+	
+		    // 기준선 텍스트 포맷팅
+		    if (field) {
+		        let baselineStart = new Date(field);
+		        return (
+	                formatDate(baselineStart.getUTCMonth() + 1) +
+	                '/' +
+	                formatDate(baselineStart.getUTCDate()) +
+	                '/' +
+	                baselineStart.getUTCFullYear() +
+	                ' ' +
+	                formatDate(baselineStart.getUTCHours()) +
+	                ':' +
+	                formatDate(baselineStart.getUTCMinutes())
+	            );
+	        }
+	
+	        // 이정표 텍스트 포맷팅
+	        let actualStart = data.item.get('actualStart');
+	        let actualEnd = data.item.get('actualEnd');
+	        if (actualStart === actualEnd || (actualStart && !actualEnd)) {
+	            let start = new Date(actualStart);
+	            return (
+	                formatDate(start.getUTCMonth() + 1) +
+	                '/' +
+	                formatDate(start.getUTCDate()) +
+	                '/' +
+	                start.getUTCFullYear() +
+	                ' ' +
+	                formatDate(start.getUTCHours()) +
+	                ':' +
+	                formatDate(start.getUTCMinutes())
+	            );
+	        }
+	        return '';
+	    }
+	
+	    // 네 번째 열의 날짜를 예쁘게 포맷팅
+	    function fourthColumnTextFormatter(item) {
+	        let field = item.baselineEnd;
+	        if (field) {
+	            let baselineEnd = new Date(field);
+	            return (
+	                formatDate(baselineEnd.getUTCMonth() + 1) +
+	                '/' +
+	                formatDate(baselineEnd.getUTCDate()) +
+	                '/' +
+	                baselineEnd.getUTCFullYear() +
+	                ' ' +
+	                formatDate(baselineEnd.getUTCHours()) +
+	                ':' +
+	                formatDate(baselineEnd.getUTCMinutes())
+	            );
+	        }
+	        return '';
+	    }
+	
+	    // 날짜 단위를 예쁘게 포맷팅
+	    function formatDate(dateUnit) {
+	        if (dateUnit < 10) dateUnit = '0' + dateUnit;
+	        return dateUnit + '';
+	    }
+	}
+
+});
+
+	/*
+	// 간트차트 생성(로드)
 	function createGanttChart() {
 	  if (ganttChartLoaded) return; // 이미 간트 차트가 로드된 경우
 
@@ -722,6 +1111,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 });
+*/
 
 
 /*
