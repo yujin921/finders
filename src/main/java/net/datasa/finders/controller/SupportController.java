@@ -55,4 +55,18 @@ public class SupportController {
 		}
 		return "support/client"; //
 	}
+	
+	@GetMapping("example")
+	public String example(Model model, Principal principal) {
+		if (principal != null) {
+			// principal.getName()은 현재 로그인한 사용자의 username을 가져옴
+			String userId = principal.getName();
+
+			// MemberService를 통해 사용자의 정보 가져오기
+			MemberEntity member = memberService.findByMemberId(userId);
+			log.debug(member.getProfileImg());
+			model.addAttribute("profileImgUrl", member.getProfileImg());
+		}
+		return "support/example"; //
+	}
 }

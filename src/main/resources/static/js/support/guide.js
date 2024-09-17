@@ -20,5 +20,5 @@ document.addEventListener('DOMContentLoaded', function() {
         testimonials[currentTestimonial].style.display = 'block';
     }
 
-    setInterval(showNextTestimonial, 5000); // 5초마다 testimonial 변경
+    setInterval(showNextTestimonial, 3000); // 3초마다 testimonial 변경
 });
