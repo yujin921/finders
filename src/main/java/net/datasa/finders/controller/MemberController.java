@@ -87,7 +87,7 @@ public class MemberController {
                     // 프리랜서 스킬 저장
                     if (selectedSkillsString != null && !selectedSkillsString.isEmpty()) {
                         List<String> selectedSkills = Arrays.asList(selectedSkillsString.split(","));
-                        memberService.saveFreelancerSkills(savedMember.getMemberId(), selectedSkills);
+                        memberService.updateFreelancerSkills(savedMember.getMemberId(), selectedSkills);
                     }
                     break;
                 case ROLE_CLIENT:

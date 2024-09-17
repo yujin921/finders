@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>finders</title>
+<link rel="stylesheet" th:href="@{/css/support/guide.css}">
+<!-- Font Awesome 추가 -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script th:src="@{/js/support/guide.js}"></script>
+</head>
+<body>
+	<header>
+		<div class="container">
+			<div class="header-content">
+				<div class="logo">
+					<a href="/"> <img th:src="@{/images/findersLogo.png}"
+						alt="Finders Logo">
+					</a>
+				</div>
+				<div class="search-bar">
+					<input type="text" placeholder="프로젝트 또는 프리랜서 검색">
+					<button type="submit">
+						<i class="fas fa-search"></i>
+					</button>
+				</div>
+				<div class="login-actions">
+					<th:block sec:authorize="not isAuthenticated()">
+						<a th:href="@{/member/join}">회원가입</a>
+						<a th:href="@{/member/login}" class="btn">로그인</a>
+					</th:block>
+
+					<th:block sec:authorize="isAuthenticated()">
+						<img th:src="${profileImgUrl}" alt="Profile Image"
+							style="width: 50px; height: 50px; border-radius: 50%;" />
+						<a th:href="@{/project/view}">프로젝트 관리</a>
+						<a th:href="@{/member/myPage}">마이페이지</a>
+						<a th:href="@{/member/logout}" class="btn">로그아웃</a>
+					</th:block>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<!-- Navigation Menu -->
+	<nav>
+		<ul>
+			<li sec:authorize="hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN')"><a
+				href="board/write">프로젝트 등록</a></li>
+			<li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
+			<li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
+			<li><a href="#">서비스 안내</a></li>
+			<li><a href="#">이용 사례</a></li>
+			<li><a href="#">커뮤니티</a></li>
+			<span>│</span>
+			<li><a th:href="@{/myProject/view}">내 프로젝트 목록</a></li>
+			<li><a href="#">미팅룸</a></li>
+		</ul>
+	</nav>
+
+	<main>
+		<section class="hero">
+			<h1>당신의 프로젝트를 위한 최고의 인재를 찾아보세요</h1>
+			<p>월 평균 538건의 프로젝트가 등록되는 Finders에서 시작하세요</p>
+			<a href="#" class="cta-button">프로젝트 시작하기</a>
+		</section>
+
+		<section class="features">
+			<div class="feature-card" id="card1">
+				<i class="fas fa-users"></i>
+				<h3>다양한 전문가</h3>
+				<p>IT, 디자인, 마케팅 등 다양한 분야의 전문가를 만나보세요.</p>
+			</div>
+			<div class="feature-card" id="card2">
+				<i class="fas fa-shield-alt"></i>
+				<h3>안전한 계약</h3>
+				<p>검증된 프리랜서와 안전하게 계약을 체결하세요.</p>
+			</div>
+			<div class="feature-card" id="card3">
+				<i class="fas fa-chart-line"></i>
+				<h3>프로젝트 관리</h3>
+				<p>진행 상황을 실시간으로 확인하고 관리할 수 있습니다.</p>
+			</div>
+		</section>
+
+		<section class="testimonials">
+			<h2>고객 후기</h2>
+			<div class="testimonial-slider">
+				<div class="testimonial">
+					<p>"Finders 덕분에 완벽한 개발자를 찾을 수 있었습니다. 정말 감사합니다!"</p>
+					<span>- 김OO, IT 스타트업 CEO</span>
+				</div>
+				<div class="testimonial">
+					<p>"프로젝트 관리가 너무 편리해요. 다음에도 꼭 이용하고 싶습니다."</p>
+					<span>- 이OO, 마케팅 에이전시 대표</span>
+				</div>
+			</div>
+		</section>
+	</main>
+	<!-- Footer -->
+	<footer>
+		<div class="container">
+			<p>&copy; 2024 프리랜서 마켓플레이스. All rights reserved.</p>
+			<p>
+				<a href="#">개인정보 처리방침</a> | <a href="#">이용 약관</a> | <a href="#">연락처</a>
+			</p>
+		</div>
+	</footer>
+
+</body>
+</html>
