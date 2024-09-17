@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>클라이언트 후기 목록</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+        }
+        section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+        }
+        .rating-average {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .review-items ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .review-items li {
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>클라이언트 후기 목록</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2>내가 받은 클라이언트 후기</h2>
+            <div class="rating-average">
+                <strong>평점 평균: </strong>
+                <span id="averageRating" th:text="${averageRating}">평점 평균</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>프로젝트 번호</th>
+                        <th>프리랜서 ID</th>
+                        <th>평점</th>
+                        <th>코멘트</th>
+                        <th>작성일</th>
+                        <th>리뷰 항목</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="review : ${reviews}">
+                        <td th:text="${review.projectNum}">프로젝트 번호</td>
+                        <td th:text="${review.freelancerId}">프리랜서 ID</td>
+                        <td th:text="${review.rating}">평점</td>
+                        <td th:text="${review.comment}">코멘트</td>
+                        <td th:text="${review.reviewDate}">작성일</td>
+                        <td class="review-items">
+                            <ul>
+                                <li th:each="item : ${review.reviewItems}" th:text="${item.itemName} + ' : ' + (item.selected ? '선택됨' : '선택되지 않음')"></li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Company Name. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        $(document).ready(function() {
+            // 프로젝트 번호를 HTML의 data 속성에서 가져옵니다.
+            var projectNum = $('body').data('projectnum');
+
+            $.ajax({
+                url: '/review/getAverageRating',
+                method: 'GET',
+                data: { projectNum: projectNum },
+                success: function(data) {
+                    $('#averageRating').text(data.toFixed(2)); // 소수점 2자리로 표시
+                },
+                error: function() {
+                    $('#averageRating').text('오류 발생');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
