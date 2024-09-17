@@ -71,6 +71,7 @@
 	        // 기능 분류 목록 로드 함수
 	        function loadFunctionTitles(projectNum, isFirstTask) {
 	        	console.log('Loading function titles for projectNum:', projectNum); // 디버깅을 위한 로그
+	        	console.log("isFirstTask 체크용: ", isFirstTask);
 	        	
 	            $.ajax({
 	                url: 'loadFunctionTitles',
@@ -114,54 +115,24 @@
 	            funcTitleId = $(this).val();
 	        });
 	
-	        // 새 기능 추가 버튼 클릭 시
-	        $('#add-new-function-btn').on('click', function() {
-	            const newFunctionName = $('#new-function-name').val();
-	            
-	            console.log("newFunctionName check용: ", newFunctionName);
-	            
-	            if (newFunctionName.trim() === '') {
-	                alert('기능 이름을 입력해 주세요.');
+	     	// 폼 제출 이벤트 핸들러
+	        $('#save-function-and-task-btn').on('click', function() {
+	        	const newFunctionName = $('#new-function-name').val();
+	            const projectNum = $('#project-num').val(); // 프로젝트 번호 값 읽기
+	            const selectedFunctionId = $('#function-select').val(); // 선택된 기능 ID
+
+	            if (newFunctionName.trim() === '' && selectedFunctionId === '') {
+	                alert('기능 이름을 입력해 주세요 또는 기능을 선택해 주세요.');
 	                return;
 	            }
 	            
-	            $.ajax({
-	                url: 'saveFunction',
-	                type: 'post',
-	                data: JSON.stringify({ titleName: newFunctionName }), // JSON 객체의 key가 DTO의 필드 이름과 일치해야 함.
-	                contentType: 'application/json',
-	                dataType: 'json',
-	                success: function(response) {
-	                	console.log('서버 응답:', response); // 응답 내용 로그
-	                	
-	                    // 응답에서 functionTitleId를 가져옴
-	                    const newFuncTitleId = response.functionTitleId;
-	                    
-	                    // 새 기능 추가 후 기능 분류 목록 갱신
-	                    $('#function-select').append(`<option value="${newFuncTitleId}">${newFunctionName}</option>`);
-	                    $('#function-select').val(newFuncTitleId); // 새로 추가한 기능을 선택된 값으로 설정
-	                    $('#new-function-name').hide();
-	                    $('#add-new-function-btn').hide();
-	                    alert('새 기능이 추가되었습니다.');
-	                    
-	                    // 선택한 기능 분류 ID를 전역 변수에 저장
-	                    funcTitleId = newFuncTitleId;
-	                },
-	                error: function() {
-	                    alert('새 기능 추가에 실패했습니다.');
-	                }
-	            });
-	        });
-	
-	        // 폼 제출 이벤트 핸들러
-	        $('#task-form').on('submit', function(event) {
-	            event.preventDefault();
-	
-	            const newFunctionName = $('#new-function-name').val();
+	        	// functionTitleName을 새 기능 입력값이나 선택된 기능 이름으로 설정
+	            const functionTitleName = newFunctionName.trim() !== '' ? newFunctionName : $('#function-select option:selected').text();
+
 	            const taskData = {
-	                functionTitleId: funcTitleId ? funcTitleId : null, // 전역 변수 사용
-	                functionTitleName: newFunctionName,
-	                taskTitle: $('#task-title').val(),
+	            	functionTitleId: selectedFunctionId || null, // 선택된 기능 ID, 새 기능의 경우 null 처리
+	            	functionTitleName: functionTitleName, // 기능 제목 추가
+	            	taskTitle: $('#task-title').val(),
 	                taskDescription: $('#task-description').val(),
 	                taskStatus: $('#task-status').val(),
 	                taskPriority: $('#task-priority').val(),
@@ -169,16 +140,18 @@
 	                taskEndDate: $('#task-end-date').val(),
 	                freelancerId: $('#task-assignee').val()
 	            };
-	            
-	            console.log('taskData 체크용: ', taskData)
-	
+
+	            console.log('taskData 체크용: ', taskData);
+
 	            $.ajax({
-	                url: 'saveTask?projectNum=' + projectNum, // URL 쿼리 파라미터로 전송
+	                url: 'saveFunctionAndTask?projectNum=' + projectNum, // 쿼리 파라미터에 functionTitleName을 포함시키지 않음
 	                type: 'post',
-	                contentType: 'application/json', // JSON 형식으로 데이터 전송
-	                data: JSON.stringify(taskData), // 데이터는 JSON 문자열로 변환
+	                data: JSON.stringify(taskData), // taskData를 직접 포함
+	                contentType: 'application/json',
 	                dataType: 'json',
 	                success: function(response) {
+	                    console.log('서버 응답:', response);
+
 	                    // 새 기능 추가 후 기능 분류 목록 갱신
 	                    if (newFunctionName.trim() !== '') {
 	                        $('#function-select').append(`<option value="${response.functionTitleId}">${newFunctionName}</option>`);
@@ -186,15 +159,15 @@
 	                        $('#new-function-name').hide();
 	                        $('#add-new-function-btn').hide();
 	                    }
-	
+
 	                    alert('업무가 성공적으로 등록되었습니다.');
 	                    $('#task-modal').addClass('hidden').hide();
-	                    
-	                 	// 업무 목록 업데이트
+
+	                    // 업무 목록 업데이트
 	                    loadTasks();
 	                },
-	                error: function() {
-	                    alert('업무 등록에 실패했습니다.');
+	                error: function(xhr) {
+	                    alert('업무 등록에 실패했습니다: ' + xhr.responseText);
 	                }
 	            });
 	        });
@@ -442,7 +415,7 @@
                     </select>
                     
                     <input type="text" id="new-function-name" placeholder="새 기능 입력" style="display: none;" autocomplete='off'>
-                    <button type="button" id="add-new-function-btn" style="display: none;">확인</button>
+                    <!-- <button type="button" id="add-new-function-btn" style="display: none;">확인</button> -->
                 </div>
                 <div class="form-group">
                     <label for="task-title">업무명</label>
@@ -485,7 +458,8 @@
                 </div>
                 <div class="modal-buttons">
                     <button type="button" class="btn-close" id="close-task-modal">취소</button>
-                    <button type="submit" class="btn-save">저장</button>
+                    <!-- <button type="submit" class="btn-save">저장</button> -->
+                    <button type="button" class="btn-save" id="save-function-and-task-btn">저장</button>
                 </div>
             </form>
         </div>

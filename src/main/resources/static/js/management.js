@@ -542,24 +542,30 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		// 이름 로드 함수
 		function loadNames(projectNum, entityType) {
-			console.log(`Loading names for projectNum: ${projectNum}, entityType: ${entityType}`); // 디버깅용 로그
-			
+		    console.log(`Loading names for projectNum: ${projectNum}, entityType: ${entityType}`); // 디버깅용 로그
+		    
 		    $.ajax({
 		        url: 'loadEntityNames',
 		        type: 'GET',
 		        data: { projectNum: projectNum, entityType: entityType },
 		        success: function(response) {
-					console.log('Response:', response); // 디버깅용 로그
-					
+		            console.log('Response:', response); // 디버깅용 로그
+		            
 		            const $select = $('#name-select');
 		            $select.empty().append('<option value="">선택</option>'); // 초기화 후 기본 옵션 추가
+
 		            response.forEach(function(item) {
-		                $select.append(`<option value="${item.functionTitleId}">${item.titleName}</option>`);
+		                // 엔티티 타입에 따라 올바른 필드명을 사용
+		                if (entityType === 'task') {
+		                    $select.append(`<option value="${item.taskId}">${item.taskTitle}</option>`);
+		                } else if (entityType === 'function') {
+		                    $select.append(`<option value="${item.functionTitleId}">${item.titleName}</option>`);
+		                }
 		            });
 		        },
 		        error: function(xhr, status, error) {
-					console.error('Error:', error); // 디버깅용 로그
-					
+		            console.error('Error:', error); // 디버깅용 로그
+		            
 		            alert('이름 목록을 불러오는 데 실패했습니다.');
 		        }
 		    });
@@ -628,7 +634,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		                // 간트차트를 새로고침하여 반영된 진행도 확인
 		                refreshGanttChart();
-		            } else {
+						
+						// 입력 박스와 select 박스 값을 초기화
+						$('#progress-value-input').val('');
+		            
+					} else {
 		                alert('진행도 업데이트에 실패했습니다.');
 		            }
 		        },

@@ -22,7 +22,6 @@ import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.entity.RoleName;
-import net.datasa.finders.domain.entity.TaskManagementEntity;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ProjectManagementService;
 
@@ -71,16 +70,70 @@ public class ProjectManagementController {
 	    }
 	}
     
+    /*
     @ResponseBody
     @PostMapping("saveFunction")
-    public FunctionTitleDTO saveFunction(@RequestBody FunctionTitleDTO functionTitleDTO) {
+    public FunctionTitleDTO saveFunction(@RequestParam("projectNum") int projectNum,
+                                          @RequestBody FunctionTitleDTO functionTitleDTO) {
         try {
-        	FunctionTitleDTO dto = projectManagementService.saveFunction(functionTitleDTO.getTitleName());
-            return dto;
+            // projectNum과 titleName을 DTO에서 추출
+            String functionTitleName = functionTitleDTO.getTitleName();
             
+            // 서비스 메서드를 호출하여 기능을 저장
+            FunctionTitleDTO dto = projectManagementService.saveFunction(projectNum, functionTitleName);
+            return dto;
         } catch (Exception e) {
-        	log.error("Error saving task", e);
+            log.error("Error saving function", e);
             return null;
+        }
+    }
+    
+    @ResponseBody
+    @PostMapping("saveTask")
+    public TaskManagementDTO saveTask(
+            @RequestParam("projectNum") int projectNum,
+            @RequestBody TaskManagementDTO taskDTO) {
+        
+        try {
+            log.debug("projectNum controller 체크용: {}", projectNum);
+            log.debug("taskDTO controller 체크용: {}", taskDTO);
+
+            TaskManagementDTO savedTask = projectManagementService.saveTask(projectNum, taskDTO);
+
+            log.debug("taskManagementDTO controller 체크용2: {}", savedTask);
+            
+            return savedTask;
+
+        } catch (IllegalArgumentException e) {
+            log.error("Duplicate task title or role error: ", e);
+            return null;
+        } catch (Exception e) {
+            log.error("Error saving task: ", e);
+            return null;
+        }
+    }
+    */
+    
+    @ResponseBody
+    @PostMapping("saveFunctionAndTask")
+    public ResponseEntity<?> saveFunctionAndTask(
+            @RequestParam("projectNum") int projectNum,
+            @RequestBody TaskManagementDTO taskDTO) {
+
+        try {
+        	// FunctionTitleName이 request body에 포함된 경우 
+            String functionTitleName = taskDTO.getFunctionTitleName();
+
+            // 서비스 계층에서 기능 제목과 업무 데이터 저장 처리
+            FunctionTitleDTO savedFunction = projectManagementService.saveFunctionAndTask(projectNum, functionTitleName, taskDTO);
+            
+            return ResponseEntity.ok(savedFunction);
+        } catch (IllegalArgumentException e) {
+            log.error("Validation error: ", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Error saving function and task: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving function and task");
         }
     }
     
@@ -98,29 +151,6 @@ public class ProjectManagementController {
         	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         
         }
-    }
-    
-    @ResponseBody
-    @PostMapping("saveTask")
-    public TaskManagementDTO saveTask(@RequestParam("projectNum") int projectNum,
-            @RequestBody TaskManagementDTO taskDTO) {
-    	
-    	try {
-    		log.debug("projectNum controller 체크용: ", projectNum);
-    		log.debug("taskDTO controller 체크용: ", taskDTO);
-
-    		TaskManagementDTO savedTask = projectManagementService.saveTask(projectNum, taskDTO);
-            
-        	log.debug("taskManagementDTO controller 체크용2: ", savedTask);
-        	
-        	return savedTask;
-        
-        } catch (Exception e) {	
-        	log.error("Error saving task", e);
-        	return null;
-        
-        }
-
     }
     
     @ResponseBody

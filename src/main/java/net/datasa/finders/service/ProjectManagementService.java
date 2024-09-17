@@ -162,16 +162,93 @@ public class ProjectManagementService {
         return dto;
     }
     
-    public FunctionTitleDTO saveFunction(String functionTitleName) {
-    	FunctionTitleEntity functionTitleEntity = FunctionTitleEntity.builder()
+    @Transactional
+    public FunctionTitleDTO saveFunction(int projectNum, String functionTitleName) {
+        // 중복 체크
+        boolean isDuplicate = taskManagementRepository.existsByProjectPublishingEntity_ProjectNumAndFunctionTitleEntity_TitleName(projectNum, functionTitleName);
+        
+        if (isDuplicate) {
+            throw new IllegalArgumentException("중복된 기능 제목이 존재합니다.");
+        }
+
+        // 새로운 기능 저장
+        FunctionTitleEntity functionTitleEntity = FunctionTitleEntity.builder()
                 .titleName(functionTitleName)
                 .functionProcessivity("0%")
                 .build();
-        
+
         functionTitleRepository.save(functionTitleEntity);
-        
+
         return new FunctionTitleDTO(functionTitleEntity.getFunctionTitleId(), functionTitleEntity.getTitleName(), functionTitleEntity.getFunctionProcessivity());
-	}
+    }
+    
+    @Transactional
+    public TaskManagementDTO saveTask(int projectNum, TaskManagementDTO taskDTO) {
+        // 프로젝트와 프리랜서, 기능 제목 조회
+        ProjectPublishingEntity projectPublishing = projectPublishingRepository.findById(projectNum)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
+        
+        MemberEntity member = memberRepository.findById(taskDTO.getFreelancerId())
+                .orElseThrow(() -> new EntityNotFoundException("프리랜서 회원 아이디가 없습니다."));
+
+        FunctionTitleEntity functionTitle = taskDTO.getFunctionTitleId() != null
+                ? functionTitleRepository.findById(taskDTO.getFunctionTitleId())
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 기능 분류 항목입니다."))
+                : null;
+        
+        TaskStatus status = TaskStatus.valueOf(taskDTO.getTaskStatus().toUpperCase());
+        TaskPriority priority = TaskPriority.valueOf(taskDTO.getTaskPriority().toUpperCase());
+        LocalDate startDate = parseDate(taskDTO.getTaskStartDate());
+        LocalDate endDate = parseDate(taskDTO.getTaskEndDate());
+
+        // 중복 체크
+        boolean isDuplicate = taskManagementRepository.existsByProjectPublishingEntity_ProjectNumAndTaskTitle(projectNum, taskDTO.getTaskTitle());
+        if (isDuplicate) {
+            throw new IllegalArgumentException("중복된 업무 제목이 존재합니다.");
+        }
+
+        // 역할 체크
+        if (member.getRoleName() != RoleName.ROLE_FREELANCER) {
+            throw new IllegalArgumentException("해당 회원은 프리랜서가 아닙니다.");
+        }
+
+        // 업무 저장
+        TaskManagementEntity taskManagementEntity = TaskManagementEntity.builder()
+                .projectPublishingEntity(projectPublishing)
+                .memberEntity(member)
+                .functionTitleEntity(functionTitle)
+                .taskTitle(taskDTO.getTaskTitle())
+                .taskDescription(taskDTO.getTaskDescription())
+                .taskStatus(status)
+                .taskPriority(priority)
+                .taskStartDate(startDate)
+                .taskEndDate(endDate)
+                .taskProcessivity("0%")
+                .build();
+
+        taskManagementRepository.save(taskManagementEntity);
+
+        return taskDTO;
+    }
+    
+    @Transactional
+    public FunctionTitleDTO saveFunctionAndTask(int projectNum, String functionTitleName, TaskManagementDTO taskDTO) {
+        // 기능 제목이 새로 추가된 경우
+        FunctionTitleDTO savedFunction;
+        if (taskDTO.getFunctionTitleId() == null || taskDTO.getFunctionTitleId() <= 0) {
+            // 새 기능 저장
+            savedFunction = saveFunction(projectNum, functionTitleName);
+            taskDTO.setFunctionTitleId(savedFunction.getFunctionTitleId());
+        } else {
+            // 기존 기능 선택
+            savedFunction = new FunctionTitleDTO(taskDTO.getFunctionTitleId(), functionTitleName, "0%");
+        }
+        
+        // 업무 저장
+        saveTask(projectNum, taskDTO);
+
+        return savedFunction;
+    }
     
     public List<FunctionTitleDTO> getAllFunctionTitles(int projectNum) {
         
@@ -206,42 +283,6 @@ public class ProjectManagementService {
             throw new IllegalArgumentException("Invalid date format: " + date, e);
         }
     }
-
-	public TaskManagementDTO saveTask(int projectNum, TaskManagementDTO taskDTO) {
-		
-		ProjectPublishingEntity projectPublishing = projectPublishingRepository.findById(projectNum)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
-		
-		MemberEntity member = memberRepository.findById(taskDTO.getFreelancerId())
-                .orElseThrow(() -> new EntityNotFoundException("프리랜서 회원 아이디가 없습니다."));
-		
-		FunctionTitleEntity functionTitle = taskDTO.getFunctionTitleId() != null
-                ? functionTitleRepository.findById(taskDTO.getFunctionTitleId())
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 기능 분류 항목입니다."))
-                : null;
-		
-		TaskStatus status = TaskStatus.valueOf(taskDTO.getTaskStatus().toUpperCase());
-		TaskPriority priority = TaskPriority.valueOf(taskDTO.getTaskPriority().toUpperCase());
-		LocalDate startDate = parseDate(taskDTO.getTaskStartDate());
-        LocalDate endDate = parseDate(taskDTO.getTaskEndDate());
-		
-		TaskManagementEntity taskManagementEntity = TaskManagementEntity.builder()
-				.projectPublishingEntity(projectPublishing)
-				.memberEntity(member)
-				.functionTitleEntity(functionTitle)
-				.taskTitle(taskDTO.getTaskTitle())
-				.taskDescription(taskDTO.getTaskDescription())
-				.taskStatus(status)
-				.taskPriority(priority)
-				.taskStartDate(startDate) // 변환된 LocalDate 사용
-				.taskEndDate(endDate)     // 변환된 LocalDate 사용
-				.taskProcessivity("0%")
-				.build();
-
-        taskManagementRepository.save(taskManagementEntity);
-		
-        return taskDTO;
-	}
 
 	public List<TaskManagementDTO> getTasks(int projectNum) {
 		// 프로젝트 번호로 업무를 조회

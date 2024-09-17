@@ -23,6 +23,10 @@ public interface TaskManagementRepository extends JpaRepository<TaskManagementEn
 	           "WHERE t.projectPublishingEntity.projectNum = :projectNum")
 	Optional<TaskDateRangeDTO> findTaskDateRangeByProjectNum(@Param("projectNum") int projectNum);
 	
+	boolean existsByProjectPublishingEntity_ProjectNumAndFunctionTitleEntity_TitleName(int projectNum, String titleName);
+	
+	boolean existsByProjectPublishingEntity_ProjectNumAndTaskTitle(int projectNum, String taskTitle);
+	
 	// 주어진 프로젝트 번호와 기능 제목 ID로 TaskManagementEntity 존재 여부를 확인
     boolean existsByProjectPublishingEntity_ProjectNumAndFunctionTitleEntity_FunctionTitleId(int projectNum, int functionTitleId);
 	
