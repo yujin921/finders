@@ -5,15 +5,17 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+    <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <script th:src="@{/js/validation.js}"></script>
     <script th:src="@{/js/joinForm.js}" defer></script>
     <script th:src="@{/js/popup_2.js}"></script>
 </head>
 <body>
-	<div sec:authorize="isAuthenticated()">
-	<h1>안녕하세요, <span sec:authentication="name"></span>님!</h1>
-	</div>
+
+		<div class="hello" sec:authorize="isAuthenticated()">
+		<h1>안녕하세요, <span sec:authentication="name"></span>님!</h1>
+		</div>
 	
 	        <!-- 프리랜서 수정 폼 -->
         <div sec:authorize="hasRole('ROLE_FREELANCER')" id="freelancer-update">
@@ -53,6 +55,32 @@
                 
                 <label for="freelancer-country">체류 중인 국가</label>
                 <input type="text" id="freelancer-country" name="country" th:value="${member.freelancer.country}"><br>
+                
+                <div id="section5" class="section">
+				        <input type="hidden" id="selectedSkills" name="skills">
+				        <!-- 선택된 기술 표시 박스 -->
+				        <!-- 관련 기술 선택 섹션 -->
+				        <div class="tech-section">
+				            <h2>보유 기술</h2>
+				            <p>프로젝트에서 활용 가능한 기술에 대해 모두 선택해주세요.(최소 1개 이상)</p>
+				            <div class="tech-buttons">
+				                <div class="tech-button" data-tech="Python" onclick="toggleTech(this)">Python</div>
+				                <div class="tech-button" data-tech="Javascript" onclick="toggleTech(this)">Javascript</div>
+				                <div class="tech-button" data-tech="JAVA" onclick="toggleTech(this)">JAVA</div>
+				                <div class="tech-button" data-tech="C#" onclick="toggleTech(this)">C#</div>
+				                <div class="tech-button" data-tech="C" onclick="toggleTech(this)">C</div>
+				                <div class="tech-button" data-tech="C++" onclick="toggleTech(this)">C++</div>
+				                <div class="tech-button" data-tech="PHP" onclick="toggleTech(this)">PHP</div>
+				                <div class="tech-button" data-tech="RUBY" onclick="toggleTech(this)">RUBY</div>
+				                <div class="tech-button" data-tech="HTML" onclick="toggleTech(this)">HTML</div>
+				                <div class="tech-button" data-tech="CSS" onclick="toggleTech(this)">CSS</div>
+				                <div class="tech-button" data-tech="iOS" onclick="toggleTech(this)">iOS</div>
+				                <div class="tech-button" data-tech="안드로이드" onclick="toggleTech(this)">안드로이드</div>
+				            </div>
+				        </div>
+					</div>
+                
+                
                 <button type="submit">회원 정보 수정</button>
                 <div class="errorMsg" th:if="${param.error}"><script>alert('회원가입에 실패했습니다.')</script></div>
             </form>
