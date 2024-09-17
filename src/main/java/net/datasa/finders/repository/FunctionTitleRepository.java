@@ -7,5 +7,5 @@ import net.datasa.finders.domain.entity.FunctionTitleEntity;
 
 @Repository
 public interface FunctionTitleRepository extends JpaRepository<FunctionTitleEntity, Integer> {
-
+	
 }

@@ -39,7 +39,7 @@
 	            const isFirstTask = !localStorage.getItem('firstTaskRegistered');
 	
 	            // 기능 분류 목록 로드
-	            loadFunctionTitles(isFirstTask);
+	            loadFunctionTitles(projectNum, isFirstTask);
 	
 	            // 첫 번째 업무 등록 이후 상태 저장
 	            if (isFirstTask) {
@@ -69,10 +69,13 @@
 	        console.log("projectNum 체크용: ", projectNum);
 	
 	        // 기능 분류 목록 로드 함수
-	        function loadFunctionTitles(isFirstTask) {
+	        function loadFunctionTitles(projectNum, isFirstTask) {
+	        	console.log('Loading function titles for projectNum:', projectNum); // 디버깅을 위한 로그
+	        	
 	            $.ajax({
 	                url: 'loadFunctionTitles',
 	                type: 'get',
+	                data: { projectNum: projectNum },
 	                success: function(response) {
 	                    const $select = $('#function-select');
 	                    $select.empty().append('<option value="">기존 기능 선택</option>');
@@ -376,17 +379,43 @@
                     <!-- Gantt 차트 컨테이너 -->
 					<div id="gantt-chart"></div>
 					
+					<!-- Hidden input field to store the actual DB ID -->
+					<input type="hidden" id="db-id" value="">
+					
 					<!-- 진행도 업데이트 입력 및 버튼 -->
-					<div>
-					    <label for="progress-id">작업 ID:</label>
-					    <input type="number" id="progress-id">
+					<div class="update-container">
+					    <div class="update-section">
+					        <label for="task-id">작업 ID:</label>
+					        <input type="number" id="task-id" class="input-field">
+					        
+					        <label for="actual-start-date">실제 시작일:</label>
+					        <input type="date" id="actual-start-date" class="input-field">
+					        
+					        <label for="actual-end-date">실제 종료일:</label>
+					        <input type="date" id="actual-end-date" class="input-field">
+					        
+					        <button id="update-schedule-button" class="button">실제 진행 일정 업데이트</button>
+					    </div>
 					    
-					    <label for="progress-value">진행도(%):</label>
-					    <input type="text" id="progress-value" placeholder="(입력 예시) 50%">
-					    
-					    <button id="update-progress-button">진행도 업데이트</button>
+					    <div class="update-section">
+							<label for="entityType-select">Entity Type:</label>
+							<select id="entityType-select">
+								<option value="task">Task</option>
+								<option value="function">Function</option>
+							</select>
+							
+							<label for="name-select">Name:</label>
+							<select id="name-select">
+								<!-- Options will be populated dynamically -->
+							</select>
+				            
+				            <label for="progress-value">진행도(%):</label>
+				            <input type="text" id="progress-value-input" class="input-field" placeholder="(입력 예시) 50%">
+				            
+				            <button id="update-progress-button" class="button">진행도 업데이트</button>
+				        </div>
 					</div>
-                </div>
+				</div>
                 <div id="calendar-content" class="tab-content calendar-content">
                     <div id="calendar"></div>
                 </div>
