@@ -99,29 +99,36 @@ public class MemberService {
     			.build();
     			freelancerRepository.save(freelancerEntity);
     }
-    
-//    @Transactional
-//    public void saveFreelancerSkills(String freelancerId, List<String> skills) {
-//        MemberEntity freelancer = memberRepository.findById(freelancerId)
-//            .orElseThrow(() -> new EntityNotFoundException("Freelancer not found"));
-//
-//        // 새로운 스킬 저장
-//        for (String skill : skills) {
-//            FreelancerSkillEntity skillEntity = FreelancerSkillEntity.builder()
-//                .freelancerId(freelancer)
-//                .skillText(skill)
-//                .build();
-//            freelancerSkillRepository.save(skillEntity);
-//        }
-//    }
-    
+
     @Transactional
     public void saveFreelancerSkills(String freelancerId, List<String> skills) {
         MemberEntity freelancer = memberRepository.findById(freelancerId)
             .orElseThrow(() -> new EntityNotFoundException("Freelancer not found"));
 
         // 기존 스킬 삭제
+        
+        // 새로운 스킬 저장
+        for (String skill : skills) {
+            // 문자열 정제
+            String cleanedSkill = cleanSkillString(skill);
+            
+            if (!cleanedSkill.isEmpty()) {
+                FreelancerSkillEntity skillEntity = FreelancerSkillEntity.builder()
+                    .freelancerId(freelancer)
+                    .skillText(cleanedSkill)
+                    .build();
+                freelancerSkillRepository.save(skillEntity);
+            }
+        }
+    }
+    
+    @Transactional
+    public void updateFreelancerSkills(String freelancerId, List<String> skills) {
+        MemberEntity freelancer = memberRepository.findById(freelancerId)
+            .orElseThrow(() -> new EntityNotFoundException("Freelancer not found"));
 
+        // 기존 스킬 삭제
+        freelancerSkillRepository.deleteByFreelancerId(freelancer);
         // 새로운 스킬 저장
         for (String skill : skills) {
             // 문자열 정제
@@ -228,6 +235,7 @@ public class MemberService {
     public void updateFreelancer(FreelancerDTO dto, MultipartFile profileImg, String uploadPath) throws IOException {
         MemberEntity member = memberRepository.findById(dto.getMemberId())
             .orElseThrow(() -> new RuntimeException("Member not found"));
+        
 
         // 이름과 이메일 업데이트
         member.setMemberName(dto.getMemberName());
@@ -254,6 +262,8 @@ public class MemberService {
           freelancer.setAddress(dto.getAddress());
           freelancer.setDetailAddress(dto.getDetailAddress());
           freelancer.setExtraAddress(dto.getExtraAddress());
+          
+          updateFreelancerSkills(dto.getMemberId(), dto.getSkills());
 
           freelancerRepository.save(freelancer);
           memberRepository.save(member);

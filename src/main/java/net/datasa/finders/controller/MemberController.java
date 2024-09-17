@@ -70,39 +70,6 @@ public class MemberController {
 		return "member/idCheck";
     }
 
-
-//    @PostMapping("join")
-//    public String join(@ModelAttribute MemberDTO member,
-//                       @RequestParam("profileImg") MultipartFile profileImg,
-//                       @ModelAttribute FreelancerDTO freelancer,
-//                       @ModelAttribute ClientDTO client,
-//                       @RequestParam(value = "selectedSkills", required = false) List<String> selectedSkills,
-//                       Model model) {
-//        try {
-//            MemberEntity savedMember = memberService.join(member, uploadPath, profileImg);
-//            
-//            switch (member.getRoleName()) {
-//                case ROLE_FREELANCER:
-//                    memberService.joinFreelancer(freelancer, member);
-//                    // 프리랜서 스킬 저장
-//                    if (selectedSkills != null && !selectedSkills.isEmpty()) {
-//                        memberService.saveFreelancerSkills(savedMember.getMemberId(), selectedSkills);
-//                    }
-//                    break;
-//                case ROLE_CLIENT:
-//                    memberService.joinClient(client, member);
-//                    break;
-//                default:
-//                    throw new IllegalArgumentException("Invalid role: " + member.getRoleName());
-//            }
-//        } catch (IOException e) {
-//            log.error("파일 처리 중 오류 발생", e);
-//            model.addAttribute("errorMessage", "파일 업로드 중 오류가 발생했습니다. 다시 시도해 주세요.");
-//            return "/member/joinForm";
-//        }
-//
-//        return "redirect:/";
-//    }
     
     @PostMapping("join")
     public String join(@ModelAttribute MemberDTO member,
@@ -162,9 +129,8 @@ public class MemberController {
     
     @PostMapping("/update/freelancer")
     public String updateFreelancer(@ModelAttribute FreelancerDTO freelancerDTO,
-    							
-                               @RequestParam("profileImg") MultipartFile profileImg,
-                               Model model) {
+    								@RequestParam("profileImg") MultipartFile profileImg,
+    								Model model) {
         try {
         	log.debug("{}",freelancerDTO);
             memberService.updateFreelancer(freelancerDTO, profileImg, uploadPath);
