@@ -2,7 +2,9 @@ package net.datasa.finders.controller;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ClientDTO;
 import net.datasa.finders.domain.dto.FreelancerDTO;
+import net.datasa.finders.domain.dto.FreelancerSkillDTO;
 import net.datasa.finders.domain.dto.MemberDTO;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.security.AuthenticatedUser;
@@ -65,28 +70,58 @@ public class MemberController {
 		return "member/idCheck";
     }
 
+
+//    @PostMapping("join")
+//    public String join(@ModelAttribute MemberDTO member,
+//                       @RequestParam("profileImg") MultipartFile profileImg,
+//                       @ModelAttribute FreelancerDTO freelancer,
+//                       @ModelAttribute ClientDTO client,
+//                       @RequestParam(value = "selectedSkills", required = false) List<String> selectedSkills,
+//                       Model model) {
+//        try {
+//            MemberEntity savedMember = memberService.join(member, uploadPath, profileImg);
+//            
+//            switch (member.getRoleName()) {
+//                case ROLE_FREELANCER:
+//                    memberService.joinFreelancer(freelancer, member);
+//                    // 프리랜서 스킬 저장
+//                    if (selectedSkills != null && !selectedSkills.isEmpty()) {
+//                        memberService.saveFreelancerSkills(savedMember.getMemberId(), selectedSkills);
+//                    }
+//                    break;
+//                case ROLE_CLIENT:
+//                    memberService.joinClient(client, member);
+//                    break;
+//                default:
+//                    throw new IllegalArgumentException("Invalid role: " + member.getRoleName());
+//            }
+//        } catch (IOException e) {
+//            log.error("파일 처리 중 오류 발생", e);
+//            model.addAttribute("errorMessage", "파일 업로드 중 오류가 발생했습니다. 다시 시도해 주세요.");
+//            return "/member/joinForm";
+//        }
+//
+//        return "redirect:/";
+//    }
+    
     @PostMapping("join")
     public String join(@ModelAttribute MemberDTO member,
-    					@RequestParam("profileImg") MultipartFile profileImg,
+                       @RequestParam("profileImg") MultipartFile profileImg,
                        @ModelAttribute FreelancerDTO freelancer,
                        @ModelAttribute ClientDTO client,
+                       @RequestParam(value = "selectedSkills", required = false) String selectedSkillsString,
                        Model model) {
-    	
-    	if (profileImg != null) {
-			log.debug("파일 존재 여부 : {}", profileImg.isEmpty());
-			log.debug("파라미터 이름 : {}", profileImg.getName());
-			log.debug("파일의 이름 : {}", profileImg.getOriginalFilename());
-			log.debug("크기 : {}", profileImg.getSize());
-			log.debug("파일 종류 : {}", profileImg.getContentType());
-		}
-
         try {
-            // 회원 가입 처리
-            memberService.join(member, uploadPath, profileImg);
-            log.debug("{}",member);
+            MemberEntity savedMember = memberService.join(member, uploadPath, profileImg);
+            
             switch (member.getRoleName()) {
                 case ROLE_FREELANCER:
                     memberService.joinFreelancer(freelancer, member);
+                    // 프리랜서 스킬 저장
+                    if (selectedSkillsString != null && !selectedSkillsString.isEmpty()) {
+                        List<String> selectedSkills = Arrays.asList(selectedSkillsString.split(","));
+                        memberService.saveFreelancerSkills(savedMember.getMemberId(), selectedSkills);
+                    }
                     break;
                 case ROLE_CLIENT:
                     memberService.joinClient(client, member);
@@ -94,14 +129,9 @@ public class MemberController {
                 default:
                     throw new IllegalArgumentException("Invalid role: " + member.getRoleName());
             }
-
         } catch (IOException e) {
-        	log.error("파일 처리 중 오류 발생", e);
-
-            // 오류 메시지를 모델에 추가
+            log.error("파일 처리 중 오류 발생", e);
             model.addAttribute("errorMessage", "파일 업로드 중 오류가 발생했습니다. 다시 시도해 주세요.");
-
-            // 회원가입 페이지로 포워딩
             return "/member/joinForm";
         }
 

@@ -12,6 +12,6 @@ import net.datasa.finders.domain.entity.MemberEntity;
 @AllArgsConstructor
 public class FreelancerSkillDTO {
 	private int skillNum;
-    MemberEntity memberEntity;
+    MemberEntity freelancerId;
     private String skillText;
 }

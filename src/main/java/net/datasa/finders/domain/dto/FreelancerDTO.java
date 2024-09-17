@@ -1,5 +1,7 @@
 package net.datasa.finders.domain.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +26,5 @@ public class FreelancerDTO {
 	String address;
 	String detailAddress;
 	String extraAddress;
+	List<String> skills;
 }

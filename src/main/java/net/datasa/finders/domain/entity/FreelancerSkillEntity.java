@@ -20,7 +20,7 @@ public class FreelancerSkillEntity {
 
     @ManyToOne
     @JoinColumn(name = "freelancer_id", referencedColumnName = "member_id")
-    MemberEntity memberEntity;
+    MemberEntity freelancerId;
 
     @Column(name = "skill_text", nullable = false)
     String skillText;

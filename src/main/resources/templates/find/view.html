@@ -1,81 +1,279 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>파트너스 찾기</title>
-    <link rel="stylesheet" href="/css/find/view.css">
+    <title>finders</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <!-- Font Awesome 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script th:src="@{/js/home.js}"></script>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .sub-title {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .search-bar input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-right: none;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: #009688;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .content-wrapper {
+            display: flex;
+            background-color: white;
+            border: 1px solid #ddd;
+        }
+        .filters {
+            width: 250px;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+        .filters h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .filters h3 {
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .filters label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .results {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        #sort {
+            border: 1px solid #ddd;
+        }
+        .sort-options {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .sort-options button {
+            padding: 5px 10px;
+            margin-right: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .sort-options button.active {
+            background-color: #f0f0f0;
+        }
+        .partner-card {
+            display: flex;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .partner-image {
+            width: 100px;
+            height: 100px;
+            margin-right: 20px;
+        }
+        .partner-info h3 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .partner-grade {
+            display: inline-block;
+            padding: 2px 5px;
+            background-color: #4a90e2;
+            color: white;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+        .partner-rating {
+            color: #ffc107;
+        }
+        .partner-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .partner-skills {
+            margin-top: 10px;
+        }
+        .skill-tag {
+            display: inline-block;
+            padding: 2px 5px;
+            background-color: #f0f0f0;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+    </style>	
 </head>
 <body>
+    <!-- Header Section -->
     <header>
-        <h1>파트너스 찾기</h1>
-        <button class="cta-button">포트폴리오 등록하기</button>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="/">
+                        <img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
+                    </a>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="프로젝트 또는 프리랜서 검색">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="login-actions">
+                    <!-- 비로그인 상태 -->
+                    <th:block sec:authorize="not isAuthenticated()">
+                        <a th:href="@{/member/join}">회원가입</a>
+                        <a th:href="@{/member/login}" class="btn">로그인</a>
+                    </th:block>
+                    
+                    <!-- 로그인 상태 -->
+                    <th:block sec:authorize="isAuthenticated()">
+                        <img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
+                        <a th:href="@{/project/view}">프로젝트 관리</a>
+                        <a th:href="@{/member/myPage}">마이페이지</a>
+                        <a th:href="@{/member/logout}" class="btn">로그아웃</a>
+                    </th:block>
+                </div>
+            </div>
+        </div>
     </header>
-    <div class="container">
-        <aside class="sidebar">
-            <h2>파트너스 필터</h2>
-            <div class="filter-section">
-                <h3>파트너 등급</h3>
-                <label><input type="checkbox"> PRIME+</label>
-                <label><input type="checkbox"> PRO</label>
-            </div>
-            <div class="filter-section">
-                <h3>선호 프로젝트 형태</h3>
-                <label><input type="checkbox"> 외주(도급)</label>
-                <label><input type="checkbox"> 기간제(상주)</label>
-            </div>
-            <div class="filter-section">
-                <h3>파트너 직종</h3>
-                <label><input type="checkbox"> 개발</label>
-                <label><input type="checkbox"> 디자인</label>
-                <label><input type="checkbox"> 기획</label>
-            </div>
-            <div class="filter-section">
-                <h3>파트너 업태</h3>
-                <label><input type="checkbox"> 법인사업자</label>
-                <label><input type="checkbox"> 개인사업자</label>
-                <label><input type="checkbox"> 팀</label>
-                <label><input type="checkbox"> 개인</label>
-            </div>
-            <div class="filter-section">
-                <h3>파트너 지역</h3>
-                <select>
-                    <option>전체 선택</option>
-                </select>
-            </div>
-        </aside>
-        <main>
+
+    <!-- Navigation Menu -->
+    <nav>
+        <ul>
+            <li sec:authorize="hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN')"><a href="board/write">프로젝트 등록</a></li>
+            <li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
+            <li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
+            <li><a href="#">서비스 안내</a></li>
+            <li><a href="#">이용 사례</a></li>
+            <li><a href="#">커뮤니티</a></li>
+            <span>│</span>
+            <li><a th:href="@{/myProject/view}">내 프로젝트 목록</a></li>
+            <li><a th:href="@{/project/management}">프로젝트 관리</a></li>
+            <li><a href="#">미팅룸</a></li>
+        </ul>
+    </nav>
+
+    <!-- 새로 추가된 파트너스 찾기 섹션 -->
+    <main>
+        <div class="container">
+            <h1>파트너스 찾기</h1>
+            <p>130,049명의 파트너스가 있습니다.</p>
             <div class="search-bar">
-                <input type="text" placeholder="파트너스 찾기">
-                <button>검색</button>
+                <input type="text" id="search" placeholder="검색어를 입력하세요">
+                <button id="searchBtn">검색</button>
             </div>
-            <div class="sort-options">
-                <label><input type="radio" name="sort" checked> 기본 정렬순</label>
-                <label><input type="radio" name="sort"> 평점 높은순</label>
-                <label><input type="radio" name="sort"> 포트폴리오 많은순</label>
-                <label><input type="radio" name="sort"> 최근 업데이트순</label>
-            </div>
-            <div class="partner-list">
-                <!-- 파트너 카드 예시 -->
-                <div class="partner-card">
-                    <img src="partner-logo.jpg" alt="파트너 로고">
-                    <h3>파트너 이름</h3>
-                    <p class="partner-description">파트너 설명...</p>
-                    <div class="partner-info">
-                        <span class="rating">평점: 4.98</span>
-                        <span class="projects">계약한 프로젝트: 333건</span>
-                        <span class="portfolio">포트폴리오: 1,471개</span>
+            
+            <div class="content-wrapper">
+                <aside class="filters">
+                    <h2>파트너스 필터</h2>
+                    <section>
+                        <h3>파트너 등급</h3>
+                        <label><input type="checkbox" name="grade" value="PRIME+"> PRIME+</label>
+                        <label><input type="checkbox" name="grade" value="PRO"> PRO</label>
+                    </section>
+                    <section>
+                        <h3>선호 프로젝트 형태</h3>
+                        <label><input type="checkbox" name="projectType" value="외주"> 외주(도급)</label>
+                        <label><input type="checkbox" name="projectType" value="기간제"> 기간제(상주)</label>
+                    </section>
+                    <!-- 다른 필터 섹션들 추가 -->
+                </aside>
+                
+                <section id="results">
+                    <div id="sort">
+                        <button class="active">기본 정렬순</button>
+                        <button>평점 높은순</button>
+                        <button>포트폴리오 많은순</button>
+                        <button>최근 업데이트순</button>
                     </div>
-                    <div class="skills">
-                        <span>PHP</span>
-                        <span>Java</span>
-                        <span>React Native</span>
-                        <!-- 추가 스킬... -->
+                    
+                    <div id="partners">
+                        <!-- 파트너 카드들이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 프리랜서 마켓플레이스. All rights reserved.</p>
+            <p><a href="#">개인정보 처리방침</a> | <a href="#">이용 약관</a> | <a href="#">연락처</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // 파트너 데이터와 렌더링 로직
+        const partners = [
+            {
+                name: "ja******",
+                image: "https://example.com/image1.jpg",
+                grade: "PRIME+",
+                rating: 4.98,
+                reviews: 228,
+                projects: 333,
+                portfolio: 1471,
+                skills: ["Php", "Java", "React Native", "Jsp", "C#", "Android", "iOS"]
+            },
+            // 더 많은 파트너 데이터...
+        ];
+
+        function createPartnerCard(partner) {
+            return `
+                <div class="partner-card">
+                    <img src="${partner.image}" alt="${partner.name}" class="partner-image">
+                    <div class="partner-info">
+                        <h3>${partner.name} <span class="grade">${partner.grade}</span></h3>
+                        <div class="rating">★★★★★ ${partner.rating} / 평가 ${partner.reviews}개</div>
+                        <div class="partner-stats">
+                            <span>계약한 프로젝트: ${partner.projects}건</span>
+                            <span>포트폴리오: ${partner.portfolio}개</span>
+                        </div>
+                        <div class="skills">
+                            ${partner.skills.map(skill => `<span class="skill">${skill}</span>`).join('')}
+                        </div>
                     </div>
                 </div>
-                <!-- 추가 파트너 카드... -->
-            </div>
-        </main>
-    </div>
+            `;
+        }
+
+        function renderPartners() {
+            const partnersContainer = document.getElementById('partners');
+            partnersContainer.innerHTML = partners.map(createPartnerCard).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', renderPartners);
+    </script>
 </body>
 </html>

@@ -1,16 +1,20 @@
 package net.datasa.finders.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.datasa.finders.domain.dto.ClientDTO;
 import net.datasa.finders.domain.dto.FreelancerDTO;
+import net.datasa.finders.domain.dto.FreelancerSkillDTO;
 import net.datasa.finders.domain.dto.MemberDTO;
 import net.datasa.finders.domain.entity.ClientEntity;
 import net.datasa.finders.domain.entity.FreelancerEntity;
+import net.datasa.finders.domain.entity.FreelancerSkillEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.repository.ClientRepository;
 import net.datasa.finders.repository.FreelancerRepository;
+import net.datasa.finders.repository.FreelancerSkillRepository;
 import net.datasa.finders.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -32,6 +37,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final FreelancerRepository freelancerRepository;
     private final ClientRepository clientRepository;
+    private final FreelancerSkillRepository freelancerSkillRepository;
     
     public MemberEntity join(MemberDTO dto, String uploadPath, MultipartFile profileImg) throws IOException {
         LocalDateTime now = LocalDateTime.now();
@@ -92,6 +98,49 @@ public class MemberService {
     			.extraAddress(dto.getExtraAddress())
     			.build();
     			freelancerRepository.save(freelancerEntity);
+    }
+    
+//    @Transactional
+//    public void saveFreelancerSkills(String freelancerId, List<String> skills) {
+//        MemberEntity freelancer = memberRepository.findById(freelancerId)
+//            .orElseThrow(() -> new EntityNotFoundException("Freelancer not found"));
+//
+//        // 새로운 스킬 저장
+//        for (String skill : skills) {
+//            FreelancerSkillEntity skillEntity = FreelancerSkillEntity.builder()
+//                .freelancerId(freelancer)
+//                .skillText(skill)
+//                .build();
+//            freelancerSkillRepository.save(skillEntity);
+//        }
+//    }
+    
+    @Transactional
+    public void saveFreelancerSkills(String freelancerId, List<String> skills) {
+        MemberEntity freelancer = memberRepository.findById(freelancerId)
+            .orElseThrow(() -> new EntityNotFoundException("Freelancer not found"));
+
+        // 기존 스킬 삭제
+
+        // 새로운 스킬 저장
+        for (String skill : skills) {
+            // 문자열 정제
+            String cleanedSkill = cleanSkillString(skill);
+            
+            if (!cleanedSkill.isEmpty()) {
+                FreelancerSkillEntity skillEntity = FreelancerSkillEntity.builder()
+                    .freelancerId(freelancer)
+                    .skillText(cleanedSkill)
+                    .build();
+                freelancerSkillRepository.save(skillEntity);
+            }
+        }
+    }
+
+    // 문자열 정제 메서드
+    private String cleanSkillString(String skill) {
+        // 따옴표, 대괄호, 쉼표 등을 제거하고 앞뒤 공백을 제거
+        return skill.replaceAll("[\"\\[\\],]", "").trim();
     }
     
     public void joinClient(ClientDTO dto, MemberDTO member) {
