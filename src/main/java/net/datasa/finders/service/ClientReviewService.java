@@ -40,9 +40,9 @@ public class ClientReviewService {
 
     // 클라이언트가 평가한 리뷰 목록을 가져오는 메서드
     @Transactional(readOnly = true)
-    public List<ClientReviewDTO> getReceivedReviews(String freelancerId) {
+    public List<ClientReviewDTO> getReceivedReviews(String clientId) {
         // 프리랜서 ID를 사용하여 리뷰를 조회하고 DTO로 변환
-        return reviewRepository.findByFreelancerId(freelancerId).stream()
+        return reviewRepository.findByClientId(clientId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -73,14 +73,14 @@ public class ClientReviewService {
     
     @Transactional
     public void createClientReview(ClientReviewDTO reviewDTO) {
-        ClientReviewsEntity reviewEntity = new ClientReviewsEntity();
-        reviewEntity.setProjectNum(reviewDTO.getProjectNum());
-        reviewEntity.setClientId(reviewDTO.getClientId());
-        reviewEntity.setFreelancerId(reviewDTO.getFreelancerId());
-        reviewEntity.setRating(reviewDTO.getRating());
-        reviewEntity.setComment(reviewDTO.getComment());
-        reviewEntity.setReviewDate(LocalDateTime.now());
-
+    	  ClientReviewsEntity reviewEntity = ClientReviewsEntity.builder()
+    	            .projectNum(reviewDTO.getProjectNum())
+    	            .freelancerId(reviewDTO.getClientId()) // 평가를 남긴 ID를 received_id로 설정
+    	            .clientId(reviewDTO.getFreelancerId()) // 평가를 받은 ID를 send_id로 설정
+    	            .rating(reviewDTO.getRating())
+    	            .comment(reviewDTO.getComment())
+    	            .reviewDate(LocalDateTime.now())
+    	            .build();
         // 리뷰 항목 변환 및 저장
         List<ClientReviewItemEntity> reviewItems = reviewDTO.getReviewItems().stream()
                 .map(item -> {
@@ -93,15 +93,6 @@ public class ClientReviewService {
 
         reviewEntity.setReviewItems(reviewItems);
 
-        
-        // 클라이언트 ID, 프로젝트 번호, 프리랜서 ID로 이미 작성된 리뷰가 있는지 확인
-        boolean isReviewCompleted = reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
-                reviewDTO.getProjectNum(), reviewDTO.getClientId(), reviewDTO.getFreelancerId());
-
-        // 이미 리뷰가 작성되었다면 예외 발생
-        if (isReviewCompleted) {
-            throw new IllegalStateException("이미 이 프리랜서에 대한 리뷰가 작성되었습니다.");
-        }
         // 저장
         reviewRepository.save(reviewEntity);
     }
@@ -110,7 +101,7 @@ public class ClientReviewService {
     public boolean isReviewCompleted(String freelancerId, int projectNum, String clientId) {
         
     	
-    	return reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(projectNum, clientId, freelancerId);
+    	return reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(projectNum, freelancerId,clientId);
     }
 
 

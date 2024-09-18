@@ -31,6 +31,7 @@ public class ClientReviewController {
         try {
             List<ClientReviewDTO> reviews = clientReviewService.getReceivedReviews(clientId); // 클라이언트 리뷰 가져오기
             model.addAttribute("reviews", reviews);
+            log.info("Retrieved reviews count: {}", reviews.size());
             return "review/clientreview"; // 클라이언트 리뷰 템플릿 이름
         } catch (Exception e) {
             e.printStackTrace();

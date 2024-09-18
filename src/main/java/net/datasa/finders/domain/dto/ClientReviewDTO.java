@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 public class ClientReviewDTO {
     private int reviewId;
     private int projectNum;
-    private String clientId;
     private String freelancerId;
+    private String clientId;
     private float rating;
     private String comment;
     private LocalDateTime reviewDate; // 추가된 필드

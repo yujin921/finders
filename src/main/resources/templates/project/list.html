@@ -83,12 +83,17 @@
         <tr th:each="project : ${projects}">
             <td th:text="${project.projectNum}">1</td>
             <td th:text="${project.projectName}">프로젝트 A</td>
-            <td>
-                <!-- 후기 작성 버튼: freelancerreview 페이지로 이동 -->
-  			 <a th:href="@{/freelancerreview/writefreelancerreview(projectNum=${project.projectNum})}" class="button">프리랜서 후기 작성</a>
-  			 <a th:href="@{/clientreview/writeclientreview(projectNum=${project.projectNum})}" class="button">클라이언트 후기 작성</a>
-
-            </td>
+			<td>
+			    <!-- 로그인한 사용자가 클라이언트일 때만 프리랜서 후기 작성 버튼 표시 -->
+			    <a sec:authorize="hasRole('ROLE_CLIENT')" 
+			       th:href="@{/freelancerreview/writefreelancerreview(projectNum=${project.projectNum})}" 
+			       class="button">후기 작성</a>
+			
+			    <!-- 로그인한 사용자가 프리랜서일 때만 클라이언트 후기 작성 버튼 표시 -->
+			    <a sec:authorize="hasRole('ROLE_FREELANCER')" 
+			       th:href="@{/clientreview/writeclientreview(projectNum=${project.projectNum})}" 
+			       class="button">후기 작성</a>
+			</td>
         </tr>
         </tbody>
     </table>

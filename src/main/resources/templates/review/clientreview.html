@@ -76,7 +76,6 @@
             <h2>내가 받은 클라이언트 후기</h2>
             <div class="rating-average">
                 <strong>평점 평균: </strong>
-                <span id="averageRating" th:text="${averageRating}">평점 평균</span>
             </div>
             <table>
                 <thead>
@@ -112,22 +111,7 @@
     </footer>
     
     <script>
-        $(document).ready(function() {
-            // 프로젝트 번호를 HTML의 data 속성에서 가져옵니다.
-            var projectNum = $('body').data('projectnum');
 
-            $.ajax({
-                url: '/review/getAverageRating',
-                method: 'GET',
-                data: { projectNum: projectNum },
-                success: function(data) {
-                    $('#averageRating').text(data.toFixed(2)); // 소수점 2자리로 표시
-                },
-                error: function() {
-                    $('#averageRating').text('오류 발생');
-                }
-            });
-        });
     </script>
 </body>
 </html>

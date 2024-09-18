@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>프로젝트 관리</title>
@@ -41,44 +41,20 @@
     <div class="container">
         <h1>프로젝트 관리</h1>
 
-        <!-- 채팅방 생성 버튼 -->
-    <!--     <button class="button" onclick="createChatRooms()">채팅방 생성</button>
- -->
         <!-- 채팅방 목록 페이지로 이동하는 버튼 -->
         <a href="/chat/list" class="button">채팅방</a>
         <a href="/chat/view" class="button">채팅방2</a>
         <a href="/project/list" class="button">프로젝트 리스트</a>
-        <a href="/freelancerreview/received" class="button">받은 리뷰</a>
-        <a href="/clientreview/received" class="button">받은 리뷰</a>
 
+        <!-- 프리랜서가 받은 리뷰 버튼: 프리랜서일 때만 표시 -->
+        <a sec:authorize="hasRole('ROLE_FREELANCER')" 
+           href="/freelancerreview/received" 
+           class="button">받은 리뷰</a>
+
+        <!-- 클라이언트가 받은 리뷰 버튼: 클라이언트일 때만 표시 -->
+        <a sec:authorize="hasRole('ROLE_CLIENT')" 
+           href="/clientreview/received" 
+           class="button">받은 리뷰</a>
     </div>
-
-    <script>
-  /*       function createChatRooms() {
-            const memberId = prompt("채팅방을 생성할 member_id를 입력하세요:");
-
-            if (memberId) {
-                fetch('/chat/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams({ memberId: memberId })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('채팅방이 성공적으로 생성되었습니다.');
-                    } else {
-                        alert('채팅방 생성에 실패했습니다.');
-                        response.text().then(text => console.error('서버 응답:', text));
-                    }
-                })
-                .catch(error => {
-                    console.error('채팅방 생성 오류:', error);
-                    alert('채팅방 생성 중 오류가 발생했습니다.');
-                });
-            }
-        } */
-    </script>
 </body>
 </html>

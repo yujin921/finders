@@ -33,10 +33,10 @@ public class ClientReviewsEntity {
     @Column(name = "project_num", nullable = false) // 프로젝트 번호
     private int projectNum;
 
-    @Column(name = "freelancer_id", nullable = false, length = 20) // 평가를 남긴 클라이언트 ID
+    @Column(name = "send_id", nullable = false, length = 20) // 평가를 남긴 클라이언트 ID
     private String freelancerId;
 
-    @Column(name = "client_id", nullable = false, length = 20) // 평가를 받은 프리랜서 ID
+    @Column(name = "received_id", nullable = false, length = 20) // 평가를 받은 프리랜서 ID
     private String clientId;
 
     @Column(name = "rating", nullable = false) // 총 평점 (0.5~5점)
