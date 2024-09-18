@@ -1,24 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // 피쳐 카드 애니메이션
-    const cards = document.querySelectorAll('.feature-card');
-    cards.forEach(card => {
-        card.addEventListener('mouseover', () => {
-            card.style.backgroundColor = '#f0f0f0';
-        });
-        card.addEventListener('mouseout', () => {
-            card.style.backgroundColor = 'white';
-        });
+  const tabs = document.querySelectorAll('.main-tabs button');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      tabs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      
+      const target = this.getAttribute('data-tab');
+      tabContents.forEach(content => {
+        content.style.display = content.id === target ? 'block' : 'none';
+      });
     });
+  });
 
-    // 간단한 testimonial 슬라이더
-    const testimonials = document.querySelectorAll('.testimonial');
-    let currentTestimonial = 0;
-
-    function showNextTestimonial() {
-        testimonials[currentTestimonial].style.display = 'none';
-        currentTestimonial = (currentTestimonial + 1) % testimonials.length;
-        testimonials[currentTestimonial].style.display = 'block';
-    }
-
-    setInterval(showNextTestimonial, 3000); // 3초마다 testimonial 변경
+  // 초기 상태 설정
+  tabs[0].click();
 });
