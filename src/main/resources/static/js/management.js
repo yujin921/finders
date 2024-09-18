@@ -401,15 +401,44 @@ document.addEventListener('DOMContentLoaded', function() {
 		    type: 'GET',
 		    dataType: 'json',
 		    success: function(response) {
-		        if (response && response.data) {
-		            if (Array.isArray(response.data)) {
-		                createGanttChart(response.data, response.adjustedStartDate, response.adjustedEndDate);
-		            } else {
-		                alert('간트 차트 데이터를 로드하는 데 실패했습니다. 데이터 형식이 올바르지 않습니다.');
-		            }
-		        } else {
-		            alert('간트 차트 데이터를 로드하는 데 실패했습니다. 서버에서 데이터를 받지 못했습니다.');
-		        }
+				
+				// 응답 데이터 검증
+	            if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
+
+	                // 데이터 추출
+	                const data = response.data;
+	                
+	                // 가장 이른 시작일 (baselineStart 또는 actualStart 중 가장 빠른 날짜 찾기)
+	                const earliestStart = data
+	                    .map(item => new Date(item.baselineStart || item.actualStart))
+	                    .filter(date => !isNaN(date.getTime()))
+	                    .reduce((earliest, current) => current < earliest ? current : earliest, new Date(8640000000000000));
+	                
+	                // 가장 늦은 종료일 (baselineEnd 또는 actualEnd 중 가장 늦은 날짜 찾기)
+	                const latestEnd = data
+	                    .map(item => new Date(item.baselineEnd || item.actualEnd))
+	                    .filter(date => !isNaN(date.getTime()))
+	                    .reduce((latest, current) => current > latest ? current : latest, new Date(-8640000000000000));
+	                
+	                // 여유 기간 추가
+	                const bufferDay = 30;
+	                const adjustedStartDate = new Date(earliestStart.getTime() - bufferDay * 24 * 60 * 60 * 1000);
+	                const adjustedEndDate = new Date(latestEnd.getTime() + bufferDay * 24 * 60 * 60 * 1000);
+
+	                // 날짜 포맷 설정
+	                const formatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
+	                const format = (date) => date ? formatter.format(date).replace(/\//g, '-') + 'T00:00:00Z' : null;
+
+	                // 조정된 날짜를 로그로 출력 (디버깅 용)
+	                console.log('조정된 시작일:', format(adjustedStartDate));
+	                console.log('조정된 종료일:', format(adjustedEndDate));
+
+	                // 간트차트 생성 함수 호출
+	                createGanttChart(data, format(adjustedStartDate), format(adjustedEndDate));
+	            } else {
+	                alert('간트 차트 데이터를 로드하는 데 필요한 정보가 부족합니다.');
+	                console.error('잘못된 데이터:', response);
+	            }
 		    },
 		    error: function(xhr, status, error) {
 		        console.error('AJAX Error:', status, error);
