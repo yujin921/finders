@@ -191,30 +191,54 @@
             return;
         }
 
-        fetch(`/review/getParticipants?projectNum=${projectNum}`) // 필요한 API 호출
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('네트워크 응답이 실패했습니다.');
-                }
-                return response.json();
-            })
+        fetch('/member/getMemberId')
+            .then(response => response.json())
             .then(data => {
-                const participantSelect = document.getElementById('participantSelect');
-                if (Array.isArray(data)) {
-                    participantSelect.innerHTML = '';
-                    data.forEach(participant => {
-                        const option = document.createElement('option');
-                        option.value = participant.id; // 참가자 ID
-                        option.textContent = participant.name; // 참가자 이름
-                        participantSelect.appendChild(option);
+                const clientId = data.memberId;
+                const reviewDataDiv = document.getElementById('review-data');
+                reviewDataDiv.dataset.projectNum = projectNum;
+                reviewDataDiv.dataset.clientId = clientId;
+
+                // 참가자 목록을 서버에서 가져오기
+                fetch(`/review/getParticipants?projectNum=${projectNum}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const participantSelect = document.getElementById('participantSelect');
+
+                        if (Array.isArray(data)) {
+                            participantSelect.innerHTML = '';
+                            data.forEach(participant => {
+                                // 참가자 데이터 출력
+                                console.log('Participant Data:', participant);
+
+                                const option = document.createElement('option');
+                                option.value = participant.id; // 참가자 ID
+                                option.textContent = participant.name; // 참가자 이름
+
+                                // 작성 완료 여부에 따라 상태 설정
+                                if (participant.reviewCompleted) { // reviewCompleted로 변경
+                                    option.textContent += ' (작성 완료)'; // 작성 완료 표시
+                                    option.disabled = true; // 작성 완료된 경우 선택 불가
+                                }
+
+                                participantSelect.appendChild(option);
+                            });
+                        } else {
+                            console.error('Invalid participants data format.');
+                            alert('참가자 데이터를 불러오는 중 오류가 발생했습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('참가자 데이터 로드 중 오류:', error);
+                        alert('참가자 데이터를 불러오는 중 오류가 발생했습니다.');
                     });
-                }
             })
             .catch(error => {
-                console.error('참가자 데이터를 불러오는 중 오류 발생:', error);
-                alert('참가자 데이터를 불러오는 중 오류가 발생했습니다.');
+                console.error('클라이언트 ID 로드 중 오류:', error);
+                alert('클라이언트 ID를 불러오는 중 오류가 발생했습니다.');
             });
     }
+
 
         document.addEventListener('DOMContentLoaded', loadParticipantData);
 

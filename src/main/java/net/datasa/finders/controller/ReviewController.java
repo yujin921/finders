@@ -96,6 +96,15 @@ public class ReviewController {
 
         try {
             List<ClientDataDTO> participants = clientReviewService.getParticipantsByProject(projectNum, clientId);
+
+            // 각 참가자의 리뷰 작성 완료 여부를 확인하여 설정
+            for (ClientDataDTO participant : participants) {
+                // participant.getId() 대신 freelancerId를 사용해야 할 수 있음
+                boolean isReviewCompleted = clientReviewService.isReviewCompleted(participant.getId(), projectNum, clientId);
+                participant.setReviewCompleted(isReviewCompleted); // 작성 완료 상태 설정
+                log.info("참가자 ID: {}, 리뷰 작성 완료 여부: {}", participant.getId(), isReviewCompleted); // 로그 추가
+            }
+
             return ResponseEntity.ok(participants);
         } catch (Exception e) {
             log.error("참가자 목록을 가져오는 중 오류 발생: ", e);
@@ -108,14 +117,17 @@ public class ReviewController {
             @RequestBody ClientReviewDTO reviewDTO, 
             @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            // 클라이언트 ID를 UserDetails에서 가져와 설정
             String clientId = userDetails.getUsername();
             reviewDTO.setClientId(clientId); // DTO에 클라이언트 ID 설정
 
+            // 클라이언트 리뷰가 이미 작성되었는지 확인
+            if (clientReviewService.isReviewCompleted(clientId, reviewDTO.getProjectNum(), reviewDTO.getFreelancerId())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 리뷰를 작성하였습니다.");
+            }
+
             // 필요한 검증: projectNum이 존재하는지 확인
             if (!projectExists(reviewDTO.getProjectNum())) {
-            	log.info("Project Number: {}", reviewDTO.getProjectNum());
-            	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("존재하지 않는 프로젝트 번호입니다.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("존재하지 않는 프로젝트 번호입니다.");
             }
 
             // 클라이언트 리뷰 저장
@@ -127,8 +139,9 @@ public class ReviewController {
         }
     }
 
+
     // 프로젝트가 존재하는지 확인하는 메서드
     private boolean projectExists(int projectNum) {
-        return projectRepository.existsById(projectNum); // 프로젝트 레포지토리에서 확인
+        return projectRepository.existsById(projectNum);
     }
 }

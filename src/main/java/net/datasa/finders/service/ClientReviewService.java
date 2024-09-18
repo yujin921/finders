@@ -93,8 +93,25 @@ public class ClientReviewService {
 
         reviewEntity.setReviewItems(reviewItems);
 
+        
+        // 클라이언트 ID, 프로젝트 번호, 프리랜서 ID로 이미 작성된 리뷰가 있는지 확인
+        boolean isReviewCompleted = reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
+                reviewDTO.getProjectNum(), reviewDTO.getClientId(), reviewDTO.getFreelancerId());
+
+        // 이미 리뷰가 작성되었다면 예외 발생
+        if (isReviewCompleted) {
+            throw new IllegalStateException("이미 이 프리랜서에 대한 리뷰가 작성되었습니다.");
+        }
         // 저장
         reviewRepository.save(reviewEntity);
     }
+    
+    @Transactional(readOnly = true)
+    public boolean isReviewCompleted(String freelancerId, int projectNum, String clientId) {
+        
+    	
+    	return reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(projectNum, clientId, freelancerId);
+    }
+
 
 }
