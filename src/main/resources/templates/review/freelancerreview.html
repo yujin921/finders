@@ -82,7 +82,7 @@
                 <thead>
                     <tr>
                         <th>프로젝트 번호</th>
-                        <th>클라이언트 ID</th>
+                        <th>ID</th>
                         <th>평점</th>
                         <th>코멘트</th>
                         <th>작성일</th>
@@ -90,18 +90,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="review : ${reviews}">
-                        <td th:text="${review.projectNum}">프로젝트 번호</td>
-                        <td th:text="${review.clientId}">클라이언트 ID</td>
-                        <td th:text="${review.rating}">평점</td>
-                        <td th:text="${review.comment}">코멘트</td>
-                        <td th:text="${review.reviewDate}">작성일</td>
-                        <td class="review-items">
-                            <ul>
-                                <li th:each="item : ${review.reviewItems}" th:text="${item.itemName} + ' : ' + (item.selected ? '선택됨' : '선택되지 않음')"></li>
-                            </ul>
-                        </td>
-                    </tr>
+					<tr th:each="review : ${reviews}">
+					    <td th:text="${review.projectNum}">프로젝트 번호</td>
+					    <td th:text="${review.reviewerId}">ID</td>
+					    <td th:text="${review.rating}">평점</td>
+					    <td th:text="${review.comment}">코멘트</td>
+					    <td th:text="${review.reviewDate}">작성일</td> <!-- 날짜를 그대로 출력 -->
+					    <td class="review-items" th:if="${review.reviewItems != null}">
+					        <ul>
+					            <li th:each="item : ${review.reviewItems}" 
+					                th:text="${item.itemName} + ' : ' + (item.selected ? '선택됨' : '선택되지 않음')"></li>
+					        </ul>
+					    </td>
+					</tr>
+
                 </tbody>
             </table>
         </section>

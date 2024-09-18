@@ -25,6 +25,7 @@ public interface ClientReviewsRepository extends JpaRepository<ClientReviewsEnti
     @Query("SELECT cr FROM ClientReviewsEntity cr WHERE cr.clientId = :clientId")
     List<ClientReviewsEntity> findByClientId(@Param("clientId") String clientId);
     
+
     // 프로젝트 번호, 클라이언트 ID, 프리랜서 ID로 리뷰가 존재하는지 확인하는 메서드 추가
     boolean existsByProjectNumAndClientIdAndFreelancerId(int projectNum, String clientId, String freelancerId);
 }

@@ -73,7 +73,7 @@
 
     <main>
         <section>
-            <h2>내가 받은 클라이언트 후기</h2>
+            <h2>내가 받은 후기</h2>
             <div class="rating-average">
                 <strong>평점 평균: </strong>
             </div>
@@ -81,7 +81,7 @@
                 <thead>
                     <tr>
                         <th>프로젝트 번호</th>
-                        <th>프리랜서 ID</th>
+                        <th>ID</th>
                         <th>평점</th>
                         <th>코멘트</th>
                         <th>작성일</th>
@@ -91,7 +91,7 @@
                 <tbody>
                     <tr th:each="review : ${reviews}">
                         <td th:text="${review.projectNum}">프로젝트 번호</td>
-                        <td th:text="${review.freelancerId}">프리랜서 ID</td>
+                        <td th:text="${review.freelancerId}">ID</td>
                         <td th:text="${review.rating}">평점</td>
                         <td th:text="${review.comment}">코멘트</td>
                         <td th:text="${review.reviewDate}">작성일</td>

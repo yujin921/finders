@@ -1,5 +1,6 @@
 package net.datasa.finders.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,10 +14,13 @@ import lombok.RequiredArgsConstructor;
 import net.datasa.finders.domain.dto.FreelancerDataDTO;
 import net.datasa.finders.domain.dto.FreelancerReviewDTO;
 import net.datasa.finders.domain.dto.ReviewItemDTO;
+import net.datasa.finders.domain.dto.UnifiedReviewDTO;
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
 import net.datasa.finders.domain.entity.FreelancerReviewItemEntity;
 import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.repository.ClientReviewsRepository;
 import net.datasa.finders.repository.FreelancerReviewsRepository;
 import net.datasa.finders.repository.MemberRepository;
 
@@ -27,7 +31,8 @@ public class FreelancerReviewService {
     private static final Logger logger = LoggerFactory.getLogger(FreelancerReviewService.class);
     private final MemberRepository memberRepository;
     private final FreelancerReviewsRepository reviewRepository;  // 추가된 부분
-    
+    private final ClientReviewsRepository clientReviewRepository;
+    private final FreelancerReviewsRepository freelancerReviewRepository; 
 
     /**
      * 특정 프로젝트에 참여 중인 프리랜서 목록을 조회합니다.
@@ -97,6 +102,34 @@ public class FreelancerReviewService {
                 .itemName(entity.getItemName())
                 .selected(entity.isItemValue()) // boolean으로 설정
                 .build();
+    }
+    
+
+    // 프리랜서가 클라이언트와 다른 프리랜서로부터 받은 모든 리뷰 조회
+    @Transactional(readOnly = true)
+    public List<UnifiedReviewDTO> getAllReviewsForFreelancer(String freelancerId) {
+        // 클라이언트가 프리랜서에게 남긴 리뷰 조회 (ClientReviewsEntity)
+        List<ClientReviewsEntity> clientReviews = clientReviewRepository.findByFreelancerId(freelancerId);
+
+        // 프리랜서가 다른 프리랜서에게 남긴 리뷰 조회 (ClientReviewsEntity에서 조회)
+        List<ClientReviewsEntity> freelancerToFreelancerReviews = clientReviewRepository.findByClientId(freelancerId);
+
+        // 프리랜서가 클라이언트에게서 받은 리뷰 조회 (FreelancerReviewsEntity)
+        List<FreelancerReviewsEntity> freelancerReviews = freelancerReviewRepository.findByFreelancerId(freelancerId);
+
+        // 통합된 리뷰 리스트로 변환
+        List<UnifiedReviewDTO> unifiedReviews = new ArrayList<>();
+
+        // 클라이언트가 남긴 리뷰 추가
+        clientReviews.forEach(review -> unifiedReviews.add(UnifiedReviewDTO.fromClientReview(review)));
+
+        // 프리랜서가 프리랜서에게 남긴 리뷰 추가
+        freelancerToFreelancerReviews.forEach(review -> unifiedReviews.add(UnifiedReviewDTO.fromClientReview(review)));
+
+        // 프리랜서가 받은 리뷰 추가
+        freelancerReviews.forEach(review -> unifiedReviews.add(UnifiedReviewDTO.fromFreelancerReview(review)));
+
+        return unifiedReviews;
     }
 
 }

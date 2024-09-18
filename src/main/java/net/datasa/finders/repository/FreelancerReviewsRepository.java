@@ -17,7 +17,11 @@ public interface FreelancerReviewsRepository extends JpaRepository<FreelancerRev
         @Param("clientId") String clientId,
         @Param("freelancerId") String freelancerId); 
     
-    List<FreelancerReviewsEntity> findByFreelancerId(String freelancerId); 
+    // 프리랜서가 받은 모든 리뷰 조회
+    List<FreelancerReviewsEntity> findByFreelancerId(String freelancerId);
+    
+    // 프리랜서가 남긴 리뷰도 조회하는 쿼리
+    List<FreelancerReviewsEntity> findByClientId(String freelancerId);  // 프리랜서가 리뷰를 남긴 경우
     // 프로젝트 번호, 클라이언트 ID, 프리랜서 ID로 리뷰가 존재하는지 확인하는 메서드 추가
     boolean existsByProjectNumAndClientIdAndFreelancerId(int projectNum, String clientId, String freelancerId);
 

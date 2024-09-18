@@ -1,7 +1,7 @@
 package net.datasa.finders.service;
 
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,10 +13,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FreelancerDataDTO;
 import net.datasa.finders.domain.dto.FreelancerReviewDTO;
 import net.datasa.finders.domain.dto.ReviewItemDTO;
+import net.datasa.finders.domain.dto.UnifiedReviewDTO;
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
 import net.datasa.finders.domain.entity.FreelancerReviewItemEntity;
 import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.repository.ClientReviewsRepository;
 import net.datasa.finders.repository.FreelancerReviewItemRepository;
 import net.datasa.finders.repository.FreelancerReviewsRepository;
 import net.datasa.finders.repository.MemberRepository;
@@ -29,17 +32,15 @@ public class ReviewService {
 
     private final FreelancerReviewsRepository reviewRepository;
     private final FreelancerReviewItemRepository reviewItemRepository;
+    private final ClientReviewsRepository clientReviewRepository;
     private final MemberRepository memberRepository;
     private final ProjectPublishingRepository projectPublishingRepository;
-    
 
     @Transactional
     public FreelancerReviewDTO createFreelancerReview(FreelancerReviewDTO reviewDTO) {
-        // 클라이언트 ID, 프로젝트 번호, 프리랜서 ID로 이미 작성된 리뷰가 있는지 확인
         boolean isReviewCompleted = reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
                 reviewDTO.getProjectNum(), reviewDTO.getClientId(), reviewDTO.getFreelancerId());
 
-        // 이미 리뷰가 작성되었다면 예외 발생
         if (isReviewCompleted) {
             throw new IllegalStateException("이미 이 프리랜서에 대한 리뷰가 작성되었습니다.");
         }
@@ -57,8 +58,7 @@ public class ReviewService {
                 .reviewItems(reviewDTO.getReviewItems())
                 .build();
     }
-    
-    // saveReviewEntity 메서드 추가
+
     private FreelancerReviewsEntity saveReviewEntity(FreelancerReviewDTO reviewDTO) {
         return reviewRepository.save(
                 FreelancerReviewsEntity.builder()
@@ -95,36 +95,29 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public FreelancerReviewDTO getReviewData(int projectNum, String clientId) {
-        // 프로젝트 번호와 클라이언트 ID를 기반으로 평가할 프리랜서 목록을 조회
         List<MemberEntity> freelancers = memberRepository.findByProjects_ProjectNum(projectNum)
                 .stream()
                 .filter(member -> member.getRoleName() == RoleName.ROLE_FREELANCER)
                 .collect(Collectors.toList());
 
-        // 프리랜서 데이터를 DTO로 변환하면서, 각 프로젝트별로 리뷰 완료 여부 확인
         List<FreelancerDataDTO> freelancerDTOs = freelancers.stream()
             .map(freelancer -> {
-                // 특정 프로젝트와 프리랜서 ID로 리뷰 존재 여부 확인
                 boolean isReviewCompleted = reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
                         projectNum, clientId, freelancer.getMemberId());
 
-                // 로그 추가: 각 프리랜서의 작성 완료 상태 출력
                 log.info("Freelancer ID: {}, isReviewCompleted: {}", freelancer.getMemberId(), isReviewCompleted);
 
-                // DTO 생성 시 작성 완료 상태 설정
                 return new FreelancerDataDTO(freelancer.getMemberId(), freelancer.getMemberName(), isReviewCompleted);
             })
             .collect(Collectors.toList());
 
-        // 리뷰 데이터 반환
         return FreelancerReviewDTO.builder()
             .projectNum(projectNum)
             .clientId(clientId)
-            .freelancerData(freelancerDTOs) // 프리랜서 리스트를 DTO에 추가
+            .freelancerData(freelancerDTOs)
             .build();
     }
 
-    // 평균 평점을 계산하는 메소드
     public double calculateAverageRating() {
         List<FreelancerReviewsEntity> reviews = reviewRepository.findAll();
         if (reviews.isEmpty()) {
@@ -137,4 +130,16 @@ public class ReviewService {
         return totalRating / reviews.size();
     }
 
+    // 클라이언트와 프리랜서 리뷰를 모두 조회하여 통합 반환하는 메서드 추가
+    @Transactional(readOnly = true)
+    public List<UnifiedReviewDTO> getAllReviewsForFreelancer(String freelancerId) {
+        List<ClientReviewsEntity> clientReviews = clientReviewRepository.findByFreelancerId(freelancerId);
+        List<FreelancerReviewsEntity> freelancerReviews = reviewRepository.findByFreelancerId(freelancerId);
+
+        List<UnifiedReviewDTO> unifiedReviews = new ArrayList<>();
+        clientReviews.forEach(review -> unifiedReviews.add(UnifiedReviewDTO.fromClientReview(review)));
+        freelancerReviews.forEach(review -> unifiedReviews.add(UnifiedReviewDTO.fromFreelancerReview(review)));
+
+        return unifiedReviews;
+    }
 }
