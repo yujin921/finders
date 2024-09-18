@@ -1,10 +1,13 @@
 package net.datasa.finders.domain.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,4 +32,8 @@ public class FunctionTitleEntity {
     @Column(name = "function_processivity", nullable = false, columnDefinition = "DEFAULT '0%'")
     private String functionProcessivity;
 
+    // TaskManagementEntity와의 관계 설정
+    @OneToMany(mappedBy = "functionTitleEntity")
+    private List<TaskManagementEntity> tasks;
+    
 }

@@ -1,5 +1,6 @@
 package net.datasa.finders.controller;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +19,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.FunctionDTO;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
+import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
@@ -186,19 +189,30 @@ public class ProjectManagementController {
     
     @ResponseBody
     @GetMapping("loadEntityNames")
-    public List<?> loadEntityNames(@RequestParam("projectNum") int projectNum
-    		, @RequestParam("entityType") String entityType) {
-    	
-    	// entityType에 따라 다른 데이터 반환 로직
-        if ("task".equalsIgnoreCase(entityType)) {
-            // TaskManagementEntity 리스트 반환
-            return projectManagementService.getTasks(projectNum);
-        } else if ("function".equalsIgnoreCase(entityType)) {
-            // FunctionTitleEntity 리스트 반환
-            return projectManagementService.getFunctions(projectNum);
+    public ResponseEntity<List<Object>> loadEntityNames(@RequestParam("projectNum") int projectNum,
+                                                         @RequestParam("entityType") String entityType) {
+        try {
+            List<Object> entities = new ArrayList<>();
+            switch (entityType.toLowerCase()) {
+                case "task":
+                    // `getTasksFilter` 메소드가 반환하는 리스트를 `List<Object>`로 변환
+                    List<TaskDTO> tasks = projectManagementService.getTasksFilter(projectNum);
+                    entities.addAll(tasks);
+                    break;
+                case "function":
+                    // `getFunctions` 메소드가 반환하는 리스트를 `List<Object>`로 변환
+                    List<FunctionDTO> functions = projectManagementService.getFunctions(projectNum);
+                    entities.addAll(functions);
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body(Collections.emptyList());
+            }
+            return ResponseEntity.ok(entities);
+        } catch (Exception e) {
+            // 에러 발생 시 로그에 에러 메시지 기록
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
         }
-        // 유효하지 않은 entityType일 경우 빈 리스트 반환
-        return Collections.emptyList();
     }
     
     @ResponseBody
@@ -212,6 +226,24 @@ public class ProjectManagementController {
         } catch (Exception e) {
             e.printStackTrace();
             return "failure";
+        }
+    }
+    
+    // 실제 일정 업데이트 요청 처리
+    @ResponseBody
+    @PostMapping("updateSchedule")
+    public ResponseEntity<String> updateSchedule(
+            @RequestParam("entityType") String entityType,
+            @RequestParam("id") int dbId,
+            @RequestParam("actualStart") String actualStart,
+            @RequestParam("actualEnd") String actualEnd) {
+        try {
+            // 요청 데이터를 Service로 전달
+            projectManagementService.updateSchedule(entityType, dbId, actualStart, actualEnd);
+            return ResponseEntity.ok("success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("failure");
         }
     }
     

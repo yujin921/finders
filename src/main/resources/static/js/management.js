@@ -1,3 +1,15 @@
+window.addEventListener('load', adjustSidebarHeight);
+window.addEventListener('resize', adjustSidebarHeight);
+
+function adjustSidebarHeight() {
+    const container = document.querySelector('.container');
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+
+    // 사이드바의 높이를 전체 컨테이너 높이에서 main-content의 높이를 뺀 값으로 설정
+    sidebar.style.height = `${container.clientHeight}px`;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
@@ -409,6 +421,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 간트차트 생성(로드)
 	function createGanttChart(ganttChartData, adjustedStartDate, adjustedEndDate) {
 		
+		console.log('createGanttChart 호출:');
+	    console.log('간트차트 데이터:', ganttChartData); // 데이터 확인 로그
+	    console.log('조정된 시작일:', adjustedStartDate);
+	    console.log('조정된 종료일:', adjustedEndDate);
+		
 		if (ganttChartLoaded) {
 			// 기존 차트가 로드되어 있으면 제거
 			ganttChart.dispose();
@@ -421,6 +438,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	        // 데이터 트리 생성
 	        let treeData = anychart.data.tree(ganttChartData, "as-tree");
+			
+			console.log('TreeData 체크용:', treeData);
 
 	        // 차트에 데이터 설정
 	        ganttChart.data(treeData);
@@ -470,6 +489,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	        timeline.milestones().preview().enabled(true); // 이정표 미리보기를 활성화합니다
 	        timeline.baselineMilestones().preview().enabled(true); // 기준선 이정표 미리보기를 활성화합니다
 
+			// 날짜 형식 로그 추가
+	        ganttChartData.forEach(task => {
+	            console.log('Task Data 체크용:', task);
+	            console.log('Actual Start 체크용:', task.actualStart);
+	            console.log('Actual End 체크용:', task.actualEnd);
+	        });
+			
 	        // Gantt 데이터에서 시작일과 종료일 추출
 	        let chartFirstElement = ganttChartData[0];
 	        let chartLastElement = ganttChartData[ganttChartData.length - 1];
@@ -496,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        }
 
 	        // 여유 기간을 설정합니다
-	        const bufferDays = 7;
+	        const bufferDays = 30;
 
 	        // 날짜 문자열을 Date 객체로 변환
 	        let adjustedStartDateObj = new Date(adjustedStartDate);
@@ -540,71 +566,112 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	    });
 		
-		// 이름 로드 함수
-		function loadNames(projectNum, entityType) {
-		    console.log(`Loading names for projectNum: ${projectNum}, entityType: ${entityType}`); // 디버깅용 로그
+		// loadEntityNames(진행도)
+		function loadNamesForProgress(projectNum, entityType) {
+		    console.log(`Loading names for progress select box, projectNum: ${projectNum}, entityType: ${entityType}`); // 디버깅용 로그
 		    
 		    $.ajax({
 		        url: 'loadEntityNames',
 		        type: 'GET',
 		        data: { projectNum: projectNum, entityType: entityType },
 		        success: function(response) {
-		            console.log('Response:', response); // 디버깅용 로그
+		            console.log('Response for progress select box:', response); // 디버깅용 로그
 		            
-		            const $select = $('#name-select');
-		            $select.empty().append('<option value="">선택</option>'); // 초기화 후 기본 옵션 추가
-
+		            const $selectProgress = $('#name-select');
+		            $selectProgress.empty().append('<option value="">선택</option>'); 
+		            
 		            response.forEach(function(item) {
-		                // 엔티티 타입에 따라 올바른 필드명을 사용
-		                if (entityType === 'task') {
-		                    $select.append(`<option value="${item.taskId}">${item.taskTitle}</option>`);
-		                } else if (entityType === 'function') {
-		                    $select.append(`<option value="${item.functionTitleId}">${item.titleName}</option>`);
+		                if (entityType === 'task' && item.taskId && item.taskTitle) {
+		                    $selectProgress.append(`<option value="${item.taskId}">${item.taskTitle}</option>`);
+		                } else if (entityType === 'function' && item.functionTitleId && item.titleName) {
+		                    $selectProgress.append(`<option value="${item.functionTitleId}">${item.titleName}</option>`);
 		                }
 		            });
 		        },
 		        error: function(xhr, status, error) {
-		            console.error('Error:', error); // 디버깅용 로그
+		            console.error('Error loading progress names:', error); // 디버깅용 로그
+		            alert('진행도 이름 목록을 불러오는 데 실패했습니다.');
+		        }
+		    });
+		}
+		
+		// loadEntityNames(실제 진행 일정)
+		function loadNamesForDate(projectNum, entityType) {
+		    console.log(`Loading names for date select box, projectNum: ${projectNum}, entityType: ${entityType}`); // 디버깅용 로그
+		    
+		    $.ajax({
+		        url: 'loadEntityNames',
+		        type: 'GET',
+		        data: { projectNum: projectNum, entityType: entityType },
+		        success: function(response) {
+		            console.log('Response for date select box:', response); // 디버깅용 로그
 		            
-		            alert('이름 목록을 불러오는 데 실패했습니다.');
+		            const $selectDate = $('#name-selectDate');
+		            $selectDate.empty().append('<option value="">선택</option>'); 
+		            
+		            response.forEach(function(item) {
+		                if (entityType === 'task' && item.taskId && item.taskTitle) {
+		                    $selectDate.append(`<option value="${item.taskId}">${item.taskTitle}</option>`);
+		                } else if (entityType === 'function' && item.functionTitleId && item.titleName) {
+		                    $selectDate.append(`<option value="${item.functionTitleId}">${item.titleName}</option>`);
+		                }
+		            });
+		        },
+		        error: function(xhr, status, error) {
+		            console.error('Error loading date names:', error); // 디버깅용 로그
+		            alert('일정 이름 목록을 불러오는 데 실패했습니다.');
 		        }
 		    });
 		}
 
-		// Entity Type select box 변경 시 처리
-		$('#entityType-select').change(function() {
-		    const entityType = $(this).val();
-		    const projectNum = getQueryParam('projectNum'); // URL 쿼리 스트링에서 projectNum을 가져옴
-
-			console.log(`Entity Type Selected: ${entityType}`); // 디버깅용 로그
-			console.log(`Project Num: ${projectNum}`); // 디버깅용 로그
-			
-		    if (entityType && projectNum) {
-		        // 엔티티 유형이 선택되면, 해당 엔티티에 맞는 항목을 로드
-		        loadNames(projectNum, entityType);
-		        $('#name-select').prop('disabled', false);
-		    } else {
-		        // 엔티티 유형이 선택되지 않으면, 'Name' select box 비활성화
-		        $('#name-select').prop('disabled', true);
-		        $('#name-select').empty().append('<option value="">선택</option>');
-		    }
-		});
-
-		// 페이지 로드 시 기본값으로 'function'을 선택하여 이름을 로드
+		// 페이지 로드 시 기본값으로 'task'를 선택하여 이름을 로드
 		$(document).ready(function() {
-		    const projectNum = new URLSearchParams(window.location.search).get('projectNum');
-		    if (projectNum) {
-		        $('#entityType-select').val('function');  // 기본값으로 'function' 선택
-				loadNames(projectNum, 'function');  // 기본값으로 'function' 로드
+		    let projectNumber = new URLSearchParams(window.location.search).get('projectNum');
+		    if (projectNumber) {
+		        $('#entityType-select').val('task');  // 기본값으로 'task' 선택
+				$('#entityType-selectDate').val('task'); // 기본값으로 'task' 선택
+				loadNamesForProgress(projectNumber, 'task');  // 기본값으로 'task' 로드
+				loadNamesForDate(projectNum, 'task'); // 기본값으로 'task' 로드
 			}
+			
+			// 기존 이벤트 리스너를 제거하고 새로운 리스너를 추가
+			$('#update-progress-button').off('click').on('click', updateProgress);
+			$('#update-schedule-button').off('click').on('click', updateActualDate);
+			
+			// Entity Type select box 변경 시 처리 (진행도)
+			$('#entityType-select').change(function() {
+			    const entityType = $(this).val();
+			    const projectNum = getQueryParam('projectNum'); // URL 쿼리 스트링에서 projectNum을 가져옴
 
-		    // Entity Type 선택 변경 시 이름 로드
-		    $('#entityType-select').change(function() {
-		        const selectedType = $(this).val();
-		        if (projectNum) {
-		            loadNames(projectNum, selectedType);
-		        }
-		    });
+			    console.log(`Entity Type Selected for progress: ${entityType}`); // 디버깅용 로그
+			    console.log(`Project Num: ${projectNum}`); // 디버깅용 로그
+			    
+			    if (entityType && projectNum) {
+			        loadNamesForProgress(projectNum, entityType);
+			        $('#name-select').prop('disabled', false);
+			    } else {
+			        $('#name-select').prop('disabled', true);
+			        $('#name-select').empty().append('<option value="">선택</option>');
+			    }
+			});
+
+			// Entity Type select box 변경 시 처리 (실제 일정 업데이트)
+			$('#entityType-selectDate').change(function() {
+			    const entityType = $(this).val();
+			    const projectNum = getQueryParam('projectNum'); // URL 쿼리 스트링에서 projectNum을 가져옴
+
+			    console.log(`Entity Type Selected for date: ${entityType}`); // 디버깅용 로그
+			    console.log(`Project Num: ${projectNum}`); // 디버깅용 로그
+			    
+			    if (entityType && projectNum) {
+			        loadNamesForDate(projectNum, entityType);
+			        $('#name-selectDate').prop('disabled', false);
+			    } else {
+			        $('#name-selectDate').prop('disabled', true);
+			        $('#name-selectDate').empty().append('<option value="">선택</option>');
+			    }
+			});
+
 		});
 
 		// 진행도 업데이트 함수
@@ -615,7 +682,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		    // 입력 값 유효성 검사
 		    if (!ganttId || !entityType || !progressValue) {
-		        alert('ID, Entity Type, and Progress Value are required.');
+		        alert('모든 필드를 입력해 주세요');
 		        return;
 		    }
 
@@ -649,11 +716,52 @@ document.addEventListener('DOMContentLoaded', function() {
 		    });
 		}
 		
-		// 페이지 로드 시 버튼 클릭 이벤트 리스너 추가
-		$(document).ready(function() {
-		    // 기존 이벤트 리스너를 제거하고 새로운 리스너를 추가
-		    $('#update-progress-button').off('click').on('click', updateProgress);
-		});
+		// 실제 일정 업데이트 버튼 클릭 이벤트 핸들러
+		function updateActualDate() {
+		    let ganttId = $('#name-selectDate').val();
+			let entityType = $('#entityType-selectDate').val();
+		    let actualStart = $('#actual-start-date').val();
+		    let actualEnd = $('#actual-end-date').val();
+
+		    // 입력 값 유효성 검사
+		    if (!ganttId || !entityType || !actualStart || !actualEnd) {
+		        alert('모든 필드를 입력해 주세요');
+		        return;
+		    }
+
+		    // AJAX 요청을 통해 서버에 실제 일정 업데이트 요청
+		    $.ajax({
+		        url: 'updateSchedule',
+		        type: 'POST',
+		        data: {
+		            entityType: entityType,
+		            id: ganttId,
+		            actualStart: actualStart,
+		            actualEnd: actualEnd
+		        },
+		        success: function(response) {
+					console.log('업데이트 응답:', response); // 응답 로그 추가
+				    
+		            if (response === 'success') {
+		                alert('실제 일정이 업데이트되었습니다.');
+
+		                // 간트 차트를 새로고침하여 반영된 일정을 확인
+		                refreshGanttChart();
+						
+						// 입력 박스와 select 박스 값을 초기화
+						$('#actual-start-date').val('');
+						$('#actual-end-date').val('');
+		                
+		            } else {
+		                alert('실제 일정 업데이트에 실패했습니다.');
+		            }
+		        },
+		        error: function(xhr, status, error) {
+		            console.error('AJAX Error:', status, error);
+		            alert('서버 요청 중 오류가 발생했습니다.');
+		        }
+		    });
+		}
 
 		// 간트차트 새로고침 함수
 		function refreshGanttChart() {
@@ -664,34 +772,52 @@ document.addEventListener('DOMContentLoaded', function() {
 		    }
 
 		    $.ajax({
-		        url: 'getGanttChartData',  // 간트차트 데이터를 가져오는 API URL
+		        url: 'getGanttChartData?projectNum=' + projectNum, // URL 쿼리 파라미터로 전송
 		        type: 'GET',
-		        data: { projectNum: projectNum },
-		        success: function(data) {
+		        dataType: 'json',
+		        success: function(response) {
 		            // 응답 데이터 검증
-		            if (data && Array.isArray(data.data) && data.data.length > 0 &&
-		                data.adjustedStartDate && data.adjustedEndDate) {
-		                
-		                // 날짜 유효성 검사
-		                const adjustedStartDate = new Date(data.adjustedStartDate);
-		                const adjustedEndDate = new Date(data.adjustedEndDate);
+		            if (response && response.data && Array.isArray(response.data) && response.data.length > 0 &&
+		                response.adjustedStartDate && response.adjustedEndDate) {
 
-		                if (isNaN(adjustedStartDate.getTime()) || isNaN(adjustedEndDate.getTime())) {
-		                    alert('조정된 날짜 형식이 잘못되었습니다.');
-		                    console.error('잘못된 날짜 형식:', data.adjustedStartDate, data.adjustedEndDate);
-		                    return;
-		                }
+		                // 데이터 추출
+		                const data = response.data;
+		                
+		                // 가장 이른 시작일 (baselineStart 또는 actualStart 중 가장 빠른 날짜 찾기)
+		                const earliestStart = data
+		                    .map(item => new Date(item.baselineStart || item.actualStart))
+		                    .filter(date => !isNaN(date.getTime()))
+		                    .reduce((earliest, current) => current < earliest ? current : earliest, new Date(8640000000000000));
+		                
+		                // 가장 늦은 종료일 (baselineEnd 또는 actualEnd 중 가장 늦은 날짜 찾기)
+		                const latestEnd = data
+		                    .map(item => new Date(item.baselineEnd || item.actualEnd))
+		                    .filter(date => !isNaN(date.getTime()))
+		                    .reduce((latest, current) => current > latest ? current : latest, new Date(-8640000000000000));
+		                
+		                // 여유 기간 추가
+		                const bufferDay = 30;
+		                const adjustedStartDate = new Date(earliestStart.getTime() - bufferDay * 24 * 60 * 60 * 1000);
+		                const adjustedEndDate = new Date(latestEnd.getTime() + bufferDay * 24 * 60 * 60 * 1000);
+
+		                // 날짜 포맷 설정
+		                const formatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
+		                const format = (date) => date ? formatter.format(date).replace(/\//g, '-') + 'T00:00:00Z' : null;
+
+		                // 조정된 날짜를 로그로 출력 (디버깅 용)
+		                console.log('조정된 시작일:', format(adjustedStartDate));
+		                console.log('조정된 종료일:', format(adjustedEndDate));
 
 		                // 간트차트 생성 함수 호출
-		                createGanttChart(data.data, data.adjustedStartDate, data.adjustedEndDate);
+		                createGanttChart(data, format(adjustedStartDate), format(adjustedEndDate));
 		            } else {
-		                alert('간트차트 데이터를 불러오는 데 필요한 정보가 부족합니다.');
-		                console.error('잘못된 데이터:', data);
+		                alert('간트 차트 데이터를 로드하는 데 필요한 정보가 부족합니다.');
+		                console.error('잘못된 데이터:', response);
 		            }
 		        },
 		        error: function(xhr, status, error) {
-		            console.error('AJAX Error:', status, error);
-		            alert('간트차트 데이터를 불러오는 데 실패했습니다.');
+		            console.error('AJAX 오류:', status, error);
+		            alert('서버 요청 중 오류가 발생했습니다.');
 		        }
 		    });
 		}
@@ -1337,6 +1463,28 @@ document.addEventListener('DOMContentLoaded', function() {
       alert('올바른 작업 ID와 진행도 값을 입력해 주세요.');
     }
   }
+  
+  // Entity Type select box 변경 시 처리
+  		$('#entityType-select').change(function() {
+  		    const entityType = $(this).val();
+  		    const projectNum = getQueryParam('projectNum'); // URL 쿼리 스트링에서 projectNum을 가져옴
+
+  			console.log(`Entity Type Selected: ${entityType}`); // 디버깅용 로그
+  			console.log(`Project Num: ${projectNum}`); // 디버깅용 로그
+  			
+  		    if (entityType && projectNum) {
+  		        // 엔티티 유형이 선택되면, 해당 엔티티에 맞는 항목을 로드
+  		        loadNames(projectNum, entityType);
+  		        $('#name-select').prop('disabled', false);
+  				$('#name-selectDate').prop('disabled', false)
+  		    } else {
+  		        // 엔티티 유형이 선택되지 않으면, 'Name' select box 비활성화
+  		        $('#name-select').prop('disabled', true);
+  		        $('#name-select').empty().append('<option value="">선택</option>');
+  				$('#name-selectDate').prop('disabled', true)
+  				$('#name-selectDate').empty().append('<option value="">선택</option>');
+  		    }
+  		});
 	*/
 
 function loadApplicationList() {

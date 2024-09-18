@@ -355,11 +355,18 @@
 					<!-- Hidden input field to store the actual DB ID -->
 					<input type="hidden" id="db-id" value="">
 					
-					<!-- 진행도 업데이트 입력 및 버튼 -->
+					<!-- 실제 진행일정 및 진행도 업데이트 입력 및 버튼 -->
 					<div class="update-container">
 					    <div class="update-section">
-					        <label for="task-id">작업 ID:</label>
-					        <input type="number" id="task-id" class="input-field">
+					        <label for="entityType-selectDate">Entity Type:</label>
+							<select id="entityType-selectDate">
+								<option value="task">Task</option>
+							</select>
+							
+							<label for="name-selectDate">Name:</label>
+							<select id="name-selectDate">
+								<!-- Options will be populated dynamically -->
+							</select>
 					        
 					        <label for="actual-start-date">실제 시작일:</label>
 					        <input type="date" id="actual-start-date" class="input-field">
