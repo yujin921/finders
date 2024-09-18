@@ -1,148 +1,197 @@
+/* 루트 변수 정의 */
 :root {
-  --primary-color: #4a90e2;
-  --secondary-color: #f5a623;
-  --background-color: #f8f9fa;
-  --text-color: #333;
-  --error-color: #e74c3c;
-  --success-color: #2ecc71;
-  --border-radius: 5px;
-  --button-radius: 20px;
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --text-color: #333;
+    --bg-color: #f4f4f4;
+    --light-gray: #ecf0f1;
 }
 
+/* 전체 요소에 대한 기본 스타일 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* body 요소 스타일 */
 body {
-  font-family: 'Noto Sans KR', sans-serif;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  line-height: 1.6;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    min-width: 1200px; 
 }
 
-.container {
-  width: 90%;
-  max-width: 600px;
-  margin: 40px auto;
-  background-color: #fff;
-  border-radius: var(--border-radius);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+.sidebar {
+  width: 200px; /* 적당한 크기로 조정 */
+  background-color: #f0f0f0;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-h1 {
-  text-align: center;
-  color: var(--primary-color);
-  font-size: 2.2em;
-  margin: 30px 0;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.tabs {
-  display: flex;
-  background-color: #f1f3f5;
-  padding: 10px;
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
-}
-
-.tabs button {
+.main-content {
   flex: 1;
-  padding: 12px;
-  font-size: 15px;
-  background-color: transparent;
-  border: none;
-  color: var(--text-color);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-bottom: 3px solid transparent;
+  padding: 20px;
 }
 
-.tabs button.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
-  font-weight: bold;
+/* 컨테이너 클래스 스타일 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-.tab-content {
-  display: none;
-  padding: 25px;
+/* header 요소 스타일 */
+header {
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-.tab-content.active {
-  display: block;
-  animation: fadeIn 0.5s ease;
+/* header 내부 콘텐츠 스타일 */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* 로고 스타일 */
+.logo {
+    font-weight: bold;
+    color: var(--primary-color);
 }
 
-form {
-  display: flex;
-  flex-direction: column;
+/* 로고 이미지 스타일 */
+.logo > a > img {
+    width: 150px;
+    height: 50px;
 }
 
-label {
-  margin-top: 15px;
-  font-weight: 500;
-  color: var(--primary-color);
+/* 검색바 스타일 */
+.search-bar {
+    flex-grow: 1;
+    margin: 0 20px;
+    position: relative;
 }
 
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="number"],
-input[type="date"] {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #ddd;
-  border-radius: var(--border-radius);
-  font-size: 14px;
-  transition: border-color 0.3s ease;
+/* 검색바 입력 필드 스타일 */
+.search-bar input {
+    width: 100%;
+    padding: 12px 45px 12px 20px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 16px;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus,
-input[type="email"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus {
-  border-color: var(--primary-color);
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+/* 검색바 버튼 스타일 */
+.search-bar button {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 20px;
 }
 
-input[type="button"],
-button[type="submit"] {
-  background-color: var(--primary-color);
-  color: #fff;
-  border: none;
-  padding: 10px 15px;
-  margin-top: 20px;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-size: 15px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+/* 로그인 액션 영역 스타일 */
+.login-actions {
+    display: flex;
+    align-items: center;
 }
 
-input[type="button"]:hover,
-button[type="submit"]:hover {
-  background-color: #3a7bc8;
+/* 로그인 액션 링크 스타일 */
+.login-actions a {
+    text-decoration: none;
+    color: var(--text-color);
+    margin-left: 25px;
 }
 
-.errorMsg {
-  color: var(--error-color);
-  margin-top: 10px;
-  font-size: 13px;
+/* 로그인 버튼 스타일 */
+.login-actions .btn {
+    color: white;
 }
 
+/* 일반 버튼 스타일 */
+.btn {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+/* 버튼 호버 효과 */
+.btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-3px);
+}
+
+
+							/* 여기까지 header 부분 */
+
+
+/* 네비게이션 메뉴 스타일 */
+nav {
+    background-color: #fff;
+    padding: 12px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* 네비게이션 메뉴 리스트 스타일 */
+nav ul {
+    display: flex;
+    list-style-type: none;
+    justify-content: center;
+}
+
+/* 네비게이션 메뉴 아이템 스타일 */
+nav ul li {
+    margin: 0 20px;
+}
+
+/* 네비게이션 메뉴 링크 스타일 */
+nav ul li a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+/* 네비게이션 메뉴 링크 호버 효과 */
+nav ul li a:hover {
+    color: var(--primary-color);
+}
+
+
+								/* 여기까지 navigation 부분 */
+
+/* 푸터 스타일 */
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 30px 0;
+    margin-top: 50px;
+}
+
+/* 푸터 문단 스타일 */
+footer p {
+    margin: 0;
+    font-size: 0.9em;
+}
+
+								/* 여기까지 footer 부분 */
+								
+								/* 기술 섹션 스타일 */
 .tech-section {
   margin-top: 25px;
   background-color: var(--background-color);
@@ -182,26 +231,15 @@ button[type="submit"]:hover {
   color: #fff;
 }
 
-@media (max-width: 768px) {
-  .container {
-    width: 95%;
-    margin: 20px auto;
-  }
-  
-  h1 {
-    font-size: 1.8em;
-  }
-  
-  .tabs button {
-    font-size: 13px;
-    padding: 10px;
-  }
-  
-  .tab-content {
-    padding: 20px;
-  }
-  
-  .tech-buttons, .selected-techs {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  }
+
+
+/* main 요소 스타일 추가 */
+main {
+    max-width: 800px;
+    margin: 40px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+

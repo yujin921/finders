@@ -12,13 +12,71 @@
     <script th:src="@{/js/popup_2.js}"></script>
 </head>
 <body>
+			<header>
+		<div class="container">
+			<div class="header-content">
+				<div class="logo">
+					<a href="/"> <img th:src="@{/images/findersLogo.png}"
+						alt="Finders Logo">
+					</a>
+				</div>
+				<div class="search-bar">
+					<input type="text" placeholder="프로젝트 또는 프리랜서 검색">
+					<button type="submit">
+						<i class="fas fa-search"></i>
+					</button>
+				</div>
+				<div class="login-actions">
+					<th:block sec:authorize="not isAuthenticated()">
+						<a th:href="@{/member/join}">회원가입</a>
+						<a th:href="@{/member/login}" class="btn">로그인</a>
+					</th:block>
 
-		<div class="hello" sec:authorize="isAuthenticated()">
-		<h1>안녕하세요, <span sec:authentication="name"></span>님!</h1>
+					<th:block sec:authorize="isAuthenticated()">
+						<img th:src="${profileImgUrl}" alt="Profile Image"
+							style="width: 50px; height: 50px; border-radius: 50%;" />
+						<a th:href="@{/project/view}">프로젝트 관리</a>
+						<a th:href="@{/member/myPage}">마이페이지</a>
+						<a th:href="@{/member/logout}" class="btn">로그아웃</a>
+					</th:block>
+				</div>
+			</div>
 		</div>
-	
+	</header>
+
+	<!-- Navigation Menu -->
+	<nav>
+		<ul>
+			<li sec:authorize="hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN')"><a
+				href="board/write">프로젝트 등록</a></li>
+			<li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
+			<li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
+            <li><a th:href="@{/support/guide}">서비스 안내</a></li>
+        	<li><a th:href="@{/support/example}">이용 사례</a></li>
+			<li><a href="#">커뮤니티</a></li>
+			<span>│</span>
+			<li><a th:href="@{/myProject/view}">내 프로젝트 목록</a></li>
+			<li><a href="#">미팅룸</a></li>
+		</ul>
+	</nav>
+
+
+  <aside class="sidebar">
+    <!-- 사이드바 내용 -->
+      <h2>사이드바</h2>
+  <ul>
+    <li><a th:href="@{/member/myPage}">개인정보 수정</a></li>
+    <li><a th:href="@{/portfolio/create}">포트폴리오 작성</a></li>
+  </ul>
+  </aside>
+
+
+	<main>
 	        <!-- 프리랜서 수정 폼 -->
         <div sec:authorize="hasRole('ROLE_FREELANCER')" id="freelancer-update">
+        <div class="hello" sec:authorize="isAuthenticated()">
+		<h1>안녕하세요, <span sec:authentication="name"></span>님!</h1>
+		</div>
             <form id="freelancer-update-form" th:action="@{/member/update/freelancer}" method="post" enctype="multipart/form-data">
                 <!-- 프로필 이미지 업로드 -->
                 <label for="freelancer-profile-img">프로필 이미지</label>
@@ -85,11 +143,13 @@
                 <div class="errorMsg" th:if="${param.error}"><script>alert('회원가입에 실패했습니다.')</script></div>
             </form>
             
-            <a th:href="@{/portfolio/create}">포트폴리오 생성</a>
         </div>
 
         <!-- client 수정 폼 -->
         <div sec:authorize="hasRole('ROLE_CLIENT')" id="client-update">
+        <div class="hello" sec:authorize="isAuthenticated()">
+			<h1>안녕하세요, <span sec:authentication="name"></span>님!</h1>
+		</div>
             <form id="client-update-form" th:action="@{/member/update/client}" method="post" enctype="multipart/form-data">
                 <label for="client-profile-img">프로필 이미지</label>
                 <input type="file" id="client-profile-img" name="profileImg"
@@ -133,7 +193,19 @@
                 <div class="errorMsg" th:if="${param.error}"><script>alert('회원가입에 실패했습니다.')</script></div>
             </form>
         </div>
-        <script>
+        </main>
+        
+        	<!-- Footer -->
+	<footer>
+		<div class="container">
+			<p>&copy; 2024 프리랜서 마켓플레이스. All rights reserved.</p>
+			<p>
+				<a href="#">개인정보 처리방침</a> | <a href="#">이용 약관</a> | <a href="#">연락처</a>
+			</p>
+		</div>
+	</footer>
+        
+<script>
 function previewImage(input, previewId) {
     var preview = document.getElementById(previewId);
     var file = input.files[0];
@@ -151,6 +223,8 @@ function previewImage(input, previewId) {
         preview.style.display = 'none';
     }
 }
+
+
 </script>
 </body>
 
