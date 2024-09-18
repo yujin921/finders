@@ -182,6 +182,11 @@ button[type="submit"]:hover {
   color: #fff;
 }
 
+#client-join, #freelancer-join {
+	width: 562px;
+}
+
+
 @media (max-width: 768px) {
   .container {
     width: 95%;

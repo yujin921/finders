@@ -8,7 +8,6 @@
 <!-- Font Awesome 추가 -->
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<script th:src="@{/js/support/guide.js}"></script>
 </head>
 <body>
 	<header>
@@ -58,46 +57,45 @@
 			<li><a href="#">미팅룸</a></li>
 		</ul>
 	</nav>
+	
+	<div class="guide-text">
+	<h2>서비스 안내</h2>
+	</div>
+	
+    <!-- Main Content -->
+    <main class="container">
+        <div class="main-tabs">
+            <button class="tab active" data-tab="client-guide">클라이언트 이용방법</button>
+            <button class="tab" data-tab="freelancer-guide">프리랜서 이용방법</button>
+            <button class="tab" data-tab="pay-guide">결제 방식</button>
+        </div>
+        
+        <div class="tab-content active" id="client-guide">
+            <h1>의뢰하고 싶은 프로젝트를 무료로 등록해보세요.</h1>
+            <p>프로젝트는 파인더스 매니저와 상담 후 공개됩니다.</p>
+            <p>파인더스 매니저와 상담하며 내용을 수정 및 보완할 수 있으니 편하게 작성하세요.</p>
+            <a th:href="@{/board/write}" class="button">프로젝트 등록하기 ></a>
+            <h1>클라클라</h1>
+        </div>
+        
+        <div class="tab-content" id="freelancer-guide">
+            <h1>참가하고 싶은 프로젝트에 직접 지원해보세요.</h1>
+            <p>클라이언트에게 자신을 소개할 포트폴리오를 작성할 수 있습니다.</p>
+            <p>포트폴리오 양식은 파인더스에서 지원합니다.</p>
+            <a th:href="@{/board/view}" class="button">프로젝트 신청하기 ></a>
+            <a th:href="@{/portfolio/create}" class="button">포트폴리오 작성하기 ></a>
+            <h1>프리프리</h1>
+        </div>
+        
+        <div class="tab-content" id="pay-guide">
+            <h1>의뢰하고 싶은 프로젝트를 무료로 등록해보세요.</h1>
+            <p>프로젝트는 위시켓 매니저와 상담 후 공개됩니다.</p>
+            <p>위시켓 매니저와 상담하며 내용을 수정 및 보완할 수 있으니 편하게 작성하세요.</p>
+            <a href="#" class="button">프로젝트 등록하러 가기 ></a>
+			<h1>결제결제</h1>
+        </div>
+    </main>
 
-	<main>
-		<section class="hero">
-			<h1>당신의 프로젝트를 위한 최고의 인재를 찾아보세요</h1>
-			<p>월 평균 538건의 프로젝트가 등록되는 Finders에서 시작하세요</p>
-			<a href="#" class="cta-button">프로젝트 시작하기</a>
-		</section>
-
-		<section class="features">
-			<div class="feature-card" id="card1">
-				<i class="fas fa-users"></i>
-				<h3>다양한 전문가</h3>
-				<p>IT, 디자인, 마케팅 등 다양한 분야의 전문가를 만나보세요.</p>
-			</div>
-			<div class="feature-card" id="card2">
-				<i class="fas fa-shield-alt"></i>
-				<h3>안전한 계약</h3>
-				<p>검증된 프리랜서와 안전하게 계약을 체결하세요.</p>
-			</div>
-			<div class="feature-card" id="card3">
-				<i class="fas fa-chart-line"></i>
-				<h3>프로젝트 관리</h3>
-				<p>진행 상황을 실시간으로 확인하고 관리할 수 있습니다.</p>
-			</div>
-		</section>
-
-		<section class="testimonials">
-			<h2>고객 후기</h2>
-			<div class="testimonial-slider">
-				<div class="testimonial">
-					<p>"Finders 덕분에 완벽한 개발자를 찾을 수 있었습니다. 정말 감사합니다!"</p>
-					<span>- 김OO, IT 스타트업 CEO</span>
-				</div>
-				<div class="testimonial">
-					<p>"프로젝트 관리가 너무 편리해요. 다음에도 꼭 이용하고 싶습니다."</p>
-					<span>- 이OO, 마케팅 에이전시 대표</span>
-				</div>
-			</div>
-		</section>
-	</main>
 	<!-- Footer -->
 	<footer>
 		<div class="container">
@@ -107,6 +105,6 @@
 			</p>
 		</div>
 	</footer>
-
+<script th:src="@{/js/support/guide.js}"></script>
 </body>
 </html>

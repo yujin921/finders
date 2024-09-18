@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function(event) {
             // 프리랜서 회원가입 폼인지 확인
-            const isFreelancerForm = this.id === 'freelancer-join-form';
+            const isFreelancerForm = this.id === 'freelancer-update-form';
 
             // 프리랜서 폼이고 기술이 선택되지 않은 경우에만 경고 메시지 표시
             if (isFreelancerForm && selectedTechs.length === 0) {
