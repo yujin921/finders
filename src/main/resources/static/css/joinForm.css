@@ -1,19 +1,18 @@
 :root {
-  --primary-color: #4a90e2;
-  --secondary-color: #f5a623;
-  --background-color: #f8f9fa;
-  --text-color: #333;
-  --error-color: #e74c3c;
-  --success-color: #2ecc71;
-  --border-radius: 5px;
-  --button-radius: 20px;
+  --primary-color: #1A202C;   /* 다크 네이비 */
+  --secondary-color: #4FD1C5; /* 청록색 */
+  --accent-color: #F6AD55;    /* 오렌지 */
+  --background-color: #f8f9fa; /* 밝은 회색 배경 */
+  --text-color: #333;         /* 기본 텍스트 색상 */
+  --error-color: #e74c3c;     /* 오류 색상 */
+  --border-radius: 8px;       /* 전체적인 둥근 모서리 */
+  --button-radius: 5px;       /* 버튼 둥근 모서리 */
 }
 
 body {
   font-family: 'Noto Sans KR', sans-serif;
   background-color: var(--background-color);
   color: var(--text-color);
-  line-height: 1.6;
   margin: 0;
   padding: 0;
   display: flex;
@@ -23,67 +22,59 @@ body {
 }
 
 .container {
-  width: 90%;
+  width: 100%;
   max-width: 600px;
-  margin: 40px auto;
   background-color: #fff;
   border-radius: var(--border-radius);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px 30px;
+  margin: 20px auto;
 }
 
 h1 {
   text-align: center;
   color: var(--primary-color);
-  font-size: 2.2em;
-  margin: 30px 0;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+  font-size: 2rem;
+  margin-bottom: 20px;
 }
 
 .tabs {
   display: flex;
-  background-color: #f1f3f5;
-  padding: 10px;
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .tabs button {
-  flex: 1;
-  padding: 12px;
-  font-size: 15px;
+  width: 250px; /* 버튼의 고정 넓이를 동일하게 설정 */
+  padding: 10px 20px;
+  font-size: 1rem;
   background-color: transparent;
-  border: none;
-  color: var(--text-color);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  margin: 0 10px;
+  color: var(--primary-color);
   cursor: pointer;
   transition: all 0.3s ease;
-  border-bottom: 3px solid transparent;
 }
 
 .tabs button.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
-  font-weight: bold;
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .tab-content {
   display: none;
-  padding: 25px;
+  max-width: 100%; /* 폼 컨텐츠의 최대 너비 통일 */
 }
 
 .tab-content.active {
   display: block;
-  animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 form {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 label {
@@ -96,13 +87,15 @@ input[type="text"],
 input[type="password"],
 input[type="email"],
 input[type="number"],
-input[type="date"] {
+input[type="date"],
+input[type="file"] {
   width: 100%;
-  padding: 10px;
+  max-width: 500px; /* 입력 필드의 고정 넓이 */
+  padding: 12px;
   margin-top: 5px;
   border: 1px solid #ddd;
   border-radius: var(--border-radius);
-  font-size: 14px;
+  font-size: 1rem;
   transition: border-color 0.3s ease;
 }
 
@@ -110,24 +103,26 @@ input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus,
 input[type="number"]:focus,
-input[type="date"]:focus {
+input[type="date"]:focus,
+input[type="file"]:focus {
   border-color: var(--primary-color);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 input[type="button"],
 button[type="submit"] {
+  width: 100%;
+  max-width: 500px; /* 버튼의 고정 넓이 */
   background-color: var(--primary-color);
-  color: #fff;
-  border: none;
-  padding: 10px 15px;
+  color: white;
+  padding: 12px;
   margin-top: 20px;
-  border-radius: var(--border-radius);
+  border: none;
+  border-radius: var(--button-radius);
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  font-size: 15px;
-  font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -140,73 +135,64 @@ button[type="submit"]:hover {
 .errorMsg {
   color: var(--error-color);
   margin-top: 10px;
-  font-size: 13px;
+  font-size: 0.9rem;
 }
 
+/* 기술 선택 섹션 */
 .tech-section {
   margin-top: 25px;
-  background-color: var(--background-color);
-  padding: 15px;
-  border-radius: var(--border-radius);
 }
 
-.tech-buttons, .selected-techs {
+.tech-buttons {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 10px;
-  margin-top: 12px;
-}
-
-.tech-button, .selected-tech {
-  padding: 8px 12px;
-  border-radius: var(--button-radius);
-  font-size: 13px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: all 0.3s ease;
 }
 
 .tech-button {
-  background-color: #e9ecef;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: var(--button-radius);
+  text-align: center;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .tech-button:hover {
-  background-color: #dee2e6;
+  background-color: var(--secondary-color);
+  color: white;
 }
 
-.tech-button.selected, .selected-tech {
+.tech-button.selected {
   background-color: var(--primary-color);
-  color: #fff;
+  color: white;
 }
 
-#client-join, #freelancer-join {
-	width: 562px;
+/* 중복확인 버튼 */
+input[type="button"] {
+  margin-left: 10px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
 }
-
 
 @media (max-width: 768px) {
   .container {
-    width: 95%;
-    margin: 20px auto;
+    width: 100%;
+    margin: 0 10px;
   }
-  
+
   h1 {
-    font-size: 1.8em;
+    font-size: 1.6rem;
   }
-  
+
   .tabs button {
-    font-size: 13px;
-    padding: 10px;
+    padding: 8px;
+    font-size: 0.9rem;
   }
-  
-  .tab-content {
-    padding: 20px;
-  }
-  
-  .tech-buttons, .selected-techs {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    font-size: 0.9rem;
   }
 }
