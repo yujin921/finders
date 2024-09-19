@@ -30,6 +30,7 @@
 		    		</th:block>
 		
 		    		<th:block sec:authorize="isAuthenticated()">
+		    		    <!-- 프로필 이미지 표시 -->
 		    			<img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
 		    		    <a th:href="@{/project/view}">프로젝트 관리</a>
 		    		    <a th:href="@{/member/myPage}">마이페이지</a>

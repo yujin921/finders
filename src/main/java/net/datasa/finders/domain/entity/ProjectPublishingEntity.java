@@ -52,4 +52,8 @@ public class ProjectPublishingEntity {
 
     @Column(name = "project_status", columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean projectStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_num", referencedColumnName = "project_num", insertable = false, updatable = false)
+    private ProjectEntity project;
 }

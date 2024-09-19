@@ -49,52 +49,85 @@
 				href="board/write">프로젝트 등록</a></li>
 			<li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
 			<li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
-            <li><a th:href="@{/support/guide}">서비스 안내</a></li>
-        	<li><a th:href="@{/support/example}">이용 사례</a></li>
+			<li><a th:href="@{/support/guide}">서비스 안내</a></li>
+			<li><a th:href="@{/support/example}">이용 사례</a></li>
 			<li><a href="#">커뮤니티</a></li>
 			<span>│</span>
 			<li><a th:href="@{/myProject/view}">내 프로젝트 목록</a></li>
 			<li><a href="#">미팅룸</a></li>
 		</ul>
 	</nav>
-	
+
 	<div class="guide-text">
-	<h2>서비스 안내</h2>
+		<h2>서비스 안내</h2>
 	</div>
-	
-    <!-- Main Content -->
-    <main class="container">
-        <div class="main-tabs">
-            <button class="tab active" data-tab="client-guide">클라이언트 이용방법</button>
-            <button class="tab" data-tab="freelancer-guide">프리랜서 이용방법</button>
-            <button class="tab" data-tab="pay-guide">결제 방식</button>
-        </div>
-        
-        <div class="tab-content active" id="client-guide">
-            <h1>의뢰하고 싶은 프로젝트를 무료로 등록해보세요.</h1>
-            <p>프로젝트는 파인더스 매니저와 상담 후 공개됩니다.</p>
-            <p>파인더스 매니저와 상담하며 내용을 수정 및 보완할 수 있으니 편하게 작성하세요.</p>
-            <a th:href="@{/board/write}" class="button">프로젝트 등록하기 ></a>
-            <h1>클라클라</h1>
-        </div>
-        
-        <div class="tab-content" id="freelancer-guide">
-            <h1>참가하고 싶은 프로젝트에 직접 지원해보세요.</h1>
-            <p>클라이언트에게 자신을 소개할 포트폴리오를 작성할 수 있습니다.</p>
-            <p>포트폴리오 양식은 파인더스에서 지원합니다.</p>
-            <a th:href="@{/board/view}" class="button">프로젝트 신청하기 ></a>
-            <a th:href="@{/portfolio/create}" class="button">포트폴리오 작성하기 ></a>
-            <h1>프리프리</h1>
-        </div>
-        
-        <div class="tab-content" id="pay-guide">
-            <h1>의뢰하고 싶은 프로젝트를 무료로 등록해보세요.</h1>
-            <p>프로젝트는 위시켓 매니저와 상담 후 공개됩니다.</p>
-            <p>위시켓 매니저와 상담하며 내용을 수정 및 보완할 수 있으니 편하게 작성하세요.</p>
-            <a href="#" class="button">프로젝트 등록하러 가기 ></a>
+
+	<!-- Main Content -->
+	<main class="container">
+		<div class="main-tabs">
+			<button class="tab active" data-tab="client-guide">클라이언트
+				이용방법</button>
+			<button class="tab" data-tab="freelancer-guide">프리랜서 이용방법</button>
+			<button class="tab" data-tab="pay-guide">결제 방식</button>
+		</div>
+
+		<div class="tab-content active" id="client-guide">
+			<h1>의뢰하고 싶은 프로젝트를 무료로 등록해보세요.</h1>
+			<p>프로젝트는 파인더스 매니저와 상담 후 공개됩니다.</p>
+			<p>파인더스 매니저와 상담하며 내용을 수정 및 보완할 수 있으니 편하게 작성하세요.</p>
+			<a th:href="@{/board/write}" class="button">프로젝트 등록하기 ></a>
+			
+			<div class="faq-container">
+				<div class="faq-item">
+					<div class="faq-icon">💼</div>
+					<div class="faq-content">
+						<div class="faq-question">의뢰하려는 프로젝트의 견적이 궁금하신가요?</div>
+						<div class="faq-answer">프로젝트를 등록하면 파인더스 매니저가 업무범위에 맞는 적정 금액 및
+							기간을 무료로 상담해드립니다.</div>
+					</div>
+				</div>
+				<div class="faq-item">
+					<div class="faq-icon">💡</div>
+					<div class="faq-content">
+						<div class="faq-question">아이디어 유출이 걱정되시나요?</div>
+						<div class="faq-answer">프로젝트는 파인더스 매니저와 사전 상담 후 등록되며, 사전 상담 시
+							공개하고 싶지 않은 내용은 공개되지 않습니다.</div>
+					</div>
+				</div>
+				<div class="faq-item">
+					<div class="faq-icon">📊</div>
+					<div class="faq-content">
+						<div class="faq-question">회사 정보가 공개될까 봐 걱정되시나요?</div>
+						<div class="faq-answer">회사 정보는 공개되지 않으니 걱정하지 마시고 등록해주세요.</div>
+					</div>
+				</div>
+				<div class="more-questions">
+					<h3>자주 묻는 질문</h3>
+					<ul>
+						<li>위시켓에서 정부지원사업도 진행이 가능한가요?</li>
+						<li>상주 프리랜서나 기간 단위로도 인력을 구인할 수 있나요?</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-content" id="freelancer-guide">
+			<h1>참가하고 싶은 프로젝트에 직접 지원해보세요.</h1>
+			<p>클라이언트에게 자신을 소개할 포트폴리오를 작성할 수 있습니다.</p>
+			<p>포트폴리오 양식은 파인더스에서 지원합니다.</p>
+			<a th:href="@{/board/view}" class="button">프로젝트 신청하기 ></a> <a
+				th:href="@{/portfolio/create}" class="button">포트폴리오 작성하기 ></a>
+			<h1>프리프리</h1>
+		</div>
+
+		<div class="tab-content" id="pay-guide">
+			<h1>돈 걱정하지 마세요. 파인더스가 결제까지 지원합니다.</h1>
+			<p>금액은 클라이언트와 프리랜서 간의 상담을 통해 조정 가능합니다.</p>
+			<p>파인더스는 공정한 거래를 위해 노력합니다.</p>
+			<a href="#" class="button">결제 방식 알아보기 ></a>
 			<h1>결제결제</h1>
-        </div>
-    </main>
+		</div>
+	</main>
 
 	<!-- Footer -->
 	<footer>
@@ -105,6 +138,6 @@
 			</p>
 		</div>
 	</footer>
-<script th:src="@{/js/support/guide.js}"></script>
+	<script th:src="@{/js/support/guide.js}"></script>
 </body>
 </html>

@@ -3,6 +3,7 @@ package net.datasa.finders.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ProjectApplicationDTO;
+import net.datasa.finders.domain.dto.TeamDTO;
 import net.datasa.finders.domain.entity.ApplicationResult;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ProjectApplicationService;
@@ -26,7 +27,7 @@ public class ManagementRestController {
         return ResponseEntity.ok(applications);
     }
 
-    @PostMapping("update-application-status")
+    @PostMapping("/update-application-status")
     public ResponseEntity<Void> updateApplicationStatus(
             @RequestParam("projectNum") int projectNum,
             @RequestParam("freelancerId") String freelancerId,
@@ -39,8 +40,16 @@ public class ManagementRestController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();  // 잘못된 상태값인 경우 400 응답
         }
+
         // 상태 업데이트
         projectApplicationService.updateApplicationStatus(projectNum, freelancerId, result);
+
         return ResponseEntity.ok().build();  // 성공적으로 상태가 변경된 경우 200 응답
+    }
+
+    @GetMapping("/team-list")
+    public ResponseEntity<List<TeamDTO>> getTeamList(@RequestParam("projectNum") int projectNum) {
+        List<TeamDTO> teamList = projectApplicationService.getTeamMembersByProject(projectNum);
+        return ResponseEntity.ok(teamList);
     }
 }

@@ -68,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 프리랜서 폼인 경우에만 선택한 기술들을 hidden input에 저장
                 document.getElementById('selectedSkills').value = selectedTechs.join(',');
             }
-            // 클라이언트(기업) 폼인 경우 추가적인 검사 없이 제출 허용
         });
     });
 });
