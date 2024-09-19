@@ -42,7 +42,6 @@ public class BoardController {
     @ResponseBody
     @GetMapping("list")
     public List<ProjectPublishingDTO> list() {
-        log.debug("현재 상태 - 로그2: {}", "로그");
         List<ProjectPublishingDTO> list = boardService.getList();
         return list;
     }
