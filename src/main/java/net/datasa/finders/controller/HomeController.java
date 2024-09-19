@@ -21,20 +21,9 @@ public class HomeController {
   	@Value("${member.uploadPath}")
   	String uploadPath;
 	
-	@Autowired
-	private MemberService memberService;
 
   	@GetMapping({"","/"})
-  	public String homePage(Model model, Principal principal) {
-  	    if (principal != null) {
-  	        // principal.getName()은 현재 로그인한 사용자의 username을 가져옴
-  	        String userId = principal.getName();
-  	        
-  	        // MemberService를 통해 사용자의 정보 가져오기
-  	        MemberEntity member = memberService.findByMemberId(userId);
-  	        log.debug(member.getProfileImg());
-  	        model.addAttribute("profileImgUrl", member.getProfileImg());
-  	    }
+  	public String homePage() {
   	    return "home"; // home.html 템플릿으로 이동
   	}
 }

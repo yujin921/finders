@@ -249,23 +249,26 @@ main {
   top: 0;
   width: 100%;
   height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0,0,0,0.5);
+  overflow-y: auto;
 }
 
 .modal-content {
   background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
+  border-radius: 8px;
+  width: 90%;
   max-width: 600px;
-  border-radius: 5px;
+  margin: 5% auto;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  position: relative;
 }
 
 .close {
   color: #aaa;
-  float: right;
+  position: absolute;
+  top: 10px;
+  right: 20px;
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
@@ -273,19 +276,118 @@ main {
 
 .close:hover,
 .close:focus {
-  color: black;
+  color: #000;
   text-decoration: none;
-  cursor: pointer;
 }
 
-#modalImage {
-  width: 100%;
-  max-height: 300px;
-  object-fit: cover;
+.category-tag {
+  background-color: #e6f3ff;
+  color: #0080ff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.modal-header h2 {
+  font-size: 24px;
+  margin: 0 0 10px 0;
+}
+
+.project-info {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
   margin-bottom: 20px;
 }
 
-#registerProject {
+.info-item {
+  text-align: center;
+}
+
+.info-item span {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.info-item strong {
+  font-size: 18px;
+  color: #212529;
   display: block;
-  margin: 20px auto 0;
+  margin-top: 5px;
+}
+
+.project-details {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.detail-item span {
+  font-size: 14px;
+  color: #6c757d;
+  width: 120px;
+}
+
+.detail-item p {
+  font-size: 14px;
+  color: #212529;
+  margin: 0;
+}
+
+.project-description {
+  margin-bottom: 20px;
+}
+
+.project-solution h4 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.project-solution ul {
+  padding-left: 20px;
+}
+
+.project-solution li {
+  margin-bottom: 5px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn.secondary {
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #ced4da;
+}
+
+.btn.primary {
+  background-color: #0080ff;
+  color: white;
+  border: none;
+}
+
+.btn:hover {
+  opacity: 0.9;
 }
