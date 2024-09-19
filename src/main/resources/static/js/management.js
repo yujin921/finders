@@ -437,7 +437,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	                // 간트차트 생성 함수 호출
 	                createGanttChart(data, format(adjustedStartDate), format(adjustedEndDate));
-	            } else {
+	            } else if (!response.data) {
+					alert('간트 차트 데이터를 로드하는 데 필요한 정보가 없습니다.n\먼저 업무 등록을 해주세요.');
+					console.error('데이터 없음:', response);
+				}else {
 	                alert('간트 차트 데이터를 로드하는 데 필요한 정보가 부족합니다.');
 	                console.error('잘못된 데이터:', response);
 	            }
