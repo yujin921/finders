@@ -241,3 +241,78 @@ footer p {
     margin: 0;
     font-size: 0.9em;
 }
+
+.faq-container {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.faq-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+
+.faq-icon {
+  font-size: 24px;
+  margin-right: 15px;
+  min-width: 30px;
+  text-align: center;
+}
+
+.faq-content {
+  flex: 1;
+}
+
+.faq-question {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.faq-answer {
+  font-size: 16px;
+  color: #666;
+}
+
+.more-questions {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.more-questions h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.more-questions ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.more-questions li {
+  margin-bottom: 10px;
+  color: #0066cc;
+  cursor: pointer;
+}
+
+.more-questions li::before {
+  content: "Q";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: #0066cc;
+  color: white;
+  text-align: center;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.faq-container {
+	margin-top: 50px;
+	
+}

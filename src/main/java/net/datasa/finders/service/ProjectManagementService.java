@@ -1,59 +1,23 @@
 package net.datasa.finders.service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.domain.dto.FunctionDTO;
-import net.datasa.finders.domain.dto.FunctionDataDTO;
-import net.datasa.finders.domain.dto.FunctionTitleDTO;
-import net.datasa.finders.domain.dto.ProjectPublishingDTO;
-import net.datasa.finders.domain.dto.TaskDTO;
-import net.datasa.finders.domain.dto.TaskDateRangeDTO;
-import net.datasa.finders.domain.dto.TaskManagementDTO;
-import net.datasa.finders.domain.entity.FunctionTitleEntity;
-import net.datasa.finders.domain.entity.MemberEntity;
-import net.datasa.finders.domain.entity.PrequalificationQuestionEntity;
-import net.datasa.finders.domain.entity.ProjectCategoryEntity;
-import net.datasa.finders.domain.entity.ProjectManagementEntity;
-import net.datasa.finders.domain.entity.ProjectPublishingEntity;
-import net.datasa.finders.domain.entity.ProjectRequiredSkillEntity;
-import net.datasa.finders.domain.entity.RoleName;
-import net.datasa.finders.domain.entity.TaskManagementEntity;
-import net.datasa.finders.domain.entity.TaskPriority;
-import net.datasa.finders.domain.entity.TaskStatus;
-import net.datasa.finders.domain.entity.WorkScopeEntity;
-import net.datasa.finders.repository.FunctionTitleRepository;
-import net.datasa.finders.repository.MemberRepository;
-import net.datasa.finders.repository.PrequalificationQuestionRepository;
-import net.datasa.finders.repository.ProjectCategoryRepository;
-import net.datasa.finders.repository.ProjectManagementRepository;
-import net.datasa.finders.repository.ProjectPublishingRepository;
-import net.datasa.finders.repository.ProjectRequiredSkillRepository;
-import net.datasa.finders.repository.TaskManagementRepository;
-import net.datasa.finders.repository.TeamRepository;
-import net.datasa.finders.repository.WorkScopeRepository;
+import net.datasa.finders.domain.dto.*;
+import net.datasa.finders.domain.entity.*;
+import net.datasa.finders.repository.*;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -63,7 +27,6 @@ public class ProjectManagementService {
 
 	private final ProjectPublishingRepository projectPublishingRepository;
     private final MemberRepository memberRepository;
-    private final TeamRepository teamRepository;
     private final WorkScopeRepository workScopeRepository;
     private final ProjectCategoryRepository categoryRepository;
     private final ProjectRequiredSkillRepository skillRepository;
@@ -73,11 +36,12 @@ public class ProjectManagementService {
     private final ProjectManagementRepository projectManagementRepository;
 
     public List<ProjectPublishingDTO> getMyList(String id) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
+        List<ProjectPublishingEntity> entityList;
         
-    	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
-    	List<ProjectPublishingEntity> entityList = projectPublishingRepository.findAll(sort);
-    	
-    	List<ProjectPublishingDTO> dtoList = new ArrayList<>();
+        entityList = projectPublishingRepository.findAll(sort);
+        
+        List<ProjectPublishingDTO> dtoList = new ArrayList<>();
 
         for (ProjectPublishingEntity entity : entityList) {
             if (entity.getClientId().getMemberId().equals(id)) {
@@ -96,8 +60,49 @@ public class ProjectManagementService {
                 dtoList.add(dto);
             }
         }
+            
+        return dtoList;
+
+        /*
+        if (roleName.equals("ROLE_FREELANCER")) {
+            // 프리랜서 ID로 프로젝트 목록 조회
+            entityList = projectPublishingRepository.findByFreelancerId(id);
+        } else {
+            // 클라이언트와 관리자의 경우 모두 프로젝트 조회
+            entityList = projectPublishingRepository.findAll(sort);
+        }
+
+        List<ProjectPublishingDTO> dtoList = new ArrayList<>();
+
+        for (ProjectPublishingEntity entity : entityList) {
+            // ROLE_ADMIN은 모든 프로젝트를 DTO로 추가
+            ProjectPublishingDTO dto = ProjectPublishingDTO.builder()
+                    .projectNum(entity.getProjectNum())
+                    .clientId(entity.getClientId().getMemberId())
+                    .projectTitle(entity.getProjectTitle())
+                    .recruitDeadline(entity.getRecruitDeadline())
+                    .projectStartDate(entity.getProjectStartDate())
+                    .projectEndDate(entity.getProjectEndDate())
+                    .projectBudget(entity.getProjectBudget())
+                    .projectDescription(entity.getProjectDescription())
+                    .projectImage(entity.getProjectImage())
+                    .projectStatus(entity.getProjectStatus())
+                    .build();
+
+            if (roleName.equals("ROLE_CLIENT") && entity.getClientId().getMemberId().equals(id)) {
+                // 클라이언트의 경우, 자신의 프로젝트만 추가
+                dtoList.add(dto);
+            } else if (roleName.equals("ROLE_FREELANCER")) {
+                // 프리랜서의 경우, 해당 프로젝트 DTO 추가
+                dtoList.add(dto);
+            } else if (roleName.equals("ROLE_ADMIN")) {
+                // 관리자는 모든 프로젝트 DTO 추가
+                dtoList.add(dto);
+            }
+        }
 
         return dtoList;
+        */
     }
     
     private ProjectPublishingDTO convertToDTO(ProjectPublishingEntity entity) {
@@ -495,34 +500,34 @@ public class ProjectManagementService {
 	
 	
 	// ProjectNum을 기준으로 데이터를 가져오는 서비스 메서드
-		public Map<String, Object> getGanttChartData(int projectNum) {
-			// 주어진 프로젝트 번호를 기준으로 업무 데이터 조회
-		    List<TaskManagementEntity> taskEntities = taskManagementRepository.findByProjectPublishingEntity_ProjectNum(projectNum);
+	public Map<String, Object> getGanttChartData(int projectNum) {
+		// 주어진 프로젝트 번호를 기준으로 업무 데이터 조회
+		List<TaskManagementEntity> taskEntities = taskManagementRepository.findByProjectPublishingEntity_ProjectNum(projectNum);
 		    
-		    log.debug("taskEntities: {}", taskEntities);
-		    log.debug("Task Entities Size: " + taskEntities.size());
+		log.debug("taskEntities: {}", taskEntities);
+		log.debug("Task Entities Size: " + taskEntities.size());
 		    
-		    // TaskManagementEntity를 통해 FunctionTitleEntity를 조회하기 위한 함수 호출
-		    Set<Integer> functionTitleIds = taskEntities.stream()
-		        .map(task -> task.getFunctionTitleEntity().getFunctionTitleId())
+		// TaskManagementEntity를 통해 FunctionTitleEntity를 조회하기 위한 함수 호출
+		Set<Integer> functionTitleIds = taskEntities.stream()
+				.map(task -> task.getFunctionTitleEntity().getFunctionTitleId())
 		        .collect(Collectors.toSet());
 		    
-		    // FunctionTitleEntity를 조회 (ID 기반으로)
-		    List<FunctionTitleEntity> functionEntities = functionTitleRepository.findAllById(functionTitleIds);
+		// FunctionTitleEntity를 조회 (ID 기반으로)
+		List<FunctionTitleEntity> functionEntities = functionTitleRepository.findAllById(functionTitleIds);
 
-		    log.debug("functionEntities: {}", functionEntities);
+		log.debug("functionEntities: {}", functionEntities);
 		    
-		    // FunctionTitle ID를 키로 사용하여 작업 리스트를 그룹화
-		    Map<Integer, List<TaskManagementEntity>> functionTasksMap = taskEntities.stream()
-		        .collect(Collectors.groupingBy(task -> task.getFunctionTitleEntity().getFunctionTitleId()));
+		// FunctionTitle ID를 키로 사용하여 작업 리스트를 그룹화
+		Map<Integer, List<TaskManagementEntity>> functionTasksMap = taskEntities.stream()
+				.collect(Collectors.groupingBy(task -> task.getFunctionTitleEntity().getFunctionTitleId()));
 
-	        // 데이터 포맷 설정
-	        List<Map<String, Object>> functionsData = new ArrayList<>();
-	        AtomicInteger idCounter = new AtomicInteger(1);
+	    // 데이터 포맷 설정
+	    List<Map<String, Object>> functionsData = new ArrayList<>();
+	    AtomicInteger idCounter = new AtomicInteger(1);
 
-	        for (FunctionTitleEntity function : functionEntities) {
-	            List<Map<String, Object>> children = functionTasksMap.getOrDefault(function.getFunctionTitleId(), Collections.emptyList())
-	                .stream()
+	    for (FunctionTitleEntity function : functionEntities) {
+	    	List<Map<String, Object>> children = functionTasksMap.getOrDefault(function.getFunctionTitleId(), Collections.emptyList())
+	    			.stream()
 	                .map(task -> {
 	                    Map<String, Object> taskData = new HashMap<>();
 	                    int taskId = idCounter.getAndIncrement();
@@ -544,103 +549,104 @@ public class ProjectManagementService {
 	                    taskData.put("baselineEnd", task.getTaskEndDate() + "T23:59:59Z");
 	                    taskData.put("rowHeight", 35);
 	                    return taskData;
-	                }).collect(Collectors.toList());
+	        }).collect(Collectors.toList());
 
-	            // Function Title의 baseline 날짜 계산
-	            LocalDate functionStartDate = functionTasksMap.getOrDefault(function.getFunctionTitleId(), Collections.emptyList())
+	        // Function Title의 baseline 날짜 계산
+	        LocalDate functionStartDate = functionTasksMap.getOrDefault(function.getFunctionTitleId(), Collections.emptyList())
 	                .stream().map(TaskManagementEntity::getTaskStartDate).min(LocalDate::compareTo).orElse(null);
-	            LocalDate functionEndDate = functionTasksMap.getOrDefault(function.getFunctionTitleId(), Collections.emptyList())
+	        LocalDate functionEndDate = functionTasksMap.getOrDefault(function.getFunctionTitleId(), Collections.emptyList())
 	                .stream().map(TaskManagementEntity::getTaskEndDate).max(LocalDate::compareTo).orElse(null);
 
-	            // Function Title의 actual 날짜 계산
-	            LocalDate functionActualStart = functionTasksMap.getOrDefault(function.getFunctionTitleId(), Collections.emptyList())
+	        // Function Title의 actual 날짜 계산
+	        LocalDate functionActualStart = functionTasksMap.getOrDefault(function.getFunctionTitleId(), Collections.emptyList())
 	                .stream()
 	                .map(TaskManagementEntity::getActualStartDate)
 	                .filter(Objects::nonNull)
 	                .min(LocalDate::compareTo)
 	                .orElse(null);
-	            LocalDate functionActualEnd = functionTasksMap.getOrDefault(function.getFunctionTitleId(), Collections.emptyList())
+	        LocalDate functionActualEnd = functionTasksMap.getOrDefault(function.getFunctionTitleId(), Collections.emptyList())
 	                .stream()
 	                .map(TaskManagementEntity::getActualEndDate)
 	                .filter(Objects::nonNull)
 	                .max(LocalDate::compareTo)
 	                .orElse(null);
 	            
-	            Map<String, Object> functionData = new HashMap<>();
-	            functionData.put("id", idCounter.getAndIncrement()); // 간트차트 내의 ID
-	            functionData.put("dbId", function.getFunctionTitleId()); // 실제 DB ID
-	            functionData.put("entityType", "function"); // 엔티티 유형
-	            functionData.put("name", function.getTitleName());
-	            functionData.put("actualStart", functionActualStart != null ? functionActualStart + "T00:00:00Z" : null);
-	            functionData.put("actualEnd", functionActualEnd != null ? functionActualEnd + "T23:59:59Z" : null);
-	            functionData.put("progressValue", function.getFunctionProcessivity());  // default 값 "0%"
-	            functionData.put("baselineStart", functionStartDate != null ? functionStartDate + "T00:00:00Z" : null);
-	            functionData.put("baselineEnd", functionEndDate != null ? functionEndDate + "T23:59:59Z" : null);
-	            functionData.put("rowHeight", 35);
-	            functionData.put("children", children);
+	        Map<String, Object> functionData = new HashMap<>();
+	        functionData.put("id", idCounter.getAndIncrement()); // 간트차트 내의 ID
+	        functionData.put("dbId", function.getFunctionTitleId()); // 실제 DB ID
+	        functionData.put("entityType", "function"); // 엔티티 유형
+	        functionData.put("name", function.getTitleName());
+	        functionData.put("actualStart", functionActualStart != null ? functionActualStart + "T00:00:00Z" : null);
+	        functionData.put("actualEnd", functionActualEnd != null ? functionActualEnd + "T23:59:59Z" : null);
+	        functionData.put("progressValue", function.getFunctionProcessivity());  // default 값 "0%"
+	        functionData.put("baselineStart", functionStartDate != null ? functionStartDate + "T00:00:00Z" : null);
+	        functionData.put("baselineEnd", functionEndDate != null ? functionEndDate + "T23:59:59Z" : null);
+	        functionData.put("rowHeight", 35);
+	        functionData.put("children", children);
 
-	            System.out.println("Function Data: " + functionData);
+	        System.out.println("Function Data: " + functionData);
 	            
-	            functionsData.add(functionData);
-	        }
+	        functionsData.add(functionData);
+	    }
 
-	        System.out.println("Functions Data: " + functionsData);
+	    System.out.println("Functions Data: " + functionsData);
 	        
-	        // baselineStart를 기준으로 기능 데이터 정렬
-	        functionsData.sort((f1, f2) -> {
-	            String start1 = (String) f1.get("baselineStart");
-	            String start2 = (String) f2.get("baselineStart");
+	    // baselineStart를 기준으로 기능 데이터 정렬
+	    functionsData.sort((f1, f2) -> {
+	    	String start1 = (String) f1.get("baselineStart");
+	        String start2 = (String) f2.get("baselineStart");
+	        return start1.compareTo(start2);
+	    });
+	        
+	    // 각 기능의 자식 업무를 baselineStart 기준으로 정렬
+	    for (Map<String, Object> functionData : functionsData) {
+	    	@SuppressWarnings("unchecked")
+	        List<Map<String, Object>> children = (List<Map<String, Object>>) functionData.get("children");
+	        children.sort((t1, t2) -> {
+	        	String start1 = (String) t1.get("baselineStart");
+	            String start2 = (String) t2.get("baselineStart");
 	            return start1.compareTo(start2);
 	        });
-	        
-	        // 각 기능의 자식 업무를 baselineStart 기준으로 정렬
-	        for (Map<String, Object> functionData : functionsData) {
-	            @SuppressWarnings("unchecked")
-	            List<Map<String, Object>> children = (List<Map<String, Object>>) functionData.get("children");
-	            children.sort((t1, t2) -> {
-	                String start1 = (String) t1.get("baselineStart");
-	                String start2 = (String) t2.get("baselineStart");
-	                return start1.compareTo(start2);
-	            });
-	        }
+	    }
 
-	        // bufferDay 설정
-	        int bufferDay = 7;
+	    // bufferDay 설정
+	    int bufferDay = 30;
 
-	        // 가장 처음 시작하는 업무의 시작일과 가장 마지막에 끝나는 업무의 종료일 계산
-	        LocalDate overallStartDate = functionsData.stream()
-	            .map(f -> (String) f.get("baselineStart"))
+	    // 가장 처음 시작하는 업무의 시작일과 가장 마지막에 끝나는 업무의 종료일 계산
+	    LocalDate overallStartDate = functionsData.stream()
+	    		.map(f -> (String) f.get("baselineStart"))
 	            .filter(Objects::nonNull)
 	            .map(start -> LocalDate.parse(start.substring(0, 10)))
 	            .min(LocalDate::compareTo)
 	            .orElse(null);
 
-	        LocalDate overallEndDate = functionsData.stream()
+	    LocalDate overallEndDate = functionsData.stream()
 	            .map(f -> (String) f.get("baselineEnd"))
 	            .filter(Objects::nonNull)
 	            .map(end -> LocalDate.parse(end.substring(0, 10)))
 	            .max(LocalDate::compareTo)
 	            .orElse(null);
 
-	        // 여유 기간 추가
-	        if (overallStartDate != null) {
-	            overallStartDate = overallStartDate.minusDays(bufferDay);
-	        }
-	        if (overallEndDate != null) {
-	            overallEndDate = overallEndDate.plusDays(bufferDay);
-	        }
-
-	        // 여유 기간을 적용한 시작일과 종료일 계산
-	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-	        String adjustedStartDate = overallStartDate != null ? overallStartDate.atStartOfDay().format(formatter) : null;
-	        String adjustedEndDate = overallEndDate != null ? overallEndDate.atStartOfDay().plusDays(1).minusNanos(1).format(formatter) : null;
-
-	        Map<String, Object> response = new HashMap<>();
-	        response.put("data", functionsData);
-	        response.put("adjustedStartDate", adjustedStartDate);
-	        response.put("adjustedEndDate", adjustedEndDate);
-	        return response;
+	    // 여유 기간 추가
+	    if (overallStartDate != null) {
+	    	overallStartDate = overallStartDate.minusDays(bufferDay);
 	    }
+	    
+	    if (overallEndDate != null) {
+	    	overallEndDate = overallEndDate.plusDays(bufferDay);
+	    }
+
+	    // 여유 기간을 적용한 시작일과 종료일 계산
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	    String adjustedStartDate = overallStartDate != null ? overallStartDate.atStartOfDay().format(formatter) : null;
+	    String adjustedEndDate = overallEndDate != null ? overallEndDate.atStartOfDay().plusDays(1).minusNanos(1).format(formatter) : null;
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("data", functionsData);
+	    response.put("adjustedStartDate", adjustedStartDate);
+	    response.put("adjustedEndDate", adjustedEndDate);
+	    return response;
+	}
 
 	
 	
