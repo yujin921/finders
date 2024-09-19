@@ -25,6 +25,7 @@ public class WebSecurityConfig {
             , "/member/join"        //회원가입
             , "/member/idCheck"		//중복체크
             , "/board/view"
+            , "/board/list"
     };
     
     // 프리랜서 회원 접근 가능
