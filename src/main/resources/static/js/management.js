@@ -405,10 +405,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		    success: function(response) {
 				
 				// 응답 데이터 검증
-	            if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
+	            if (Array.isArray(response.data) && response.data.length > 0) {
 
 	                // 데이터 추출
 	                const data = response.data;
+					
+					console.log("data 체크용: {}", data);
 	                
 	                // 가장 이른 시작일 (baselineStart 또는 actualStart 중 가장 빠른 날짜 찾기)
 	                const earliestStart = data
@@ -437,12 +439,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	                // 간트차트 생성 함수 호출
 	                createGanttChart(data, format(adjustedStartDate), format(adjustedEndDate));
-	            } else if (!response.data) {
-					alert('간트 차트 데이터를 로드하는 데 필요한 정보가 없습니다.n\먼저 업무 등록을 해주세요.');
+	            } else if (Array.isArray(response.data) && response.data.length == 0) {
+					alert('간트 차트 데이터를 로드하는 데 필요한 정보가 없습니다.\n먼저 업무 등록을 해주세요.');
 					console.error('데이터 없음:', response);
-				}else {
+					return; // 페이지 이동 없이 현재 페이지에 머물게 함
+				} else {
 	                alert('간트 차트 데이터를 로드하는 데 필요한 정보가 부족합니다.');
 	                console.error('잘못된 데이터:', response);
+					return; // 페이지 이동 없이 현재 페이지에 머물게 함
 	            }
 		    },
 		    error: function(xhr, status, error) {
@@ -530,70 +534,50 @@ document.addEventListener('DOMContentLoaded', function() {
 	            console.log('Actual End 체크용:', task.actualEnd);
 	        });
 			
-	        // Gantt 데이터에서 시작일과 종료일 추출
-	        let chartFirstElement = ganttChartData[0];
-	        let chartLastElement = ganttChartData[ganttChartData.length - 1];
+			// 각 업무의 baselineStart 및 actualStart 중 가장 빠른 시작일 및 가장 늦은 종료일을 계산
+			let earliestStart = new Date(Math.min(...ganttChartData.flatMap(item => 
+			    item.children.map(child => 
+			        new Date(child.baselineStart || child.actualStart)
+			    )
+			)));
 
-	        console.log("시작일 형식: ", chartFirstElement.actualStart);
-	        console.log("종료일 형식: ", chartLastElement.children[chartLastElement.children.length - 1].actualEnd);
+			let latestEnd = new Date(Math.max(...ganttChartData.flatMap(item => 
+			    item.children.map(child => 
+			        new Date(child.baselineEnd || child.actualEnd)
+			    )
+			)));
 
-	        // 날짜 문자열을 Date 객체로 변환 (가정: 날짜 문자열은 "YYYY-MM-DD" 형식)
-	        startDateStr = chartFirstElement.actualStart;
-	        endDateStr = chartLastElement.children[chartLastElement.children.length - 1].actualEnd;
+			// 유효한 날짜인지 확인
+			if (isNaN(earliestStart.getTime())) {
+			    console.warn('유효하지 않은 가장 빠른 시작일:', earliestStart);
+			    // 필요시 기본값 설정
+			}
+			if (isNaN(latestEnd.getTime())) {
+			    console.warn('유효하지 않은 가장 늦은 종료일:', latestEnd);
+			    // 필요시 기본값 설정
+			}
+			
+			// 여유 기간을 설정합니다
+			const bufferDays = 30;
 
-	        // 날짜 문자열을 Date 객체로 변환합니다
-	        startDate = new Date(startDateStr);
-	        endDate = new Date(endDateStr);
+			// 여유 기간을 추가합니다
+			earliestStart.setUTCDate(earliestStart.getUTCDate() - bufferDays);
+			latestEnd.setUTCDate(latestEnd.getUTCDate() + bufferDays);
 
-	        // 유효한 날짜인지 확인
-	        if (isNaN(startDate.getTime())) {
-	            console.warn('유효하지 않은 시작일:', startDateStr);
-	            startDate = new Date(); // 기본값을 현재 날짜로 설정
-	        }
-	        if (isNaN(endDate.getTime())) {
-	            console.warn('유효하지 않은 종료일:', endDateStr);
-	            endDate = new Date(); // 기본값을 현재 날짜로 설정
-	        }
+			console.log("조정된 시작일:", earliestStart.toISOString());
+			console.log("조정된 종료일:", latestEnd.toISOString());
 
-	        // 여유 기간을 설정합니다
-	        const bufferDays = 30;
+			// Gantt 차트를 HTML 컨테이너에 렌더링합니다
+			ganttChart.container('gantt-chart'); // 컨테이너 ID를 수정하세요
+			ganttChart.draw();
 
-	        // 날짜 문자열을 Date 객체로 변환
-	        let adjustedStartDateObj = new Date(adjustedStartDate);
-	        let adjustedEndDateObj = new Date(adjustedEndDate);
+			// 차트의 날짜 범위를 조정합니다
+			ganttChart.zoomTo(earliestStart.getTime(), latestEnd.getTime());
+			timeline.scale().minimum(earliestStart.getTime());
+			timeline.scale().maximum(latestEnd.getTime());
 
-	        // 날짜가 유효한지 확인
-	        if (isNaN(adjustedStartDateObj.getTime())) {
-	            console.warn('유효하지 않은 조정된 시작일:', adjustedStartDate);
-	            adjustedStartDateObj = startDate;
-	        }
-	        if (isNaN(adjustedEndDateObj.getTime())) {
-	            console.warn('유효하지 않은 조정된 종료일:', adjustedEndDate);
-	            adjustedEndDateObj = endDate;
-	        }
-
-	        // 여유 기간을 추가합니다
-	        adjustedStartDateObj.setUTCDate(adjustedStartDateObj.getUTCDate() - bufferDays);
-	        adjustedEndDateObj.setUTCDate(adjustedEndDateObj.getUTCDate() + bufferDays);
-
-	        console.log("조정된 시작일:", adjustedStartDateObj.toISOString());
-	        console.log("조정된 종료일:", adjustedEndDateObj.toISOString());
-
-	        // Gantt 차트를 HTML 컨테이너에 렌더링합니다
-	        ganttChart.container('gantt-chart'); // 컨테이너 ID를 수정하세요
-	        ganttChart.draw();
-
-	        // 날짜가 올바른지 확인하고 순서를 맞춤
-	        zoomStart = Math.min(adjustedStartDateObj.getTime(), adjustedEndDateObj.getTime());
-	        zoomEnd = Math.max(adjustedStartDateObj.getTime(), adjustedEndDateObj.getTime());
-
-	        console.log("Zoom Start:", zoomStart);
-	        console.log("Zoom End:", zoomEnd);
-
-	        // 차트의 날짜 범위를 조정합니다
-	        ganttChart.zoomTo(zoomStart, zoomEnd);
-	        timeline.scale().minimum(zoomStart);
-	        timeline.scale().maximum(zoomEnd);
+			console.log("Zoom Start:", earliestStart.getTime());
+			console.log("Zoom End:", latestEnd.getTime());
 
 	        ganttChart.fitAll();
 	        ganttChartLoaded = true;
@@ -1520,6 +1504,75 @@ document.addEventListener('DOMContentLoaded', function() {
   		    }
   		});
 	*/
+	
+	/*
+		        // Gantt 데이터에서 시작일과 종료일 추출
+		        let chartFirstElement = ganttChartData[0];
+		        let chartLastElement = ganttChartData[ganttChartData.length - 1];
+
+		        // console.log("시작일 형식: ", chartFirstElement.actualStart);
+				console.log("시작일 형식: ", chartFirstElement.children[0].actualStart);
+		        console.log("종료일 형식: ", chartLastElement.children[chartLastElement.children.length - 1].actualEnd);
+
+		        // 날짜 문자열을 Date 객체로 변환 (가정: 날짜 문자열은 "YYYY-MM-DD" 형식)
+		        // startDateStr = chartFirstElement.actualStart;
+				startDateStr = chartFirstElement.children[0].actualStart;
+				endDateStr = chartLastElement.children[chartLastElement.children.length - 1].actualEnd;
+
+		        // 날짜 문자열을 Date 객체로 변환합니다
+		        startDate = new Date(startDateStr);
+		        endDate = new Date(endDateStr);
+
+		        // 유효한 날짜인지 확인
+		        if (isNaN(startDate.getTime())) {
+		            console.warn('유효하지 않은 시작일:', startDateStr);
+		            startDate = new Date(); // 기본값을 현재 날짜로 설정
+		        }
+		        if (isNaN(endDate.getTime())) {
+		            console.warn('유효하지 않은 종료일:', endDateStr);
+		            endDate = new Date(); // 기본값을 현재 날짜로 설정
+		        }
+
+		        // 여유 기간을 설정합니다
+		        const bufferDays = 30;
+
+		        // 날짜 문자열을 Date 객체로 변환
+		        let adjustedStartDateObj = new Date(adjustedStartDate);
+		        let adjustedEndDateObj = new Date(adjustedEndDate);
+
+		        // 날짜가 유효한지 확인
+		        if (isNaN(adjustedStartDateObj.getTime())) {
+		            console.warn('유효하지 않은 조정된 시작일:', adjustedStartDate);
+		            adjustedStartDateObj = startDate;
+		        }
+		        if (isNaN(adjustedEndDateObj.getTime())) {
+		            console.warn('유효하지 않은 조정된 종료일:', adjustedEndDate);
+		            adjustedEndDateObj = endDate;
+		        }
+
+		        // 여유 기간을 추가합니다
+		        adjustedStartDateObj.setUTCDate(adjustedStartDateObj.getUTCDate() - bufferDays);
+		        adjustedEndDateObj.setUTCDate(adjustedEndDateObj.getUTCDate() + bufferDays);
+
+		        console.log("조정된 시작일:", adjustedStartDateObj.toISOString());
+		        console.log("조정된 종료일:", adjustedEndDateObj.toISOString());
+
+		        // Gantt 차트를 HTML 컨테이너에 렌더링합니다
+		        ganttChart.container('gantt-chart'); // 컨테이너 ID를 수정하세요
+		        ganttChart.draw();
+
+		        // 날짜가 올바른지 확인하고 순서를 맞춤
+		        zoomStart = Math.min(adjustedStartDateObj.getTime(), adjustedEndDateObj.getTime());
+		        zoomEnd = Math.max(adjustedStartDateObj.getTime(), adjustedEndDateObj.getTime());
+
+		        console.log("Zoom Start:", zoomStart);
+		        console.log("Zoom End:", zoomEnd);
+				
+				// 차트의 날짜 범위를 조정합니다
+				ganttChart.zoomTo(zoomStart, zoomEnd);
+				timeline.scale().minimum(zoomStart);
+				timeline.scale().maximum(zoomEnd);
+				*/
 
 function loadApplicationList() {
     fetch('/project/application-list')  // 서버에서 클라이언트의 지원자 목록을 가져옴

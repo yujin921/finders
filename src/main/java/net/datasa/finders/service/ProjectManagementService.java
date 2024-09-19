@@ -536,6 +536,7 @@ public class ProjectManagementService {
 	                    taskData.put("entityType", "task");  // 엔티티 유형
 	                    taskData.put("name", task.getTaskTitle());
 	                    
+	                    /*
 	                    // 시작일과 종료일 값을 설정할 변수
 	                    LocalDate startDate = (task.getActualStartDate() != null) ? task.getActualStartDate() : task.getTaskStartDate();
 	                    LocalDate endDate = (task.getActualEndDate() != null) ? task.getActualEndDate() : task.getTaskEndDate();
@@ -547,6 +548,20 @@ public class ProjectManagementService {
 	                    taskData.put("progressValue", task.getTaskProcessivity());  // default 값 "0%"
 	                    taskData.put("baselineStart", task.getTaskStartDate() + "T00:00:00Z");
 	                    taskData.put("baselineEnd", task.getTaskEndDate() + "T23:59:59Z");
+	                    */
+	                    
+	                    // taskData에 값을 추가
+	                    LocalDate startDate = task.getActualStartDate() != null ? task.getActualStartDate() : task.getTaskStartDate();
+	                    LocalDate endDate = task.getActualEndDate() != null ? task.getActualEndDate() : task.getTaskEndDate();
+
+	                    // actual을 baseline과 동일하게 설정
+	                    taskData.put("actualStart", (startDate != null ? startDate + "T00:00:00Z" : null));
+	                    taskData.put("actualEnd", (endDate != null ? endDate + "T23:59:59Z" : null));
+
+	                    // taskData에 값을 추가
+	                    taskData.put("baselineStart", (startDate != null ? startDate + "T00:00:00Z" : null));
+	                    taskData.put("baselineEnd", (endDate != null ? endDate + "T23:59:59Z" : null));
+	                    taskData.put("progressValue", task.getTaskProcessivity());  // default 값 "0%"
 	                    taskData.put("rowHeight", 35);
 	                    return taskData;
 	        }).collect(Collectors.toList());
