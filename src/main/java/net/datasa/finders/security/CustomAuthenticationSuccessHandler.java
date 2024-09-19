@@ -5,16 +5,20 @@ import java.util.Collection;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import net.datasa.finders.domain.entity.MemberEntity;
 
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 	@Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
+
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String roleName = null;
 
@@ -32,6 +36,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             }
         }
 
+        
         // Redirect URL based on the role
         String redirectUrl = "/"; // Default redirect URL
         String roleFromForm = request.getParameter("roleName");
