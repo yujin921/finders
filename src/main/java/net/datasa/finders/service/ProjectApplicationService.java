@@ -4,13 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ProjectApplicationDTO;
-import net.datasa.finders.domain.entity.ApplicationResult;
-import net.datasa.finders.domain.entity.MemberEntity;
-import net.datasa.finders.domain.entity.ProjectApplicationEntity;
-import net.datasa.finders.domain.entity.ProjectPublishingEntity;
-import net.datasa.finders.repository.MemberRepository;
-import net.datasa.finders.repository.ProjectApplicationRepository;
-import net.datasa.finders.repository.ProjectPublishingRepository;
+import net.datasa.finders.domain.dto.TeamDTO;
+import net.datasa.finders.domain.entity.*;
+import net.datasa.finders.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +20,8 @@ public class ProjectApplicationService {
     private final ProjectPublishingRepository projectPublishingRepository;
     private final ProjectApplicationRepository projectApplicationRepository;
     private final MemberRepository memberRepository;
+    private final TeamRepository teamRepository;
+    private final ProjectRepository projectRepository;
 
     // 프리랜서가 프로젝트에 이미 지원했는지 확인
     public boolean hasApplied(int projectNum, String freelancerUsername) {
@@ -69,31 +67,41 @@ public class ProjectApplicationService {
         MemberEntity freelancer = memberRepository.findByCustomMemberId(freelancerUsername)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        ProjectPublishingEntity project = projectPublishingRepository.findById(projectNum)
+        ProjectPublishingEntity projectPublishing = projectPublishingRepository.findById(projectNum)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        ProjectApplicationEntity application = projectApplicationRepository.findByProjectNumAndFreelancer(project, freelancer)
+        ProjectEntity projectEntity = projectRepository.findById(projectNum)
+                .orElseThrow(() -> new RuntimeException("ProjectEntity not found"));
+
+        ProjectApplicationEntity application = projectApplicationRepository.findByProjectNumAndFreelancer(projectPublishing, freelancer)
                 .orElseThrow(() -> new IllegalArgumentException("신청 기록이 없습니다."));
 
         application.setApplicationResult(result);  // 상태 업데이트
         projectApplicationRepository.save(application);
+
+        // 상태가 ACCEPTED인 경우 팀에 추가
+        if (result == ApplicationResult.ACCEPTED) {
+            addMembersToTeam(projectEntity, projectPublishing.getClientId(), freelancer);
+        }
     }
 
-    public List<ProjectApplicationDTO> getPendingApplications(int projectNum) {
-        ProjectPublishingEntity project = projectPublishingRepository.findById(projectNum)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+    // 팀에 신청자와 작성자 추가하는 메서드
+    private void addMembersToTeam(ProjectEntity projectEntity, MemberEntity client, MemberEntity freelancer) {
+        // 프리랜서 팀에 추가
+        TeamEntity teamFreelancer = TeamEntity.builder()
+                .projectNum(projectEntity.getProjectNum())  // 프로젝트 번호
+                .memberId(freelancer.getMemberId())  // 프리랜서 ID
+                .project(projectEntity)
+                .build();
+        teamRepository.save(teamFreelancer);
 
-        List<ProjectApplicationEntity> applications = projectApplicationRepository.findByProjectNumAndApplicationResult(project, ApplicationResult.PENDING);
-
-        // 엔티티를 DTO로 변환하여 반환
-        return applications.stream()
-                .map(application -> ProjectApplicationDTO.builder()
-                        .applicationNum(application.getApplicationNum())
-                        .projectNum(application.getProjectNum().getProjectNum())
-                        .freelancerId(application.getFreelancer().getMemberId())
-                        .applicationResult(application.getApplicationResult())
-                        .build())
-                .collect(Collectors.toList());
+        // 프로젝트 작성자 팀에 추가
+        TeamEntity teamAuthor = TeamEntity.builder()
+                .projectNum(projectEntity.getProjectNum())  // 프로젝트 번호
+                .memberId(client.getMemberId())  // 작성자 ID
+                .project(projectEntity)
+                .build();
+        teamRepository.save(teamAuthor);
     }
 
     // 클라이언트가 작성한 프로젝트에 지원한 프리랜서 목록을 조회하는 메서드
@@ -113,6 +121,16 @@ public class ProjectApplicationService {
                         .projectTitle(application.getProjectNum().getProjectTitle())  // 프로젝트 제목
                         .freelancerId(application.getFreelancer().getMemberId()) // 프리랜서 아이디
                         .applicationResult(application.getApplicationResult())   // 신청 상태
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<TeamDTO> getTeamMembersByProject(int projectNum) {
+        List<TeamEntity> teamEntities = teamRepository.findByProjectNum(projectNum);
+        return teamEntities.stream()
+                .map(team -> TeamDTO.builder()
+                        .projectNum(team.getProjectNum())
+                        .memberId(team.getMemberId())
                         .build())
                 .collect(Collectors.toList());
     }

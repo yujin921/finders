@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>프로젝트 등록 - Finder</title>
     <link rel="stylesheet" th:href="@{/css/writeForm.css}">
-    <script th:src="@{/js/writeForm.js}"></script>
+    <script th:src="@{/js/board/writeForm.js}"></script>
 </head>
 <body>
     <header>
@@ -67,31 +67,30 @@
 					<div id="section2" class="section">
 						<h2>업무범위</h2>
 				        <div class="scope-of-work">
-				            <div class="scope-option" onclick="toggleSelect(this)" data-scope="개발">
-				                <input type="checkbox" value="개발">
-				                <img src="https://via.placeholder.com/50" alt="개발">
-				                <p>개발</p>
-				            </div>
-				
-				            <div class="scope-option" onclick="toggleSelect(this)" data-scope="디자인">
-				                <input type="checkbox" value="디자인">
-				                <img src="https://via.placeholder.com/50" alt="디자인">
-				                <p>디자인</p>
-				            </div>
-				
-				            <div class="scope-option" onclick="toggleSelect(this)" data-scope="기획">
-				                <input type="checkbox" value="기획">
-				                <img src="https://via.placeholder.com/50" alt="기획">
-				                <p>기획</p>
-				            </div>
-				
-				            <div class="scope-option" onclick="toggleSelect(this)" data-scope="기타">
-				                <input type="checkbox" value="기타">
-				                <img src="https://via.placeholder.com/50" alt="기타">
-				                <p>기타</p>
-				            </div>
-				            <input type="hidden" id="selectedWorkScopes" name="selectedWorkScopes">
-				        </div>
+						    <div class="scope-option" onclick="toggleSelect(this)" data-scope="개발">
+						        <input type="checkbox" value="개발">
+						        <img src="https://via.placeholder.com/50" alt="개발">
+						        <p>개발</p>
+						    </div>
+						
+						    <div class="scope-option" onclick="toggleSelect(this)" data-scope="디자인">
+						        <input type="checkbox" value="디자인">
+						        <img src="https://via.placeholder.com/50" alt="디자인">
+						        <p>디자인</p>
+						    </div>
+						
+						    <div class="scope-option" onclick="toggleSelect(this)" data-scope="기획">
+						        <input type="checkbox" value="기획">
+						        <img src="https://via.placeholder.com/50" alt="기획">
+						        <p>기획</p>
+						    </div>
+						
+						    <div class="scope-option" onclick="toggleSelect(this)" data-scope="기타">
+						        <input type="checkbox" value="기타">
+						        <img src="https://via.placeholder.com/50" alt="기타">
+						        <p>기타</p>
+						    </div>
+						</div>
 					</div>
 					
 					<div id="section3" class="section">

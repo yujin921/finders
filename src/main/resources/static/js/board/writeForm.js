@@ -24,16 +24,25 @@ function updateRecruitSelectOptions() {
     const recruitSelects = document.querySelectorAll('.recruit-team-section select[name="role"], .recruit-added-item select[name="role"]');
 
     recruitSelects.forEach(select => {
-        // select 필드의 모든 옵션 제거
+        const selectedValue = select.value; // 현재 선택된 값 저장
+
+        // 기존 옵션 모두 제거
         select.innerHTML = '';
 
-        // 선택된 업무 범위를 기준으로 옵션 추가
+        // 선택된 업무 범위를 기준으로 새로운 옵션 추가
         selectedScopes.forEach(scope => {
             const option = document.createElement('option');
             option.value = scope;
             option.textContent = scope;
             select.appendChild(option);
         });
+
+        // 이전에 선택된 값이 새로운 옵션에 존재하면 복원
+        if (selectedScopes.includes(selectedValue)) {
+            select.value = selectedValue;
+        } else {
+            select.value = ''; // 존재하지 않으면 선택 초기화
+        }
     });
 }
 
@@ -63,16 +72,25 @@ function updateRecruitCategoryOptions() {
     const recruitCategorySelects = document.querySelectorAll('.recruit-team-section select[name="category"], .recruit-added-item select[name="category"]');
 
     recruitCategorySelects.forEach(select => {
-        // select 필드의 모든 옵션 제거
+        const selectedValue = select.value; // 현재 선택된 값 저장
+
+        // 기존 옵션 모두 제거
         select.innerHTML = '';
 
-        // 선택된 카테고리를 기준으로 옵션 추가
+        // 선택된 카테고리를 기준으로 새로운 옵션 추가
         selectedCategories.forEach(category => {
             const option = document.createElement('option');
             option.value = category;
             option.textContent = category;
             select.appendChild(option);
         });
+
+        // 이전에 선택된 값이 새로운 옵션에 존재하면 복원
+        if (selectedCategories.includes(selectedValue)) {
+            select.value = selectedValue;
+        } else {
+            select.value = ''; // 존재하지 않으면 선택 초기화
+        }
     });
 }
 

@@ -1,7 +1,7 @@
 html, body {
-	margin: 0;
-	padding: 0;
-	width: 100%;
+   margin: 0;
+   padding: 0;
+   width: 100%;
     height: 100%;
     font-family: Arial, sans-serif;
 }
@@ -20,8 +20,6 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%; /* 사이드바를 컨테이너 높이에 맞게 조정 */
-    box-sizing: border-box;
 }
 
 .logo img {
@@ -237,7 +235,7 @@ h1 {
 }
 
 #project-completion-button {
-	margin-left: 30px;
+   margin-left: 30px;
     padding: 10px 20px;
     background-color: #3498db;
     color: white;
@@ -336,11 +334,6 @@ h1 {
     }
 }
 
-#gantt-content, #calendar-content {
-    flex: 1; /* 메인 콘텐츠 영역을 유동적으로 조정 */
-    overflow-y: auto; /* 콘텐츠가 넘칠 경우 수직 스크롤 허용 */
-}
-
 #gantt-content {
     flex: 1;
     overflow-x: auto; /* 수평 스크롤 허용 */
@@ -348,7 +341,7 @@ h1 {
 }
 
 #gantt-chart {
-	width: 100%;
+   width: 100%;
     min-width: 1000px; /* 최소 너비를 크게 설정하여 짤리는 문제 해결 */
     height: 600px; /* 높이는 필요에 따라 조정 */
     box-sizing: border-box; /* 패딩과 테두리를 포함한 전체 크기 설정 */
@@ -453,187 +446,6 @@ h1 {
 
 .modal-buttons button:hover {
     opacity: 0.8;
-}
-
-/* 여기서 부터는 업무 등록 모달창 */
-/* 업무 등록 모달 스타일 */
-.task-modal {
-    display: none; /* 기본적으로 숨겨진 상태 */
-    position: fixed; /* 화면의 위치에 고정 */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
-    z-index: 1000; /* 최상위 레이어 */
-    overflow: hidden; /* 스크롤 방지 */
-}
-
-/* 업무 등록 모달 콘텐츠 스타일 */
-.task-modal .modal-content {
-    background: #fff; /* 흰색 배경 */
-    margin: 5% auto; /* 화면 중앙에 위치 */
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%; /* 너비 설정 */
-    max-height: 80vh; /* 최대 높이 설정 */
-    overflow-y: auto; /* 세로 스크롤 추가 */
-}
-
-/* 업무 등록 모달 버튼 스타일 */
-.task-modal .btn-close {
-    background-color: #ccc; /* 회색 배경 */
-    border: none; /* 테두리 없음 */
-    padding: 10px 20px; /* 여백 */
-    cursor: pointer; /* 커서 모양 변경 */
-}
-
-.task-modal .btn-save {
-    background-color: #2ecc71; /* 저장 버튼 색상 */
-    color: white;
-    border: none; /* 테두리 없음 */
-    padding: 10px 20px; /* 여백 */
-    cursor: pointer; /* 커서 모양 변경 */
-}
-
-.task-modal .btn-save:hover {
-    background-color: #27ae60; /* 저장 버튼 호버 색상 */
-}
-
-.task-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-.task-table th, .task-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-.task-table th {
-    background-color: #f4f4f4;
-}
-
-.task-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.task-table tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* 드롭다운 컨테이너 스타일 */
-.dropdown-container {
-    margin-bottom: 20px;
-}
-
-/* 드롭다운 버튼 스타일 */
-.dropdown-toggle {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    text-align: left;
-}
-
-/* 드롭다운 내용 스타일 */
-.dropdown-content {
-    display: none;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #fff;
-}
-
-/* 업무 테이블 스타일 */
-.task-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-.task-table th, .task-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-.task-table th {
-    background-color: #f4f4f4;
-}
-
-.task-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.task-table tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* 드롭다운 버튼 클릭 시 다른 드롭다운 닫기 기능 제거 */
-.dropdown-toggle {
-    cursor: pointer;
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-}
-
-/* 전체 컨테이너 스타일 */
-.update-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* 섹션 간의 간격 */
-    padding: 20px;
-    background-color: #f9f9f9; /* 배경색 */
-    border-radius: 8px; /* 모서리 둥글게 */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-}
-
-/* 각 섹션 스타일 */
-.update-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* 요소 간의 간격 */
-}
-
-/* 라벨 스타일 */
-.update-section label {
-    font-weight: bold;
-    margin-bottom: 5px; /* 라벨과 입력 필드 간의 간격 */
-    color: #333; /* 텍스트 색상 */
-}
-
-/* 입력 필드 스타일 */
-.input-field {
-    padding: 8px;
-    border: 1px solid #ccc; /* 테두리 색상 */
-    border-radius: 4px; /* 모서리 둥글게 */
-    font-size: 16px;
-    width: 100%; /* 입력 필드가 가로를 다 차지하도록 */
-    box-sizing: border-box; /* 패딩과 테두리를 포함한 너비 조정 */
-}
-
-/* 버튼 스타일 */
-.button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px; /* 모서리 둥글게 */
-    background-color: #007bff; /* 버튼 배경색 */
-    color: #fff; /* 버튼 텍스트 색상 */
-    font-size: 16px;
-    cursor: pointer; /* 마우스 커서가 포인터로 변경됨 */
-    transition: background-color 0.3s; /* 배경색 변화 애니메이션 */
-}
-
-.button:hover {
-    background-color: #0056b3; /* 버튼 호버 시 배경색 */
 }
 
 /* 여기서 부터는 업무 등록 모달창 */

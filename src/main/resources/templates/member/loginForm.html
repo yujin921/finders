@@ -10,9 +10,8 @@
     <script th:src="@{/js/loginForm.js}"></script>
 </head>
 <body>
-    <div>
+    <div class="container">
         <h1>로그인</h1>
-
         <div class="tabs">
             <button class="active" data-tab="freelancer-login">프리랜서 로그인</button>
             <button data-tab="company-login">기업 로그인</button>
@@ -22,10 +21,10 @@
         <div id="freelancer-login" class="tab-content active">
             <form id="freelancer-login-form" th:action="@{/member/login}" method="post">
                 <label for="freelancer-id">아이디:</label>
-                <input type="text" id="freelancer-id" name="id" required><br>
+                <input type="text" id="freelancer-id" name="id" required>
                 <label for="freelancer-password">비밀번호:</label>
-                <input type="password" id="freelancer-password" name="password" required><br>
-                <input type="hidden" name="roleName" value="ROLE_FREELANCER" />
+                <input type="password" id="freelancer-password" name="password" required>
+                <input type="hidden" name="roleName" value="ROLE_FREELANCER">
                 <button type="submit">로그인</button>
                 <div id="freelancer-error" class="errorMsg" th:if="${param.error}">ID 또는 비밀번호가 틀립니다.</div>
             </form>
@@ -35,14 +34,16 @@
         <div id="company-login" class="tab-content">
             <form id="company-login-form" th:action="@{/member/login}" method="post">
                 <label for="company-id">아이디:</label>
-                <input type="text" id="company-id" name="id" required><br>
+                <input type="text" id="company-id" name="id" required>
                 <label for="company-password">비밀번호:</label>
-                <input type="password" id="company-password" name="password" required><br>
-                <input type="hidden" name="roleName" value="ROLE_CLIENT" />
+                <input type="password" id="company-password" name="password" required>
+                <input type="hidden" name="roleName" value="ROLE_CLIENT">
                 <button type="submit">로그인</button>
                 <div id="company-error" class="errorMsg" th:if="${param.error}">ID 또는 비밀번호가 틀립니다.</div>
             </form>
         </div>
     </div>
 </body>
+
+
 </html>

@@ -49,9 +49,7 @@ public class ProjectManagementController {
     @GetMapping("projectList")
     public List<ProjectPublishingDTO> projectList(@AuthenticationPrincipal AuthenticatedUser user) {
         //서비스로 사용자 아이디를 전달하여 해당 아이디의 수입,지출 내역을 목록으로 리턴한다.
-        List<ProjectPublishingDTO> projectList = projectManagementService.getMyList(user.getUsername());
-        
-        return projectList;
+        return projectManagementService.getMyList(user.getUsername());
     }
     
     @GetMapping("management")
@@ -72,50 +70,6 @@ public class ProjectManagementController {
             return "redirect:/myProject/view";
 	    }
 	}
-    
-    /*
-    @ResponseBody
-    @PostMapping("saveFunction")
-    public FunctionTitleDTO saveFunction(@RequestParam("projectNum") int projectNum,
-                                          @RequestBody FunctionTitleDTO functionTitleDTO) {
-        try {
-            // projectNum과 titleName을 DTO에서 추출
-            String functionTitleName = functionTitleDTO.getTitleName();
-            
-            // 서비스 메서드를 호출하여 기능을 저장
-            FunctionTitleDTO dto = projectManagementService.saveFunction(projectNum, functionTitleName);
-            return dto;
-        } catch (Exception e) {
-            log.error("Error saving function", e);
-            return null;
-        }
-    }
-    
-    @ResponseBody
-    @PostMapping("saveTask")
-    public TaskManagementDTO saveTask(
-            @RequestParam("projectNum") int projectNum,
-            @RequestBody TaskManagementDTO taskDTO) {
-        
-        try {
-            log.debug("projectNum controller 체크용: {}", projectNum);
-            log.debug("taskDTO controller 체크용: {}", taskDTO);
-
-            TaskManagementDTO savedTask = projectManagementService.saveTask(projectNum, taskDTO);
-
-            log.debug("taskManagementDTO controller 체크용2: {}", savedTask);
-            
-            return savedTask;
-
-        } catch (IllegalArgumentException e) {
-            log.error("Duplicate task title or role error: ", e);
-            return null;
-        } catch (Exception e) {
-            log.error("Error saving task: ", e);
-            return null;
-        }
-    }
-    */
     
     @ResponseBody
     @PostMapping("saveFunctionAndTask")
