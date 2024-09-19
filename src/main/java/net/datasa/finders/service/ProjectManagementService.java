@@ -1,59 +1,23 @@
 package net.datasa.finders.service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.domain.dto.FunctionDTO;
-import net.datasa.finders.domain.dto.FunctionDataDTO;
-import net.datasa.finders.domain.dto.FunctionTitleDTO;
-import net.datasa.finders.domain.dto.ProjectPublishingDTO;
-import net.datasa.finders.domain.dto.TaskDTO;
-import net.datasa.finders.domain.dto.TaskDateRangeDTO;
-import net.datasa.finders.domain.dto.TaskManagementDTO;
-import net.datasa.finders.domain.entity.FunctionTitleEntity;
-import net.datasa.finders.domain.entity.MemberEntity;
-import net.datasa.finders.domain.entity.PrequalificationQuestionEntity;
-import net.datasa.finders.domain.entity.ProjectCategoryEntity;
-import net.datasa.finders.domain.entity.ProjectManagementEntity;
-import net.datasa.finders.domain.entity.ProjectPublishingEntity;
-import net.datasa.finders.domain.entity.ProjectRequiredSkillEntity;
-import net.datasa.finders.domain.entity.RoleName;
-import net.datasa.finders.domain.entity.TaskManagementEntity;
-import net.datasa.finders.domain.entity.TaskPriority;
-import net.datasa.finders.domain.entity.TaskStatus;
-import net.datasa.finders.domain.entity.WorkScopeEntity;
-import net.datasa.finders.repository.FunctionTitleRepository;
-import net.datasa.finders.repository.MemberRepository;
-import net.datasa.finders.repository.PrequalificationQuestionRepository;
-import net.datasa.finders.repository.ProjectCategoryRepository;
-import net.datasa.finders.repository.ProjectManagementRepository;
-import net.datasa.finders.repository.ProjectPublishingRepository;
-import net.datasa.finders.repository.ProjectRequiredSkillRepository;
-import net.datasa.finders.repository.TaskManagementRepository;
-import net.datasa.finders.repository.TeamRepository;
-import net.datasa.finders.repository.WorkScopeRepository;
+import net.datasa.finders.domain.dto.*;
+import net.datasa.finders.domain.entity.*;
+import net.datasa.finders.repository.*;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -63,7 +27,6 @@ public class ProjectManagementService {
 
 	private final ProjectPublishingRepository projectPublishingRepository;
     private final MemberRepository memberRepository;
-    private final TeamRepository teamRepository;
     private final WorkScopeRepository workScopeRepository;
     private final ProjectCategoryRepository categoryRepository;
     private final ProjectRequiredSkillRepository skillRepository;

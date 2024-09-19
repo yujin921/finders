@@ -1,27 +1,18 @@
 package net.datasa.finders.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.entity.ChatRoomEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.ProjectEntity;
 import net.datasa.finders.repository.ChatRoomRepository;
-import net.datasa.finders.repository.FunctionTitleRepository;
 import net.datasa.finders.repository.MemberRepository;
-import net.datasa.finders.repository.PrequalificationQuestionRepository;
-import net.datasa.finders.repository.ProjectCategoryRepository;
-import net.datasa.finders.repository.ProjectPublishingRepository;
 import net.datasa.finders.repository.ProjectRepository;
-import net.datasa.finders.repository.ProjectRequiredSkillRepository;
-import net.datasa.finders.repository.TaskManagementRepository;
-import net.datasa.finders.repository.TeamRepository;
-import net.datasa.finders.repository.WorkScopeRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor

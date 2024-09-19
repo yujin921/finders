@@ -44,7 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
 				importGanttChartData();
             } else if (targetId === 'application-content') {
                 loadApplicationList();
-            }
+            } else if (targetId === 'team-content') {
+				loadTeamList();
+			}
         });
     });
 
@@ -1525,8 +1527,8 @@ function loadApplicationList() {
             <table>
                 <thead>
                     <tr>
-                        <th>프리랜서 ID</th>
-                        <th>게시물 제목</th>
+                        <th>신청자 ID</th>
+                        <th>프로젝트명</th>
                         <th>상태</th>
                         <th>동작</th>
                     </tr>
@@ -1534,36 +1536,39 @@ function loadApplicationList() {
                 <tbody>
             `;
 
-            applications.forEach(application => {
-                let statusText = application.applicationResult;
+			const pendingApplications = applications.filter(application => application.applicationResult === 'PENDING');
 
-                if (application.applicationResult === 'PENDING') {
-                    // PENDING일 경우 상태에 "지원 신청 중" 표시
-                    statusText = '지원 신청 중';
-                }
+			pendingApplications.forEach(application => {
+				let statusText = '지원 신청 중';
 
-                // 동작 버튼은 항상 표시
-                let actionHtml = `
+				// 동작 버튼은 항상 표시
+				let actionHtml = `
                     <button onclick="updateApplicationStatus(${application.projectNum}, '${application.freelancerId}', 'ACCEPTED')">찬성</button>
                     <button onclick="updateApplicationStatus(${application.projectNum}, '${application.freelancerId}', 'REJECTED')">반대</button>
                 `;
 
-                contentHtml += `
+				contentHtml += `
                 <tr>
                     <td>${application.freelancerId}</td>
                     <td>${application.projectTitle}</td>
-                    <td>${statusText}</td> <!-- 상태란에 지원 신청 중 또는 다른 상태 표시 -->
+                    <td>${statusText}</td> <!-- 상태란에 지원 신청 중 표시 -->
                     <td>${actionHtml}</td> <!-- 동작란에 찬성/반대 버튼 표시 -->
                 </tr>
                 `;
-            });
+			});
 
-            contentHtml += `</tbody></table>`;
-            document.getElementById('application-content').innerHTML = contentHtml;
-        })
-        .catch(error => {
-            console.error('Error fetching applications:', error);
-        });
+			contentHtml += `</tbody></table>`;
+
+			// PENDING 상태의 지원자가 없다면 빈 목록 메시지 표시
+			if (pendingApplications.length === 0) {
+				contentHtml += `<p>현재 지원 신청 중인 프리랜서가 없습니다.</p>`;
+			}
+
+			document.getElementById('application-content').innerHTML = contentHtml;
+		})
+		.catch(error => {
+			console.error('Error fetching applications:', error);
+		});
 }
 
 function updateApplicationStatus(projectNum, freelancerId, status) {
@@ -1591,4 +1596,51 @@ function updateApplicationStatus(projectNum, freelancerId, status) {
         .finally(() => {
             isUpdating = false;  // 업데이트 완료 후 플래그 해제
         });
+}
+
+function getQueryParam(param) {
+	const urlParams = new URLSearchParams(window.location.search);  // URL에서 쿼리 스트링을 파싱
+	return urlParams.get(param);  // 특정 파라미터 값 가져오기
+}
+
+function loadTeamList() {
+	const projectNum = getQueryParam('projectNum'); // URL에서 projectNum 가져오기
+	if (!projectNum) {
+		alert('프로젝트 번호를 찾을 수 없습니다.');
+		return;
+	}
+
+	fetch(`/project/team-list?projectNum=${projectNum}`)
+		.then(response => response.json())
+		.then(teamList => {
+			let contentHtml = `<h3>팀원 목록</h3>`;
+			if (teamList.length > 0) {
+				contentHtml += `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>팀원 ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+
+				teamList.forEach(member => {
+					contentHtml += `
+                    <tr>
+                        <td>${member.memberId}</td>
+                    </tr>
+                    `;
+				});
+
+				contentHtml += `</tbody></table>`;
+			} else {
+				contentHtml += `<p>팀원이 없습니다.</p>`;
+			}
+
+			document.getElementById('team-content').innerHTML = contentHtml;
+		})
+		.catch(error => {
+			console.error('Error fetching team list:', error);
+		});
 }
