@@ -50,96 +50,110 @@
 				href="board/write">프로젝트 등록</a></li>
 			<li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
 			<li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
-            <li><a th:href="@{/support/guide}">서비스 안내</a></li>
-        	<li><a th:href="@{/support/example}">이용 사례</a></li>
+			<li><a th:href="@{/support/guide}">서비스 안내</a></li>
+			<li><a th:href="@{/support/example}">이용 사례</a></li>
 			<li><a href="#">커뮤니티</a></li>
 			<span>│</span>
 			<li><a th:href="@{/myProject/view}">내 프로젝트 목록</a></li>
 			<li><a href="#">미팅룸</a></li>
 		</ul>
 	</nav>
-	
+
 	<main>
-    <section class="case-studies">
-        <h1>고객 사례</h1>
-        <h2>위시켓과 함께한 고객 사례</h2>
-        
-        <div class="case-grid">
-            <div class="case-card">
-                <img src="/images/case1.jpg" alt="클리티카 중요한 플랫폼">
-                <h3>클리티가 중요한 플랫폼, 검증된 개발사와 구축한 O기업</h3>
-                <p>6,000만 원 | 150일</p>
-            </div>
-            <div class="case-card">
-                <img src="/images/case2.jpg" alt="신규 헬스케어 플랫폼">
-                <h3>신규 헬스케어 플랫폼, 합리적인 견적으로 구축한 K기업</h3>
-                <p>3,800만 원 | 90일</p>
-            </div>
-            <div class="case-card">
-                <img src="/images/case3.jpg" alt="외주로 플랫폼 백엔드 구축">
-                <h3>외주로 플랫폼 백엔드 구축, 개발 기간 25% 단축한 S기업</h3>
-                <p>1,000만 원 | 60일</p>
-            </div>
-            <div class="case-card">
-                <img src="/images/case4.jpg" alt="웹 플랫폼, 앱으로 확장">
-                <h3>웹 플랫폼, 앱으로 확장하고 신규 유저 50% 증가한 B기업</h3>
-                <p>5,500만 원 | 120일</p>
-            </div>
-        </div>
-    </section>
-    
-     <div id="modal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <div class="modal-header">
-                    <span class="category-tag">스타트업</span>
-                    <h2 id="modalTitle"></h2>
-                </div>
-                <div class="modal-body">
-                    <div class="project-info">
-                        <div class="info-item">
-                            <span>프로젝트 금액</span>
-                            <strong id="modalBudget"></strong>
-                        </div>
-                        <div class="info-item">
-                            <span>프로젝트 기간</span>
-                            <strong id="modalDuration"></strong>
-                        </div>
-                    </div>
-                    <h3>해외 패키지 여행 플랫폼</h3>
-                    <div class="project-details">
-                        <div class="detail-item">
-                            <span>프로젝트 등록</span>
-                            <p id="modalRegistration"></p>
-                        </div>
-                        <div class="detail-item">
-                            <span>지원자 모집</span>
-                            <p id="modalRecruitment"></p>
-                        </div>
-                        <div class="detail-item">
-                            <span>프로젝트 계약</span>
-                            <p id="modalContract"></p>
-                        </div>
-                        <div class="detail-item">
-                            <span>프로젝트 완료</span>
-                            <p id="modalCompletion"></p>
-                        </div>
-                    </div>
-                    <div class="project-description">
-                        <p id="modalDescription"></p>
-                    </div>
-                    <div class="project-solution">
-                        <h4>솔루션</h4>
-                        <ul id="modalSolution"></ul>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="downloadCase" class="btn secondary">스타트업 사례집</button>
-                    <button id="registerProject" class="btn primary">프로젝트 등록하기</button>
-                </div>
-            </div>
-        </div>
-    </main>
+		<section class="case-studies">
+			<h1>고객 사례</h1>
+			<h2>위시켓과 함께한 고객 사례</h2>
+
+			<div class="case-grid">
+				<div class="case-card">
+					<div class="card-image">
+						<img src="/images/giyomi.jpg" alt="퀄리티카 중요한 플랫폼">
+					</div>
+					<div class="card-content">
+						<h3>신규 헬스케어 플랫폼, 합리적인 견적으로 구축한 K기업</h3>
+						<p>6,000만 원 | 150일</p>
+					</div>
+				</div>
+				<div class="case-card">
+					<div class="card-image">
+						<img src="/images/canal.jpg" alt="퀄리티카 중요한 플랫폼">
+					</div>
+					<div class="card-content">
+						<h3>퀄리티가 중요한 플랫폼, 검증된 개발사와 구축한 O기업</h3>
+						<p>6,000만 원 | 150일</p>
+					</div>
+				</div>
+				<div class="case-card">
+					<div class="card-image">
+						<img src="/images/spring.jpg" alt="퀄리티카 중요한 플랫폼">
+					</div>
+					<div class="card-content">
+						<h3>외주로 플랫폼 구축, 개발 기간 25% 단죽한 O기업</h3>
+						<p>6,000만 원 | 150일</p>
+					</div>
+				</div>
+				<div class="case-card">
+					<div class="card-image">
+						<img src="/images/yukata.png" alt="퀄리티카 중요한 플랫폼">
+					</div>
+					<div class="card-content">
+						<h3>웹 플랫폼, 앱으로 확장하고 신규 유저 50% 증가한 O기업</h3>
+						<p>6,000만 원 | 150일</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<div id="modal" class="modal">
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<div class="modal-header">
+					<span class="category-tag">스타트업</span>
+					<h2 id="modalTitle"></h2>
+				</div>
+				<div class="modal-body">
+					<div class="project-info">
+						<div class="info-item">
+							<span>프로젝트 금액</span> <strong id="modalBudget"></strong>
+						</div>
+						<div class="info-item">
+							<span>프로젝트 기간</span> <strong id="modalDuration"></strong>
+						</div>
+					</div>
+					<h3>해외 패키지 여행 플랫폼</h3>
+					<div class="project-details">
+						<div class="detail-item">
+							<span>프로젝트 등록</span>
+							<p id="modalRegistration"></p>
+						</div>
+						<div class="detail-item">
+							<span>지원자 모집</span>
+							<p id="modalRecruitment"></p>
+						</div>
+						<div class="detail-item">
+							<span>프로젝트 계약</span>
+							<p id="modalContract"></p>
+						</div>
+						<div class="detail-item">
+							<span>프로젝트 완료</span>
+							<p id="modalCompletion"></p>
+						</div>
+					</div>
+					<div class="project-description">
+						<p id="modalDescription"></p>
+					</div>
+					<div class="project-solution">
+						<h4>솔루션</h4>
+						<ul id="modalSolution"></ul>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button id="downloadCase" class="btn secondary">스타트업 사례집</button>
+					<button id="registerProject" class="btn primary">프로젝트 등록하기</button>
+				</div>
+			</div>
+		</div>
+	</main>
 
 
 	<!-- Footer -->
