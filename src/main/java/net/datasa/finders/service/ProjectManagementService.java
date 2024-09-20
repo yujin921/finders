@@ -536,6 +536,7 @@ public class ProjectManagementService {
 	                    taskData.put("entityType", "task");  // 엔티티 유형
 	                    taskData.put("name", task.getTaskTitle());
 	                    
+	                    /*
 	                    // 시작일과 종료일 값을 설정할 변수
 	                    LocalDate startDate = (task.getActualStartDate() != null) ? task.getActualStartDate() : task.getTaskStartDate();
 	                    LocalDate endDate = (task.getActualEndDate() != null) ? task.getActualEndDate() : task.getTaskEndDate();
@@ -547,6 +548,20 @@ public class ProjectManagementService {
 	                    taskData.put("progressValue", task.getTaskProcessivity());  // default 값 "0%"
 	                    taskData.put("baselineStart", task.getTaskStartDate() + "T00:00:00Z");
 	                    taskData.put("baselineEnd", task.getTaskEndDate() + "T23:59:59Z");
+	                    */
+	                    
+	                    // taskData에 값을 추가
+	                    LocalDate startDate = task.getActualStartDate() != null ? task.getActualStartDate() : task.getTaskStartDate();
+	                    LocalDate endDate = task.getActualEndDate() != null ? task.getActualEndDate() : task.getTaskEndDate();
+
+	                    // actual을 baseline과 동일하게 설정(actualStart와 actualEnd가 null인 경우 기본 날짜로 설정)
+	                    taskData.put("actualStart", (startDate != null ? startDate + "T00:00:00Z" : task.getTaskStartDate() + "T00:00:00Z"));
+	                    taskData.put("actualEnd", (endDate != null ? endDate + "T23:59:59Z" : task.getTaskEndDate() + "T23:59:59Z"));
+
+	                    // taskData에 값을 추가
+	                    taskData.put("baselineStart", task.getTaskStartDate() + "T00:00:00Z");
+	                    taskData.put("baselineEnd", task.getTaskEndDate() + "T23:59:59Z");
+	                    taskData.put("progressValue", task.getTaskProcessivity());  // default 값 "0%"
 	                    taskData.put("rowHeight", 35);
 	                    return taskData;
 	        }).collect(Collectors.toList());
@@ -576,8 +591,8 @@ public class ProjectManagementService {
 	        functionData.put("dbId", function.getFunctionTitleId()); // 실제 DB ID
 	        functionData.put("entityType", "function"); // 엔티티 유형
 	        functionData.put("name", function.getTitleName());
-	        functionData.put("actualStart", functionActualStart != null ? functionActualStart + "T00:00:00Z" : null);
-	        functionData.put("actualEnd", functionActualEnd != null ? functionActualEnd + "T23:59:59Z" : null);
+	        functionData.put("actualStart", functionActualStart != null ? functionActualStart + "T00:00:00Z" : functionStartDate + "T00:00:00Z");
+	        functionData.put("actualEnd", functionActualEnd != null ? functionActualEnd + "T23:59:59Z" : functionEndDate + "T23:59:59Z");
 	        functionData.put("progressValue", function.getFunctionProcessivity());  // default 값 "0%"
 	        functionData.put("baselineStart", functionStartDate != null ? functionStartDate + "T00:00:00Z" : null);
 	        functionData.put("baselineEnd", functionEndDate != null ? functionEndDate + "T23:59:59Z" : null);
