@@ -17,7 +17,24 @@ document.addEventListener('DOMContentLoaded', function() {
 	let ganttChart; // Gantt 차트 인스턴스를 저장할 변수
 	let timeline;
 	let ganttChartLoaded = false;
+	
+	// URL에서 쿼리 파라미터를 추출하는 함수
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
 
+    // 페이지 로드 시 projectNum 값을 추출하여 input 태그에 설정
+    const projectNum = getQueryParam('projectNum');
+    if (projectNum) {
+        $('#project-num').val(projectNum);
+    }
+
+    console.log("projectNum 체크용: ", projectNum);
+
+	// 페이지 로드 시 기본적으로 업무 목록 로드
+	loadTasks();
+	
     tabs.forEach(tab => {
         tab.addEventListener('click', function(event) {
             event.preventDefault();
@@ -29,7 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             document.getElementById(targetId).classList.add('active');
 
-            if (targetId === 'calendar-content') {
+            if (targetId === 'task-content') {
+				// 페이지 로드 시 업무 목록을 불러옴
+				loadTasks();
+			} else if (targetId === 'calendar-content') {
                 loadCalendar();
             } else if (targetId === 'gantt-content') {
 				importGanttChartData();
@@ -154,6 +174,258 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 	*/
 
+    // 업무 등록 버튼 클릭 시 모달 창 열기
+    $('#add-task-button').on('click', function() {
+        $('#task-modal').removeClass('hidden').show();
+        $('#task-form')[0].reset(); // 폼 초기화
+
+        // 첫 번째 업무 등록 여부 확인
+        const isFirstTask = !localStorage.getItem('firstTaskRegistered');
+
+        // 기능 분류 목록 로드
+        loadFunctionTitles(projectNum, isFirstTask);
+
+        // 첫 번째 업무 등록 이후 상태 저장
+        if (isFirstTask) {
+            localStorage.setItem('firstTaskRegistered', 'true');
+        }
+    });
+
+    // 모달 닫기 버튼 클릭 시
+    $('#close-task-modal').on('click', function() {
+        $('#task-modal').addClass('hidden').hide();
+    });
+
+    /*
+    // URL에서 쿼리 파라미터를 추출하는 함수
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // 페이지 로드 시 projectNum 값을 추출하여 input 태그에 설정
+    const projectNum = getQueryParam('projectNum');
+    if (projectNum) {
+        $('#project-num').val(projectNum);
+    }
+    */
+
+    console.log("projectNum 체크용: ", projectNum);
+
+    // 기능 분류 목록 로드 함수
+    function loadFunctionTitles(projectNum, isFirstTask) {
+    	console.log('Loading function titles for projectNum:', projectNum); // 디버깅을 위한 로그
+    	console.log("isFirstTask 체크용: ", isFirstTask);
+    	
+        $.ajax({
+            url: 'loadFunctionTitles',
+            type: 'get',
+            data: { projectNum: projectNum },
+            success: function(response) {
+                const $select = $('#function-select');
+                $select.empty().append('<option value="">기존 기능 선택</option>');
+                response.forEach(function(item) {
+                    $select.append(`<option value="${item.functionTitleId}">${item.titleName}</option>`);
+                });
+
+                if (isFirstTask) {
+                    // 첫 번째 업무 등록 시
+                    $('#function-select').hide();
+                    $('#new-function-name').show();
+                    $('#add-new-function-btn').show();
+                } else {
+                    // 두 번째 이후 업무 등록 시
+                    $('#function-select').show();
+                    $('#new-function-name').show();
+                    $('#add-new-function-btn').show();
+                }
+            },
+            error: function() {
+                alert('기능 분류 목록을 불러오는 데 실패했습니다.');
+            }
+        });
+    }
+
+    // 기능 분류 선택에 따라 새 기능 입력 필드 표시/숨기기
+    $('#function-select').on('change', function() {
+        if ($(this).val() === '') {
+            $('#new-function-name').show();
+            $('#add-new-function-btn').show(); // 새 기능 추가 버튼 표시
+        } else {
+            $('#new-function-name').hide();
+            $('#add-new-function-btn').hide(); // 새 기능 추가 버튼 숨기기
+        }
+        // 선택한 기능 분류 ID를 전역 변수에 저장
+        funcTitleId = $(this).val();
+    });
+
+ 	// 폼 제출 이벤트 핸들러
+    $('#save-function-and-task-btn').on('click', function() {
+    	const newFunctionName = $('#new-function-name').val();
+        const projectNum = $('#project-num').val(); // 프로젝트 번호 값 읽기
+        const selectedFunctionId = $('#function-select').val(); // 선택된 기능 ID
+
+        if (newFunctionName.trim() === '' && selectedFunctionId === '') {
+            alert('기능 이름을 입력해 주세요 또는 기능을 선택해 주세요.');
+            return;
+        }
+        
+    	// functionTitleName을 새 기능 입력값이나 선택된 기능 이름으로 설정
+        const functionTitleName = newFunctionName.trim() !== '' ? newFunctionName : $('#function-select option:selected').text();
+
+        const taskData = {
+        	functionTitleId: selectedFunctionId || null, // 선택된 기능 ID, 새 기능의 경우 null 처리
+        	functionTitleName: functionTitleName, // 기능 제목 추가
+        	taskTitle: $('#task-title').val(),
+            taskDescription: $('#task-description').val(),
+            taskStatus: $('#task-status').val(),
+            taskPriority: $('#task-priority').val(),
+            taskStartDate: $('#task-start-date').val(),
+            taskEndDate: $('#task-end-date').val(),
+            freelancerId: $('#task-assignee').val()
+        };
+
+        console.log('taskData 체크용: ', taskData);
+
+        $.ajax({
+            url: 'saveFunctionAndTask?projectNum=' + projectNum, // 쿼리 파라미터에 functionTitleName을 포함시키지 않음
+            type: 'post',
+            data: JSON.stringify(taskData), // taskData를 직접 포함
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function(response) {
+                console.log('서버 응답:', response);
+
+                // 새 기능 추가 후 기능 분류 목록 갱신
+                if (newFunctionName.trim() !== '') {
+                    $('#function-select').append(`<option value="${response.functionTitleId}">${newFunctionName}</option>`);
+                    $('#function-select').val(response.functionTitleId);
+                    $('#new-function-name').hide();
+                    $('#add-new-function-btn').hide();
+                }
+
+                alert('업무가 성공적으로 등록되었습니다.');
+                $('#task-modal').addClass('hidden').hide();
+
+                // 업무 목록 업데이트
+                loadTasks();
+            },
+            error: function(xhr) {
+                alert('업무 등록에 실패했습니다: ' + xhr.responseText);
+            }
+        });
+    });
+    
+ 	// 프로젝트 번호로 업무를 조회하여 리스트를 로드하는 함수
+    function loadTasks() {
+        $.ajax({
+            url: 'getTasks',
+            type: 'get',
+            data: { projectNum: projectNum }, // 쿼리 파라미터로 projectNum 전송
+            success: function(response) {
+                console.log('업무 목록:', response);
+
+                const $taskList = $('#task-list');
+                $taskList.empty(); // 기존 목록 초기화
+
+                if (response.length === 0) {
+                    $taskList.append('<p>업무가 없습니다.</p>');
+                } else {
+                    const uniqueFunctionTitles = [...new Set(response.map(task => task.functionTitleName))];
+
+                    uniqueFunctionTitles.forEach(title => {
+                        const filteredTasks = response.filter(task => task.functionTitleName === title);
+
+                        if (filteredTasks.length > 0) {
+                            const dropdownContainer = $('<div class="dropdown-container"></div>');
+                            const dropdownToggle = $(`<button class="dropdown-toggle">${title}</button>`);
+                            const dropdownContent = $('<div class="dropdown-content"></div>');
+
+                            const table = $('<table class="task-table"></table>');
+                            const thead = $(`<thead>
+                                <tr>
+                                    <th>업무 제목</th>
+                                    <th>설명</th>
+                                    <th>상태</th>
+                                    <th>우선순위</th>
+                                    <th>시작 날짜</th>
+                                    <th>종료 날짜</th>
+                                    <th>프리랜서 ID</th>
+                                </tr>
+                            </thead>`);
+                            const tbody = $('<tbody></tbody>');
+
+                            filteredTasks.forEach(task => {
+                                tbody.append(`
+                                    <tr>
+                                        <td>${task.taskTitle}</td>
+                                        <td>${task.taskDescription}</td>
+                                        <td>${task.taskStatus}</td>
+                                        <td>${task.taskPriority}</td>
+                                        <td>${task.taskStartDate}</td>
+                                        <td>${task.taskEndDate}</td>
+                                        <td>${task.freelancerId}</td>
+                                    </tr>
+                                `);
+                            });
+
+                            table.append(thead).append(tbody);
+                            dropdownContent.append(table);
+                            dropdownContainer.append(dropdownToggle).append(dropdownContent);
+                            $taskList.append(dropdownContainer);
+                        }
+                    });
+
+                 	// 드롭다운 메뉴 클릭 시 열리고 닫히는 기능
+                    $('.dropdown-toggle').on('click', function() {
+                        const $content = $(this).siblings('.dropdown-content');
+                        $content.slideToggle(); // 클릭한 메뉴 열기/닫기
+                    });
+
+                    // 페이지 로드 시 모든 드롭다운 메뉴 열기
+                    $('.dropdown-content').show();
+                }
+            },
+            error: function() {
+                alert('업무 목록을 불러오는 데 실패했습니다.');
+            }
+        });
+    }
+ 	
+ 	// 프로젝트 완료 버튼 클릭 시
+    $('#project-completion-button').on('click', function() {
+        
+        if (!projectNum) {
+            alert('프로젝트 번호를 찾을 수 없습니다.');
+            return;
+        }
+        
+        console.log('프로젝트 완료 - projectNum 체크용: ', projectNum);
+    	
+    	$.ajax({
+            url: 'completeProject?projectNum=' + projectNum, // URL 쿼리 파라미터로 전송
+            type: 'post',
+            contentType: 'application/json', // JSON 형식으로 데이터 전송
+            data: JSON.stringify({ projectNum: projectNum }), // 데이터는 JSON 문자열로 변환
+            dataType: 'text',
+            success: function(response) {
+                if (response === 'success') {
+                    alert('프로젝트가 완료되었습니다.');
+                    
+                    // 목록 화면 업데이트
+                    loadTasks();
+                } else {
+                    alert('프로젝트 완료 처리에 실패했습니다.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+                alert('서버 요청 중 오류가 발생했습니다.');
+            }
+    	});
+    });
+	
+	
     // 캘린더 로드
     function loadCalendar() {
         if (calendar) return; // 이미 캘린더가 로드된 경우
@@ -371,18 +643,6 @@ document.addEventListener('DOMContentLoaded', function() {
             hour12: true
         };
         return new Intl.DateTimeFormat('en-US', options).format(date);
-    }
-	
-	// URL에서 쿼리 파라미터를 추출하는 함수
-    function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
-    }
-
-    // 페이지 로드 시 projectNum 값을 추출하여 input 태그에 설정
-    const projectNum = getQueryParam('projectNum');
-    if (projectNum) {
-        $('#project-num').val(projectNum);
     }
 	
 	// 간트차트 데이터 로드
