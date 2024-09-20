@@ -1,4 +1,4 @@
-$(document).ready(function() {
+		$(document).ready(function() {
 			list();
 		});
 
@@ -10,7 +10,6 @@ $(document).ready(function() {
 		            $('#output').empty();
 
 					$(list).each(function(i, obj) {
-						const formattedDate = new Date(obj.recruitDeadline).toISOString().split('T')[0];
 						let status = obj.projectStatus ? "모집완료" : "모집중";
 
 						let remainingDays = calculateRemainingDays(obj.projectStartDate, obj.projectEndDate);

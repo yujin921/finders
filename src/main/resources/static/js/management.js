@@ -1543,7 +1543,7 @@ function loadTeamList() {
                 <table>
                     <thead>
                         <tr>
-                            <th>팀원 ID</th>
+                            
                         </tr>
                     </thead>
                     <tbody>

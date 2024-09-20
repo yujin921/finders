@@ -41,9 +41,8 @@ public class BoardController {
 
     @ResponseBody
     @GetMapping("list")
-    public List<ProjectPublishingDTO> list(@AuthenticationPrincipal AuthenticatedUser user) {
-        //서비스로 사용자 아이디를 전달하여 해당 아이디의 수입,지출 내역을 목록으로 리턴한다.
-        List<ProjectPublishingDTO> list = boardService.getList(user.getUsername());
+    public List<ProjectPublishingDTO> list() {
+        List<ProjectPublishingDTO> list = boardService.getList();
         return list;
     }
 

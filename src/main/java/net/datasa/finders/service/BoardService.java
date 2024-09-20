@@ -114,7 +114,7 @@ public class BoardService {
         }
     }
 	
-    public List<ProjectPublishingDTO> getList(String id) {
+    public List<ProjectPublishingDTO> getList() {
         
     	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
     	List<ProjectPublishingEntity> entityList = projectPublishingRepository.findAll(sort);
