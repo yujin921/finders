@@ -138,34 +138,80 @@ button[type="submit"]:hover {
   font-size: 0.9rem;
 }
 
-/* 기술 선택 섹션 */
-.tech-section {
+.tech-section, .field-section, .category-section {
   margin-top: 25px;
+  background-color: var(--background-color);
+  padding: 15px;
+  border-radius: var(--border-radius);
 }
 
-.tech-buttons {
+.tech-buttons, .selected-techs, .field-buttons, .category-buttons, .selected-field, .selected-category {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 10px;
+  margin-top: 12px;
 }
 
-.tech-button {
-  background-color: #f0f0f0;
-  padding: 10px;
+.tech-button, .selected-tech, .field-button, .category-button, .selected-field, .selected-category {
+  padding: 8px 12px;
   border-radius: var(--button-radius);
+  font-size: 13px;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.3s ease;
+}
+
+.tech-button, .field-button, .category-button {
+  background-color: #e9ecef;
   cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-.tech-button:hover {
-  background-color: var(--secondary-color);
-  color: white;
+.tech-button:hover, .field-button:hover, .category-button:hover {
+  background-color: #dee2e6;
 }
 
-.tech-button.selected {
+.tech-button.selected, .selected-tech, .category-button.selected, .selected-category, .field-button.selected, .selected-field {
   background-color: var(--primary-color);
-  color: white;
+  color: #fff;
+}.tech-section, .field-section, .category-section {
+  margin-top: 25px;
+  background-color: var(--background-color);
+  padding: 15px;
+  border-radius: var(--border-radius);
+}
+
+.tech-buttons, .selected-techs, .field-buttons, .category-buttons, .selected-field, .selected-category {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.tech-button, .selected-tech, .field-button, .category-button, .selected-field, .selected-category {
+  padding: 8px 12px;
+  border-radius: var(--button-radius);
+  font-size: 13px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.3s ease;
+}
+
+.tech-button, .field-button, .category-button {
+  background-color: #e9ecef;
+  cursor: pointer;
+}
+
+.tech-button:hover, .field-button:hover, .category-button:hover {
+  background-color: #dee2e6;
+}
+
+.tech-button.selected, .selected-tech, .category-button.selected, .selected-category, .field-button.selected, .selected-field {
+  background-color: var(--primary-color);
+  color: #fff;
 }
 
 /* 중복확인 버튼 */
