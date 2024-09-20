@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1:1 화상 회의</title>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script th:src="@{/js/webCam/webCam.js}"></script>
+</head>
+<body>
+    <h1>1:1 화상 회의</h1>
+
+    <!-- 자신의 영상 -->
+    <video id="localVideo" autoplay playsinline muted></video>
+
+    <!-- 상대방의 영상 -->
+    <video id="remoteVideo" autoplay playsinline></video>
+
+    <!-- 화상 회의 시작 버튼 -->
+    <button id="startCall">통화 시작</button>
+</body>
+</html>
