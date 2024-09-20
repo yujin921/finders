@@ -138,6 +138,8 @@ button[type="submit"]:hover {
   font-size: 0.9rem;
 }
 
+/* 기술 분야 카테고리 섹션 */
+
 .tech-section, .field-section, .category-section {
   margin-top: 25px;
   background-color: var(--background-color);

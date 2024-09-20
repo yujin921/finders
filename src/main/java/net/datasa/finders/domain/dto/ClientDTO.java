@@ -1,6 +1,7 @@
 package net.datasa.finders.domain.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,4 +29,7 @@ public class ClientDTO {
 	String address;
 	String detailAddress;
 	String extraAddress;
+	
+	List<String> fields;
+	List<String> categorys;
 }

@@ -192,21 +192,23 @@ footer p {
 								/* 여기까지 footer 부분 */
 								
 								/* 기술 섹션 스타일 */
-.tech-section {
+/* 기술 분야 카테고리 섹션 */
+
+.tech-section, .field-section, .category-section {
   margin-top: 25px;
   background-color: var(--background-color);
   padding: 15px;
   border-radius: var(--border-radius);
 }
 
-.tech-buttons, .selected-techs {
+.tech-buttons, .selected-techs, .field-buttons, .category-buttons, .selected-field, .selected-category {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 10px;
   margin-top: 12px;
 }
 
-.tech-button, .selected-tech {
+.tech-button, .selected-tech, .field-button, .category-button, .selected-field, .selected-category {
   padding: 8px 12px;
   border-radius: var(--button-radius);
   font-size: 13px;
@@ -217,16 +219,53 @@ footer p {
   transition: all 0.3s ease;
 }
 
-.tech-button {
+.tech-button, .field-button, .category-button {
   background-color: #e9ecef;
   cursor: pointer;
 }
 
-.tech-button:hover {
+.tech-button:hover, .field-button:hover, .category-button:hover {
   background-color: #dee2e6;
 }
 
-.tech-button.selected, .selected-tech {
+.tech-button.selected, .selected-tech, .category-button.selected, .selected-category, .field-button.selected, .selected-field {
+  background-color: var(--primary-color);
+  color: #fff;
+}.tech-section, .field-section, .category-section {
+  margin-top: 25px;
+  background-color: var(--background-color);
+  padding: 15px;
+  border-radius: var(--border-radius);
+}
+
+.tech-buttons, .selected-techs, .field-buttons, .category-buttons, .selected-field, .selected-category {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.tech-button, .selected-tech, .field-button, .category-button, .selected-field, .selected-category {
+  padding: 8px 12px;
+  border-radius: var(--button-radius);
+  font-size: 13px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.3s ease;
+}
+
+.tech-button, .field-button, .category-button {
+  background-color: #e9ecef;
+  cursor: pointer;
+}
+
+.tech-button:hover, .field-button:hover, .category-button:hover {
+  background-color: #dee2e6;
+}
+
+.tech-button.selected, .selected-tech, .category-button.selected, .selected-category, .field-button.selected, .selected-field {
   background-color: var(--primary-color);
   color: #fff;
 }
