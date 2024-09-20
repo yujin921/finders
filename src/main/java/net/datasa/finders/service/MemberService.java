@@ -94,8 +94,10 @@ public class MemberService {
     
     public void joinFreelancer(FreelancerDTO dto, MemberDTO member) {
     	
+    	MemberEntity memberEntity = memberRepository.findById(member.getMemberId()).orElseThrow(() -> new EntityNotFoundException("아이디 못찾음"));
+    	
     	FreelancerEntity freelancerEntity = FreelancerEntity.builder()
-    			.freelancerId(member.getMemberId())
+    			.member(memberEntity)
     			.freelancerPhone(dto.getFreelancerPhone())
     			.country(dto.getCountry())
     			.postalCode(dto.getPostalCode())
@@ -192,8 +194,10 @@ public class MemberService {
     
     public void joinClient(ClientDTO dto, MemberDTO member) {
     	
+    	MemberEntity memberEntity = memberRepository.findById(member.getMemberId()).orElseThrow(() -> new EntityNotFoundException("아이디 못찾음"));
+    	
     	ClientEntity clientEntity = ClientEntity.builder()
-    			.clientId(member.getMemberId())
+    			.member(memberEntity)
     			.clientPhone(dto.getClientPhone())
     			.industry(dto.getIndustry())
     			.foundedDate(dto.getFoundedDate())

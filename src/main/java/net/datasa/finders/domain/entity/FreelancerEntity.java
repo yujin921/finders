@@ -17,11 +17,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class FreelancerEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "freelancer_id")
-    private String freelancerId;
+    private Integer freelancerId;
 
     @ManyToOne
-    @JoinColumn(name = "freelancer_id", referencedColumnName = "member_id", insertable = false, updatable = false)
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id", insertable = false, updatable = false)
     private MemberEntity member;
 
 	@Column(name = "freelancer_phone", length = 100)
