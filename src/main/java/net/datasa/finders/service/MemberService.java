@@ -7,11 +7,15 @@ import net.datasa.finders.domain.dto.ClientDTO;
 import net.datasa.finders.domain.dto.FreelancerDTO;
 import net.datasa.finders.domain.dto.FreelancerSkillDTO;
 import net.datasa.finders.domain.dto.MemberDTO;
+import net.datasa.finders.domain.entity.ClientCategoryEntity;
 import net.datasa.finders.domain.entity.ClientEntity;
+import net.datasa.finders.domain.entity.ClientFieldEntity;
 import net.datasa.finders.domain.entity.FreelancerEntity;
 import net.datasa.finders.domain.entity.FreelancerSkillEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.repository.ClientCategoryRepository;
+import net.datasa.finders.repository.ClientFieldRepository;
 import net.datasa.finders.repository.ClientRepository;
 import net.datasa.finders.repository.FreelancerRepository;
 import net.datasa.finders.repository.FreelancerSkillRepository;
@@ -38,6 +42,8 @@ public class MemberService {
     private final FreelancerRepository freelancerRepository;
     private final ClientRepository clientRepository;
     private final FreelancerSkillRepository freelancerSkillRepository;
+    private final ClientFieldRepository clientFieldRepository;
+    private final ClientCategoryRepository clientCategoryRepository;
     
     public MemberEntity join(MemberDTO dto, String uploadPath, MultipartFile profileImg) throws IOException {
         LocalDateTime now = LocalDateTime.now();
@@ -143,6 +149,51 @@ public class MemberService {
             }
         }
     }
+    
+    @Transactional
+    public void updateClientField(String clientId, List<String> fields) {
+        MemberEntity client = memberRepository.findById(clientId)
+            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
+
+        // 기존 스킬 삭제
+        clientFieldRepository.deleteByClientId(client);
+        // 새로운 스킬 저장
+        for (String field : fields) {
+            // 문자열 정제
+            String cleanedSkill = cleanSkillString(field);
+            
+            if (!cleanedSkill.isEmpty()) {
+                ClientFieldEntity fieldEntity = ClientFieldEntity.builder()
+                	.clientId(client)
+                	.fieldText(cleanedSkill)
+                	.build();
+                clientFieldRepository.save(fieldEntity);
+            }
+        }
+    }
+    
+    @Transactional
+    public void updateClientCategory(String clientId, List<String> categorys) {
+        MemberEntity client = memberRepository.findById(clientId)
+            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
+
+        // 기존 스킬 삭제
+        clientCategoryRepository.deleteByClientId(client);
+        // 새로운 스킬 저장
+        for (String category : categorys) {
+            // 문자열 정제
+            String cleanedSkill = cleanSkillString(category);
+            
+            if (!cleanedSkill.isEmpty()) {
+                ClientCategoryEntity categoryEntity = ClientCategoryEntity.builder()
+                	.clientId(client)
+                	.categoryText(cleanedSkill)
+                	.build();
+                clientCategoryRepository.save(categoryEntity);
+            }
+        }
+    }
+
 
     // 문자열 정제 메서드
     private String cleanSkillString(String skill) {
