@@ -15,17 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const contents = document.querySelectorAll('.tab-content');
     let calendar;
 	let ganttChart; // Gantt 차트 인스턴스를 저장할 변수
-	// let ganttChartData = []; // Gantt 차트 데이터 저장 변수
 	let timeline;
 	let ganttChartLoaded = false;
-	
-	// 간트차트 화면 상 표시 날짜 범위 지정을 위해 필요한 변수들
-	let startDateStr = null;
-	let endDateStr = null;
-	let startDate = null;
-	let endDate = null;
-	let zoomStart;
-	let zoomEnd;
 
     tabs.forEach(tab => {
         tab.addEventListener('click', function(event) {
@@ -411,34 +402,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	                const data = response.data;
 					
 					console.log("data 체크용: {}", data);
-	                
-	                // 가장 이른 시작일 (baselineStart 또는 actualStart 중 가장 빠른 날짜 찾기)
-	                const earliestStart = data
-	                    .map(item => new Date(item.baselineStart || item.actualStart))
-	                    .filter(date => !isNaN(date.getTime()))
-	                    .reduce((earliest, current) => current < earliest ? current : earliest, new Date(8640000000000000));
-	                
-	                // 가장 늦은 종료일 (baselineEnd 또는 actualEnd 중 가장 늦은 날짜 찾기)
-	                const latestEnd = data
-	                    .map(item => new Date(item.baselineEnd || item.actualEnd))
-	                    .filter(date => !isNaN(date.getTime()))
-	                    .reduce((latest, current) => current > latest ? current : latest, new Date(-8640000000000000));
-	                
-	                // 여유 기간 추가
-	                const bufferDay = 30;
-	                const adjustedStartDate = new Date(earliestStart.getTime() - bufferDay * 24 * 60 * 60 * 1000);
-	                const adjustedEndDate = new Date(latestEnd.getTime() + bufferDay * 24 * 60 * 60 * 1000);
-
-	                // 날짜 포맷 설정
-	                const formatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
-	                const format = (date) => date ? formatter.format(date).replace(/\//g, '-') + 'T00:00:00Z' : null;
-
-	                // 조정된 날짜를 로그로 출력 (디버깅 용)
-	                console.log('조정된 시작일:', format(adjustedStartDate));
-	                console.log('조정된 종료일:', format(adjustedEndDate));
-
+					
 	                // 간트차트 생성 함수 호출
-	                createGanttChart(data, format(adjustedStartDate), format(adjustedEndDate));
+	                createGanttChart(data);
+					
 	            } else if (Array.isArray(response.data) && response.data.length == 0) {
 					alert('간트 차트 데이터를 로드하는 데 필요한 정보가 없습니다.\n먼저 업무 등록을 해주세요.');
 					console.error('데이터 없음:', response);
@@ -457,12 +424,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 	
 	// 간트차트 생성(로드)
-	function createGanttChart(ganttChartData, adjustedStartDate, adjustedEndDate) {
+	function createGanttChart(ganttChartData) {
 		
 		console.log('createGanttChart 호출:');
 	    console.log('간트차트 데이터:', ganttChartData); // 데이터 확인 로그
-	    console.log('조정된 시작일:', adjustedStartDate);
-	    console.log('조정된 종료일:', adjustedEndDate);
 		
 		if (ganttChartLoaded) {
 			// 기존 차트가 로드되어 있으면 제거
@@ -535,17 +500,30 @@ document.addEventListener('DOMContentLoaded', function() {
 	        });
 			
 			// 각 업무의 baselineStart 및 actualStart 중 가장 빠른 시작일 및 가장 늦은 종료일을 계산
-			let earliestStart = new Date(Math.min(...ganttChartData.flatMap(item => 
-			    item.children.map(child => 
-			        new Date(child.baselineStart || child.actualStart)
-			    )
-			)));
+			let earliestStart = new Date(Math.min(
+			    ...ganttChartData.flatMap(item => [
+			        new Date(item.baselineStart).getTime(),
+			        new Date(item.actualStart).getTime(),
+			        ...item.children.map(child => [
+			            new Date(child.baselineStart).getTime(),
+			            new Date(child.actualStart).getTime()
+			        ])
+			    ]).flat() // 평탄화
+			));
 
-			let latestEnd = new Date(Math.max(...ganttChartData.flatMap(item => 
-			    item.children.map(child => 
-			        new Date(child.baselineEnd || child.actualEnd)
-			    )
-			)));
+			let latestEnd = new Date(Math.max(
+			    ...ganttChartData.flatMap(item => [
+			        new Date(item.baselineEnd).getTime(),
+			        new Date(item.actualEnd).getTime(),
+			        ...item.children.map(child => [
+			            new Date(child.baselineEnd).getTime(),
+			            new Date(child.actualEnd).getTime()
+			        ])
+			    ]).flat() // 평탄화
+			));
+			
+			console.log('earliestStart 체크용:', earliestStart);
+			console.log('latestEnd 체크용:', latestEnd);
 
 			// 유효한 날짜인지 확인
 			if (isNaN(earliestStart.getTime())) {
@@ -737,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		// 실제 일정 업데이트 버튼 클릭 이벤트 핸들러
 		function updateActualDate() {
 		    let ganttId = $('#name-selectDate').val();
-			let entityType = $('#entityType-selectDate').val();
+		    let entityType = $('#entityType-selectDate').val();
 		    let actualStart = $('#actual-start-date').val();
 		    let actualEnd = $('#actual-end-date').val();
 
@@ -758,17 +736,17 @@ document.addEventListener('DOMContentLoaded', function() {
 		            actualEnd: actualEnd
 		        },
 		        success: function(response) {
-					console.log('업데이트 응답:', response); // 응답 로그 추가
-				    
+		            console.log('업데이트 응답:', response); // 응답 로그 추가
+		            
 		            if (response === 'success') {
 		                alert('실제 일정이 업데이트되었습니다.');
 
-		                // 간트 차트를 새로고침하여 반영된 일정을 확인
-		                refreshGanttChart();
-						
-						// 입력 박스와 select 박스 값을 초기화
-						$('#actual-start-date').val('');
-						$('#actual-end-date').val('');
+		                // 간트 차트를 새로 고치기 전에 현재 데이터로 업데이트
+		                refreshGanttChart(ganttId, entityType, actualStart, actualEnd);
+		                
+		                // 입력 박스와 select 박스 값을 초기화
+		                $('#actual-start-date').val('');
+		                $('#actual-end-date').val('');
 		                
 		            } else {
 		                alert('실제 일정 업데이트에 실패했습니다.');
@@ -782,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		// 간트차트 새로고침 함수
-		function refreshGanttChart() {
+		function refreshGanttChart(ganttId, entityType, actualStart, actualEnd) {
 		    const projectNum = new URLSearchParams(window.location.search).get('projectNum');
 		    if (!projectNum) {
 		        alert('프로젝트 번호가 없습니다.');
@@ -795,39 +773,49 @@ document.addEventListener('DOMContentLoaded', function() {
 		        dataType: 'json',
 		        success: function(response) {
 		            // 응답 데이터 검증
-		            if (response && response.data && Array.isArray(response.data) && response.data.length > 0 &&
-		                response.adjustedStartDate && response.adjustedEndDate) {
+		            if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
 
 		                // 데이터 추출
 		                const data = response.data;
-		                
-		                // 가장 이른 시작일 (baselineStart 또는 actualStart 중 가장 빠른 날짜 찾기)
-		                const earliestStart = data
-		                    .map(item => new Date(item.baselineStart || item.actualStart))
-		                    .filter(date => !isNaN(date.getTime()))
-		                    .reduce((earliest, current) => current < earliest ? current : earliest, new Date(8640000000000000));
-		                
-		                // 가장 늦은 종료일 (baselineEnd 또는 actualEnd 중 가장 늦은 날짜 찾기)
-		                const latestEnd = data
-		                    .map(item => new Date(item.baselineEnd || item.actualEnd))
-		                    .filter(date => !isNaN(date.getTime()))
-		                    .reduce((latest, current) => current > latest ? current : latest, new Date(-8640000000000000));
-		                
-		                // 여유 기간 추가
-		                const bufferDay = 30;
-		                const adjustedStartDate = new Date(earliestStart.getTime() - bufferDay * 24 * 60 * 60 * 1000);
-		                const adjustedEndDate = new Date(latestEnd.getTime() + bufferDay * 24 * 60 * 60 * 1000);
 
-		                // 날짜 포맷 설정
-		                const formatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
-		                const format = (date) => date ? formatter.format(date).replace(/\//g, '-') + 'T00:00:00Z' : null;
+						console.log('data 응답 check:', data);
+						
+		                // 업데이트된 값 적용
+		                data.forEach(function(functionItem) {
+		                    // Function Title의 자식 업무 업데이트
+		                    if (functionItem.children) {
+		                        functionItem.children.forEach(function(child) {
+		                            if (child.dbId === ganttId) {
+		                                // baseline 값은 초기 데이터에서 가져오기
+		                                const originalBaselineStart = child.baselineStart; // 원본 baselineStart 저장
+		                                const originalBaselineEnd = child.baselineEnd;     // 원본 baselineEnd 저장
 
-		                // 조정된 날짜를 로그로 출력 (디버깅 용)
-		                console.log('조정된 시작일:', format(adjustedStartDate));
-		                console.log('조정된 종료일:', format(adjustedEndDate));
+		                                // actualStart와 actualEnd만 업데이트
+		                                child.actualStart = actualStart; // 업데이트된 시작일
+		                                child.actualEnd = actualEnd;     // 업데이트된 종료일
+
+		                                // baseline 값을 원래대로 유지
+		                                child.baselineStart = originalBaselineStart;
+		                                child.baselineEnd = originalBaselineEnd;
+		                            }
+		                        });
+		                    }
+		                });
+
+		                // 기능 자체의 actualStart와 actualEnd 업데이트
+		                if (entityType === 'function') {
+		                    data.forEach(function(functionItem) {
+		                        if (functionItem.dbId === ganttId) {
+		                            functionItem.actualStart = actualStart; // 업데이트된 시작일
+		                            functionItem.actualEnd = actualEnd;     // 업데이트된 종료일
+		                        }
+		                    });
+		                }
+
+		                console.log("refresh data 체크용: ", data);
 
 		                // 간트차트 생성 함수 호출
-		                createGanttChart(data, format(adjustedStartDate), format(adjustedEndDate));
+		                createGanttChart(data);
 		            } else {
 		                alert('간트 차트 데이터를 로드하는 데 필요한 정보가 부족합니다.');
 		                console.error('잘못된 데이터:', response);
@@ -1190,389 +1178,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	      }
 	  }
 
-	  // 모든 부모 항목에 굵고 기울임꼴 텍스트 설정 추가
-	  function labelTextSettingsFormatter(label, dataItem) {
-	    if (dataItem.numChildren()) {
-	      label.fontWeight('bold').fontStyle('italic');
-	    }
-	  }
-
-	  // 세 번째 열의 날짜를 예쁘게 포맷팅
-	  function thirdColumnTextFormatter(data) {
-	    let field = data.baselineStart;
-
-	    // 기준선 텍스트 포맷팅
-	    if (field) {
-	      let baselineStart = new Date(field);
-	      return (
-	        formatDate(baselineStart.getUTCMonth() + 1) +
-	        '/' +
-	        formatDate(baselineStart.getUTCDate()) +
-	        '/' +
-	        baselineStart.getUTCFullYear() +
-	        ' ' +
-	        formatDate(baselineStart.getUTCHours()) +
-	        ':' +
-	        formatDate(baselineStart.getUTCMinutes())
-	      );
-	    }
-
-	    // 이정표 텍스트 포맷팅
-	    let actualStart = data.item.get('actualStart');
-	    let actualEnd = data.item.get('actualEnd');
-	    if (actualStart === actualEnd || (actualStart && !actualEnd)) {
-	      let start = new Date(actualStart);
-	      return (
-	        formatDate(start.getUTCMonth() + 1) +
-	        '/' +
-	        formatDate(start.getUTCDate()) +
-	        '/' +
-	        start.getUTCFullYear() +
-	        ' ' +
-	        formatDate(start.getUTCHours()) +
-	        ':' +
-	        formatDate(start.getUTCMinutes())
-	      );
-	    }
-	    return '';
-	  }
-
-	  // 네 번째 열의 날짜를 예쁘게 포맷팅
-	  function fourthColumnTextFormatter(item) {
-	    let field = item.baselineEnd;
-	    if (field) {
-	      let baselineEnd = new Date(field);
-	      return (
-	        formatDate(baselineEnd.getUTCMonth() + 1) +
-	        '/' +
-	        formatDate(baselineEnd.getUTCDate()) +
-	        '/' +
-	        baselineEnd.getUTCFullYear() +
-	        ' ' +
-	        formatDate(baselineEnd.getUTCHours()) +
-	        ':' +
-	        formatDate(baselineEnd.getUTCMinutes())
-	      );
-	    }
-	    return '';
-	  }
-
-	  // 날짜 단위를 예쁘게 포맷팅
-	  function formatDate(dateUnit) {
-	    if (dateUnit < 10) dateUnit = '0' + dateUnit;
-	    return dateUnit + '';
-	  }
-	}
-
-});
 */
 
-
-/*
-	// 간트 차트 로드
-    function loadGanttChart() {
-        if (ganttChartLoaded) return; // 이미 간트 차트가 로드된 경우
-
-        anychart.onDocumentReady(function() {
-            // Gantt 차트 데이터 예시
-            ganttChartData = [
-                { id: '1', name: '디자인', actualStart: '2024-09-01', actualEnd: '2024-09-04', progressValue: "0%" },
-                { id: '2', name: '기획', actualStart: '2024-09-05', actualEnd: '2024-09-10', progressValue: "0%" },            
-				{
-				    id: "3",
-				    name: "개발",
-				    baselineStart: "2024-09-11",
-				    baselineEnd: "2024-09-14",
-				    actualStart: "2024-09-15",
-				    actualEnd: "2024-09-20",
-					progressValue: "0%",
-				    children: [
-				      {
-				        id: "3_1",
-				        name: "Analysis",
-				        baselineStart: "2024-09-15",
-				        baselineEnd: "2024-09-16",
-				        actualStart: "2024-09-15",
-				        actualEnd: "2024-09-17",
-						progressValue: "0%"
-				      },
-				      {
-				        id: "3_2",
-				        name: "Design",
-				        baselineStart: "2024-09-17",
-				        baselineEnd: "2024-09-18",
-				        actualStart: "2024-09-16",
-				        actualEnd: "2024-09-17",
-						progressValue: "0%"
-				      },
-				      {
-				        id: "3_3",
-				        name: "Implementation",
-				        baselineStart: "2024-09-18",
-				        baselineEnd: "2024-09-19",
-				        actualStart: "2024-09-17",
-				        actualEnd: "2024-09-18",
-						progressValue: "0%"
-				      }
-				  ]},
-				  { id: '4', name: '테스트', actualStart: '2024-09-19', actualEnd: '2024-09-30', progressValue: "0%" }
-			];
-
-            ganttChart = anychart.ganttProject();
-            
-			// treeData 변수 정의
-			let treeData = anychart.data.tree(ganttChartData, 'as-tree');
-			ganttChart.data(treeData);
-
-            ganttChart.getTimeline().tasks().fill('#00bcd4');
-            ganttChart.getTimeline().tasks().stroke(null);
-
-            ganttChart.getTimeline().tasks().progress(function() {
-                return this.getData('progress') || 0;
-            });
-
-            let dataGrid = ganttChart.dataGrid();
-
-            dataGrid.column(0)
-                .title('ID')
-                .width(30)
-                .labels({ hAlign: 'center' });
-
-            dataGrid.column(1).labels().hAlign('left').width(180);
-
-            dataGrid.column(2)
-                .title('Start Time')
-                .width(70)
-                .labels()
-                .hAlign('right')
-                .format(function () {
-                    let date = new Date(this.actualStart);
-                    let month = date.getUTCMonth() + 1;
-                    let strMonth = month > 9 ? month : '0' + month;
-                    let utcDate = date.getUTCDate();
-                    let strDate = utcDate > 9 ? utcDate : '0' + utcDate;
-                    return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
-                });
-
-            dataGrid.column(3)
-                .title('End Time')
-                .width(70)
-                .labels()
-                .hAlign('right')
-                .format(function () {
-                    let date = new Date(this.actualEnd);
-                    let month = date.getUTCMonth() + 1;
-                    let strMonth = month > 9 ? month : '0' + month;
-                    let utcDate = date.getUTCDate();
-                    let strDate = utcDate > 9 ? utcDate : '0' + utcDate;
-                    return date.getUTCFullYear() + '.' + strMonth + '.' + strDate;
-                });
-				
-			console.log("시작일 형식: ", ganttChartData[0].actualStart);
-			console.log("종료일 형식: ", ganttChartData[ganttChartData.length - 1].actualEnd);
-
-			startDateStr = ganttChartData[0].actualStart;
-			endDateStr = ganttChartData[ganttChartData.length - 1].actualEnd;
-			
-			// 날짜 문자열을 Date 객체로 변환 (가정: 날짜 문자열은 "YYYY-MM-DD" 형식)
-			startDate = new Date(startDateStr);
-			endDate = new Date(endDateStr);
-			
-			// Date 객체에서 연도, 월, 일 추출
-			startYear = startDate.getUTCFullYear();
-			startMonth = startDate.getUTCMonth(); // 월은 0부터 시작
-			startDay = startDate.getUTCDate();
-
-			endYear = endDate.getUTCFullYear();
-			endMonth = endDate.getUTCMonth();
-			endDay = endDate.getUTCDate();
-			
-			// 차트가 컨테이너에 맞게 크기를 조정
-	        ganttChart.container('gantt-chart');
-	        ganttChart.width("100%");  // 가로 크기를 컨테이너에 맞추기
-	        ganttChart.height(600);    // 높이는 고정
-	        ganttChart.draw();
-
-	        // 전체 데이터 표시
-	        ganttChart.fitAll();
-			ganttChartLoaded = true;
-
-			// 특정 날짜 범위로 확대할 경우 사용
-			// ex) ganttChart.zoomTo(Date.UTC(2024, 8, 1), Date.UTC(2024, 12, 30));
-			// ganttChart.zoomTo(Date.UTC(startYear, startMonth, startDay), Date.UTC(endYear, endMonth, endDay));
-
-            // ganttChartLoaded = true;
-
-            // 진행도 업데이트 버튼 이벤트 리스너 추가
-            document.getElementById('update-progress-button').addEventListener('click', updateProgress);
-        });
-    }
-
-	// 간트 차트 진행도 업데이트 함수
-  function updateProgress() {
-    const id = document.getElementById('progress-id').value.trim();
-    const progressValue = document.getElementById('progress-value').value.trim();
-
-    // 디버깅 로그 추가
-    console.log(`id: ${id}`);
-    console.log(`Progress Value: ${progressValue}`);
-    console.log(`Current Gantt Chart Data:`, ganttChartData);
-
-    if (id && progressValue) {
-      // 데이터 업데이트 로직
-      function updateTaskProgress(tasks, id, progressValue) {
-        console.log(`Searching for ID: ${id} in tasks`, tasks);
-
-        for (let task of tasks) {
-          console.log(`Checking task ID: ${task.id}`);
-          if (task.id === id) {
-            console.log(`Found task with ID: ${id}`);
-            task.progressValue = progressValue;
-            return true; // 업데이트 성공
-          }
-          if (task.children) {
-            const found = updateTaskProgress(task.children, id, progressValue);
-            if (found) return true;
-          }
-        }
-        return false; // 업데이트 실패
-      }
-
-      // 진행도 값을 업데이트
-      const updated = updateTaskProgress(ganttChartData, id, progressValue);
-
-      console.log(`Update successful: ${updated}`);
-
-	  if (updated) {
-        try {
-          // Gantt 차트 데이터 업데이트
-          ganttChart.data(anychart.data.tree(ganttChartData, 'as-tree'));
-
-          // Gantt 차트 그리기 전에 타임라인과 관련된 설정을 확인
-          const timeline = ganttChart.getTimeline();
-          if (timeline) {
-			// 현재 줌 및 레이아웃 설정을 저장
-            const zoomStart = ganttChart.getTimeline().scale().minimum();
-            const zoomEnd = ganttChart.getTimeline().scale().maximum();
-
-            // Gantt 차트 데이터 업데이트
-            ganttChart.data(anychart.data.tree(ganttChartData, 'as-tree'));
-
-			// 차트 다시 그리기
-			ganttChart.draw(false);
-
-			ganttChart.zoomTo(Date.UTC(startYear, startMonth, startDay), Date.UTC(endYear, endMonth, endDay));
-
-			// 저장된 줌 및 레이아웃 설정 복원
-			ganttChart.getTimeline().scale().minimum(zoomStart);
-			ganttChart.getTimeline().scale().maximum(zoomEnd);
-
-          } else {
-            console.log("Timeline 설정을 가져오는 데 실패했습니다.");
-          }
-
-        } catch (error) {
-          console.error("차트를 그리던 중 오류가 발생했습니다: ", error);
-        }
-      } else {
-        alert('해당 작업을 찾을 수 없습니다.');
-      }
-    } else {
-      alert('올바른 작업 ID와 진행도 값을 입력해 주세요.');
-    }
-  }
-  
-  // Entity Type select box 변경 시 처리
-  		$('#entityType-select').change(function() {
-  		    const entityType = $(this).val();
-  		    const projectNum = getQueryParam('projectNum'); // URL 쿼리 스트링에서 projectNum을 가져옴
-
-  			console.log(`Entity Type Selected: ${entityType}`); // 디버깅용 로그
-  			console.log(`Project Num: ${projectNum}`); // 디버깅용 로그
-  			
-  		    if (entityType && projectNum) {
-  		        // 엔티티 유형이 선택되면, 해당 엔티티에 맞는 항목을 로드
-  		        loadNames(projectNum, entityType);
-  		        $('#name-select').prop('disabled', false);
-  				$('#name-selectDate').prop('disabled', false)
-  		    } else {
-  		        // 엔티티 유형이 선택되지 않으면, 'Name' select box 비활성화
-  		        $('#name-select').prop('disabled', true);
-  		        $('#name-select').empty().append('<option value="">선택</option>');
-  				$('#name-selectDate').prop('disabled', true)
-  				$('#name-selectDate').empty().append('<option value="">선택</option>');
-  		    }
-  		});
-	*/
-	
-	/*
-		        // Gantt 데이터에서 시작일과 종료일 추출
-		        let chartFirstElement = ganttChartData[0];
-		        let chartLastElement = ganttChartData[ganttChartData.length - 1];
-
-		        // console.log("시작일 형식: ", chartFirstElement.actualStart);
-				console.log("시작일 형식: ", chartFirstElement.children[0].actualStart);
-		        console.log("종료일 형식: ", chartLastElement.children[chartLastElement.children.length - 1].actualEnd);
-
-		        // 날짜 문자열을 Date 객체로 변환 (가정: 날짜 문자열은 "YYYY-MM-DD" 형식)
-		        // startDateStr = chartFirstElement.actualStart;
-				startDateStr = chartFirstElement.children[0].actualStart;
-				endDateStr = chartLastElement.children[chartLastElement.children.length - 1].actualEnd;
-
-		        // 날짜 문자열을 Date 객체로 변환합니다
-		        startDate = new Date(startDateStr);
-		        endDate = new Date(endDateStr);
-
-		        // 유효한 날짜인지 확인
-		        if (isNaN(startDate.getTime())) {
-		            console.warn('유효하지 않은 시작일:', startDateStr);
-		            startDate = new Date(); // 기본값을 현재 날짜로 설정
-		        }
-		        if (isNaN(endDate.getTime())) {
-		            console.warn('유효하지 않은 종료일:', endDateStr);
-		            endDate = new Date(); // 기본값을 현재 날짜로 설정
-		        }
-
-		        // 여유 기간을 설정합니다
-		        const bufferDays = 30;
-
-		        // 날짜 문자열을 Date 객체로 변환
-		        let adjustedStartDateObj = new Date(adjustedStartDate);
-		        let adjustedEndDateObj = new Date(adjustedEndDate);
-
-		        // 날짜가 유효한지 확인
-		        if (isNaN(adjustedStartDateObj.getTime())) {
-		            console.warn('유효하지 않은 조정된 시작일:', adjustedStartDate);
-		            adjustedStartDateObj = startDate;
-		        }
-		        if (isNaN(adjustedEndDateObj.getTime())) {
-		            console.warn('유효하지 않은 조정된 종료일:', adjustedEndDate);
-		            adjustedEndDateObj = endDate;
-		        }
-
-		        // 여유 기간을 추가합니다
-		        adjustedStartDateObj.setUTCDate(adjustedStartDateObj.getUTCDate() - bufferDays);
-		        adjustedEndDateObj.setUTCDate(adjustedEndDateObj.getUTCDate() + bufferDays);
-
-		        console.log("조정된 시작일:", adjustedStartDateObj.toISOString());
-		        console.log("조정된 종료일:", adjustedEndDateObj.toISOString());
-
-		        // Gantt 차트를 HTML 컨테이너에 렌더링합니다
-		        ganttChart.container('gantt-chart'); // 컨테이너 ID를 수정하세요
-		        ganttChart.draw();
-
-		        // 날짜가 올바른지 확인하고 순서를 맞춤
-		        zoomStart = Math.min(adjustedStartDateObj.getTime(), adjustedEndDateObj.getTime());
-		        zoomEnd = Math.max(adjustedStartDateObj.getTime(), adjustedEndDateObj.getTime());
-
-		        console.log("Zoom Start:", zoomStart);
-		        console.log("Zoom End:", zoomEnd);
-				
-				// 차트의 날짜 범위를 조정합니다
-				ganttChart.zoomTo(zoomStart, zoomEnd);
-				timeline.scale().minimum(zoomStart);
-				timeline.scale().maximum(zoomEnd);
-				*/
 
 function loadApplicationList() {
     fetch('/project/application-list')  // 서버에서 클라이언트의 지원자 목록을 가져옴
