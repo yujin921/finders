@@ -222,7 +222,7 @@ public class ProjectManagementService {
         if (member.getRoleName() != RoleName.ROLE_FREELANCER) {
             throw new IllegalArgumentException("해당 회원은 프리랜서가 아닙니다.");
         }
-
+        
         // 업무 저장
         TaskManagementEntity taskManagementEntity = TaskManagementEntity.builder()
                 .projectPublishingEntity(projectPublishing)
@@ -789,6 +789,21 @@ public class ProjectManagementService {
         taskManagementRepository.save(task);
     }
 
+    // 프로젝트 번호에 따라 업무를 조회하고 DTO로 변환하여 반환
+    public List<TaskManagementDTO> getTasksForCalendar(int projectNum) {
+        List<TaskManagementEntity> tasks = taskManagementRepository.findByProjectPublishingEntity_ProjectNum(projectNum);
+
+        return tasks.stream()
+                .map(task -> TaskManagementDTO.builder()
+                        .taskId(task.getTaskId())
+                        .taskTitle(task.getTaskTitle())
+                        .taskStartDate(task.getTaskStartDate().toString())
+                        .taskEndDate(task.getTaskEndDate().toString())
+                        .taskStatus(task.getTaskStatus().toString())
+                        .taskPriority(task.getTaskPriority().toString())
+                        .build())
+                .collect(Collectors.toList());
+    }
     
     
     // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Service 코드

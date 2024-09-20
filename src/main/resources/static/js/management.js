@@ -196,20 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#task-modal').addClass('hidden').hide();
     });
 
-    /*
-    // URL에서 쿼리 파라미터를 추출하는 함수
-    function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
-    }
-
-    // 페이지 로드 시 projectNum 값을 추출하여 input 태그에 설정
-    const projectNum = getQueryParam('projectNum');
-    if (projectNum) {
-        $('#project-num').val(projectNum);
-    }
-    */
-
     console.log("projectNum 체크용: ", projectNum);
 
     // 기능 분류 목록 로드 함수
@@ -427,61 +413,64 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 	
     // 캘린더 로드
-    function loadCalendar() {
-        if (calendar) return; // 이미 캘린더가 로드된 경우
+	function loadCalendar() {
+	    if (calendar) return; // 이미 캘린더가 로드된 경우
 
-        const calendarEl = document.getElementById('calendar');
-        if (!calendarEl) return;
-		
-        calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
-            },
-            views: {
-                listMonth: {
-                    buttonText: 'List'
-                }
-            },
-            events: [
-                {
-                    title: '프로젝트 시작',
-                    start: '2024-09-01',
-                    color: 'green'
-                },
-                {
-                    title: '중간 점검',
-                    start: '2024-09-15',
-                    color: 'orange'
-                },
-                {
-                    title: '프로젝트 마감',
-                    start: '2024-09-30',
-                    color: 'red'
-                },
-                {
-                    title: '미팅',
-                    start: '2024-09-10T10:00:00',
-                    end: '2024-09-10T12:00:00'
-                },
-                {
-                    title: '휴가',
-                    start: '2024-09-20',
-                    end: '2024-09-22'
-                }
-            ],
-            dateClick: function(info) {
-                openEventModal(info.dateStr);
-            },
-            eventClick: function(info) {
-                openEventDetailModal(info.event);
-            }
-        });
+	    const calendarEl = document.getElementById('calendar');
+	    if (!calendarEl) return;
 
-        calendar.render();
-    }
+	    $.ajax({
+	        url: `calendar?projectNum=${projectNum}`,
+	        type: 'GET',
+	        dataType: 'json',
+	        success: function(tasks) {
+	            // 캘린더 초기화
+	            calendar = new FullCalendar.Calendar(calendarEl, {
+	                initialView: 'dayGridMonth',
+	                headerToolbar: {
+	                    left: 'prev,next today',
+	                    center: 'title',
+	                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+	                },
+					events: tasks.map(task => ({
+	                    title: task.taskTitle, // 업무 제목
+						start: task.actualStartDate || task.taskStartDate, // 실제 시작 날짜가 있으면 사용
+						end: task.actualEndDate || task.taskEndDate || undefined, // 실제 종료 날짜가 있으면 사용
+	                    color: getColorByStatus(task.taskStatus) // 상태에 따라 색상 변경
+	                })),
+	                dateClick: function(info) {
+	                    openEventModal(info.dateStr); // 날짜 클릭 시 이벤트 모달 열기
+	                },
+	                eventClick: function(info) {
+	                    openEventDetailModal(info.event); // 이벤트 클릭 시 상세 모달 열기
+	                }
+	            });
+
+	            calendar.render(); // 캘린더 렌더링
+	        },
+	        error: function(xhr) {
+	            console.error('업무 로드 실패:', xhr.responseText); // 에러 로그
+	        }
+	    });
+	}
+
+	// 상태(Status)에 따라 색상을 반환하는 함수
+	function getColorByStatus(status) {
+	    switch (status) {
+	        case 'COMPLETED':
+	            return 'green'; // 완료
+	        case 'INPROGRESS':
+	            return 'blue'; // 진행 중
+	        case 'HOLD':
+	            return 'yellow'; // 보류
+	        case 'REQUEST':
+	            return 'orange'; // 요청
+	        case 'FEEDBACK':
+	            return 'purple'; // 피드백
+	        default:
+	            return 'gray'; // 기본 색상
+	    }
+	}
 
     // 일정 추가 모달 열기
     function openEventModal(dateStr) {
@@ -1439,6 +1428,227 @@ document.addEventListener('DOMContentLoaded', function() {
 	      }
 	  }
 
+*/
+
+/*
+// 캘린더 로드
+    function loadCalendar() {
+        if (calendar) return; // 이미 캘린더가 로드된 경우
+
+        const calendarEl = document.getElementById('calendar');
+        if (!calendarEl) return;
+		
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+            },
+            views: {
+                listMonth: {
+                    buttonText: 'List'
+                }
+            },
+            events: [
+                {
+                    title: '프로젝트 시작',
+                    start: '2024-09-01',
+                    color: 'green'
+                },
+                {
+                    title: '중간 점검',
+                    start: '2024-09-15',
+                    color: 'orange'
+                },
+                {
+                    title: '프로젝트 마감',
+                    start: '2024-09-30',
+                    color: 'red'
+                },
+                {
+                    title: '미팅',
+                    start: '2024-09-10T10:00:00',
+                    end: '2024-09-10T12:00:00'
+                },
+                {
+                    title: '휴가',
+                    start: '2024-09-20',
+                    end: '2024-09-22'
+                }
+            ],
+            dateClick: function(info) {
+                openEventModal(info.dateStr);
+            },
+            eventClick: function(info) {
+                openEventDetailModal(info.event);
+            }
+        });
+
+        calendar.render();
+    }
+
+    // 일정 추가 모달 열기
+    function openEventModal(dateStr) {
+		
+        const eventModal = document.getElementById('event-modal');
+        const eventForm = document.getElementById('event-form');
+
+        eventModal.classList.remove('hidden');
+        document.getElementById('event-start-date').value = dateStr;
+        document.getElementById('event-end-date').value = dateStr;
+
+        const closeButton = eventModal.querySelector('.btn-close');
+        closeButton.addEventListener('click', () => {
+            eventModal.classList.add('hidden');
+        });
+
+        // 기존의 이벤트 리스너를 제거하고 새로운 리스너를 추가
+        eventForm.removeEventListener('submit', handleEventFormSubmit);
+        eventForm.addEventListener('submit', handleEventFormSubmit);
+
+    }
+
+    // 이벤트 폼 제출 핸들러
+    function handleEventFormSubmit(event) {
+        event.preventDefault();
+		
+        const title = document.getElementById('event-title').value;
+        const type = document.getElementById('event-type').value;
+        const startDate = document.getElementById('event-start-date').value;
+        const endDate = document.getElementById('event-end-date').value;
+        const startTime = document.getElementById('event-start-time').value;
+        const endTime = document.getElementById('event-end-time').value;
+
+		console.log(`Event submitted - Title: ${title}, Type: ${type}, Start Date: ${startDate}, End Date: ${endDate}, Start Time: ${startTime}, End Time: ${endTime}`);
+		
+        if (title && startDate && endDate) {
+            let startDateTime, endDateTime;
+
+            // 중복 일정 체크
+            const events = calendar.getEvents();
+            const isDuplicate = (start, end) => {
+                return events.some(event =>
+                    (event.title === title && 
+                    event.startStr === start && 
+                    event.endStr === end)
+                );
+            };
+
+            if (type === '1') {
+                // 일일 일정 (반복 일정)
+                const startOfDayTime = `${startDate}T${startTime}:00`;
+                const endOfDayTime = `${endDate}T${endTime}:00`;
+
+                let currentDate = new Date(startDate);
+                const endDateObj = new Date(endDate);
+
+                while (currentDate <= endDateObj) {
+                    const eventStart = `${currentDate.toISOString().split('T')[0]}T${startTime}:00`;
+                    const eventEnd = `${currentDate.toISOString().split('T')[0]}T${endTime}:00`;
+
+                    if (!isDuplicate(eventStart, eventEnd)) {
+                        calendar.addEvent({
+                            title: title,
+                            start: eventStart,
+                            end: eventEnd
+                        });
+                    }
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+            } else if (type === '2') {
+                // 시간 기반 일정
+                startDateTime = `${startDate}T${startTime}:00`;
+                endDateTime = `${endDate}T${endTime}:00`;
+
+                if (!isDuplicate(startDateTime, endDateTime)) {
+                    calendar.addEvent({
+                        title: title,
+                        start: startDateTime,
+                        end: endDateTime
+                    });
+                }
+            }
+
+            // 모달 닫기 및 폼 리셋
+            document.getElementById('event-modal').classList.add('hidden');
+            document.getElementById('event-form').reset();
+        }
+    }
+
+    // 모달 내용 초기화
+    function resetEventForm() {
+        document.getElementById('event-title').value = '';
+        document.getElementById('event-type').value = '1';
+        document.getElementById('event-start-date').value = '';
+        document.getElementById('event-end-date').value = '';
+        document.getElementById('event-start-time').value = '';
+        document.getElementById('event-end-time').value = '';
+    }
+
+    // 일정 상세 모달 열기
+    function openEventDetailModal(event) {
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+
+        const modalContent = document.createElement('div');
+        modalContent.classList.add('modal-content');
+
+        const title = document.createElement('h3');
+        title.textContent = event.title;
+
+        const details = document.createElement('p');
+        details.textContent = formatEventDetails(event);
+
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Close';
+        closeButton.classList.add('btn-close');
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('btn-delete');
+        deleteButton.addEventListener('click', () => {
+            event.remove();
+            document.body.removeChild(modal);
+        });
+
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.classList.add('modal-buttons');
+        buttonsContainer.appendChild(closeButton);
+        buttonsContainer.appendChild(deleteButton);
+
+        modalContent.appendChild(title);
+        modalContent.appendChild(details);
+        modalContent.appendChild(buttonsContainer);
+        modal.appendChild(modalContent);
+
+        document.body.appendChild(modal);
+    }
+
+    // 일정 상세 내용 포맷팅
+    function formatEventDetails(event) {
+        const startDate = new Date(event.start);
+        const endDate = event.end ? new Date(event.end) : null;
+        const startDateStr = formatDate(startDate);
+        const endDateStr = endDate ? formatDate(endDate) : 'No end time';
+        return `${startDateStr} ~ ${endDateStr}`;
+    }
+
+    // 날짜 포맷팅
+    function formatDate(date) {
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        };
+        return new Intl.DateTimeFormat('en-US', options).format(date);
+    }
 */
 
 

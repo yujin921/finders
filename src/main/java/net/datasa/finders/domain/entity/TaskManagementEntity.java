@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,15 +30,15 @@ public class TaskManagementEntity {
     @Column(name = "task_id")
 	private Integer taskId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_num", referencedColumnName = "project_num")
     private ProjectPublishingEntity projectPublishingEntity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "freelancer_id", referencedColumnName = "member_id")
     private MemberEntity memberEntity;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "function_title_id", referencedColumnName = "function_title_id")
     private FunctionTitleEntity functionTitleEntity;
     

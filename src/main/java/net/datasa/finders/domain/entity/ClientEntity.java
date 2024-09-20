@@ -25,8 +25,8 @@ public class ClientEntity {
     @Column(name = "client_id")
     private Integer clientId;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id", referencedColumnName = "member_id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id")
     private MemberEntity member;
 
     @Column(name = "client_phone", length = 20)

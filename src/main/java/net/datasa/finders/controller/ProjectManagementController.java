@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FunctionDTO;
@@ -198,6 +199,21 @@ public class ProjectManagementController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("failure");
+        }
+    }
+    
+    // 캘린더에 표시할 업무 조회
+    @GetMapping("calendar")
+    public ResponseEntity<?> getTasksForCalendar(@RequestParam("projectNum") int projectNum) {
+        try {
+            List<TaskManagementDTO> tasks = projectManagementService.getTasksForCalendar(projectNum);
+            return ResponseEntity.ok(tasks); // 조회된 업무 리스트를 반환
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("유효하지 않은 요청입니다: " + e.getMessage()); // 잘못된 요청 처리
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 프로젝트를 찾을 수 없습니다: " + e.getMessage()); // 프로젝트 미발견 처리
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage()); // 일반 오류 처리
         }
     }
     
