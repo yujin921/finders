@@ -645,6 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return new Intl.DateTimeFormat('en-US', options).format(date);
     }
 	
+	
 	// 간트차트 데이터 로드
 	function importGanttChartData() {
 		
