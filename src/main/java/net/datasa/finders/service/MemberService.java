@@ -179,12 +179,12 @@ public class MemberService {
         // 새로운 스킬 저장
         for (String category : categorys) {
             // 문자열 정제
-            String cleanedSkill = cleanFieldString(category);
+            String cleanedCategory = cleanCategoryString(category);
             
-            if (!cleanedSkill.isEmpty()) {
+            if (!cleanedCategory.isEmpty()) {
                 ClientCategoryEntity categoryEntity = ClientCategoryEntity.builder()
                 	.clientId(client)
-                	.categoryText(cleanedSkill)
+                	.categoryText(cleanedCategory)
                 	.build();
                 clientCategoryRepository.save(categoryEntity);
             }

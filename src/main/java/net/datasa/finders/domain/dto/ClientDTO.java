@@ -19,7 +19,7 @@ public class ClientDTO {
     String memberName;
     String email;
 	
-	String clientId;
+	Integer clientId;
 	String clientPhone;
 	String industry;
 	LocalDate foundedDate;

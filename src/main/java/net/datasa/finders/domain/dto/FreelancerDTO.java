@@ -19,7 +19,7 @@ public class FreelancerDTO {
     String memberName;
     String email;
 	
-	String freelancerId;
+	Integer freelancerId;
 	String freelancerPhone;
 	String country;
 	String postalCode;
