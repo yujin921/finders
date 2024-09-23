@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
+import net.datasa.finders.domain.dto.TeamDTO;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ProjectManagementService;
@@ -48,10 +50,15 @@ public class ProjectManagementController {
 	
 	@ResponseBody
     @GetMapping("projectList")
-    public List<ProjectPublishingDTO> projectList(@AuthenticationPrincipal AuthenticatedUser user) {
-        //서비스로 사용자 아이디를 전달하여 해당 아이디의 수입,지출 내역을 목록으로 리턴한다.
-        return projectManagementService.getMyList(user.getUsername());
-    }
+	public ResponseEntity<?> projectList(@AuthenticationPrincipal AuthenticatedUser user) {
+	    List<ProjectPublishingDTO> projectList = projectManagementService.getMyList(user.getUsername(), user.getRoleName());
+	    
+	    if (projectList.isEmpty()) {
+	        return ResponseEntity.ok("참여한 프로젝트가 없습니다.");
+	    }
+	    
+	    return ResponseEntity.ok(projectList);
+	}
     
     @GetMapping("management")
 	public String read(@RequestParam("projectNum") int pNum
@@ -71,6 +78,24 @@ public class ProjectManagementController {
             return "redirect:/myProject/view";
 	    }
 	}
+    
+    @ResponseBody
+    @GetMapping("freelancersInput")
+    public ResponseEntity<List<String>> getFreelancers(@RequestParam("projectNum") int projectNum) {
+        try {
+            List<TeamDTO> freelancers = projectManagementService.getFreelancersByProject(projectNum);
+            
+            // memberId 리스트로 변환
+            List<String> memberIds = freelancers.stream()
+                    .map(TeamDTO::getMemberId)
+                    .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(memberIds);
+        } catch (Exception e) {
+            e.printStackTrace(); // 로그에 오류 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
     
     @ResponseBody
     @PostMapping("saveFunctionAndTask")
