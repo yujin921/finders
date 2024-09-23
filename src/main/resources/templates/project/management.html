@@ -120,9 +120,9 @@
 							</select>
 				            
 				            <label for="progress-value">진행도(%):</label>
-				            <input type="text" id="progress-value-input" class="input-field" placeholder="(입력 예시) 50%">
-				            
-				            <button id="update-progress-button" class="button">진행도 업데이트</button>
+				            <input type="range" id="progress-value" min="0" max="100" value="0" oninput="updateProgressDisplay()">
+							<span id="progress-value-display">0%</span>
+							<button id="update-progress-button" class="button">진행도 업데이트</button>
 				        </div>
 					</div>
 				</div>

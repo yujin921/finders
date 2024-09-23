@@ -70,4 +70,14 @@ public class TaskManagementEntity {
     
 	@Column(name = "task_processivity", nullable = false, columnDefinition = "DEFAULT '0%'")
     private String taskProcessivity;
+	
+	@Override
+    public String toString() {
+        return "TaskManagementEntity{" +
+                "taskId=" + taskId +
+                ", taskTitle='" + taskTitle + '\'' +
+                ", functionTitleId=" + (functionTitleEntity != null ? functionTitleEntity.getFunctionTitleId() : null) +
+                '}';
+    }
+	
 }

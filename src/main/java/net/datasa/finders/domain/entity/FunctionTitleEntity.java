@@ -36,4 +36,13 @@ public class FunctionTitleEntity {
     @OneToMany(mappedBy = "functionTitleEntity")
     private List<TaskManagementEntity> tasks;
     
+    @Override
+    public String toString() {
+        return "FunctionTitleEntity{" +
+                "functionTitleId=" + functionTitleId +
+                ", titleName='" + titleName + '\'' +
+                ", taskCount=" + (tasks != null ? tasks.size() : 0) +
+                '}';
+    }
+    
 }

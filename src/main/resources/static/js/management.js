@@ -10,6 +10,15 @@ function adjustSidebarHeight() {
     sidebar.style.height = `${container.clientHeight}px`;
 }
 
+// 간트차트 진행도 표시 함수
+function updateProgressDisplay() {
+	// 스크롤바에서 현재 값 가져오기
+	const progressValue = document.getElementById('progress-value').value;
+	
+	// 해당 값을 표시하는 요소 업데이트
+	document.getElementById('progress-value-display').textContent = `${progressValue}%`;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
@@ -924,7 +933,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		function updateProgress() {
 		    let ganttId = $('#name-select').val();
 		    let entityType = $('#entityType-select').val();
-		    let progressValue = $('#progress-value-input').val();
+		    let progressValue = $('#progress-value').val() + "%"; // 스크롤바 값을 가져와서 "%" 추가
 
 		    // 입력 값 유효성 검사
 		    if (!ganttId || !entityType || !progressValue) {
@@ -947,11 +956,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		                // 간트차트를 새로고침하여 반영된 진행도 확인
 		                refreshGanttChart();
+		                
+		                // 입력 박스와 select 박스 값을 초기화
+		                $('#progress-value').val(0); // 스크롤바 초기화
+		                // $('#progress-value-display').text('0%'); // 진행도 표시 초기화
 						
-						// 입력 박스와 select 박스 값을 초기화
-						$('#progress-value-input').val('');
-		            
-					} else {
+						updateProgressDisplay();
+						
+		            } else {
 		                alert('진행도 업데이트에 실패했습니다.');
 		            }
 		        },
