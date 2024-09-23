@@ -34,24 +34,36 @@ public class ProjectManagementService {
     private final FunctionTitleRepository functionTitleRepository;
     private final TaskManagementRepository taskManagementRepository;
     private final ProjectManagementRepository projectManagementRepository;
+    private final TeamRepository teamRepository;
 
     public List<ProjectPublishingDTO> getMyList(String id, String roleName) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
+    	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
         List<ProjectPublishingEntity> entityList = new ArrayList<>();
         
         if (roleName.equals("ROLE_FREELANCER")) {
-            // 프리랜서 ID로 프로젝트 목록 조회
-            entityList = projectPublishingRepository.findAcceptedProjectsByFreelancerId(id);
+            // 프리랜서 ID로 팀 조회
+            List<TeamEntity> teamEntities = teamRepository.findByMemberId(id);
+            
+            // 해당 팀의 프로젝트 번호 목록을 가져옴
+            List<Integer> projectNums = teamEntities.stream()
+                .map(TeamEntity::getProjectNum)
+                .collect(Collectors.toList());
+
+            // 프로젝트 번호를 기준으로 프로젝트 조회
+            entityList = projectPublishingRepository.findAllByProjectNumIn(projectNums);
+            
         } else if (roleName.equals("ROLE_CLIENT")) {
             // 클라이언트의 경우 자신의 프로젝트만 조회
             entityList = projectPublishingRepository.findAll(sort).stream()
                 .filter(entity -> entity.getClientId().getMemberId().equals(id))
                 .collect(Collectors.toList());
+            
         } else if (roleName.equals("ROLE_ADMIN")) {
             // 관리자는 모든 프로젝트 조회
             entityList = projectPublishingRepository.findAll(sort);
         }
 
+        // DTO 변환
         List<ProjectPublishingDTO> dtoList = new ArrayList<>();
 
         for (ProjectPublishingEntity entity : entityList) {
@@ -74,6 +86,7 @@ public class ProjectManagementService {
         return dtoList;
         
         /*
+        Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
         List<ProjectPublishingEntity> entityList;
         
         entityList = projectPublishingRepository.findAll(sort);

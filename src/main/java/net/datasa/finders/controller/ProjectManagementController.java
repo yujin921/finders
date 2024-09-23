@@ -48,10 +48,15 @@ public class ProjectManagementController {
 	
 	@ResponseBody
     @GetMapping("projectList")
-    public List<ProjectPublishingDTO> projectList(@AuthenticationPrincipal AuthenticatedUser user) {
-        //서비스로 사용자 아이디를 전달하여 해당 아이디의 수입,지출 내역을 목록으로 리턴한다.
-        return projectManagementService.getMyList(user.getUsername(), user.getRoleName());
-    }
+	public ResponseEntity<?> projectList(@AuthenticationPrincipal AuthenticatedUser user) {
+	    List<ProjectPublishingDTO> projectList = projectManagementService.getMyList(user.getUsername(), user.getRoleName());
+	    
+	    if (projectList.isEmpty()) {
+	        return ResponseEntity.ok("참여한 프로젝트가 없습니다.");
+	    }
+	    
+	    return ResponseEntity.ok(projectList);
+	}
     
     @GetMapping("management")
 	public String read(@RequestParam("projectNum") int pNum
