@@ -7,18 +7,66 @@
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <script th:src="@{/js/webCam/webCam.js}"></script>
+    <style>
+        /* 전체 레이아웃 스타일 */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* 입력창과 버튼들을 상단에 배치 */
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* 캠 화면을 담는 컨테이너 */
+        .video-container {
+            display: flex;
+            justify-content: space-between; /* 캠 화면을 좌우로 나눔 */
+            width: 1300px; /* 두 개의 640px 영상과 여유 공간을 맞춤 */
+            margin-top: 50px;
+        }
+
+        /* 캠 고정 크기 설정 */
+        #localStream, #remoteStreamDiv video {
+            width: 640px;
+            height: 480px;
+            object-fit: cover;
+            background-color: black; /* 상대방 캠이 없을 때 빈 화면 처리 */
+        }
+
+        /* 상대 캠이 없을 때 공간 확보를 위해 기본적으로 비디오 공간을 유지 */
+        #remoteStreamDiv {
+            width: 640px;
+            height: 480px;
+            background-color: black; /* 상대방 캠이 없을 때 빈 화면 처리 */
+        }
+    </style>
 </head>
 <body>
-    <h1>1:1 화상 회의</h1>
+<div class="control-panel">
+    <input type="number" id="roomIdInput" />
+    <button type="button" id="enterRoomBtn">enter Room</button>
+    <button type="button" id="startSteamBtn" style="display: none;">start Streams</button>
+</div>
+<!-- 좌우로 캠을 배치하는 컨테이너 -->
+<div class="video-container">
+    <!-- 왼쪽 내 캠 화면 -->
+    <video id="localStream" autoplay playsinline controls></video>
 
-    <!-- 자신의 영상 -->
-    <video id="localVideo" autoplay playsinline muted></video>
-
-    <!-- 상대방의 영상 -->
-    <video id="remoteVideo" autoplay playsinline></video>
-
-    <!-- 화상 회의 시작 버튼 -->
-    <button id="startCall">통화 시작</button>
+    <!-- 오른쪽 상대방 캠 화면 -->
+    <div id="remoteStreamDiv">
+        <!-- 상대방 캠이 들어오면 여기에 추가됨 -->
+    </div>
+</div>
+<script src="/js/webCam/webCam.js"></script>
 </body>
 </html>
