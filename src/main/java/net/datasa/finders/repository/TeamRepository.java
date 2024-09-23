@@ -1,7 +1,6 @@
 package net.datasa.finders.repository;
 
 import net.datasa.finders.domain.entity.TeamEntity;
-import net.datasa.finders.domain.entity.TeamEntityId; // 복합 키 클래스 추가
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +14,6 @@ public interface TeamRepository extends JpaRepository<TeamEntity, Integer> { // 
 
     // 특정 member_id가 포함된 팀 조회 메서드 추가
     List<TeamEntity> findByMemberId(String memberId);
+
+    boolean existsByProjectNumAndMemberId(int projectNum, String memberId);
 }

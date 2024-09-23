@@ -88,20 +88,24 @@ public class ProjectApplicationService {
     // 팀에 신청자와 작성자 추가하는 메서드
     private void addMembersToTeam(ProjectEntity projectEntity, MemberEntity client, MemberEntity freelancer) {
         // 프리랜서 팀에 추가
-        TeamEntity teamFreelancer = TeamEntity.builder()
-                .projectNum(projectEntity.getProjectNum())  // 프로젝트 번호
-                .memberId(freelancer.getMemberId())  // 프리랜서 ID
-                .project(projectEntity)
-                .build();
-        teamRepository.save(teamFreelancer);
+        if (!teamRepository.existsByProjectNumAndMemberId(projectEntity.getProjectNum(), freelancer.getMemberId())) {
+            TeamEntity teamFreelancer = TeamEntity.builder()
+                    .projectNum(projectEntity.getProjectNum())  // 프로젝트 번호
+                    .memberId(freelancer.getMemberId())  // 프리랜서 ID
+                    .project(projectEntity)
+                    .build();
+            teamRepository.save(teamFreelancer);
+        }
 
-        // 프로젝트 작성자 팀에 추가
-        TeamEntity teamAuthor = TeamEntity.builder()
-                .projectNum(projectEntity.getProjectNum())  // 프로젝트 번호
-                .memberId(client.getMemberId())  // 작성자 ID
-                .project(projectEntity)
-                .build();
-        teamRepository.save(teamAuthor);
+        // 작성자가 이미 팀에 있는지 확인 후 추가
+        if (!teamRepository.existsByProjectNumAndMemberId(projectEntity.getProjectNum(), client.getMemberId())) {
+            TeamEntity teamAuthor = TeamEntity.builder()
+                    .projectNum(projectEntity.getProjectNum())  // 프로젝트 번호
+                    .memberId(client.getMemberId())  // 작성자 ID
+                    .project(projectEntity)
+                    .build();
+            teamRepository.save(teamAuthor);
+        }
     }
 
     // 클라이언트가 작성한 프로젝트에 지원한 프리랜서 목록을 조회하는 메서드
