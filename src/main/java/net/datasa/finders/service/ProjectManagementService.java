@@ -682,6 +682,16 @@ public class ProjectManagementService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    // 업무등록 모달창의 "담당자" 입력란에 대한 프로젝트 참여하는 프리랜서 ID로 자동완성
+    public List<TeamDTO> getFreelancersByProject(int projectNum) {
+    	List<TeamEntity> teamEntities = teamRepository.findByProjectNum(projectNum);
+        
+        // Entity를 DTO로 변환
+        return teamEntities.stream()
+                .map(entity -> new TeamDTO(entity.getTeamNum(), entity.getProjectNum(), entity.getMemberId()))
+                .collect(Collectors.toList());
+    }
     
     
     // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Service 코드

@@ -185,6 +185,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 업무 등록 버튼 클릭 시 모달 창 열기
     $('#add-task-button').on('click', function() {
+		
+		console.log('Opening task modal'); // 모달이 열릴 때 로그 출력
+		console.log('Project Number:', projectNum); // projectNum 값 로그 출력
+		
         $('#task-modal').removeClass('hidden').show();
         $('#task-form')[0].reset(); // 폼 초기화
 
@@ -198,6 +202,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isFirstTask) {
             localStorage.setItem('firstTaskRegistered', 'true');
         }
+		
+		// 자동완성 초기화 호출
+		initializeAssigneeAutocomplete();
+		
     });
 
     // 모달 닫기 버튼 클릭 시
@@ -253,6 +261,69 @@ document.addEventListener('DOMContentLoaded', function() {
         // 선택한 기능 분류 ID를 전역 변수에 저장
         funcTitleId = $(this).val();
     });
+	
+	let assignees = []; // AJAX로 불러온 데이터 저장할 배열
+	
+	// "담당자" 입력란에 ID 입력 시 해당 프로젝트에 참여하는 프리랜서 ID 자동완성
+	function initializeAssigneeAutocomplete() {
+		console.log('Initializing assignee autocomplete'); // 로그 추가
+		
+	    $('#task-assignee').autocomplete({
+	        source: function(request, response) {
+	            
+	            $.ajax({
+	                url: 'freelancersInput?projectNum=' + projectNum,
+	                type: 'GET',
+	                dataType: 'json',
+	                success: function(data) {
+						console.log("AJAX success, data:", data);
+						assignees = data; // 데이터 저장
+					
+	                },
+	                error: function() {
+						console.error("AJAX error:", error);
+	                }
+	            });
+	        },
+	        minLength: 1, // 최소 입력 길이
+	        select: function(event, ui) {
+				console.log("Selected value:", ui.item.value);
+				$('#task-assignee').val(ui.item.value); // 선택된 값 설정
+	        }
+	    });
+		
+		// 입력 필드 이벤트 핸들링
+	    $('#task-assignee').on('input', function() {
+	        let value = $(this).val().toLowerCase();
+	        $('#autocomplete-list').empty(); // 이전 목록 비우기
+
+	        if (value) {
+	            let filteredAssignees = assignees.filter(assignee => assignee.toLowerCase().includes(value));
+	            filteredAssignees.forEach(assignee => {
+	                $('#autocomplete-list').append(`<div class="autocomplete-item">${assignee}</div>`);
+	            });
+	            $('#autocomplete-list').removeClass('hidden'); // 목록 보이기
+	        } else {
+	            $('#autocomplete-list').addClass('hidden'); // 입력이 없으면 목록 숨기기
+	        }
+	    });
+
+	    // 클릭 시 입력 필드에 값 설정
+	    $(document).on('click', '.autocomplete-item', function() {
+	        $('#task-assignee').val($(this).text());
+	        $('#autocomplete-list').addClass('hidden'); // 목록 숨기기
+	    });
+
+	    // 입력 필드 밖 클릭 시 목록 숨기기
+	    $(document).on('click', function(e) {
+	        if (!$(e.target).closest('#task-assignee').length) {
+	            $('#autocomplete-list').addClass('hidden');
+	        }
+	    });
+
+	    console.log("Autocomplete initialized");
+		
+	}
 
  	// 폼 제출 이벤트 핸들러
     $('#save-function-and-task-btn').on('click', function() {

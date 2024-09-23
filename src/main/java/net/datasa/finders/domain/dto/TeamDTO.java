@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamDTO {
+	private int teamNum;
     private int projectNum;
     private String memberId;
 }
