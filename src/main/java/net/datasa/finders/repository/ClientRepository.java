@@ -9,7 +9,7 @@ import net.datasa.finders.domain.entity.ClientEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 
 @Repository
-public interface ClientRepository extends JpaRepository<ClientEntity, String> {
+public interface ClientRepository extends JpaRepository<ClientEntity, Integer> {
 	
 	Optional<ClientEntity> findByMember(MemberEntity member);
 
