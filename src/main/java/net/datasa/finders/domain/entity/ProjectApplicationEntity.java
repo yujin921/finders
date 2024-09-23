@@ -24,7 +24,7 @@ public class ProjectApplicationEntity {
     @JoinColumn(name = "project_num", referencedColumnName = "project_num", nullable = false)
     private ProjectPublishingEntity projectNum;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "freelancer_id", referencedColumnName = "member_id", nullable = false)
     private MemberEntity freelancer;
 
