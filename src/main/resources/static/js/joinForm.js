@@ -1,6 +1,27 @@
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tabs button');
     const tabContents = document.querySelectorAll('.tab-content');
+	const freelancerPw = document.getElementById('freelancer-password');
+	const freelancerPwCheck = document.getElementById('freelancer-password-check');
+	const clientPw = document.getElementById('client-password');
+	const clientPwCheck = document.getElementById('client-password-check');
+	const pwError = document.getElementById('password-error');
+	const pwCorrect = document.getElementById('password-correct');
+	
+	  function validatePassword() {
+	    if (freelancerPw.value !== freelancerPwCheck.value) {
+	      pwError.style.display = 'block';
+		  pwCorrect.style.display = 'none';
+	    } else {
+	      pwError.style.display = 'none';
+		  pwCorrect.style.display = 'block';
+	    }
+	  }
+
+	  freelancerPw.addEventListener('input', validatePassword);
+	  freelancerPwCheck.addEventListener('input', validatePassword);
+	
+	
 
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {

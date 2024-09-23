@@ -94,8 +94,10 @@ public class MemberService {
     
     public void joinFreelancer(FreelancerDTO dto, MemberDTO member) {
     	
+    	MemberEntity memberEntity = memberRepository.findById(member.getMemberId()).orElseThrow(() -> new EntityNotFoundException("아이디 못찾음"));
+    	
     	FreelancerEntity freelancerEntity = FreelancerEntity.builder()
-    			.freelancerId(member.getMemberId())
+    			.member(memberEntity)
     			.freelancerPhone(dto.getFreelancerPhone())
     			.country(dto.getCountry())
     			.postalCode(dto.getPostalCode())
@@ -105,27 +107,22 @@ public class MemberService {
     			.build();
     			freelancerRepository.save(freelancerEntity);
     }
+    
 
-    @Transactional
-    public void saveFreelancerSkills(String freelancerId, List<String> skills) {
-        MemberEntity freelancer = memberRepository.findById(freelancerId)
-            .orElseThrow(() -> new EntityNotFoundException("Freelancer not found"));
-
-        // 기존 스킬 삭제
-        
-        // 새로운 스킬 저장
-        for (String skill : skills) {
-            // 문자열 정제
-            String cleanedSkill = cleanSkillString(skill);
-            
-            if (!cleanedSkill.isEmpty()) {
-                FreelancerSkillEntity skillEntity = FreelancerSkillEntity.builder()
-                    .freelancerId(freelancer)
-                    .skillText(cleanedSkill)
-                    .build();
-                freelancerSkillRepository.save(skillEntity);
-            }
-        }
+    // 문자열 정제 메서드
+    private String cleanSkillString(String skill) {
+        // 따옴표, 대괄호, 쉼표 등을 제거하고 앞뒤 공백을 제거
+        return skill.replaceAll("[\"\\[\\],]", "").trim();
+    }
+    
+    private String cleanFieldString(String field) {
+        // 따옴표, 대괄호, 쉼표 등을 제거하고 앞뒤 공백을 제거
+        return field.replaceAll("[\"\\[\\],]", "").trim();
+    }
+    
+    private String cleanCategoryString(String category) {
+        // 따옴표, 대괄호, 쉼표 등을 제거하고 앞뒤 공백을 제거
+        return category.replaceAll("[\"\\[\\],]", "").trim();
     }
     
     @Transactional
@@ -160,7 +157,7 @@ public class MemberService {
         // 새로운 스킬 저장
         for (String field : fields) {
             // 문자열 정제
-            String cleanedSkill = cleanSkillString(field);
+            String cleanedSkill = cleanFieldString(field);
             
             if (!cleanedSkill.isEmpty()) {
                 ClientFieldEntity fieldEntity = ClientFieldEntity.builder()
@@ -182,29 +179,25 @@ public class MemberService {
         // 새로운 스킬 저장
         for (String category : categorys) {
             // 문자열 정제
-            String cleanedSkill = cleanSkillString(category);
+            String cleanedCategory = cleanCategoryString(category);
             
-            if (!cleanedSkill.isEmpty()) {
+            if (!cleanedCategory.isEmpty()) {
                 ClientCategoryEntity categoryEntity = ClientCategoryEntity.builder()
                 	.clientId(client)
-                	.categoryText(cleanedSkill)
+                	.categoryText(cleanedCategory)
                 	.build();
                 clientCategoryRepository.save(categoryEntity);
             }
         }
     }
 
-
-    // 문자열 정제 메서드
-    private String cleanSkillString(String skill) {
-        // 따옴표, 대괄호, 쉼표 등을 제거하고 앞뒤 공백을 제거
-        return skill.replaceAll("[\"\\[\\],]", "").trim();
-    }
     
     public void joinClient(ClientDTO dto, MemberDTO member) {
     	
+    	MemberEntity memberEntity = memberRepository.findById(member.getMemberId()).orElseThrow(() -> new EntityNotFoundException("아이디 못찾음"));
+    	
     	ClientEntity clientEntity = ClientEntity.builder()
-    			.clientId(member.getMemberId())
+    			.member(memberEntity)
     			.clientPhone(dto.getClientPhone())
     			.industry(dto.getIndustry())
     			.foundedDate(dto.getFoundedDate())
@@ -339,6 +332,13 @@ public class MemberService {
             member.setProfileImg(newImagePath);
         }
         
+        if (dto.getFields() != null && !dto.getFields().isEmpty()) {
+            updateClientField(dto.getMemberId(), dto.getFields());
+        }
+        if (dto.getCategorys() != null && !dto.getCategorys().isEmpty()) {
+            updateClientCategory(dto.getMemberId(), dto.getCategorys());
+        }
+        
         ClientEntity client = clientRepository.findByMember(member)
               .orElseThrow(() -> new RuntimeException("client not found"));
 
@@ -351,6 +351,9 @@ public class MemberService {
       client.setAddress(dto.getAddress());
       client.setDetailAddress(dto.getDetailAddress());
       client.setExtraAddress(dto.getExtraAddress());
+      
+      updateClientField(dto.getMemberId(), dto.getFields());
+      updateClientCategory(dto.getMemberId(), dto.getCategorys());
 
           clientRepository.save(client);
           memberRepository.save(member);

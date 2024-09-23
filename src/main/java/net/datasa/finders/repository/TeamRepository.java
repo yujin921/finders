@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TeamRepository extends JpaRepository<TeamEntity, TeamEntityId> { // 복합 키 클래스 설정
+public interface TeamRepository extends JpaRepository<TeamEntity, Integer> { // 복합 키 클래스 설정
 
     // 특정 프로젝트 번호에 해당하는 팀 구성원 조회
     List<TeamEntity> findByProjectNum(Integer projectNum);
