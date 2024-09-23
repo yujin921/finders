@@ -12,6 +12,6 @@ import net.datasa.finders.domain.entity.MemberEntity;
 @Repository
 
 public interface FreelancerRepository extends JpaRepository<FreelancerEntity, Integer> {
-	FreelancerEntity findByMember(MemberEntity member);
-
+	
+	Optional<FreelancerEntity> findByMember(MemberEntity member);
 }

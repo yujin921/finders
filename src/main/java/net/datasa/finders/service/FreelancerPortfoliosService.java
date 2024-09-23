@@ -26,13 +26,12 @@ public class FreelancerPortfoliosService {
 	public void save(FreelancerPortfoliosDTO fPDTO, AuthenticatedUser user) {
 		
 		MemberEntity memberEntity = memberRepository.findById(user.getUsername()).orElseThrow(() -> new EntityNotFoundException("회원정보가 없습니다."));
-		FreelancerEntity freelancerEntity = freelancerRepository.findByMember(memberEntity);
 		
 		FreelancerPortfoliosEntity freelancerPortfoliosEntity = FreelancerPortfoliosEntity.builder()
 				.projectTitle(fPDTO.getProjectTitle())
 				.projectDescription(fPDTO.getProjectDescription())
 				.projectLink(fPDTO.getProjectLink())
-				.freelancerEntity(freelancerEntity)
+				.memberEntity(memberEntity)
 				.build();
 		
 		freelancerPortfoliosRepository.save(freelancerPortfoliosEntity);
