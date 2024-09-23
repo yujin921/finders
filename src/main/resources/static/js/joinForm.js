@@ -40,9 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 선택한 기술들을 저장할 배열
     let selectedTechs = [];
-   let selectedField = [];
-   let selectedCategory = [];
-   
+
+	let selectedField = [];
+	let selectedCategory = [];
+
     // 기술 버튼 클릭 시 호출되는 함수
     window.toggleTech = function(element) {
         const tech = element.getAttribute('data-tech');
@@ -79,8 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
          selectedCategory.splice(index3, 1);
       }
    }
-   
-   
+
     // 회원가입 폼 제출 시 유효성 검사 수정
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function(event) {
@@ -111,6 +111,4 @@ document.addEventListener('DOMContentLoaded', function() {
          }
         });
     });
-   
-   
 });

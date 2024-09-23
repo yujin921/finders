@@ -15,33 +15,42 @@ function toggleSelect(element) {
     // 숨겨진 input 필드에 선택된 값을 저장 (폼 제출용)
     document.getElementById('selectedWorkScopes').value = selectedScopes.join(',');
 
-    // 모집 인원의 select 필드 업데이트
+    // 모든 recruit select 필드 즉시 업데이트
     updateRecruitSelectOptions();
 }
 
 // 모집 인원 select 필드 업데이트 함수
 function updateRecruitSelectOptions() {
-    const recruitSelects = document.querySelectorAll('.recruit-team-section select[name="role"], .recruit-added-item select[name="role"]');
+    const recruitSelects = document.querySelectorAll('select[name="role"]');  // 모든 role select 필드 찾기
 
     recruitSelects.forEach(select => {
         const selectedValue = select.value; // 현재 선택된 값 저장
 
         // 기존 옵션 모두 제거
-        select.innerHTML = '';
+        select.innerHTML = '';  // 옵션 비우기
 
-        // 선택된 업무 범위를 기준으로 새로운 옵션 추가
-        selectedScopes.forEach(scope => {
+        // 선택된 업무 범위가 없는 경우 기본 옵션 추가
+        if (selectedScopes.length === 0) {
             const option = document.createElement('option');
-            option.value = scope;
-            option.textContent = scope;
+            option.value = '';
+            option.textContent = '업무 범위를 선택해주세요';
             select.appendChild(option);
-        });
-
-        // 이전에 선택된 값이 새로운 옵션에 존재하면 복원
-        if (selectedScopes.includes(selectedValue)) {
-            select.value = selectedValue;
         } else {
-            select.value = ''; // 존재하지 않으면 선택 초기화
+            // 선택된 업무 범위를 기준으로 새로운 옵션 추가
+            selectedScopes.forEach(scope => {
+                const option = document.createElement('option');
+                option.value = scope;
+                option.textContent = scope;
+                select.appendChild(option);
+            });
+
+            // 이전에 선택된 값이 유효하면 복원
+            if (selectedValue && selectedScopes.includes(selectedValue)) {
+                select.value = selectedValue;
+            } else {
+                // 유효하지 않으면 기본값 선택
+                select.value = selectedScopes[0] || '';
+            }
         }
     });
 }
@@ -63,7 +72,7 @@ function toggleCategory(element) {
     // 숨겨진 input 필드에 선택된 카테고리 저장
     document.getElementById('selectedCategories').value = selectedCategories.join(',');
 
-    // 모집 인원의 카테고리 select 필드 업데이트
+    // 모든 recruit select 필드 즉시 업데이트
     updateRecruitCategoryOptions();
 }
 
@@ -77,19 +86,27 @@ function updateRecruitCategoryOptions() {
         // 기존 옵션 모두 제거
         select.innerHTML = '';
 
-        // 선택된 카테고리를 기준으로 새로운 옵션 추가
-        selectedCategories.forEach(category => {
+        if (selectedCategories.length === 0) {
+            // 선택된 카테고리가 없는 경우 기본 옵션 추가
             const option = document.createElement('option');
-            option.value = category;
-            option.textContent = category;
+            option.value = '';
+            option.textContent = '카테고리를 선택해주세요';
             select.appendChild(option);
-        });
-
-        // 이전에 선택된 값이 새로운 옵션에 존재하면 복원
-        if (selectedCategories.includes(selectedValue)) {
-            select.value = selectedValue;
         } else {
-            select.value = ''; // 존재하지 않으면 선택 초기화
+            // 선택된 카테고리를 기준으로 새로운 옵션 추가
+            selectedCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                select.appendChild(option);
+            });
+
+            // 이전에 선택된 값이 새로운 옵션에 존재하면 복원
+            if (selectedCategories.includes(selectedValue)) {
+                select.value = selectedValue;
+            } else {
+                select.value = ''; // 존재하지 않으면 선택 초기화
+            }
         }
     });
 }

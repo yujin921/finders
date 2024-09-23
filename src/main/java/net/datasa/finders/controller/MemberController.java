@@ -77,6 +77,8 @@ public class MemberController {
                        @ModelAttribute FreelancerDTO freelancer,
                        @ModelAttribute ClientDTO client,
                        @RequestParam(value = "selectedSkills", required = false) String selectedSkillsString,
+                       @RequestParam(value = "selectedField", required = false) String selectedFieldString,
+                       @RequestParam(value = "selectedCategory", required = false) String selectedCategoryString,
                        Model model) {
         try {
             MemberEntity savedMember = memberService.join(member, uploadPath, profileImg);
@@ -92,6 +94,15 @@ public class MemberController {
                     break;
                 case ROLE_CLIENT:
                     memberService.joinClient(client, member);
+                    // 클라이언트 관심 분야 저장
+                    if (selectedFieldString != null && !selectedFieldString.isEmpty()) {
+                    	List<String> selectedField = Arrays.asList(selectedFieldString.split(","));
+                    	memberService.updateClientField(savedMember.getMemberId(), selectedField);
+                    }
+                    if (selectedCategoryString != null && !selectedCategoryString.isEmpty()) {
+                    	List<String> selectedCategory = Arrays.asList(selectedCategoryString.split(","));
+                    	memberService.updateClientCategory(savedMember.getMemberId(), selectedCategory);
+                    }
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid role: " + member.getRoleName());
@@ -145,13 +156,20 @@ public class MemberController {
     @PostMapping("/update/client")
     public String updateClient(@ModelAttribute ClientDTO clientDTO,
                                @RequestParam("profileImg") MultipartFile profileImg,
+                               @RequestParam(value = "selectedField", required = false) String selectedFieldString,
+                               @RequestParam(value = "selectedCategory", required = false) String selectedCategoryString,
                                Model model) {
         try {
-        	log.debug("{}",clientDTO);
+        	if (selectedFieldString != null && !selectedFieldString.isEmpty()) {
+                clientDTO.setFields(Arrays.asList(selectedFieldString.split(",")));
+            }
+            if (selectedCategoryString != null && !selectedCategoryString.isEmpty()) {
+                clientDTO.setCategorys(Arrays.asList(selectedCategoryString.split(",")));
+            }
             memberService.updateClient(clientDTO, profileImg, uploadPath);
-            
             return "redirect:/";
         } catch (Exception e) {
+        	log.debug("{}", clientDTO);
             model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
             return "redirect:/member/myPage";
         }

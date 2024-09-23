@@ -7,11 +7,15 @@ import net.datasa.finders.domain.dto.ClientDTO;
 import net.datasa.finders.domain.dto.FreelancerDTO;
 import net.datasa.finders.domain.dto.FreelancerSkillDTO;
 import net.datasa.finders.domain.dto.MemberDTO;
+import net.datasa.finders.domain.entity.ClientCategoryEntity;
 import net.datasa.finders.domain.entity.ClientEntity;
+import net.datasa.finders.domain.entity.ClientFieldEntity;
 import net.datasa.finders.domain.entity.FreelancerEntity;
 import net.datasa.finders.domain.entity.FreelancerSkillEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.repository.ClientCategoryRepository;
+import net.datasa.finders.repository.ClientFieldRepository;
 import net.datasa.finders.repository.ClientRepository;
 import net.datasa.finders.repository.FreelancerRepository;
 import net.datasa.finders.repository.FreelancerSkillRepository;
@@ -38,6 +42,8 @@ public class MemberService {
     private final FreelancerRepository freelancerRepository;
     private final ClientRepository clientRepository;
     private final FreelancerSkillRepository freelancerSkillRepository;
+    private final ClientFieldRepository clientFieldRepository;
+    private final ClientCategoryRepository clientCategoryRepository;
     
     public MemberEntity join(MemberDTO dto, String uploadPath, MultipartFile profileImg) throws IOException {
         LocalDateTime now = LocalDateTime.now();
@@ -88,8 +94,10 @@ public class MemberService {
     
     public void joinFreelancer(FreelancerDTO dto, MemberDTO member) {
     	
+    	MemberEntity memberEntity = memberRepository.findById(member.getMemberId()).orElseThrow(() -> new EntityNotFoundException("아이디 못찾음"));
+    	
     	FreelancerEntity freelancerEntity = FreelancerEntity.builder()
-    			.freelancerId(member.getMemberId())
+    			.member(memberEntity)
     			.freelancerPhone(dto.getFreelancerPhone())
     			.country(dto.getCountry())
     			.postalCode(dto.getPostalCode())
@@ -99,27 +107,22 @@ public class MemberService {
     			.build();
     			freelancerRepository.save(freelancerEntity);
     }
+    
 
-    @Transactional
-    public void saveFreelancerSkills(String freelancerId, List<String> skills) {
-        MemberEntity freelancer = memberRepository.findById(freelancerId)
-            .orElseThrow(() -> new EntityNotFoundException("Freelancer not found"));
-
-        // 기존 스킬 삭제
-        
-        // 새로운 스킬 저장
-        for (String skill : skills) {
-            // 문자열 정제
-            String cleanedSkill = cleanSkillString(skill);
-            
-            if (!cleanedSkill.isEmpty()) {
-                FreelancerSkillEntity skillEntity = FreelancerSkillEntity.builder()
-                    .freelancerId(freelancer)
-                    .skillText(cleanedSkill)
-                    .build();
-                freelancerSkillRepository.save(skillEntity);
-            }
-        }
+    // 문자열 정제 메서드
+    private String cleanSkillString(String skill) {
+        // 따옴표, 대괄호, 쉼표 등을 제거하고 앞뒤 공백을 제거
+        return skill.replaceAll("[\"\\[\\],]", "").trim();
+    }
+    
+    private String cleanFieldString(String field) {
+        // 따옴표, 대괄호, 쉼표 등을 제거하고 앞뒤 공백을 제거
+        return field.replaceAll("[\"\\[\\],]", "").trim();
+    }
+    
+    private String cleanCategoryString(String category) {
+        // 따옴표, 대괄호, 쉼표 등을 제거하고 앞뒤 공백을 제거
+        return category.replaceAll("[\"\\[\\],]", "").trim();
     }
     
     @Transactional
@@ -143,17 +146,58 @@ public class MemberService {
             }
         }
     }
+    
+    @Transactional
+    public void updateClientField(String clientId, List<String> fields) {
+        MemberEntity client = memberRepository.findById(clientId)
+            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
 
-    // 문자열 정제 메서드
-    private String cleanSkillString(String skill) {
-        // 따옴표, 대괄호, 쉼표 등을 제거하고 앞뒤 공백을 제거
-        return skill.replaceAll("[\"\\[\\],]", "").trim();
+        // 기존 스킬 삭제
+        clientFieldRepository.deleteByClientId(client);
+        // 새로운 스킬 저장
+        for (String field : fields) {
+            // 문자열 정제
+            String cleanedSkill = cleanFieldString(field);
+            
+            if (!cleanedSkill.isEmpty()) {
+                ClientFieldEntity fieldEntity = ClientFieldEntity.builder()
+                	.clientId(client)
+                	.fieldText(cleanedSkill)
+                	.build();
+                clientFieldRepository.save(fieldEntity);
+            }
+        }
     }
+    
+    @Transactional
+    public void updateClientCategory(String clientId, List<String> categorys) {
+        MemberEntity client = memberRepository.findById(clientId)
+            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
+
+        // 기존 스킬 삭제
+        clientCategoryRepository.deleteByClientId(client);
+        // 새로운 스킬 저장
+        for (String category : categorys) {
+            // 문자열 정제
+            String cleanedCategory = cleanCategoryString(category);
+            
+            if (!cleanedCategory.isEmpty()) {
+                ClientCategoryEntity categoryEntity = ClientCategoryEntity.builder()
+                	.clientId(client)
+                	.categoryText(cleanedCategory)
+                	.build();
+                clientCategoryRepository.save(categoryEntity);
+            }
+        }
+    }
+
     
     public void joinClient(ClientDTO dto, MemberDTO member) {
     	
+    	MemberEntity memberEntity = memberRepository.findById(member.getMemberId()).orElseThrow(() -> new EntityNotFoundException("아이디 못찾음"));
+    	
     	ClientEntity clientEntity = ClientEntity.builder()
-    			.clientId(member.getMemberId())
+    			.member(memberEntity)
     			.clientPhone(dto.getClientPhone())
     			.industry(dto.getIndustry())
     			.foundedDate(dto.getFoundedDate())
@@ -288,6 +332,13 @@ public class MemberService {
             member.setProfileImg(newImagePath);
         }
         
+        if (dto.getFields() != null && !dto.getFields().isEmpty()) {
+            updateClientField(dto.getMemberId(), dto.getFields());
+        }
+        if (dto.getCategorys() != null && !dto.getCategorys().isEmpty()) {
+            updateClientCategory(dto.getMemberId(), dto.getCategorys());
+        }
+        
         ClientEntity client = clientRepository.findByMember(member)
               .orElseThrow(() -> new RuntimeException("client not found"));
 
@@ -300,6 +351,9 @@ public class MemberService {
       client.setAddress(dto.getAddress());
       client.setDetailAddress(dto.getDetailAddress());
       client.setExtraAddress(dto.getExtraAddress());
+      
+      updateClientField(dto.getMemberId(), dto.getFields());
+      updateClientCategory(dto.getMemberId(), dto.getCategorys());
 
           clientRepository.save(client);
           memberRepository.save(member);

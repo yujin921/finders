@@ -21,11 +21,12 @@ import lombok.NoArgsConstructor;
 public class ClientEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "client_id")
-    private String clientId;
+    private Integer clientId;
 
-    @ManyToOne
-    @JoinColumn(name = "client_id", referencedColumnName = "member_id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id")
     private MemberEntity member;
 
     @Column(name = "client_phone", length = 20)
