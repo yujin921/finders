@@ -50,7 +50,7 @@ public class ProjectManagementController {
     @GetMapping("projectList")
     public List<ProjectPublishingDTO> projectList(@AuthenticationPrincipal AuthenticatedUser user) {
         //서비스로 사용자 아이디를 전달하여 해당 아이디의 수입,지출 내역을 목록으로 리턴한다.
-        return projectManagementService.getMyList(user.getUsername());
+        return projectManagementService.getMyList(user.getUsername(), user.getRoleName());
     }
     
     @GetMapping("management")

@@ -35,8 +35,45 @@ public class ProjectManagementService {
     private final TaskManagementRepository taskManagementRepository;
     private final ProjectManagementRepository projectManagementRepository;
 
-    public List<ProjectPublishingDTO> getMyList(String id) {
+    public List<ProjectPublishingDTO> getMyList(String id, String roleName) {
         Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
+        List<ProjectPublishingEntity> entityList = new ArrayList<>();
+        
+        if (roleName.equals("ROLE_FREELANCER")) {
+            // 프리랜서 ID로 프로젝트 목록 조회
+            entityList = projectPublishingRepository.findAcceptedProjectsByFreelancerId(id);
+        } else if (roleName.equals("ROLE_CLIENT")) {
+            // 클라이언트의 경우 자신의 프로젝트만 조회
+            entityList = projectPublishingRepository.findAll(sort).stream()
+                .filter(entity -> entity.getClientId().getMemberId().equals(id))
+                .collect(Collectors.toList());
+        } else if (roleName.equals("ROLE_ADMIN")) {
+            // 관리자는 모든 프로젝트 조회
+            entityList = projectPublishingRepository.findAll(sort);
+        }
+
+        List<ProjectPublishingDTO> dtoList = new ArrayList<>();
+
+        for (ProjectPublishingEntity entity : entityList) {
+            ProjectPublishingDTO dto = ProjectPublishingDTO.builder()
+                    .projectNum(entity.getProjectNum())
+                    .clientId(entity.getClientId().getMemberId())
+                    .projectTitle(entity.getProjectTitle())
+                    .recruitDeadline(entity.getRecruitDeadline())
+                    .projectStartDate(entity.getProjectStartDate())
+                    .projectEndDate(entity.getProjectEndDate())
+                    .projectBudget(entity.getProjectBudget())
+                    .projectDescription(entity.getProjectDescription())
+                    .projectImage(entity.getProjectImage())
+                    .projectStatus(entity.getProjectStatus())
+                    .build();
+
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+        
+        /*
         List<ProjectPublishingEntity> entityList;
         
         entityList = projectPublishingRepository.findAll(sort);
@@ -62,47 +99,8 @@ public class ProjectManagementService {
         }
             
         return dtoList;
-
-        /*
-        if (roleName.equals("ROLE_FREELANCER")) {
-            // 프리랜서 ID로 프로젝트 목록 조회
-            entityList = projectPublishingRepository.findByFreelancerId(id);
-        } else {
-            // 클라이언트와 관리자의 경우 모두 프로젝트 조회
-            entityList = projectPublishingRepository.findAll(sort);
-        }
-
-        List<ProjectPublishingDTO> dtoList = new ArrayList<>();
-
-        for (ProjectPublishingEntity entity : entityList) {
-            // ROLE_ADMIN은 모든 프로젝트를 DTO로 추가
-            ProjectPublishingDTO dto = ProjectPublishingDTO.builder()
-                    .projectNum(entity.getProjectNum())
-                    .clientId(entity.getClientId().getMemberId())
-                    .projectTitle(entity.getProjectTitle())
-                    .recruitDeadline(entity.getRecruitDeadline())
-                    .projectStartDate(entity.getProjectStartDate())
-                    .projectEndDate(entity.getProjectEndDate())
-                    .projectBudget(entity.getProjectBudget())
-                    .projectDescription(entity.getProjectDescription())
-                    .projectImage(entity.getProjectImage())
-                    .projectStatus(entity.getProjectStatus())
-                    .build();
-
-            if (roleName.equals("ROLE_CLIENT") && entity.getClientId().getMemberId().equals(id)) {
-                // 클라이언트의 경우, 자신의 프로젝트만 추가
-                dtoList.add(dto);
-            } else if (roleName.equals("ROLE_FREELANCER")) {
-                // 프리랜서의 경우, 해당 프로젝트 DTO 추가
-                dtoList.add(dto);
-            } else if (roleName.equals("ROLE_ADMIN")) {
-                // 관리자는 모든 프로젝트 DTO 추가
-                dtoList.add(dto);
-            }
-        }
-
-        return dtoList;
         */
+
     }
     
     private ProjectPublishingDTO convertToDTO(ProjectPublishingEntity entity) {
