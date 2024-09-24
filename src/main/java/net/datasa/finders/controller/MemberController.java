@@ -175,7 +175,42 @@ public class MemberController {
         }
     }
     
+    @GetMapping("findId")
+    public String findId() {
+    	return "/member/findId";
+    }
     
+    // 아이디 찾기 요청을 처리하는 POST 메서드
+    @PostMapping("/findId")
+    public String findId(@RequestParam("memberName") String memberName,
+                         @RequestParam("email") String email,
+                         Model model) {
+        try {
+            // 서비스에서 이름과 이메일을 기반으로 아이디를 찾음
+            String memberId = memberService.findUsernameBymemberNameAndEmail(memberName, email);
+            // 아이디 찾기 성공 시 메시지를 모델에 추가
+            model.addAttribute("message", "회원님의 아이디는: " + memberId);
+        } catch (Exception e) {
+            // 아이디를 찾지 못한 경우 에러 메시지를 모델에 추가
+            model.addAttribute("error", "해당 정보를 가진 사용자가 없습니다.");
+        }
+        return "/member/findIdResult"; // 결과를 보여줄 페이지 (Thymeleaf 템플릿 이름)
+    }
+    
+    @GetMapping("findPw")
+    public String findPw() {
+    	return "/member/findPw";
+    }
+    
+    @GetMapping("findIdResult")
+    public String findIdResult() {
+    	return "/member/findIdResult";
+    }
+    
+    @GetMapping("findPwResult")
+    public String findPwResult() {
+    	return "/member/findPwResult";
+    }
     
  // 현재 로그인한 사용자의 memberId를 반환하는 엔드포인트 추가
     @GetMapping("/getMemberId")
