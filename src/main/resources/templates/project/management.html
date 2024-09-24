@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css"/>
     <!-- Custom 스타일 시트 -->
     <link rel="stylesheet" th:href="@{/css/management.css}">
-    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
 <body>
     <div class="container">
@@ -120,9 +120,9 @@
 							</select>
 				            
 				            <label for="progress-value">진행도(%):</label>
-				            <input type="text" id="progress-value-input" class="input-field" placeholder="(입력 예시) 50%">
-				            
-				            <button id="update-progress-button" class="button">진행도 업데이트</button>
+				            <input type="range" id="progress-value" min="0" max="100" value="0" oninput="updateProgressDisplay()">
+							<span id="progress-value-display">0%</span>
+							<button id="update-progress-button" class="button">진행도 업데이트</button>
 				        </div>
 					</div>
 				</div>
@@ -196,6 +196,7 @@
                 <div class="form-group">
                     <label for="task-assignee">담당자</label>
                     <input type="text" id="task-assignee" autocomplete='off' required>
+					<div id="autocomplete-list" class="autocomplete-list hidden"></div>
                 </div>
                 <div class="modal-buttons">
                     <button type="button" class="btn-close" id="close-task-modal">취소</button>
@@ -254,6 +255,10 @@
     <script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
     <script src="https://cdn.anychart.com/releases/v8/js/anychart-gantt.min.js"></script>
     <script src="https://cdn.anychart.com/releases/v8/js/anychart-data-adapter.min.js"></script>
+    <!-- jQuery -->
+	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+	<!-- jQuery UI JavaScript -->
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <!-- Custom 스크립트 파일 -->
     <script src="/js/management.js" defer></script>
 </body>

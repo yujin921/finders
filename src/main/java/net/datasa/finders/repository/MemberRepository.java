@@ -38,4 +38,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
     // 프로젝트 번호를 기준으로 팀 멤버를 조회하는 쿼리
     @Query("SELECT m FROM MemberEntity m JOIN TeamEntity t ON m.memberId = t.memberId WHERE t.projectNum = :projectNum")
     List<MemberEntity> findByProjectNum(@Param("projectNum") int projectNum);
+
+	List<MemberEntity> findByRoleName(RoleName roleFreelancer);
 }

@@ -43,7 +43,6 @@ public class ManagementRestController {
 
         // 상태 업데이트
         projectApplicationService.updateApplicationStatus(projectNum, freelancerId, result);
-
         return ResponseEntity.ok().build();  // 성공적으로 상태가 변경된 경우 200 응답
     }
 
