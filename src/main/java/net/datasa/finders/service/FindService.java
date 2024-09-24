@@ -15,6 +15,8 @@ import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.domain.entity.FreelancerSkillEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.repository.ClientCategoryRepository;
+import net.datasa.finders.repository.ClientFieldRepository;
 import net.datasa.finders.repository.FreelancerPortfoliosRepository;
 import net.datasa.finders.repository.FreelancerReviewsRepository;
 import net.datasa.finders.repository.FreelancerSkillRepository;
@@ -30,10 +32,14 @@ public class FindService {
 	private final FreelancerReviewsRepository freelancerReviewsRepository;
 	private final FreelancerSkillRepository freelancerSkillRepository;
 	private final FreelancerPortfoliosRepository freelancerPortfoliosRepository;
+	private final ClientFieldRepository clientFieldRepository;
+	private final ClientCategoryRepository clientCategoryRepository;
 	
 	public List<FindFreelancerDTO> findFreelancerList(String[] fields, String[] areas) {
-
+		
+		
 		List<MemberEntity> memberEntityList = memberRepository.findByRoleName(RoleName.ROLE_FREELANCER);
+		
 		ArrayList<FindFreelancerDTO> findFreelancerDTOList = new ArrayList<>();
 		
 		for (MemberEntity memberEntity : memberEntityList) {
@@ -42,39 +48,46 @@ public class FindService {
 			
 			List<FreelancerReviewsEntity> freelancerReviewsEntityList = freelancerReviewsRepository.findByFreelancerId(memberEntity.getMemberId());
 			
-			for (FreelancerReviewsEntity freelancerReviewsEntity : freelancerReviewsEntityList) {
-				FreelancerReviewDTO freelancerReviewDTO = FreelancerReviewDTO.builder()
-						.rating(freelancerReviewsEntity.getRating())
-						.build();
-				totalRating += freelancerReviewDTO.getRating();
-			}
-			totalRating /= freelancerReviewsEntityList.size();
-			
-			if(Double.isNaN(totalRating)) {
-				totalRating = 0;
-			}
-			
-			List<FreelancerSkillEntity> freelancerSkillEntityList = freelancerSkillRepository.findByFreelancerId(memberEntity);
+			for (String field : fields) {
+				if(clientFieldRepository.findByClientIdAndFieldText(memberEntity, field).isPresent()) {
+					for (FreelancerReviewsEntity freelancerReviewsEntity : freelancerReviewsEntityList) {
+						FreelancerReviewDTO freelancerReviewDTO = FreelancerReviewDTO.builder()
+								.rating(freelancerReviewsEntity.getRating())
+								.build();
+						totalRating += freelancerReviewDTO.getRating();
+					}
+					totalRating /= freelancerReviewsEntityList.size();
+					
+					if(Double.isNaN(totalRating)) {
+						totalRating = 0;
+					}
+					
+					List<FreelancerSkillEntity> freelancerSkillEntityList = freelancerSkillRepository.findByFreelancerId(memberEntity);
 
-			String[] skills = new String[freelancerSkillEntityList.size()];
-			int i = 0;
-			for (FreelancerSkillEntity freelancerSkillEntity : freelancerSkillEntityList) {
-				skills[i] = freelancerSkillEntity.getSkillText();
-				i += 1;
-			}
+					String[] skills = new String[freelancerSkillEntityList.size()];
+					int i = 0;
+					for (FreelancerSkillEntity freelancerSkillEntity : freelancerSkillEntityList) {
+						skills[i] = freelancerSkillEntity.getSkillText();
+						i += 1;
+					}
+					
+					List<FreelancerPortfoliosEntity> freelancerPortfoliosEntityList = freelancerPortfoliosRepository.findByMember(memberEntity);
+					
+					FindFreelancerDTO findFreelancerDTO = FindFreelancerDTO.builder()
+							.memberId(memberEntity.getMemberId())
+							.profileImg(memberEntity.getProfileImg())
+							.totalRating(totalRating)
+							.totalPortfolios(freelancerPortfoliosEntityList.size())
+							.totalReviews(freelancerReviewsEntityList.size())
+							.skills(skills)
+							.build();
+					if(!findFreelancerDTOList.contains(findFreelancerDTO)) {
+						findFreelancerDTOList.add(findFreelancerDTO);
+					}
+					
+				};
+			};
 			
-			List<FreelancerPortfoliosEntity> freelancerPortfoliosEntityList = freelancerPortfoliosRepository.findByMember(memberEntity);
-			
-			FindFreelancerDTO findFreelancerDTO = FindFreelancerDTO.builder()
-					.memberId(memberEntity.getMemberId())
-					.profileImg(memberEntity.getProfileImg())
-					.totalRating(totalRating)
-					.totalPortfolios(freelancerPortfoliosEntityList.size())
-					.totalReviews(freelancerReviewsEntityList.size())
-					.skills(skills)
-					.build();
-			
-			findFreelancerDTOList.add(findFreelancerDTO);
 		}
 		
 		return findFreelancerDTOList;

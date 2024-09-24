@@ -5,22 +5,36 @@ document.addEventListener('DOMContentLoaded', function() {
 	const freelancerPwCheck = document.getElementById('freelancer-password-check');
 	const clientPw = document.getElementById('client-password');
 	const clientPwCheck = document.getElementById('client-password-check');
-	const pwError = document.getElementById('password-error');
-	const pwCorrect = document.getElementById('password-correct');
+	const freelancerPwError = document.getElementById('freelancer-password-error');
+	const freelancerPwCorrect = document.getElementById('freelancer-password-correct');
+	const clientPwError = document.getElementById('client-password-error');
+	const clientPwCorrect = document.getElementById('client-password-correct');
 	
-	  function validatePassword() {
+	  function freelancerValidatePassword() {
 	    if (freelancerPw.value !== freelancerPwCheck.value) {
-	      pwError.style.display = 'block';
-		  pwCorrect.style.display = 'none';
+	      freelancerPwError.style.display = 'block';
+		  freelancerPwCorrect.style.display = 'none';
 	    } else {
-	      pwError.style.display = 'none';
-		  pwCorrect.style.display = 'block';
+	      freelancerPwError.style.display = 'none';
+		  freelancerPwCorrect.style.display = 'block';
 	    }
 	  }
 
-	  freelancerPw.addEventListener('input', validatePassword);
-	  freelancerPwCheck.addEventListener('input', validatePassword);
-	
+	  freelancerPw.addEventListener('input', freelancerValidatePassword);
+	  freelancerPwCheck.addEventListener('input', freelancerValidatePassword);
+	  
+	  function clientValidatePassword() {
+	  	    if (clientPw.value !== clientPwCheck.value) {
+	  	      clientPwError.style.display = 'block';
+	  		  clientPwCorrect.style.display = 'none';
+	  	    } else {
+	  	      clientPwError.style.display = 'none';
+	  		  clientPwCorrect.style.display = 'block';
+	  	    }
+	  	  }
+
+	  	  clientPw.addEventListener('input', clientValidatePassword);
+	  	  clientPwCheck.addEventListener('input', clientValidatePassword);
 	
 
     tabs.forEach(tab => {
@@ -115,6 +129,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 프리랜서 폼인 경우에만 선택한 기술들을 hidden input에 저장
                 document.getElementById('selectedSkills').value = selectedTechs.join(',');
             }
+			if (isFreelancerForm && selectedField.length === 0) {
+	            alert('최소 하나 이상의 관심 분야를 선택해야 합니다.');
+	            event.preventDefault();
+	         } else if (isFreelancerForm) {
+	            document.getElementById('freelancerSelectedField').value = selectedField.join(',');
+	         }
+	         
+	         if (isFreelancerForm && selectedCategory.length === 0) {
+	            alert('최소 하나 이상의 관심 카테고리를 선택해야 합니다.');
+	            event.preventDefault();
+	         } else if (isFreelancerForm) {
+	            document.getElementById('freelancerSelectedCategory').value = selectedCategory.join(',');
+	         }
          
          const isClientForm = this.id === 'client-join-form';
          if (isClientForm && selectedField.length === 0) {

@@ -114,9 +114,12 @@
     </footer>
 
     <script>
-    $(document).ready(
-    	loadPartners	
-    );
+    $(document).ready(function() {
+    	loadPartners();	
+    	$('input[type="checkbox"]').on("click", function() {
+    		loadPartners()
+    	})
+    });
     
     function loadPartners() {
         // 선택된 필터 값들을 수집

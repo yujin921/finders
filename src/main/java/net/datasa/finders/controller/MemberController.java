@@ -76,32 +76,35 @@ public class MemberController {
                        @RequestParam("profileImg") MultipartFile profileImg,
                        @ModelAttribute FreelancerDTO freelancer,
                        @ModelAttribute ClientDTO client,
-                       @RequestParam(value = "selectedSkills", required = false) String selectedSkillsString,
-                       @RequestParam(value = "selectedField", required = false) String selectedFieldString,
-                       @RequestParam(value = "selectedCategory", required = false) String selectedCategoryString,
+                       @RequestParam(value = "selectedSkills", required = false) List<String> selectedSkills,
+                       @RequestParam(value = "selectedField", required = false) List<String> selectedField,
+                       @RequestParam(value = "selectedCategory", required = false) List<String> selectedCategory,
                        Model model) {
         try {
-            MemberEntity savedMember = memberService.join(member, uploadPath, profileImg);
+            memberService.join(member, uploadPath, profileImg);
             
             switch (member.getRoleName()) {
                 case ROLE_FREELANCER:
                     memberService.joinFreelancer(freelancer, member);
                     // 프리랜서 스킬 저장
-                    if (selectedSkillsString != null && !selectedSkillsString.isEmpty()) {
-                        List<String> selectedSkills = Arrays.asList(selectedSkillsString.split(","));
-                        memberService.updateFreelancerSkills(savedMember.getMemberId(), selectedSkills);
+                    if (selectedSkills != null && !selectedSkills.isEmpty()) {
+                        memberService.updateFreelancerSkills(member.getMemberId(), selectedSkills);
+                    }
+                    if (selectedField != null && !selectedField.isEmpty()) {
+                    	memberService.updateClientField(member.getMemberId(), selectedField);
+                    }
+                    if (selectedCategory != null && !selectedCategory.isEmpty()) {
+                    	memberService.updateClientCategory(member.getMemberId(), selectedCategory);
                     }
                     break;
                 case ROLE_CLIENT:
                     memberService.joinClient(client, member);
                     // 클라이언트 관심 분야 저장
-                    if (selectedFieldString != null && !selectedFieldString.isEmpty()) {
-                    	List<String> selectedField = Arrays.asList(selectedFieldString.split(","));
-                    	memberService.updateClientField(savedMember.getMemberId(), selectedField);
+                    if (selectedField != null && !selectedField.isEmpty()) {
+                    	memberService.updateClientField(member.getMemberId(), selectedField);
                     }
-                    if (selectedCategoryString != null && !selectedCategoryString.isEmpty()) {
-                    	List<String> selectedCategory = Arrays.asList(selectedCategoryString.split(","));
-                    	memberService.updateClientCategory(savedMember.getMemberId(), selectedCategory);
+                    if (selectedCategory != null && !selectedCategory.isEmpty()) {
+                    	memberService.updateClientCategory(member.getMemberId(), selectedCategory);
                     }
                     break;
                 default:
@@ -175,7 +178,42 @@ public class MemberController {
         }
     }
     
+    @GetMapping("findId")
+    public String findId() {
+    	return "/member/findId";
+    }
     
+    // 아이디 찾기 요청을 처리하는 POST 메서드
+    @PostMapping("/findId")
+    public String findId(@RequestParam("memberName") String memberName,
+                         @RequestParam("email") String email,
+                         Model model) {
+        try {
+            // 서비스에서 이름과 이메일을 기반으로 아이디를 찾음
+            String memberId = memberService.findUsernameBymemberNameAndEmail(memberName, email);
+            // 아이디 찾기 성공 시 메시지를 모델에 추가
+            model.addAttribute("message", "회원님의 아이디는: " + memberId);
+        } catch (Exception e) {
+            // 아이디를 찾지 못한 경우 에러 메시지를 모델에 추가
+            model.addAttribute("error", "해당 정보를 가진 사용자가 없습니다.");
+        }
+        return "/member/findIdResult"; // 결과를 보여줄 페이지 (Thymeleaf 템플릿 이름)
+    }
+    
+    @GetMapping("findPw")
+    public String findPw() {
+    	return "/member/findPw";
+    }
+    
+    @GetMapping("findIdResult")
+    public String findIdResult() {
+    	return "/member/findIdResult";
+    }
+    
+    @GetMapping("findPwResult")
+    public String findPwResult() {
+    	return "/member/findPwResult";
+    }
     
  // 현재 로그인한 사용자의 memberId를 반환하는 엔드포인트 추가
     @GetMapping("/getMemberId")

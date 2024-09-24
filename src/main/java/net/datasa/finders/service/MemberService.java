@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -391,5 +392,16 @@ public class MemberService {
         }
 
         return "http://localhost:8888/images/profile/" + newFileName;
+    }
+    
+
+    public String findUsernameBymemberNameAndEmail(String memberName, String email) throws Exception {
+        Optional<MemberEntity> member = memberRepository.findBymemberNameAndEmail(memberName, email);
+        
+        if (member.isEmpty()) {
+            throw new Exception("사용자를 찾을 수 없습니다.");
+        }
+
+        return member.get().getMemberId(); // 아이디 반환
     }
 }

@@ -1,5 +1,6 @@
 package net.datasa.finders.domain.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,11 +27,11 @@ public class ClientFieldEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "field_num")
-    Integer fieldNum;
+    private Integer fieldNum;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "client_id", referencedColumnName = "member_id")
-    MemberEntity clientId;
+    private MemberEntity clientId;
     
     @Column(name = "field_text")
     private String fieldText;
