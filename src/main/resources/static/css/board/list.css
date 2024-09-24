@@ -110,12 +110,13 @@ nav a:hover {
 
 .filter-bar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 0 40px;
     margin-bottom: 20px;
 }
 
-.filter-bar button, .filter-bar select {
+.filter-bar button {
+    margin-right: 20px; /* 버튼 사이 간격 조정 */
     padding: 10px 15px;
     border: 1px solid #ddd;
     border-radius: 25px;
@@ -173,12 +174,6 @@ footer p {
 }
 
 
-
-
-
-
-
-/* 태영이형이 넣은거 (뭔지 몰라서 안건드림) */
 .table-container {
 			display: grid;
 			grid-template-columns: repeat(3, 1fr); /* 3개의 열을 균등하게 나누기 */

@@ -56,4 +56,7 @@ public class ProjectPublishingEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_num", referencedColumnName = "project_num", insertable = false, updatable = false)
     private ProjectEntity project;
+
+    @Column(name = "project_create_date", columnDefinition = "TIMESTAMP default current_timestamp")
+    private LocalDateTime projectCreateDate;
 }

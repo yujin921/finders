@@ -49,14 +49,14 @@
 
     <div class="filter-bar">
         <button>전체 필터</button>
-        <select>
-            <option>추천순</option>
-            <option>최신순</option>
-            <option>가격순</option>
-        </select>
+        <button onclick="list('projectCreateDate,asc')">등록일 오름차순</button>
+        <button onclick="list('projectCreateDate,desc')">등록일 내림차순</button>
+        <button onclick="list('recruitDeadline,asc')">마감일 오름차순</button>
+        <button onclick="list('recruitDeadline,desc')">마감일 내림차순</button>
     </div>
-    
-	<div class="table-container" id="output">
+
+
+    <div class="table-container" id="output">
         <!-- list 내용이 이곳에 출력 -->
     </div>
     <section class="project-list">
