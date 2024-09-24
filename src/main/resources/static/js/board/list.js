@@ -2,16 +2,16 @@
 			list();
 		});
 
-		function list() {
+		function list(sortValue = 'projectCreateDate,asc') {
 		    $.ajax({
 		        url: 'list',
 		        type: 'get',
+				data: { sort: sortValue },
 		        success: function(list) {
+					sortList(list, sortValue);
 		            $('#output').empty();
-
 					$(list).each(function(i, obj) {
 						let status = obj.projectStatus ? "모집완료" : "모집중";
-
 						let remainingDays = calculateRemainingDays(obj.projectStartDate, obj.projectEndDate);
 
 						let html = `
@@ -43,4 +43,19 @@
 			const differenceInTime = end - start; // 시간 차이 (밀리초)
 			const differenceInDays = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24)); // 일로 변환 후 올림
 			return differenceInDays >= 0 ? differenceInDays : 0; // 음수일 경우 0일로 표시
+		}
+
+		function sortList(list, sortValue) {
+			let [sortField, sortDirection] = sortValue.split(',');
+
+			list.sort(function(a, b) {
+				let fieldA = a[sortField];
+				let fieldB = b[sortField];
+
+				if (sortDirection === 'asc') {
+					return fieldA > fieldB ? 1 : -1;
+				} else {
+					return fieldA < fieldB ? 1 : -1;
+				}
+			});
 		}

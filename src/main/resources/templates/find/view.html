@@ -5,135 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <title>finders</title>
-    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/find/view.css}">
     <!-- Font Awesome 추가 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 <!--     <script th:src="@{/js/home.js}"></script> -->
-        <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-        .sub-title {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .search-bar {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        .search-bar input {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-right: none;
-        }
-        .search-bar button {
-            padding: 10px 20px;
-            background-color: #009688;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .content-wrapper {
-            display: flex;
-            background-color: white;
-            border: 1px solid #ddd;
-        }
-        .filters {
-            width: 250px;
-            padding: 20px;
-            border-right: 1px solid #ddd;
-        }
-        .filters h2 {
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-        .filters h3 {
-            font-size: 16px;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-        .filters label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .results {
-            flex-grow: 1;
-            padding: 20px;
-        }
-        #sort {
-            border: 1px solid #ddd;
-        }
-        .sort-options {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        .sort-options button {
-            padding: 5px 10px;
-            margin-right: 10px;
-            background-color: white;
-            border: 1px solid #ddd;
-            cursor: pointer;
-        }
-        .sort-options button.active {
-            background-color: #f0f0f0;
-        }
-        .partner-card {
-            display: flex;
-            border: 1px solid #ddd;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .partner-image {
-            width: 100px;
-            height: 100px;
-            margin-right: 20px;
-        }
-        .partner-info h3 {
-            margin-top: 0;
-            font-size: 18px;
-        }
-        .partner-grade {
-            display: inline-block;
-            padding: 2px 5px;
-            background-color: #4a90e2;
-            color: white;
-            font-size: 12px;
-            border-radius: 3px;
-        }
-        .partner-rating {
-            color: #ffc107;
-        }
-        .partner-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-        .partner-skills {
-            margin-top: 10px;
-        }
-        .skill-tag {
-            display: inline-block;
-            padding: 2px 5px;
-            background-color: #f0f0f0;
-            margin-right: 5px;
-            margin-bottom: 5px;
-            font-size: 12px;
-        }
-    </style>	
+
 </head>
 <body>
     <!-- Header Section -->
@@ -144,10 +21,6 @@
                     <a href="/">
                         <img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
                     </a>
-                </div>
-                <div class="search-bar">
-                    <input type="text" placeholder="프로젝트 또는 프리랜서 검색">
-                    <button type="submit"><i class="fas fa-search"></i></button>
                 </div>
                 <div class="login-actions">
                     <!-- 비로그인 상태 -->
@@ -198,14 +71,20 @@
                 <aside class="filters">
                     <h2>파트너스 필터</h2>
                     <section>
-                        <h3>파트너 등급</h3>
-                        <label><input type="checkbox" name="grade" value="PRIME+"> PRIME+</label>
-                        <label><input type="checkbox" name="grade" value="PRO"> PRO</label>
+                        <h3>업무 범위</h3>
+                        <label><input type="checkbox" name="field" value="개발"> 개발</label>
+                        <label><input type="checkbox" name="field" value="디자인"> 디자인</label>
+                        <label><input type="checkbox" name="field" value="기획"> 기획</label>
+                        <label><input type="checkbox" name="field" value="기타"> 기타</label>
                     </section>
                     <section>
-                        <h3>선호 프로젝트 형태</h3>
-                        <label><input type="checkbox" name="projectType" value="외주"> 외주(도급)</label>
-                        <label><input type="checkbox" name="projectType" value="기간제"> 기간제(상주)</label>
+                        <h3>업무 영역</h3>
+                        <label><input type="checkbox" name="area" value="웹"> 웹</label>
+                        <label><input type="checkbox" name="area" value="안드로이드"> 안드로이드</label>
+                        <label><input type="checkbox" name="area" value="iOS"> iOS</label>
+                        <label><input type="checkbox" name="area" value="PC프로그램"> PC프로그램</label>
+                        <label><input type="checkbox" name="area" value="임베디드"> 임베디드</label>
+                        <label><input type="checkbox" name="area" value="기타"> 기타</label>
                     </section>
                     <!-- 다른 필터 섹션들 추가 -->
                 </aside>
@@ -235,9 +114,9 @@
     </footer>
 
     <script>
-    $(document).ready(function() {
-    	loadPartners();
-    });
+    $(document).ready(
+    	loadPartners	
+    );
     
     function loadPartners() {
         // 선택된 필터 값들을 수집
@@ -251,12 +130,17 @@
 
         // 선택된 값이 없을 경우 기본값 설정
         if (selectedFields.length === 0) {
-            selectedFields = ['input[name="field"]']; // 또는 다른 적절한 기본값
+            selectedFields = $('input[name="field"]').map(function() {
+                return this.value;
+            }).get();
         }
         
         if (selectedAreas.length === 0) {
-            selectedAreas = ['input[name="area"]']; // 또는 다른 적절한 기본값
+            selectedAreas = $('input[name="area"]').map(function() {
+                return this.value;
+            }).get();
         }
+            
 
         // AJAX 요청
         $.ajax({

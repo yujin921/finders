@@ -63,6 +63,7 @@ public class BoardService {
                 .projectDescription(projectDescription)
                 .projectImage(imageBase64) // Base64로 변환된 이미지 저장
                 .projectStatus(false)
+                .projectCreateDate(LocalDateTime.now())
                 .build();
         projectPublishingRepository.save(projectPublishingEntity);
 
@@ -132,6 +133,7 @@ public class BoardService {
                     .projectDescription(entity.getProjectDescription())
                     .projectImage(entity.getProjectImage())
                     .projectStatus(entity.getProjectStatus())
+                    .projectCreateDate(entity.getProjectCreateDate())
                     .build();
             dtoList.add(dto);
         }

@@ -68,10 +68,14 @@ public class ProjectManagementController {
             RoleName roleName = RoleName.valueOf(user.getRoleName());
 
             log.debug("현재 사용자의 역할: {}", roleName);
+            log.debug("현재 사용자의 ID: {}", user.getUsername());
+            
 	        ProjectPublishingDTO projectPublishingDTO = projectManagementService.getBoard(pNum, user.getUsername(), roleName);
 	        model.addAttribute("board", projectPublishingDTO);
             model.addAttribute("user", user);
-            model.addAttribute("roleName", projectPublishingDTO.getRoleName());
+            model.addAttribute("roleName", roleName); // 역할을 모델에 추가
+            model.addAttribute("userId", user.getUsername()); // 사용자 ID를 모델에 추가
+            
 	        return "project/management";
 	    } catch (Exception e) {
             e.printStackTrace();
@@ -81,16 +85,24 @@ public class ProjectManagementController {
     
     @ResponseBody
     @GetMapping("freelancersInput")
-    public ResponseEntity<List<String>> getFreelancers(@RequestParam("projectNum") int projectNum) {
+    public ResponseEntity<List<TeamDTO>> getFreelancers(@RequestParam("projectNum") int projectNum,
+                                                        @AuthenticationPrincipal AuthenticatedUser user) {
         try {
+            String userRole = user.getRoleName(); // 현재 로그인한 사용자의 역할
+            String currentMemberId = user.getUsername(); // 현재 로그인한 프리랜서 ID
+            
             List<TeamDTO> freelancers = projectManagementService.getFreelancersByProject(projectNum);
             
-            // memberId 리스트로 변환
-            List<String> memberIds = freelancers.stream()
-                    .map(TeamDTO::getMemberId)
-                    .collect(Collectors.toList());
+            List<TeamDTO> filteredFreelancers;
+            if ("ROLE_FREELANCER".equals(userRole)) {
+                filteredFreelancers = freelancers.stream()
+                        .filter(freelancer -> freelancer.getMemberId().equals(currentMemberId)) // 해당 ID만 반환
+                        .collect(Collectors.toList());
+            } else {
+                filteredFreelancers = freelancers; // 일반 회원의 경우 모든 프리랜서 반환
+            }
             
-            return ResponseEntity.ok(memberIds);
+            return ResponseEntity.ok(filteredFreelancers);
         } catch (Exception e) {
             e.printStackTrace(); // 로그에 오류 출력
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

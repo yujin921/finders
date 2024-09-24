@@ -37,4 +37,5 @@ public class ProjectPublishingDTO {
     private List<String> prequalificationQuestions;
     private long estimatedDay;
     private RoleName roleName;
+    private LocalDateTime projectCreateDate;
 }

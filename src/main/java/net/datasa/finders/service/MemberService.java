@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -46,7 +47,6 @@ public class MemberService {
     private final ClientCategoryRepository clientCategoryRepository;
     
     public MemberEntity join(MemberDTO dto, String uploadPath, MultipartFile profileImg) throws IOException {
-        LocalDateTime now = LocalDateTime.now();
         String imageUrl = null;
 
         // 이미지파일 경로 설정 및 이름 저장
@@ -76,8 +76,6 @@ public class MemberService {
             .email(dto.getEmail())
             .enabled(true)
             .roleName(dto.getRoleName())
-            .createdTime(now)
-            .updatedTime(now)
             .build();
 
         if (dto.getMemberId().equals("admin123")) {
@@ -394,5 +392,16 @@ public class MemberService {
         }
 
         return "http://localhost:8888/images/profile/" + newFileName;
+    }
+    
+
+    public String findUsernameBymemberNameAndEmail(String memberName, String email) throws Exception {
+        Optional<MemberEntity> member = memberRepository.findBymemberNameAndEmail(memberName, email);
+        
+        if (member.isEmpty()) {
+            throw new Exception("사용자를 찾을 수 없습니다.");
+        }
+
+        return member.get().getMemberId(); // 아이디 반환
     }
 }
