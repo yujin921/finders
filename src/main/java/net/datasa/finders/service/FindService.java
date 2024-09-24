@@ -31,7 +31,7 @@ public class FindService {
 	private final FreelancerSkillRepository freelancerSkillRepository;
 	private final FreelancerPortfoliosRepository freelancerPortfoliosRepository;
 	
-	public List<FindFreelancerDTO> findFreelancerList() {
+	public List<FindFreelancerDTO> findFreelancerList(String[] fields, String[] areas) {
 
 		List<MemberEntity> memberEntityList = memberRepository.findByRoleName(RoleName.ROLE_FREELANCER);
 		ArrayList<FindFreelancerDTO> findFreelancerDTOList = new ArrayList<>();
@@ -39,8 +39,6 @@ public class FindService {
 		for (MemberEntity memberEntity : memberEntityList) {
 			
 			double totalRating = 0;
-			int totalPortfolios = 0;
-			int totalReviews = 0;
 			
 			List<FreelancerReviewsEntity> freelancerReviewsEntityList = freelancerReviewsRepository.findByFreelancerId(memberEntity.getMemberId());
 			
@@ -66,8 +64,6 @@ public class FindService {
 			}
 			
 			List<FreelancerPortfoliosEntity> freelancerPortfoliosEntityList = freelancerPortfoliosRepository.findByMember(memberEntity);
-			
-			totalPortfolios = freelancerPortfoliosEntityList.size();
 			
 			FindFreelancerDTO findFreelancerDTO = FindFreelancerDTO.builder()
 					.memberId(memberEntity.getMemberId())

@@ -46,7 +46,6 @@ public class MemberService {
     private final ClientCategoryRepository clientCategoryRepository;
     
     public MemberEntity join(MemberDTO dto, String uploadPath, MultipartFile profileImg) throws IOException {
-        LocalDateTime now = LocalDateTime.now();
         String imageUrl = null;
 
         // 이미지파일 경로 설정 및 이름 저장
@@ -76,8 +75,6 @@ public class MemberService {
             .email(dto.getEmail())
             .enabled(true)
             .roleName(dto.getRoleName())
-            .createdTime(now)
-            .updatedTime(now)
             .build();
 
         if (dto.getMemberId().equals("admin123")) {
