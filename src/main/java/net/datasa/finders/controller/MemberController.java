@@ -76,32 +76,35 @@ public class MemberController {
                        @RequestParam("profileImg") MultipartFile profileImg,
                        @ModelAttribute FreelancerDTO freelancer,
                        @ModelAttribute ClientDTO client,
-                       @RequestParam(value = "selectedSkills", required = false) String selectedSkillsString,
-                       @RequestParam(value = "selectedField", required = false) String selectedFieldString,
-                       @RequestParam(value = "selectedCategory", required = false) String selectedCategoryString,
+                       @RequestParam(value = "selectedSkills", required = false) List<String> selectedSkills,
+                       @RequestParam(value = "selectedField", required = false) List<String> selectedField,
+                       @RequestParam(value = "selectedCategory", required = false) List<String> selectedCategory,
                        Model model) {
         try {
-            MemberEntity savedMember = memberService.join(member, uploadPath, profileImg);
+            memberService.join(member, uploadPath, profileImg);
             
             switch (member.getRoleName()) {
                 case ROLE_FREELANCER:
                     memberService.joinFreelancer(freelancer, member);
                     // 프리랜서 스킬 저장
-                    if (selectedSkillsString != null && !selectedSkillsString.isEmpty()) {
-                        List<String> selectedSkills = Arrays.asList(selectedSkillsString.split(","));
-                        memberService.updateFreelancerSkills(savedMember.getMemberId(), selectedSkills);
+                    if (selectedSkills != null && !selectedSkills.isEmpty()) {
+                        memberService.updateFreelancerSkills(member.getMemberId(), selectedSkills);
+                    }
+                    if (selectedField != null && !selectedField.isEmpty()) {
+                    	memberService.updateClientField(member.getMemberId(), selectedField);
+                    }
+                    if (selectedCategory != null && !selectedCategory.isEmpty()) {
+                    	memberService.updateClientCategory(member.getMemberId(), selectedCategory);
                     }
                     break;
                 case ROLE_CLIENT:
                     memberService.joinClient(client, member);
                     // 클라이언트 관심 분야 저장
-                    if (selectedFieldString != null && !selectedFieldString.isEmpty()) {
-                    	List<String> selectedField = Arrays.asList(selectedFieldString.split(","));
-                    	memberService.updateClientField(savedMember.getMemberId(), selectedField);
+                    if (selectedField != null && !selectedField.isEmpty()) {
+                    	memberService.updateClientField(member.getMemberId(), selectedField);
                     }
-                    if (selectedCategoryString != null && !selectedCategoryString.isEmpty()) {
-                    	List<String> selectedCategory = Arrays.asList(selectedCategoryString.split(","));
-                    	memberService.updateClientCategory(savedMember.getMemberId(), selectedCategory);
+                    if (selectedCategory != null && !selectedCategory.isEmpty()) {
+                    	memberService.updateClientCategory(member.getMemberId(), selectedCategory);
                     }
                     break;
                 default:
