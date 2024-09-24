@@ -1,6 +1,6 @@
 package net.datasa.finders.domain.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,10 +25,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "task_management")
 public class TaskManagementEntity {
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "task_id")
-	private Integer taskId;
+    private Integer taskId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_num", referencedColumnName = "project_num")
@@ -55,23 +55,23 @@ public class TaskManagementEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "task_priority", nullable = false)
     private TaskPriority taskPriority;
-	
-	@Column(name = "task_start_date", nullable = false)
-    private LocalDate taskStartDate;
-	
-	@Column(name = "task_end_date", nullable = false)
-    private LocalDate taskEndDate;
-	
-	@Column(name = "actual_start_date")
-    private LocalDate actualStartDate;
-	
-	@Column(name = "actual_end_date")
-    private LocalDate actualEndDate;
     
-	@Column(name = "task_processivity", nullable = false, columnDefinition = "DEFAULT '0%'")
+    @Column(name = "task_start_date", nullable = false)
+    private LocalDateTime taskStartDate; // LocalDate에서 LocalDateTime으로 변경
+    
+    @Column(name = "task_end_date", nullable = false)
+    private LocalDateTime taskEndDate; // LocalDate에서 LocalDateTime으로 변경
+    
+    @Column(name = "actual_start_date")
+    private LocalDateTime actualStartDate; // 변경: LocalDate에서 LocalDateTime으로
+    
+    @Column(name = "actual_end_date")
+    private LocalDateTime actualEndDate; // 변경: LocalDate에서 LocalDateTime으로
+    
+    @Column(name = "task_processivity", nullable = false, columnDefinition = "DEFAULT '0%'")
     private String taskProcessivity;
-	
-	@Override
+
+    @Override
     public String toString() {
         return "TaskManagementEntity{" +
                 "taskId=" + taskId +
@@ -79,5 +79,5 @@ public class TaskManagementEntity {
                 ", functionTitleId=" + (functionTitleEntity != null ? functionTitleEntity.getFunctionTitleId() : null) +
                 '}';
     }
-	
 }
+

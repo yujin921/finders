@@ -1,33 +1,33 @@
 package net.datasa.finders.domain.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TaskDateRangeDTO {
-	private LocalDate earliestStartDate;
-    private LocalDate latestEndDate;
+	private LocalDateTime earliestStartDate;
+    private LocalDateTime latestEndDate;
 
     // 기본 생성자
     public TaskDateRangeDTO() {}
 
-    public TaskDateRangeDTO(LocalDate earliestStartDate, LocalDate latestEndDate) {
+    public TaskDateRangeDTO(LocalDateTime earliestStartDate, LocalDateTime latestEndDate) {
         this.earliestStartDate = earliestStartDate;
         this.latestEndDate = latestEndDate;
     }
 
     // Getter 및 Setter
-    public LocalDate getEarliestStartDate() {
+    public LocalDateTime getEarliestStartDate() {
         return earliestStartDate;
     }
 
-    public void setEarliestStartDate(LocalDate earliestStartDate) {
+    public void setEarliestStartDate(LocalDateTime earliestStartDate) {
         this.earliestStartDate = earliestStartDate;
     }
 
-    public LocalDate getLatestEndDate() {
+    public LocalDateTime getLatestEndDate() {
         return latestEndDate;
     }
 
-    public void setLatestEndDate(LocalDate latestEndDate) {
+    public void setLatestEndDate(LocalDateTime latestEndDate) {
         this.latestEndDate = latestEndDate;
     }
 }

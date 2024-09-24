@@ -116,12 +116,12 @@ public class ProjectManagementController {
             @RequestBody TaskManagementDTO taskDTO) {
 
         try {
-        	// FunctionTitleName이 request body에 포함된 경우 
+            // FunctionTitleName이 request body에 포함된 경우
             String functionTitleName = taskDTO.getFunctionTitleName();
 
             // 서비스 계층에서 기능 제목과 업무 데이터 저장 처리
             FunctionTitleDTO savedFunction = projectManagementService.saveFunctionAndTask(projectNum, functionTitleName, taskDTO);
-            
+
             return ResponseEntity.ok(savedFunction);
         } catch (IllegalArgumentException e) {
             log.error("Validation error: ", e);
@@ -161,21 +161,26 @@ public class ProjectManagementController {
     
     @ResponseBody
     @PostMapping("completeProject")
-    public String completeProject(@RequestParam("projectNum") int projectNum) {
-    	
-    	try {
+    public ResponseEntity<String> completeProject(@RequestParam("projectNum") int projectNum) {
+        try {
+            // 프로젝트 완료 처리 메서드 호출
             projectManagementService.projectCompletion(projectNum);
-            return "success";
+            // 성공 시 200 OK 응답 반환
+            return ResponseEntity.ok("success");
+        } catch (EntityNotFoundException e) {
+            // 엔티티가 발견되지 않을 경우 404 NOT FOUND 응답과 메시지 반환
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
+            // 다른 예외가 발생할 경우 스택 트레이스 출력 후 500 INTERNAL SERVER ERROR 응답 반환
             e.printStackTrace();
-            return "failure";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("failure");
         }
-
     }
     
     @ResponseBody
     @GetMapping("getGanttChartData")
     public Map<String, Object> getGanttChartData(@RequestParam("projectNum") int projectNum) {
+        // 서비스 메서드를 호출하여 Gantt 차트 데이터를 가져옴
         return projectManagementService.getGanttChartData(projectNum);
     }
     
@@ -229,10 +234,17 @@ public class ProjectManagementController {
             @RequestParam("id") int dbId,
             @RequestParam("actualStart") String actualStart,
             @RequestParam("actualEnd") String actualEnd) {
+    	
         try {
             // 요청 데이터를 Service로 전달
             projectManagementService.updateSchedule(entityType, dbId, actualStart, actualEnd);
             return ResponseEntity.ok("success");
+        } catch (IllegalArgumentException e) {
+            // 유효하지 않은 EntityType의 경우 400 Bad Request 반환
+            return ResponseEntity.badRequest().body("유효하지 않은 Entity 유형입니다: " + entityType);
+        } catch (EntityNotFoundException e) {
+            // 작업을 찾을 수 없는 경우 404 Not Found 반환
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("작업을 찾을 수 없습니다. ID: " + dbId);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("failure");

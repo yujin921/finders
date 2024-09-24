@@ -1,6 +1,6 @@
 package net.datasa.finders.domain.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 public class ProjectManagementDTO {
 	private Integer managementNum;
 	private Integer projectNum;
-    private LocalDate actualStartDate;
-    private LocalDate actualEndDate;
+    private LocalDateTime actualStartDate;
+    private LocalDateTime actualEndDate;
     private Boolean delayedStatus;
     private Integer delayedDate;
 }

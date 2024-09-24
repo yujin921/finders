@@ -1,6 +1,6 @@
 package net.datasa.finders.domain.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -37,10 +37,10 @@ public class ProjectManagementEntity {
     private ProjectPublishingEntity projectPublishing;
 
     @Column(name = "actual_start_date")
-    private LocalDate actualStartDate;
+    private LocalDateTime actualStartDate;
 
     @Column(name = "actual_end_date")
-    private LocalDate actualEndDate;
+    private LocalDateTime actualEndDate;
 
     @Column(name = "delayed_status", columnDefinition = "TINYINT(1) DEFAULT 0 CHECK (delayed_status IN (0, 1))")
     private Boolean delayedStatus;
