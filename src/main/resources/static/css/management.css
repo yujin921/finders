@@ -569,6 +569,24 @@ h1 {
     background-color: #f1f1f1;
 }
 
+.autocomplete-list {
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    z-index: 1000;
+    background-color: white;
+}
+
+.autocomplete-item {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.autocomplete-item:hover {
+    background-color: #f0f0f0;
+}
+
 /* 드롭다운 버튼 클릭 시 다른 드롭다운 닫기 기능 제거 */
 .dropdown-toggle {
     cursor: pointer;

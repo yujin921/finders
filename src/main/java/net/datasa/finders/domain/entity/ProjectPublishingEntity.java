@@ -57,6 +57,6 @@ public class ProjectPublishingEntity {
     @JoinColumn(name = "project_num", referencedColumnName = "project_num", insertable = false, updatable = false)
     private ProjectEntity project;
 
-    @Column(name = "project_create_date", columnDefinition = "TIMESTAMP default current_timestamp")
+    @Column(name = "project_create_date", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime projectCreateDate;
 }

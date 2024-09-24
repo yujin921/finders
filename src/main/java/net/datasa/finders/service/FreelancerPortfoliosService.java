@@ -31,7 +31,7 @@ public class FreelancerPortfoliosService {
 				.projectTitle(fPDTO.getProjectTitle())
 				.projectDescription(fPDTO.getProjectDescription())
 				.projectLink(fPDTO.getProjectLink())
-				.memberEntity(memberEntity)
+				.member(memberEntity)
 				.build();
 		
 		freelancerPortfoliosRepository.save(freelancerPortfoliosEntity);

@@ -15,7 +15,7 @@ import net.datasa.finders.domain.entity.ProjectPublishingEntity;
 
 @Repository
 public interface ProjectPublishingRepository extends JpaRepository<ProjectPublishingEntity, Integer> {
-	@Query("SELECT p FROM ProjectPublishingEntity p JOIN FreelancerEntity f ON p.clientId.memberId = f.member.memberId WHERE f.freelancerId = :freelancerId")
-    List<ProjectPublishingEntity> findByFreelancerId(@Param("freelancerId") String freelancerId);
-
+	@Query("SELECT p FROM ProjectPublishingEntity p WHERE p.projectNum IN :projectNums")
+    List<ProjectPublishingEntity> findAllByProjectNumIn(@Param("projectNums") List<Integer> projectNums);
+	
 }

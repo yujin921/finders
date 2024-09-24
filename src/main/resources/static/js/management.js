@@ -27,6 +27,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	let timeline;
 	let ganttChartLoaded = false;
 	
+	// 사용자 정보를 담은 객체 생성
+    const userData = {
+        role: document.getElementById('user-data').dataset.role,
+        id: document.getElementById('user-data').dataset.id
+    };
+
+    console.log("User Data:", userData);
+    console.log("User Role:", userData.role);
+    console.log("User ID:", userData.id);
+	
 	// URL에서 쿼리 파라미터를 추출하는 함수
     function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -185,6 +195,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 업무 등록 버튼 클릭 시 모달 창 열기
     $('#add-task-button').on('click', function() {
+		
+		console.log('Opening task modal'); // 모달이 열릴 때 로그 출력
+		console.log('Project Number:', projectNum); // projectNum 값 로그 출력
+		
         $('#task-modal').removeClass('hidden').show();
         $('#task-form')[0].reset(); // 폼 초기화
 
@@ -198,6 +212,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isFirstTask) {
             localStorage.setItem('firstTaskRegistered', 'true');
         }
+		
+		// 자동완성 초기화 호출
+		initializeAssigneeAutocomplete();
+		
     });
 
     // 모달 닫기 버튼 클릭 시
@@ -253,6 +271,93 @@ document.addEventListener('DOMContentLoaded', function() {
         // 선택한 기능 분류 ID를 전역 변수에 저장
         funcTitleId = $(this).val();
     });
+	
+	let assignees = []; // AJAX로 불러온 데이터 저장할 배열
+
+	// "담당자" 입력란에 ID 입력 시 해당 프로젝트에 참여하는 프리랜서 ID 자동완성
+	function initializeAssigneeAutocomplete() {
+	    console.log('Initializing assignee autocomplete'); // 로그 추가
+
+	    console.log("User Data 체크용:", userData); // 확인용 로그
+	    console.log("User Role 체크용:", userData.role);
+	    console.log("User ID 체크용:", userData.id);
+
+	    // 담당자 입력란 초기화
+	    if (userData.role === 'ROLE_FREELANCER' && userData.id) {
+	        $('#task-assignee').val(userData.id); // 자신의 ID 설정
+	        $('#task-assignee').prop('readonly', true); // 읽기 전용으로 설정
+	        $('#task-assignee').css('background-color', '#f0f0f0'); // 배경색 변경
+	    } else {
+	        $('#task-assignee').prop('readonly', false); // 일반 사용자 경우 수정 가능
+	    }
+
+	    // 프리랜서 데이터 불러오기
+	    loadFreelancers();
+
+	    // 자동완성 설정
+	    $('#task-assignee').autocomplete({
+	        source: assignees.map(f => f.id), // 초기 데이터로 자동완성 목록 제공
+	        minLength: 1,
+	        select: function(event, ui) {
+	            console.log("Selected value:", ui.item.value);
+	            $('#task-assignee').val(ui.item.value); // 선택된 값 설정
+	        }
+	    });
+
+	    // 입력 필드 이벤트 핸들링
+	    $('#task-assignee').on('input', function() {
+	        let value = $(this).val().toLowerCase();
+	        $('#autocomplete-list').empty(); // 이전 목록 비우기
+
+	        if (value) {
+	            let filteredAssignees = assignees.filter(assignee => assignee.id.toLowerCase().includes(value));
+	            console.log('Filtered Assignees:', filteredAssignees); // 필터링된 결과 로그
+
+	            filteredAssignees.forEach(assignee => {
+	                $('#autocomplete-list').append(`<div class="autocomplete-item">${assignee.id}</div>`);
+	            });
+	            $('#autocomplete-list').removeClass('hidden'); // 목록 보이기
+	        } else {
+	            $('#autocomplete-list').addClass('hidden'); // 입력이 없으면 목록 숨기기
+	        }
+	    });
+
+	    // 클릭 시 입력 필드에 값 설정
+	    $(document).on('click', '.autocomplete-item', function() {
+	        $('#task-assignee').val($(this).text());
+	        $('#autocomplete-list').addClass('hidden'); // 목록 숨기기
+	    });
+
+	    // 입력 필드 밖 클릭 시 목록 숨기기
+	    $(document).on('click', function(e) {
+	        if (!$(e.target).closest('#task-assignee').length) {
+	            $('#autocomplete-list').addClass('hidden');
+	        }
+	    });
+
+	    console.log("Autocomplete initialized");
+	}
+
+	// 프리랜서 데이터를 불러오는 함수
+	function loadFreelancers() {
+	    $.ajax({
+	        url: 'freelancersInput?projectNum=' + projectNum,
+	        type: 'GET',
+	        dataType: 'json',
+	        success: function(data) {
+	            console.log("AJAX success, data:", data);
+	            // 프리랜서만 필터링
+	            assignees = data.filter(freelancer => freelancer.roleName === 'ROLE_FREELANCER')
+	                             .map(freelancer => ({
+	                id: freelancer.memberId,
+	                role: freelancer.roleName
+	            }));
+	        },
+	        error: function() {
+	            console.error("AJAX error");
+	        }
+	    });
+	}
 
  	// 폼 제출 이벤트 핸들러
     $('#save-function-and-task-btn').on('click', function() {

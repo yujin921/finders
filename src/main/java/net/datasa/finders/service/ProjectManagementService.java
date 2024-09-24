@@ -34,8 +34,58 @@ public class ProjectManagementService {
     private final FunctionTitleRepository functionTitleRepository;
     private final TaskManagementRepository taskManagementRepository;
     private final ProjectManagementRepository projectManagementRepository;
+    private final TeamRepository teamRepository;
 
-    public List<ProjectPublishingDTO> getMyList(String id) {
+    public List<ProjectPublishingDTO> getMyList(String id, String roleName) {
+    	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
+        List<ProjectPublishingEntity> entityList = new ArrayList<>();
+        
+        if (roleName.equals("ROLE_FREELANCER")) {
+            // 프리랜서 ID로 팀 조회
+            List<TeamEntity> teamEntities = teamRepository.findByMemberId(id);
+            
+            // 해당 팀의 프로젝트 번호 목록을 가져옴
+            List<Integer> projectNums = teamEntities.stream()
+                .map(TeamEntity::getProjectNum)
+                .collect(Collectors.toList());
+
+            // 프로젝트 번호를 기준으로 프로젝트 조회
+            entityList = projectPublishingRepository.findAllByProjectNumIn(projectNums);
+            
+        } else if (roleName.equals("ROLE_CLIENT")) {
+            // 클라이언트의 경우 자신의 프로젝트만 조회
+            entityList = projectPublishingRepository.findAll(sort).stream()
+                .filter(entity -> entity.getClientId().getMemberId().equals(id))
+                .collect(Collectors.toList());
+            
+        } else if (roleName.equals("ROLE_ADMIN")) {
+            // 관리자는 모든 프로젝트 조회
+            entityList = projectPublishingRepository.findAll(sort);
+        }
+
+        // DTO 변환
+        List<ProjectPublishingDTO> dtoList = new ArrayList<>();
+
+        for (ProjectPublishingEntity entity : entityList) {
+            ProjectPublishingDTO dto = ProjectPublishingDTO.builder()
+                    .projectNum(entity.getProjectNum())
+                    .clientId(entity.getClientId().getMemberId())
+                    .projectTitle(entity.getProjectTitle())
+                    .recruitDeadline(entity.getRecruitDeadline())
+                    .projectStartDate(entity.getProjectStartDate())
+                    .projectEndDate(entity.getProjectEndDate())
+                    .projectBudget(entity.getProjectBudget())
+                    .projectDescription(entity.getProjectDescription())
+                    .projectImage(entity.getProjectImage())
+                    .projectStatus(entity.getProjectStatus())
+                    .build();
+
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+        
+        /*
         Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
         List<ProjectPublishingEntity> entityList;
         
@@ -62,47 +112,8 @@ public class ProjectManagementService {
         }
             
         return dtoList;
-
-        /*
-        if (roleName.equals("ROLE_FREELANCER")) {
-            // 프리랜서 ID로 프로젝트 목록 조회
-            entityList = projectPublishingRepository.findByFreelancerId(id);
-        } else {
-            // 클라이언트와 관리자의 경우 모두 프로젝트 조회
-            entityList = projectPublishingRepository.findAll(sort);
-        }
-
-        List<ProjectPublishingDTO> dtoList = new ArrayList<>();
-
-        for (ProjectPublishingEntity entity : entityList) {
-            // ROLE_ADMIN은 모든 프로젝트를 DTO로 추가
-            ProjectPublishingDTO dto = ProjectPublishingDTO.builder()
-                    .projectNum(entity.getProjectNum())
-                    .clientId(entity.getClientId().getMemberId())
-                    .projectTitle(entity.getProjectTitle())
-                    .recruitDeadline(entity.getRecruitDeadline())
-                    .projectStartDate(entity.getProjectStartDate())
-                    .projectEndDate(entity.getProjectEndDate())
-                    .projectBudget(entity.getProjectBudget())
-                    .projectDescription(entity.getProjectDescription())
-                    .projectImage(entity.getProjectImage())
-                    .projectStatus(entity.getProjectStatus())
-                    .build();
-
-            if (roleName.equals("ROLE_CLIENT") && entity.getClientId().getMemberId().equals(id)) {
-                // 클라이언트의 경우, 자신의 프로젝트만 추가
-                dtoList.add(dto);
-            } else if (roleName.equals("ROLE_FREELANCER")) {
-                // 프리랜서의 경우, 해당 프로젝트 DTO 추가
-                dtoList.add(dto);
-            } else if (roleName.equals("ROLE_ADMIN")) {
-                // 관리자는 모든 프로젝트 DTO 추가
-                dtoList.add(dto);
-            }
-        }
-
-        return dtoList;
         */
+
     }
     
     private ProjectPublishingDTO convertToDTO(ProjectPublishingEntity entity) {
@@ -669,6 +680,20 @@ public class ProjectManagementService {
                         .taskStatus(task.getTaskStatus().toString())
                         .taskPriority(task.getTaskPriority().toString())
                         .build())
+                .collect(Collectors.toList());
+    }
+
+    // 업무등록 모달창의 "담당자" 입력란에 대한 프로젝트 참여하는 프리랜서 ID로 자동완성
+    public List<TeamDTO> getFreelancersByProject(int projectNum) {
+        List<TeamEntity> teamEntities = teamRepository.findByProjectNum(projectNum);
+        
+        // Entity를 DTO로 변환, 역할 이름 포함
+        return teamEntities.stream()
+                .map(entity -> {
+                    MemberEntity member = memberRepository.findById(entity.getMemberId())
+                            .orElseThrow(() -> new RuntimeException("Member not found"));
+                    return new TeamDTO(entity.getTeamNum(), entity.getProjectNum(), member.getMemberId(), member.getRoleName().name());
+                })
                 .collect(Collectors.toList());
     }
     

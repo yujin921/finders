@@ -171,7 +171,7 @@ function addTeamMember() {
                 <select name="role"></select>
                 <select name="category"></select>
                 <input type="number" min="1" placeholder="명" name="teamSize[]">
-                <button type="button" onclick="remove(this)">삭제</button>
+                <button type="button" class="delete-button" onclick="remove(this)">삭제</button>
             `;
     teamMembersContainer.appendChild(newTeamMember);
 
@@ -191,7 +191,7 @@ function addQuestion() {
     newQuestion.classList.add('recruit-added-question');
     newQuestion.innerHTML = `
                 <input type="text" class="recruit-question-input" placeholder="사전 질문을 입력해주세요." name="question[]">
-                <button type="button" onclick="remove(this)">삭제</button>
+                <button type="button" class = "delete-button" onclick="remove(this)">삭제</button>
             `;
     questionsContainer.appendChild(newQuestion);
 }

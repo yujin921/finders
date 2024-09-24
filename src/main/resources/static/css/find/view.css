@@ -3,6 +3,8 @@
     --primary-color: #3498db;
     --text-color: #333;
     --bg-color: #f4f4f4;
+    --secondary-color: #009688;
+    --border-color: #ddd;
 }
 
 /* 전역 스타일 */
@@ -10,14 +12,14 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
 }
 
 body {
+    font-family: 'Arial', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
-    min-width: 1200px; 
+    min-width: 1200px;
 }
 
 .container {
@@ -47,17 +49,42 @@ header {
     height: 50px;
 }
 
+/* 네비게이션 스타일 */
+nav {
+    background-color: #fff;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+nav ul {
+    display: flex;
+    list-style-type: none;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
 /* 검색바 스타일 */
 .search-bar {
     flex-grow: 1;
     margin: 0 20px;
     position: relative;
+    display: flex;
 }
 
 .search-bar input {
     width: 100%;
     padding: 12px 45px 12px 20px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 25px;
     font-size: 16px;
 }
@@ -86,10 +113,6 @@ header {
     margin-left: 25px;
 }
 
-.login-actions .btn {
-    color: white;
-}
-
 /* 버튼 스타일 */
 .btn {
     background-color: var(--primary-color);
@@ -101,28 +124,119 @@ header {
     transition: background-color 0.3s, transform 0.3s;
 }
 
-/* 네비게이션 스타일 */
-nav {
-    background-color: #fff;
-    padding: 12px 0;
-    border-bottom: 1px solid #ddd;
-}
-
-nav ul {
+/* 콘텐츠 영역 스타일 */
+.content-wrapper {
     display: flex;
-    list-style-type: none;
-    justify-content: center;
+    background-color: white;
+    border: 1px solid var(--border-color);
 }
 
-nav ul li {
-    margin: 0 20px;
+h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
 }
 
-nav ul li a {
-    text-decoration: none;
-    color: var(--text-color);
-    font-weight: bold;
-    transition: color 0.3s;
+.sub-title {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* 필터 스타일 */
+.filters {
+    width: 250px;
+    padding: 20px;
+    border-right: 1px solid var(--border-color);
+}
+
+.filters h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.filters h3 {
+    font-size: 16px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.filters label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* 결과 영역 스타일 */
+.results {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+/* 정렬 옵션 스타일 */
+.sort-options {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.sort-options button {
+    padding: 5px 10px;
+    margin-right: 10px;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+}
+
+.sort-options button.active {
+    background-color: #f0f0f0;
+}
+
+/* 파트너 카드 스타일 */
+.partner-card {
+    display: flex;
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.partner-image {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+}
+
+.partner-info h3 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.partner-grade {
+    display: inline-block;
+    padding: 2px 5px;
+    background-color: #4a90e2;
+    color: white;
+    font-size: 12px;
+    border-radius: 3px;
+}
+
+.partner-rating {
+    color: #ffc107;
+}
+
+.partner-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.partner-skills {
+    margin-top: 10px;
+}
+
+.skill-tag {
+    display: inline-block;
+    padding: 2px 5px;
+    background-color: #f0f0f0;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    font-size: 12px;
 }
 
 /* 푸터 스타일 */
