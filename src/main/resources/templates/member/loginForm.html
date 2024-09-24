@@ -28,6 +28,10 @@
                 <button type="submit">로그인</button>
                 <div id="freelancer-error" class="errorMsg" th:if="${param.error}">ID 또는 비밀번호가 틀립니다.</div>
             </form>
+            <div class="find-links">
+                <a th:href="@{/member/findId}">아이디 찾기</a> |
+                <a th:href="@{/member/findPw}">비밀번호 찾기</a>
+            </div>
         </div>
 
         <!-- 기업 로그인 폼 -->

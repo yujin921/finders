@@ -40,4 +40,8 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
     List<MemberEntity> findByProjectNum(@Param("projectNum") int projectNum);
 
 	List<MemberEntity> findByRoleName(RoleName roleFreelancer);
+	
+	// 이름과 이메일을 기준으로 사용자 찾는 메서드
+	
+	Optional<MemberEntity> findBymemberNameAndEmail(@Param("memberName") String memberName, @Param("email") String email);
 }

@@ -685,11 +685,15 @@ public class ProjectManagementService {
 
     // 업무등록 모달창의 "담당자" 입력란에 대한 프로젝트 참여하는 프리랜서 ID로 자동완성
     public List<TeamDTO> getFreelancersByProject(int projectNum) {
-    	List<TeamEntity> teamEntities = teamRepository.findByProjectNum(projectNum);
+        List<TeamEntity> teamEntities = teamRepository.findByProjectNum(projectNum);
         
-        // Entity를 DTO로 변환
+        // Entity를 DTO로 변환, 역할 이름 포함
         return teamEntities.stream()
-                .map(entity -> new TeamDTO(entity.getTeamNum(), entity.getProjectNum(), entity.getMemberId()))
+                .map(entity -> {
+                    MemberEntity member = memberRepository.findById(entity.getMemberId())
+                            .orElseThrow(() -> new RuntimeException("Member not found"));
+                    return new TeamDTO(entity.getTeamNum(), entity.getProjectNum(), member.getMemberId(), member.getRoleName().name());
+                })
                 .collect(Collectors.toList());
     }
     
