@@ -17,12 +17,13 @@
 				</a>
 	        </div>
             <nav>
-                <a href="#">프로젝트 등록</a>
-                <a href="#">프로젝트 찾기</a>
-                <a href="#">파트너스 찾기</a>
-                <a href="#">이용 사례</a>
-                <a href="#">프로젝트 관리</a>
-                <a href="#">미팅룸</a>
+                <a th:href="@{/board/write}">프로젝트 등록</a>
+                <a th:href="@{/board/view}">프로젝트 찾기</a>
+                <a th:href="@{/find/view}">프리랜서 찾기</a>
+                <a th:href="@{/support/guide}">서비스 안내</a>
+                <a th:href="@{/support/example}">이용사례</a>
+                <a th:href="@{/myProject/view}">내 프로젝트 목록</a>
+                <a th:href="@{/webrtc}">미팅룸</a>
             </nav>
             
             <div class="login-actions">
@@ -65,7 +66,7 @@
 					</div>
 					
 					<div id="section2" class="section">
-						<h2>업무범위</h2>
+						<h2>범위</h2>
 				        <div class="scope-of-work">
 						    <div class="scope-option" onclick="toggleSelect(this)" data-scope="개발">
 						        <input type="checkbox" value="개발">
@@ -176,7 +177,7 @@
 				            <label for="start-date">프로젝트 시작일</label>
 				            <input type="date" id="start-date" name="projectStartDate">
 				        </div>
-				
+						<br>
 				        <!-- 프로젝트 종료일 -->
 				        <div class="budget-item">
 				            <label for="end-date">프로젝트 종료일</label>
@@ -201,6 +202,7 @@
 				                <select name="category"></select>
 				                <input type="number" min="1" value="3" placeholder="명" name="teamSize[]">
 				                <span class="recruit-add-button" onclick="addTeamMember()">추가 +</span>
+				                
 				            </div>
 				            <div id="recruit-team-members"></div>
 				        </div>
