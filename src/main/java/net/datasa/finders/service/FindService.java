@@ -1,14 +1,5 @@
 package net.datasa.finders.service;
 
-<<<<<<< HEAD
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityNotFoundException;
-=======
->>>>>>> e6883a4eb32eba0e671e60375965e5c36450fd85
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,11 +34,6 @@ public class FindService {
 		ArrayList<FindFreelancerDTO> findFreelancerDTOList = new ArrayList<>();
 		
 		for (MemberEntity memberEntity : memberEntityList) {
-			
-<<<<<<< HEAD
-=======
-
->>>>>>> e6883a4eb32eba0e671e60375965e5c36450fd85
 			for (String field : fields) {
 				for (String area : areas) {
 					double totalRating = 0;

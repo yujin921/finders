@@ -22,7 +22,7 @@ function updateProgressDisplay() {
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
-    let calendar;
+    const calendarEl = document.getElementById('calendar');
 	let ganttChart; // Gantt 차트 인스턴스를 저장할 변수
 	let timeline;
 	let ganttChartLoaded = false;
@@ -550,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	function loadCalendar() {
 	    if (calendar) return; // 이미 캘린더가 로드된 경우
 
-	    const calendarEl = document.getElementById('calendar');
+	    calendarEl = document.getElementById('calendar');
 	    if (!calendarEl) return;
 
 	    $.ajax({
@@ -606,6 +606,34 @@ document.addEventListener('DOMContentLoaded', function() {
 	            return 'gray'; // 기본 색상
 	    }
 	}
+	
+	calendarEl = document.getElementById('calendar');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        dateClick: function(info) {
+            // 선택 모달 열기
+            document.getElementById('select-modal').classList.remove('hidden');
+        }
+    });
+
+    calendar.render();
+
+    // 업무 등록 버튼 클릭 시
+    document.getElementById('add-task').addEventListener('click', function() {
+        document.getElementById('select-modal').classList.add('hidden');
+        document.getElementById('task-modal').classList.remove('hidden');
+    });
+
+    // 캘린더 업무 외 일정 추가 버튼 클릭 시
+    document.getElementById('add-event').addEventListener('click', function() {
+        document.getElementById('select-modal').classList.add('hidden');
+        document.getElementById('event-modal').classList.remove('hidden');
+    });
+
+    // 모달 닫기
+    document.getElementById('close-select-modal').addEventListener('click', function() {
+        document.getElementById('select-modal').classList.add('hidden');
+    });
 	
 	function handleEventFormSubmit(event) {
 	    event.preventDefault();
