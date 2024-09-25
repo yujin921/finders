@@ -33,6 +33,8 @@ public class BoardService {
     private final ProjectCategoryRepository categoryRepository;
     private final ProjectRequiredSkillRepository skillRepository;
     private final PrequalificationQuestionRepository prequalificationQuestionRepository;
+    private final ClientReviewsRepository clientReviewsRepository;
+    private final ClientReviewItemRepository clientReviewItemRepository;
 
     public void write(ProjectPublishingDTO projectPublishingDTO, MultipartFile imageFile, String selectedSkills
             , String projectDescription, BigDecimal projectBudget
@@ -211,5 +213,9 @@ public class BoardService {
 
     public void deleteBoard(int pNum) {
         projectPublishingRepository.deleteById(pNum);
+    }
+    
+    public List<ClientReviewsEntity> getClientReviews(String clientId) {
+        return clientReviewsRepository.findByClientId(clientId);
     }
 }

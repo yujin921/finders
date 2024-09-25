@@ -44,6 +44,28 @@
             </li>
         </ul>
     </div>
+    
+<!-- 클라이언트에 대한 프리랜서 후기 -->
+<div>
+    <h3>클라이언트 후기</h3>
+    <div th:if="${not #lists.isEmpty(clientReviews)}">
+        <div th:each="review : ${clientReviews}" class="review-item">
+            <p>평점: <span th:text="${review.rating}"></span>/5</p>
+            <p>코멘트: <span th:text="${review.comment}"></span></p>
+            <p>작성자: <span th:text="${review.freelancerId}"></span></p>
+            <p>작성일: <span th:text="${#temporals.format(review.reviewDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+            <h4>세부 평가</h4>
+            <ul>
+                <li th:each="item : ${review.reviewItems}">
+                    <span th:text="${item.itemName} + ': ' + (${item.itemValue} ? '예' : '아니오')"></span>
+                </li>
+            </ul>
+            <hr>
+        </div>
+    </div>
+    <p th:if="${#lists.isEmpty(clientReviews)}">아직 이 클라이언트에 대한 후기가 없습니다.</p>
+</div>
+    
 
     <!-- 게시판 작성자와 로그인한 사용자가 같을 경우 삭제 버튼 표시 -->
     <span th:if="${board.clientId == user.username}">
