@@ -199,20 +199,52 @@ public class MemberController {
         }
         return "/member/findIdResult"; // 결과를 보여줄 페이지 (Thymeleaf 템플릿 이름)
     }
-    
-    @GetMapping("findPw")
-    public String findPw() {
-    	return "/member/findPw";
-    }
-    
+
     @GetMapping("findIdResult")
     public String findIdResult() {
     	return "/member/findIdResult";
     }
     
-    @GetMapping("findPwResult")
-    public String findPwResult() {
-    	return "/member/findPwResult";
+    @GetMapping("resetPw")
+    public String resetPw() {
+    	return "/member/verifyUser";
+    }
+    
+    @PostMapping("verifyUser")
+    public String verifyUser(@RequestParam("memberId") String memberId,
+                             @RequestParam("memberName") String memberName,
+                             @RequestParam("email") String email,
+                             Model model) {
+        log.info("Verifying user: id={}, name={}, email={}", memberId, memberName, email);
+        boolean isVerified = memberService.verifyUser(memberId, memberName, email);
+        log.info("User verification result: {}", isVerified);
+        
+        if (isVerified) {
+            model.addAttribute("memberId", memberId);
+            return "/member/resetPassword";
+        } else {
+            model.addAttribute("error", "일치하는 회원 정보를 찾을 수 없습니다.");
+            return "/member/verifyUser";
+        }
+    }
+    
+    @PostMapping("resetPassword")
+    public String resetPassword(@RequestParam("memberId") String memberId,
+                                @RequestParam("newPassword") String newPassword,
+                                @RequestParam("confirmPassword") String confirmPassword,
+                                Model model) {
+        if (!newPassword.equals(confirmPassword)) {
+            model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
+            model.addAttribute("memberId", memberId);
+            return "/member/resetPassword";
+        }
+
+        if (memberService.resetPassword(memberId, newPassword)) {
+            return "redirect:/";
+        } else {
+            model.addAttribute("error", "비밀번호 재설정에 실패했습니다.");
+            return "/member/resetPassword";
+        }
     }
     
  // 현재 로그인한 사용자의 memberId를 반환하는 엔드포인트 추가
