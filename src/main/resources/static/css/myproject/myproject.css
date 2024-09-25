@@ -35,7 +35,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    
 }
 
 /* 헤더 고정 */
@@ -63,6 +63,7 @@ header .search-bar, header .login-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 20px 0;
 }
 
 
@@ -184,7 +185,7 @@ nav {
     background-color: var(--secondary-color);
     padding: 12px 0;
     border-bottom: 1px solid #ddd;
-    z-index: 999; /* header보다 높은 값을 사용하여 nav가 상단에 위치하게 */
+    z-index: 999;
 }
 
 nav ul {
@@ -209,237 +210,90 @@ nav ul li a {
 nav ul li a:hover {
     color: var(--accent-color);
 }
-
-.search-bar {
-    margin: 40px auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
-.search-bar input {
-    width: 40%;
-    padding: 12px 20px;
-    border-radius: 30px;
-    border: 1px solid var(--border-color);
-    font-size: 16px;
-}
-
-.search-bar button {
-    background-color: var(--secondary-color);
-    color: #fff;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 30px;
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-.filter-bar {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 40px;
-    margin-bottom: 20px;
-    margin-right: 130px;
-    margin-left: 1200px;
-}
-
-    .filter-bar button,
-.filter-bar select {
-    padding: 10px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 25px;
-    cursor: pointer;
-}
-
-/* Footer */
-footer {
-    background-color: var(--primary-color);
-    color: white;
-    text-align: center;
-    padding: 30px 20px;
-    margin-top:50px;
-}
-
-footer p {
-    margin: 10px 0;
-    font-size:0.9em;
-}
-
-footer a {
-    color: var(--accent-color);
-    text-decoration: underline;
-}
-
-footer a:hover {
-    color: var(--highlight-color);
-}
-
+/* 테이블 컨테이너 */
 .table-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: auto;
+	display:flex;
+    flex-direction: column;
     gap: 20px;
+    padding: 20px;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-/* post 스타일 개선 */
+/* post 스타일 */
 .post {
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    padding: 25px;
-    margin-bottom: 30px;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
     display: flex;
-    flex-direction: column;
     justify-content: space-between;
-    overflow: hidden; /* 내부 요소가 넘치지 않게 설정 */
-    position: relative;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .post:hover {
-    transform: translateY(-10px) scale(1.03);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%);
-	color: white; /* 모든 글자 색상을 흰색으로 변경 */
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-.post:hover .post-info a {
-    color: white; /* 호버 시 제목 색상 변경 */
-}
-
-.post:hover .post-info p {
-    color: white; /* 호버 시 본문 텍스트 색상 변경 */
-}
-
-.post .thumbnail {
-    width: 330px;
-    height: 240px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    transition: transform 0.3s ease;
-}
-
-.post:hover .thumbnail {
-    transform: scale(1.05);
-}
-
+/* post 정보 */
 .post .post-info {
+    display: flex;
+    flex-direction: column;
     text-align: left;
-    position: relative;
-    z-index: 2;
+    flex: 1;
 }
 
-.post .post-info .author,
-.post .post-info .date,
-.post .post-info .status,
-.post .post-info a {
-    display: block;
-    margin-bottom: 12px;
-    font-size: 14px;
-}
-
-/* post 내부 텍스트 스타일링 */
-.post .post-info span {
-    display: block;
-    color: #6b7280;
-    font-size: 1rem;
+.post-info a {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #333;
+    text-decoration : none;
     margin-bottom: 8px;
-    line-height: 1.5;
-    font-weight: 500;
+    transition: color 0.3s ease;
 }
 
-/* 제목 및 링크 스타일링 */
-.post .post-info a {
-    font-weight: 700;
-    font-size: 1.5em;
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: color 0.3s ease, transform 0.3s ease;
-    margin-bottom: 12px;
+.post-info a:hover {
+    color: #3498db;
 }
 
-.post .post-info a:hover {
-    color: var(--secondary-color);
-    transform: scale(1.02);
+.post-info span {
+    display: block;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 6px;
 }
 
-/* 본문 텍스트 */
-.post .post-info p {
-    color: var(--text-color);
-    font-size: 1.1rem;
-    line-height: 1.6;
-}
-
-/* 가격 등 강조 텍스트 스타일 */
-.post .post-info .price {
-    font-size: 1.3rem;
+/* 상태 뱃지 */
+.status-badge {
+    font-size: 0.9rem;
     font-weight: bold;
-    color: var(--secondary-color);
-    margin-top: 15px;
-    letter-spacing: 1px; /* 가격 글씨를 더 두드러지게 */
+    color: #fff;
+    background-color: #4CAF50;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
-/* 날짜 및 작성자 정보 스타일 */
-.post .post-info .date,
-.post .post-info .author {
-    font-size: 0.95rem;
-    color: #a0aec0;
+/* 추가 정보 */
+.additional-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
-/* 상태 정보 스타일 (ex: 상태, 완료 여부) */
-.post .post-info .status {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #ff6347; /* 빨간색 톤으로 강조 */
-    background-color: #fdd; /* 연한 빨간색 배경 추가 */
-    padding: 10px 20px; /* 패딩을 늘려서 가운데 정렬 시 더 넓게 보이도록 */
-    border-radius: 8px;
-    display: inline-block;
-    text-align: center;
-    width: 100%; /* 전체 너비 차지 */
-    transition: background-color 0.3s ease, color 0.3s ease;
-    margin-top: 10px;
-    box-sizing: border-box;
-}
-
-
-.post:hover .post-info a {
-    color: #ffffff; /* 링크 색상 흰색으로 변경 */
-}
-
-.post:hover .post-info span,
-.post:hover .post-info .date,
-.post:hover .post-info .author,
-.post:hover .post-info .price {
-    color: #ffffff; /* 나머지 모든 텍스트 요소도 흰색으로 변경 */
-}
-
-/* 호버 시 상태 강조 */
-.post:hover .post-info .status {
-    color: white; /* 호버 시 글자 색상을 흰색으로 변경 */
-    background-color: #ff6347; /* 호버 시 배경색을 더 진한 빨간색으로 */
-    transform: scale(1.1); /* 호버 시 약간 커지도록 설정 */
-}
-
-/* 버튼 효과 */
-.btn {
-    background-color: var(--accent-color);
+.additional-info span {
+    font-size: 0.9rem;
     color: white;
-    padding: 12px 20px;
-    border-radius: 50px;
-    text-decoration: none;
-    text-align: center;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 8px;
 }
 
-.btn:hover {
-    background-color: var(--secondary-color);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+.additional-info .status {
+    font-weight: bold;
+    color: #2ecc71;
+}
+
+.additional-info .applicants {
+    color: #e74c3c;
 }

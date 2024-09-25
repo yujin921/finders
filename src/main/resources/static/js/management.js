@@ -423,17 +423,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	    });
 	});
     
- 	// 프로젝트 번호로 업무를 조회하여 리스트를 로드하는 함수
 	function loadTasks() {
 	    $.ajax({
 	        url: 'getTasks',
 	        type: 'get',
-	        data: { projectNum: projectNum }, // 쿼리 파라미터로 projectNum 전송
+	        data: { projectNum: projectNum },
 	        success: function(response) {
 	            console.log('업무 목록:', response);
 
 	            const $taskList = $('#task-list');
-	            $taskList.empty(); // 기존 목록 초기화
+	            $taskList.empty();
 
 	            if (response.length === 0) {
 	                $taskList.append('<p>업무가 없습니다.</p>');
@@ -463,14 +462,18 @@ document.addEventListener('DOMContentLoaded', function() {
 	                        const tbody = $('<tbody></tbody>');
 
 	                        filteredTasks.forEach(task => {
+	                            const priorityClass = task.taskPriority.toLowerCase();
+	                            const formattedStartDate = formatDateTime(task.taskStartDate);
+	                            const formattedEndDate = formatDateTime(task.taskEndDate);
+
 	                            tbody.append(`
 	                                <tr>
 	                                    <td>${task.taskTitle}</td>
 	                                    <td>${task.taskDescription}</td>
-	                                    <td>${task.taskStatus}</td> <!-- Enum 상태를 대문자로 표시 -->
-	                                    <td>${task.taskPriority}</td> <!-- Enum 우선순위를 대문자로 표시 -->
-	                                    <td>${task.taskStartDate}</td> <!-- LocalDateTime 형식으로 표시 -->
-	                                    <td>${task.taskEndDate}</td> <!-- LocalDateTime 형식으로 표시 -->
+	                                    <td>${task.taskStatus}</td>
+	                                    <td class="priority-${priorityClass}">${task.taskPriority}</td>
+	                                    <td>${formattedStartDate}</td>
+	                                    <td>${formattedEndDate}</td>
 	                                    <td>${task.freelancerId}</td>
 	                                </tr>
 	                            `);
@@ -483,14 +486,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	                    }
 	                });
 
-	                // 드롭다운 메뉴 클릭 시 열리고 닫히는 기능
+	                // 드롭다운 토글 기능
 	                $('.dropdown-toggle').on('click', function() {
-	                    const $content = $(this).siblings('.dropdown-content');
-	                    $content.slideToggle(); // 클릭한 메뉴 열기/닫기
+	                    const $container = $(this).parent('.dropdown-container');
+	                    $container.toggleClass('open');  // 클래스 추가로 드롭다운 토글
 	                });
-
-	                // 페이지 로드 시 모든 드롭다운 메뉴 열기
-	                $('.dropdown-content').show();
 	            }
 	        },
 	        error: function() {
@@ -498,6 +498,21 @@ document.addEventListener('DOMContentLoaded', function() {
 	        }
 	    });
 	}
+
+	function formatDateTime(dateString) {
+	    const date = new Date(dateString);
+	    const year = date.getFullYear();
+	    const month = String(date.getMonth() + 1).padStart(2, '0');
+	    const day = String(date.getDate()).padStart(2, '0');
+
+	    // 시간, 분, 초 추가
+	    const hours = String(date.getHours()).padStart(2, '0');
+	    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+	    return `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
+	}
+
+
  	
 	// 프로젝트 완료 버튼 클릭 시
 	$('#project-completion-button').on('click', function() {
@@ -591,6 +606,44 @@ document.addEventListener('DOMContentLoaded', function() {
 	            return 'gray'; // 기본 색상
 	    }
 	}
+	
+	function handleEventFormSubmit(event) {
+	    event.preventDefault();
+	    
+	    const title = document.getElementById('event-title').value;
+	    const startDate = document.getElementById('event-start-date').value;
+	    const endDate = document.getElementById('event-end-date').value;
+	    const startTime = document.getElementById('event-start-time').value;
+	    const endTime = document.getElementById('event-end-time').value;
+
+	    const eventData = {
+	        title: title,
+	        startDate: `${startDate}T${startTime}:00`,
+	        endDate: `${endDate}T${endTime}:00`,
+	        eventType: document.getElementById('event-type').value,
+	        projectNum: projectNum // 추가: 현재 프로젝트 번호 전달
+	    };
+
+	    $.ajax({
+	        url: '/calendar/event',
+	        type: 'POST',
+	        contentType: 'application/json',
+	        data: JSON.stringify(eventData),
+	        success: function(savedEvent) {
+	            calendar.addEvent({
+	                title: savedEvent.title,
+	                start: savedEvent.startDate,
+	                end: savedEvent.endDate,
+	            });
+	            document.getElementById('event-modal').classList.add('hidden');
+	            document.getElementById('event-form').reset();
+	        },
+	        error: function(xhr) {
+	            console.error('일정 등록 실패:', xhr.responseText);
+	            alert('일정을 등록하는 데 실패했습니다.');
+	        }
+	    });
+	}
 
     // 일정 추가 모달 열기
     function openEventModal(dateStr) {
@@ -610,9 +663,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // 기존의 이벤트 리스너를 제거하고 새로운 리스너를 추가
         eventForm.removeEventListener('submit', handleEventFormSubmit);
         eventForm.addEventListener('submit', handleEventFormSubmit);
-
+		
     }
 
+	/*
     // 이벤트 폼 제출 핸들러
     function handleEventFormSubmit(event) {
         event.preventDefault();
@@ -679,6 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('event-form').reset();
         }
     }
+	*/
 
     // 모달 내용 초기화
     function resetEventForm() {
@@ -799,8 +854,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	        // 데이터 트리 생성
 	        let treeData = anychart.data.tree(ganttChartData, "as-tree");
-	        
+
 	        console.log('TreeData 체크용:', treeData);
+
+	        // 각 기능의 actualStart와 actualEnd 업데이트
+	        ganttChartData.forEach(functionData => {
+	            const children = functionData.children;
+
+	            // 업무들 중에서 가장 빠른 actualStart를 찾습니다.
+	            const functionActualStart = children
+	                .map(task => {
+	                    // actualStart가 없으면 baselineStart 사용
+	                    return task.actualStart ? new Date(task.actualStart) : (task.baselineStart ? new Date(task.baselineStart) : null);
+	                })
+	                .filter(task => task !== null)
+	                .reduce((min, curr) => (min === null || curr < min ? curr : min), null);
+
+	            // 업무들 중에서 가장 늦은 actualEnd를 찾습니다.
+	            const functionActualEnd = children
+	                .map(task => {
+	                    // actualEnd가 없으면 baselineEnd 사용
+	                    return task.actualEnd ? new Date(task.actualEnd) : (task.baselineEnd ? new Date(task.baselineEnd) : null);
+	                })
+	                .filter(task => task !== null)
+	                .reduce((max, curr) => (max === null || curr > max ? curr : max), null);
+
+	            // 해당 기능의 actualStart와 actualEnd를 업데이트합니다.
+	            functionData.actualStart = functionActualStart ? functionActualStart.toISOString() : null;
+	            functionData.actualEnd = functionActualEnd ? functionActualEnd.toISOString() : null;
+	        });
 
 	        // 차트에 데이터 설정
 	        ganttChart.data(treeData);
@@ -819,7 +901,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	            .title('ID')
 	            .width(30)
 	            .labels({ hAlign: 'center' });
-	            
+
 	        // 두 번째 열 설정
 	        dataGrid
 	            .column(1)
@@ -850,13 +932,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	        timeline.milestones().preview().enabled(true); // 이정표 미리보기를 활성화합니다
 	        timeline.baselineMilestones().preview().enabled(true); // 기준선 이정표 미리보기를 활성화합니다
 
-	        // 날짜 형식 로그 추가
-	        ganttChartData.forEach(task => {
-	            console.log('Task Data 체크용:', task);
-	            console.log('Actual Start 체크용:', task.actualStart);
-	            console.log('Actual End 체크용:', task.actualEnd);
-	        });
-	        
 	        // 각 업무의 baselineStart 및 actualStart 중 가장 빠른 시작일 및 가장 늦은 종료일을 계산
 	        let earliestStart = new Date(Math.min(
 	            ...ganttChartData.flatMap(item => [
@@ -879,7 +954,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                ])
 	            ]).flat() // 평탄화
 	        ));
-	        
+
 	        console.log('earliestStart 체크용:', earliestStart);
 	        console.log('latestEnd 체크용:', latestEnd);
 
@@ -890,7 +965,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        if (isNaN(latestEnd.getTime())) {
 	            console.warn('유효하지 않은 가장 늦은 종료일:', latestEnd);
 	        }
-	        
+
 	        // 여유 기간을 설정합니다
 	        const bufferDays = 30;
 
@@ -1776,7 +1851,7 @@ function loadApplicationList() {
         .then(applications => {
             let contentHtml = `
             <h3>지원자 목록</h3>
-            <table>
+            <table class="application-table">
                 <thead>
                     <tr>
                         <th>신청자 ID</th>
@@ -1795,8 +1870,8 @@ function loadApplicationList() {
 
 				// 동작 버튼은 항상 표시
 				let actionHtml = `
-                    <button onclick="updateApplicationStatus(${application.projectNum}, '${application.freelancerId}', 'ACCEPTED')">찬성</button>
-                    <button onclick="updateApplicationStatus(${application.projectNum}, '${application.freelancerId}', 'REJECTED')">반대</button>
+                    <button class="btn-approve" onclick="updateApplicationStatus(${application.projectNum}, '${application.freelancerId}', 'ACCEPTED')">찬성</button>
+                    <button class="btn-reject" onclick="updateApplicationStatus(${application.projectNum}, '${application.freelancerId}', 'REJECTED')">반대</button>
                 `;
 
 				contentHtml += `
@@ -1813,7 +1888,7 @@ function loadApplicationList() {
 
 			// PENDING 상태의 지원자가 없다면 빈 목록 메시지 표시
 			if (pendingApplications.length === 0) {
-				contentHtml += `<p>현재 지원 신청 중인 프리랜서가 없습니다.</p>`;
+				contentHtml += `<p class="empty-list">현재 지원 신청 중인 프리랜서가 없습니다.</p>`;
 			}
 
 			document.getElementById('application-content').innerHTML = contentHtml;
@@ -1856,43 +1931,47 @@ function getQueryParam(param) {
 }
 
 function loadTeamList() {
-	const projectNum = getQueryParam('projectNum'); // URL에서 projectNum 가져오기
-	if (!projectNum) {
-		alert('프로젝트 번호를 찾을 수 없습니다.');
-		return;
-	}
+    const projectNum = getQueryParam('projectNum'); // URL에서 projectNum 가져오기
+    if (!projectNum) {
+        alert('프로젝트 번호를 찾을 수 없습니다.');
+        return;
+    }
 
-	fetch(`/project/team-list?projectNum=${projectNum}`)
-		.then(response => response.json())
-		.then(teamList => {
-			let contentHtml = `<h3>팀원 목록</h3>`;
-			if (teamList.length > 0) {
-				contentHtml += `
-                <table>
+    fetch(`/project/team-list?projectNum=${projectNum}`)
+        .then(response => response.json())
+        .then(teamList => {
+            let contentHtml = `<h3>팀원 목록</h3>`;
+            if (teamList.length > 0) {
+                contentHtml += `
+                <table class="team-table">
                     <thead>
                         <tr>
-                            
+                            <th>팀원 ID</th>
+                            <th>역할</th>
+                            <th>상태</th>
                         </tr>
                     </thead>
                     <tbody>
                 `;
 
-				teamList.forEach(member => {
-					contentHtml += `
+                teamList.forEach(member => {
+                    contentHtml += `
                     <tr>
                         <td>${member.memberId}</td>
+                        <td>${member.role || '팀원'}</td> <!-- 역할 정보가 있으면 표시, 없으면 '팀원' -->
+                        <td>${member.status || '활동 중'}</td> <!-- 상태 정보가 있으면 표시, 없으면 '활동 중' -->
                     </tr>
                     `;
-				});
+                });
 
-				contentHtml += `</tbody></table>`;
-			} else {
-				contentHtml += `<p>팀원이 없습니다.</p>`;
-			}
+                contentHtml += `</tbody></table>`;
+            } else {
+                contentHtml += `<p class="empty-list">팀원이 없습니다.</p>`;
+            }
 
-			document.getElementById('team-content').innerHTML = contentHtml;
-		})
-		.catch(error => {
-			console.error('Error fetching team list:', error);
-		});
+            document.getElementById('team-content').innerHTML = contentHtml;
+        })
+        .catch(error => {
+            console.error('Error fetching team list:', error);
+        });
 }
