@@ -24,6 +24,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.CalendarEventDTO;
 import net.datasa.finders.domain.dto.FunctionDTO;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
@@ -31,6 +32,7 @@ import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskDateRangeDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.dto.TeamDTO;
+import net.datasa.finders.domain.entity.CalendarEventEntity;
 import net.datasa.finders.domain.entity.FunctionTitleEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.PrequalificationQuestionEntity;
@@ -44,6 +46,7 @@ import net.datasa.finders.domain.entity.TaskPriority;
 import net.datasa.finders.domain.entity.TaskStatus;
 import net.datasa.finders.domain.entity.TeamEntity;
 import net.datasa.finders.domain.entity.WorkScopeEntity;
+import net.datasa.finders.repository.CalendarEventRepository;
 import net.datasa.finders.repository.FunctionTitleRepository;
 import net.datasa.finders.repository.MemberRepository;
 import net.datasa.finders.repository.PrequalificationQuestionRepository;
@@ -71,6 +74,8 @@ public class ProjectManagementService {
     private final TaskManagementRepository taskManagementRepository;
     private final ProjectManagementRepository projectManagementRepository;
     private final TeamRepository teamRepository;
+    private final CalendarEventRepository calendarEventRepository;
+
 
     public List<ProjectPublishingDTO> getMyList(String id, String roleName) {
     	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
@@ -704,6 +709,22 @@ public class ProjectManagementService {
                         .taskPriority(task.getTaskPriority()) // Enum 그대로 사용
                         .build())
                 .collect(Collectors.toList());
+    }
+    
+    public CalendarEventDTO createEvent(CalendarEventDTO calendarEventDTO) {
+        CalendarEventEntity event = new CalendarEventEntity();
+        event.setTitle(calendarEventDTO.getTitle());
+        event.setStartDate(calendarEventDTO.getStartDate());
+        event.setEndDate(calendarEventDTO.getEndDate());
+        event.setEventType(calendarEventDTO.getEventType());
+
+        // 프로젝트 번호로 프로젝트 조회
+        ProjectPublishingEntity project = projectPublishingRepository.findById(calendarEventDTO.getProjectNum())
+                .orElseThrow(() -> new IllegalArgumentException("프로젝트를 찾을 수 없습니다."));
+
+        event.setProject(project); // 프로젝트 설정
+        CalendarEventEntity savedEvent = calendarEventRepository.save(event);
+        return new CalendarEventDTO(savedEvent.getEventId(), savedEvent.getTitle(), savedEvent.getStartDate(), savedEvent.getEndDate(), savedEvent.getEventType(), savedEvent.getProject().getProjectNum());
     }
 
     // 업무등록 모달창의 "담당자" 입력란에 대한 프로젝트 참여하는 프리랜서 ID로 자동완성

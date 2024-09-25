@@ -606,6 +606,44 @@ document.addEventListener('DOMContentLoaded', function() {
 	            return 'gray'; // 기본 색상
 	    }
 	}
+	
+	function handleEventFormSubmit(event) {
+	    event.preventDefault();
+	    
+	    const title = document.getElementById('event-title').value;
+	    const startDate = document.getElementById('event-start-date').value;
+	    const endDate = document.getElementById('event-end-date').value;
+	    const startTime = document.getElementById('event-start-time').value;
+	    const endTime = document.getElementById('event-end-time').value;
+
+	    const eventData = {
+	        title: title,
+	        startDate: `${startDate}T${startTime}:00`,
+	        endDate: `${endDate}T${endTime}:00`,
+	        eventType: document.getElementById('event-type').value,
+	        projectNum: projectNum // 추가: 현재 프로젝트 번호 전달
+	    };
+
+	    $.ajax({
+	        url: '/calendar/event',
+	        type: 'POST',
+	        contentType: 'application/json',
+	        data: JSON.stringify(eventData),
+	        success: function(savedEvent) {
+	            calendar.addEvent({
+	                title: savedEvent.title,
+	                start: savedEvent.startDate,
+	                end: savedEvent.endDate,
+	            });
+	            document.getElementById('event-modal').classList.add('hidden');
+	            document.getElementById('event-form').reset();
+	        },
+	        error: function(xhr) {
+	            console.error('일정 등록 실패:', xhr.responseText);
+	            alert('일정을 등록하는 데 실패했습니다.');
+	        }
+	    });
+	}
 
     // 일정 추가 모달 열기
     function openEventModal(dateStr) {
@@ -625,9 +663,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // 기존의 이벤트 리스너를 제거하고 새로운 리스너를 추가
         eventForm.removeEventListener('submit', handleEventFormSubmit);
         eventForm.addEventListener('submit', handleEventFormSubmit);
-
+		
     }
 
+	/*
     // 이벤트 폼 제출 핸들러
     function handleEventFormSubmit(event) {
         event.preventDefault();
@@ -694,6 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('event-form').reset();
         }
     }
+	*/
 
     // 모달 내용 초기화
     function resetEventForm() {

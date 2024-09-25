@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.poi.sl.usermodel.ObjectMetaData.Application;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.CalendarEventDTO;
 import net.datasa.finders.domain.dto.FunctionDTO;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
@@ -266,6 +266,18 @@ public class ProjectManagementController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage()); // 일반 오류 처리
         }
     }
+    
+    @ResponseBody
+    @PostMapping("calendar/event")
+    public ResponseEntity<?> createCalendarEvent(@RequestBody CalendarEventDTO calendarEventDTO) {
+        try {
+            CalendarEventDTO savedEvent = projectManagementService.createEvent(calendarEventDTO);
+            return ResponseEntity.ok(savedEvent);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+    
     
 //    @GetMapping("/project/application-list")
 //    public ResponseEntity<List<Application>> getApplicationList(@RequestParam int projectNum) {
