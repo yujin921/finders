@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.poi.sl.usermodel.ObjectMetaData.Application;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -265,6 +266,13 @@ public class ProjectManagementController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage()); // 일반 오류 처리
         }
     }
+    
+//    @GetMapping("/project/application-list")
+//    public ResponseEntity<List<Application>> getApplicationList(@RequestParam int projectNum) {
+//        List<Application> applications = applicationService.getApplicationsByProjectNum(projectNum);  // 해당 projectNum에 맞는 지원자 필터링
+//        return ResponseEntity.ok(applications);
+//    }
+
     
 
     // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Controller 코드
