@@ -22,11 +22,12 @@ public class FindRestController {
 	
 	@GetMapping("findFreelancer")
 	public List<FindFreelancerDTO> findFreelancer(@RequestParam("fields") String[] fields
-			,@RequestParam("areas") String[] areas) {
+			,@RequestParam("areas") String[] areas
+			,@RequestParam("search") String search) {
 		
 		log.debug("{}, {}",fields, areas);
 		
-		List<FindFreelancerDTO> findFreelancerList = findService.findFreelancerList(fields, areas);
+		List<FindFreelancerDTO> findFreelancerList = findService.findFreelancerList(fields, areas, search);
 		
 		log.debug("{}", findFreelancerList);
 		

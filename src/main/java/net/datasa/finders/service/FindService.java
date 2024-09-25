@@ -38,10 +38,11 @@ public class FindService {
 	private final ClientCategoryRepository clientCategoryRepository;
 	private final TeamRepository teamRepository;
 	
-	public List<FindFreelancerDTO> findFreelancerList(String[] fields, String[] areas) {
+	public List<FindFreelancerDTO> findFreelancerList(String[] fields, String[] areas, String search) {
 		
+//		List<MemberEntity> memberEntityList = memberRepository.findByRoleName(RoleName.ROLE_FREELANCER);
 		
-		List<MemberEntity> memberEntityList = memberRepository.findByRoleName(RoleName.ROLE_FREELANCER);
+		List<MemberEntity> memberEntityList = memberRepository.findByRoleNameAndMemberIdContaining(RoleName.ROLE_FREELANCER, search);
 		
 		ArrayList<FindFreelancerDTO> findFreelancerDTOList = new ArrayList<>();
 		
