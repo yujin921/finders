@@ -15,10 +15,10 @@
 						let remainingDays = calculateRemainingDays(obj.projectStartDate, obj.projectEndDate);
 
 						let html = `
-							<div class="post">
+							<div class="post" onclick="location.href='/board/read?projectNum=${obj.projectNum}';">
 								<img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" class="thumbnail">
 								<div class="post-info">
-									<a href="/board/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a>
+									<span>${obj.projectTitle}</span>
 									<span>평점: ${obj.averageRating}점</span><br>
 									<span class="startdate">시작일 : ${obj.projectStartDate}</span><br>
 									<span class="budget">금액 : ${obj.projectBudget}</span>
