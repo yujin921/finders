@@ -19,7 +19,7 @@
 								<img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" class="thumbnail">
 								<div class="post-info">
 									<a href="/board/read?projectNum=${obj.projectNum}">${obj.projectTitle}</a>
-									<span>평점들어갈 자리</span><br>
+									<span>평점: ${obj.averageRating}점</span><br>
 									<span class="startdate">시작일 : ${obj.projectStartDate}</span><br>
 									<span class="budget">금액 : ${obj.projectBudget}</span>
 									<span class="author">작성자 : ${obj.clientId}</span>
@@ -47,6 +47,11 @@
 
 		function sortList(list, sortValue) {
 			let [sortField, sortDirection] = sortValue.split(',');
+
+			if (sortField === "recommend") {
+				// 추천순 기능이 추가되면 여기에 로직 구현
+				return;
+			}
 
 			list.sort(function(a, b) {
 				let fieldA = a[sortField];

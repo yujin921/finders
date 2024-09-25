@@ -1,26 +1,26 @@
 package net.datasa.finders.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
+import net.datasa.finders.domain.dto.ClientDataDTO;
+import net.datasa.finders.domain.dto.ClientReviewDTO;
+import net.datasa.finders.domain.dto.ReviewItemDTO;
+import net.datasa.finders.domain.entity.ClientReviewItemEntity;
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
+import net.datasa.finders.domain.entity.MemberEntity;
+import net.datasa.finders.repository.ClientReviewsRepository;
+import net.datasa.finders.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
-import net.datasa.finders.domain.dto.ClientDataDTO; // 클라이언트 데이터 DTO
-import net.datasa.finders.domain.dto.ClientReviewDTO; // 클라이언트 리뷰 DTO
-import net.datasa.finders.domain.dto.ReviewItemDTO;
-import net.datasa.finders.domain.entity.ClientReviewItemEntity;
-import net.datasa.finders.domain.entity.ClientReviewsEntity; // 클라이언트 리뷰 엔티티
-import net.datasa.finders.domain.entity.MemberEntity;
-import net.datasa.finders.repository.ClientReviewsRepository; // 클라이언트 리뷰 레포지토리
-import net.datasa.finders.repository.MemberRepository; // 멤버 레포지토리
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ClientReviewService {
-    private final ClientReviewsRepository reviewRepository; // 클라이언트 리뷰 레포지토리
+    private final ClientReviewsRepository clientReviewRepository; // 클라이언트 리뷰 레포지토리
     private final MemberRepository memberRepository; // 멤버 레포지토리 추가
 
     // 특정 프로젝트에 참여 중인 모든 참가자 목록을 조회합니다.
@@ -31,7 +31,7 @@ public class ClientReviewService {
         return teamMembers.stream()
                 .filter(member -> !member.getMemberId().equals(clientId)) // 클라이언트 본인 제외
                 .map(member -> {
-                    boolean isReviewCompleted = reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
+                    boolean isReviewCompleted = clientReviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
                             projectNum, clientId, member.getMemberId());
                     return new ClientDataDTO(member.getMemberId(), member.getMemberName(), isReviewCompleted);
                 })
@@ -42,7 +42,7 @@ public class ClientReviewService {
     @Transactional(readOnly = true)
     public List<ClientReviewDTO> getReceivedReviews(String clientId) {
         // 프리랜서 ID를 사용하여 리뷰를 조회하고 DTO로 변환
-        return reviewRepository.findByClientId(clientId).stream()
+        return clientReviewRepository.findByClientId(clientId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -94,15 +94,18 @@ public class ClientReviewService {
         reviewEntity.setReviewItems(reviewItems);
 
         // 저장
-        reviewRepository.save(reviewEntity);
+        clientReviewRepository.save(reviewEntity);
     }
     
     @Transactional(readOnly = true)
     public boolean isReviewCompleted(String freelancerId, int projectNum, String clientId) {
         
     	
-    	return reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(projectNum, freelancerId,clientId);
+    	return clientReviewRepository.existsByProjectNumAndClientIdAndFreelancerId(projectNum, freelancerId,clientId);
     }
 
-
+    // 프로젝트 번호로 리뷰 평점 가져오기
+    public Optional<Float> getAverageRatingForProject(int projectNum) {
+        return clientReviewRepository.findAverageRatingByProjectNum(projectNum);
+    }
 }
