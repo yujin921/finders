@@ -799,8 +799,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	        // 데이터 트리 생성
 	        let treeData = anychart.data.tree(ganttChartData, "as-tree");
-	        
+
 	        console.log('TreeData 체크용:', treeData);
+
+	        // 각 기능의 actualStart와 actualEnd 업데이트
+	        ganttChartData.forEach(functionData => {
+	            const children = functionData.children;
+
+	            // 업무들 중에서 가장 빠른 actualStart를 찾습니다.
+	            const functionActualStart = children
+	                .map(task => {
+	                    // actualStart가 없으면 baselineStart 사용
+	                    return task.actualStart ? new Date(task.actualStart) : (task.baselineStart ? new Date(task.baselineStart) : null);
+	                })
+	                .filter(task => task !== null)
+	                .reduce((min, curr) => (min === null || curr < min ? curr : min), null);
+
+	            // 업무들 중에서 가장 늦은 actualEnd를 찾습니다.
+	            const functionActualEnd = children
+	                .map(task => {
+	                    // actualEnd가 없으면 baselineEnd 사용
+	                    return task.actualEnd ? new Date(task.actualEnd) : (task.baselineEnd ? new Date(task.baselineEnd) : null);
+	                })
+	                .filter(task => task !== null)
+	                .reduce((max, curr) => (max === null || curr > max ? curr : max), null);
+
+	            // 해당 기능의 actualStart와 actualEnd를 업데이트합니다.
+	            functionData.actualStart = functionActualStart ? functionActualStart.toISOString() : null;
+	            functionData.actualEnd = functionActualEnd ? functionActualEnd.toISOString() : null;
+	        });
 
 	        // 차트에 데이터 설정
 	        ganttChart.data(treeData);
@@ -819,7 +846,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	            .title('ID')
 	            .width(30)
 	            .labels({ hAlign: 'center' });
-	            
+
 	        // 두 번째 열 설정
 	        dataGrid
 	            .column(1)
@@ -850,13 +877,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	        timeline.milestones().preview().enabled(true); // 이정표 미리보기를 활성화합니다
 	        timeline.baselineMilestones().preview().enabled(true); // 기준선 이정표 미리보기를 활성화합니다
 
-	        // 날짜 형식 로그 추가
-	        ganttChartData.forEach(task => {
-	            console.log('Task Data 체크용:', task);
-	            console.log('Actual Start 체크용:', task.actualStart);
-	            console.log('Actual End 체크용:', task.actualEnd);
-	        });
-	        
 	        // 각 업무의 baselineStart 및 actualStart 중 가장 빠른 시작일 및 가장 늦은 종료일을 계산
 	        let earliestStart = new Date(Math.min(
 	            ...ganttChartData.flatMap(item => [
@@ -879,7 +899,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                ])
 	            ]).flat() // 평탄화
 	        ));
-	        
+
 	        console.log('earliestStart 체크용:', earliestStart);
 	        console.log('latestEnd 체크용:', latestEnd);
 
@@ -890,7 +910,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        if (isNaN(latestEnd.getTime())) {
 	            console.warn('유효하지 않은 가장 늦은 종료일:', latestEnd);
 	        }
-	        
+
 	        // 여유 기간을 설정합니다
 	        const bufferDays = 30;
 
