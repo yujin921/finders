@@ -287,6 +287,7 @@ button.next {
 
 main .cta-btn {
     background-color: var(--accent-color);
+    text-decoration : none;
     color: white;
     padding: 15px 40px;
     border-radius: 30px;
