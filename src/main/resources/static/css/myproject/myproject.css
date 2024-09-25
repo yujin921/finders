@@ -212,7 +212,7 @@ nav ul li a:hover {
 }
 /* 테이블 컨테이너 */
 .table-container {
-    display: flex;
+	display:flex;
     flex-direction: column;
     gap: 20px;
     padding: 20px;
@@ -250,7 +250,7 @@ nav ul li a:hover {
     font-weight: bold;
     font-size: 1.2em;
     color: #333;
-    text-decoration: none;
+    text-decoration : none;
     margin-bottom: 8px;
     transition: color 0.3s ease;
 }
