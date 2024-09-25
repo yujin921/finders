@@ -16,5 +16,6 @@ public class FindFreelancerDTO {
 	private Double totalRating;
 	private Integer totalPortfolios;
 	private Integer totalReviews;
+	private Integer totalProjects;
 	private String[] skills;
 }
