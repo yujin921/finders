@@ -1096,6 +1096,7 @@ h1 {
 /* 테이블 스타일 */
 .task-table {
     width: 100%;
+    table-layout: fixed; /* 열 너비 고정 */
     border-collapse: collapse;
     margin-top: 0;
     font-size: 0.95em;
@@ -1112,7 +1113,54 @@ h1 {
     padding: 10px;
     text-align: left;
     border-bottom: 2px solid var(--border-color);
+    height: 50px; /* 헤더의 높이 설정 */
+    overflow: hidden; /* 넘치는 내용 숨김 */
+    text-overflow: ellipsis; /* 넘치는 텍스트 줄임 표시 */
+    white-space: nowrap; /* 텍스트가 한 줄에 표시되도록 */
 }
+
+/* 테이블 셀 (일반 열) */
+.task-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    height: 40px; /* 셀의 높이 설정 */
+    line-height: 1.5; /* 줄 높이 설정 */
+    overflow: hidden; /* 넘치는 내용 숨김 */
+    text-overflow: ellipsis; /* 넘치는 텍스트 줄임 표시 */
+    white-space: nowrap; /* 텍스트가 한 줄에 표시되도록 */
+}
+
+/* 각 열의 고정 너비 설정 */
+.task-table th:nth-child(1), .task-table td:nth-child(1) {
+    width: 10%; /* 업무 제목 열 */
+}
+
+.task-table th:nth-child(2), .task-table td:nth-child(2) {
+    width: 30%; /* 설명 열 */
+}
+
+.task-table th:nth-child(3), .task-table td:nth-child(3) {
+    width: 10%; /* 상태 열 */
+}
+
+.task-table th:nth-child(4), .task-table td:nth-child(4) {
+    width: 10%; /* 우선순위 열 */
+}
+
+.task-table th:nth-child(5), .task-table td:nth-child(5) {
+    width: 20%; /* 시작 날짜 열 */
+}
+
+.task-table th:nth-child(6), .task-table td:nth-child(6) {
+    width: 20%; /* 종료 날짜 열 */
+}
+
+.task-table th:nth-child(7), .task-table td:nth-child(7) {
+    width: 10%; /* 프리랜서 ID 열 */
+}
+
+
 
 /* 테이블 본문 */
 .task-table td {
