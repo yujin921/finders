@@ -187,8 +187,8 @@
                     <h3>${partner.memberId || '아이디 없음'}</h3>
                     <div class="rating">★★★★★ ${partner.totalRating || 0} / 평가 ${partner.totalReviews || 0}개</div>
                     <div class="partner-stats">
-                        <span>계약한 프로젝트: ${partner.projects || 0}건</span>
-                        <span>포트폴리오: ${partner.portfolio || 0}개</span>
+                        <span>계약한 프로젝트: ${partner.totalProjects || 0}건</span>
+                        <span>포트폴리오: ${partner.totalPortfolios || 0}개</span>
                     </div>
                     <div class="skills">
                         ${partner.skills ? partner.skills.join(', ') : '스킬 정보 없음'}
