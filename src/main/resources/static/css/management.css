@@ -1106,7 +1106,7 @@ h1 {
 
 /* 테이블 헤더 */
 .task-table th {
-    background-color: var(--primary-color);
+    background-color: var(--button-hover);
     color: white;
     font-weight: bold;
     padding: 10px;
@@ -1132,17 +1132,20 @@ h1 {
 
 /* 우선순위별 색상 */
 .task-table td.priority-low {
-    color: green;
+    color: grey;
 }
 
 .task-table td.priority-medium {
-    color: orange;
+    color: green;
 }
 
 .task-table td.priority-high {
-    color: red;
+    color: orange;
 }
 
+.task-table td.priority-emergency {
+    color: red;
+}
 /* 애니메이션: 드롭다운 슬라이드 */
 @keyframes dropdown-slide {
     from {
