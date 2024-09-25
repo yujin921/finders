@@ -41,7 +41,7 @@ public class ProjectPublishingEntity {
     @Column(name = "project_end_date")
     private LocalDate projectEndDate;
 
-    @Column(name = "project_budget", precision = 10, scale = 2)
+    @Column(name = "project_budget", precision = 15, scale = 0)
     private BigDecimal projectBudget;
 
     @Column(name = "project_description", columnDefinition = "TEXT")

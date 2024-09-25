@@ -29,7 +29,9 @@ public class WebSecurityConfig {
             , "/member/findId"
             , "/member/findPw"
             , "/member/findIdResult"
-            , "/member/findPwResult"
+            , "/member/resetPw"
+            , "/member/verifyUser"
+            , "/member/resetPassword"
     };
     
     // 프리랜서 회원 접근 가능

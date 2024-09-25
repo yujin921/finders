@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.TeamEntity;
 
 @Repository
@@ -17,5 +18,7 @@ public interface TeamRepository extends JpaRepository<TeamEntity, Integer> { // 
     List<TeamEntity> findByMemberId(String memberId);
 
     boolean existsByProjectNumAndMemberId(int projectNum, String memberId);
+
+	List<TeamEntity> findByMember(MemberEntity memberEntity);
 
 }

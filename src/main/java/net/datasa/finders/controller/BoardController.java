@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.entity.ApplicationResult;
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
+import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.BoardService;
+import net.datasa.finders.service.ClientReviewService;
 import net.datasa.finders.service.ProjectApplicationService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,6 +22,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,6 +32,7 @@ public class BoardController {
 	
 	private final BoardService boardService;
     private final ProjectApplicationService projectApplicationService;
+    private final ClientReviewService clientReviewService;
 	
 	@GetMapping("view")
 	public String view() {
@@ -43,6 +48,12 @@ public class BoardController {
     @GetMapping("list")
     public List<ProjectPublishingDTO> list() {
         List<ProjectPublishingDTO> list = boardService.getList();
+
+        for (ProjectPublishingDTO project : list) {
+            Optional<Float> averageRating = clientReviewService.getAverageRatingForProject(project.getProjectNum());
+            project.setAverageRating(averageRating.orElse(0.0f));  // 평점이 없을 경우 0점 설정
+        }
+
         return list;
     }
 
@@ -95,6 +106,10 @@ public class BoardController {
                 String applicationStatus = projectApplicationService.getApplicationStatus(projectNum, freelancerUsername);
                 model.addAttribute("applicationStatus", applicationStatus);
             }
+            
+            // 클라이언트에 대한 프리랜서 후기 조회
+            List<ClientReviewsEntity> clientReviews = boardService.getClientReviews(projectPublishingDTO.getClientId());
+            model.addAttribute("clientReviews", clientReviews);
 
             return "board/read";  // 'read.html'로 반환
         } catch (Exception e) {
