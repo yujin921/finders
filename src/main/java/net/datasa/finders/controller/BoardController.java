@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.entity.ApplicationResult;
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
+import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.BoardService;
@@ -104,6 +106,10 @@ public class BoardController {
                 String applicationStatus = projectApplicationService.getApplicationStatus(projectNum, freelancerUsername);
                 model.addAttribute("applicationStatus", applicationStatus);
             }
+            
+            // 클라이언트에 대한 프리랜서 후기 조회
+            List<ClientReviewsEntity> clientReviews = boardService.getClientReviews(projectPublishingDTO.getClientId());
+            model.addAttribute("clientReviews", clientReviews);
 
             return "board/read";  // 'read.html'로 반환
         } catch (Exception e) {
