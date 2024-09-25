@@ -245,67 +245,12 @@ nav ul li a:hover {
     margin-left: 1200px;
 }
 
-.filter-bar button,
+    .filter-bar button,
 .filter-bar select {
     padding: 10px 15px;
     border: 1px solid var(--border-color);
     border-radius: 25px;
     cursor: pointer;
-}
-
-.project-list, .post {
-    
-    max-width: 1200px;
-    margin: 0 auto; /* 가운데 정렬 */
-}
-
-.project-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 카드가 최소 300px 이상일 때 반응형으로 배치 */
-    gap: 20px;
-    
-    width: 100%; /* 그리드가 전체 너비를 차지하도록 설정 */
-    max-width: 1200px; /* 최대 너비를 제한 */
-    margin: 0 auto; /* 가운데 정렬 */
-}
-
-.project-card {
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.project-card h3 {
-    color: var(--primary-color);
-    margin-bottom: 10px;
-    font-size : 1.4em;
-}
-
-.project-card p {
-    color: var(--text-color);
-    margin-bottom:20px;
-}
-
-.project-card a {
-    background-color: var(--accent-color);
-    text-decoration : none;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 25px;
-    transition: background-color 0.3s ease, transform 0.2s;
-}
-
-.project-card a:hover {
-    background-color: var(--button-hover);
-    transform: translateY(-3px);
 }
 
 /* Footer */

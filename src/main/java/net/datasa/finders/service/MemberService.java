@@ -3,6 +3,7 @@ package net.datasa.finders.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ClientDTO;
 import net.datasa.finders.domain.dto.FreelancerDTO;
 import net.datasa.finders.domain.dto.FreelancerSkillDTO;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -403,5 +405,24 @@ public class MemberService {
         }
 
         return member.get().getMemberId(); // 아이디 반환
+    }
+    
+    public boolean verifyUser(String memberId, String memberName, String email) {
+        log.info("Verifying user in service: id={}, name={}, email={}", memberId, memberName, email);
+        boolean result = memberRepository.findByMemberIdAndMemberNameAndEmail(memberId, memberName, email).isPresent();
+        log.info("Verification result from repository: {}", result);
+        return result;
+    }
+    
+    public boolean resetPassword(String memberId, String newPassword) {
+        Optional<MemberEntity> memberOpt = memberRepository.findByMemberId(memberId);
+        
+        if (memberOpt.isPresent()) {
+            MemberEntity member = memberOpt.get();
+            member.setMemberPw(passwordEncoder.encode(newPassword));
+            memberRepository.save(member);
+            return true;
+        }
+        return false;
     }
 }

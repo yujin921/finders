@@ -38,4 +38,5 @@ public class ProjectPublishingDTO {
     private long estimatedDay;
     private RoleName roleName;
     private LocalDateTime projectCreateDate;
+    private float averageRating;
 }
