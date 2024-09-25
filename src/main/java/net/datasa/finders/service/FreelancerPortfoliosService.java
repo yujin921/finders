@@ -28,8 +28,8 @@ public class FreelancerPortfoliosService {
 		MemberEntity memberEntity = memberRepository.findById(user.getUsername()).orElseThrow(() -> new EntityNotFoundException("회원정보가 없습니다."));
 		
 		FreelancerPortfoliosEntity freelancerPortfoliosEntity = FreelancerPortfoliosEntity.builder()
-				.projectTitle(fPDTO.getProjectTitle())
-				.projectDescription(fPDTO.getProjectDescription())
+				.projectTitle(fPDTO.getPortfolioTitle())
+				.projectDescription(fPDTO.getPortfolioDescription())
 				.projectLink(fPDTO.getProjectLink())
 				.member(memberEntity)
 				.build();

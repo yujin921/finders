@@ -1,17 +1,29 @@
 package net.datasa.finders.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FindFreelancerDTO;
-import net.datasa.finders.domain.dto.FreelancerPortfoliosDTO;
 import net.datasa.finders.domain.dto.FreelancerReviewDTO;
-import net.datasa.finders.domain.entity.*;
-import net.datasa.finders.repository.*;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
+import net.datasa.finders.domain.entity.FreelancerPortfoliosEntity;
+import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
+import net.datasa.finders.domain.entity.FreelancerSkillEntity;
+import net.datasa.finders.domain.entity.MemberEntity;
+import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.domain.entity.TeamEntity;
+import net.datasa.finders.repository.ClientCategoryRepository;
+import net.datasa.finders.repository.ClientFieldRepository;
+import net.datasa.finders.repository.FreelancerPortfoliosRepository;
+import net.datasa.finders.repository.FreelancerReviewsRepository;
+import net.datasa.finders.repository.FreelancerSkillRepository;
+import net.datasa.finders.repository.MemberRepository;
+import net.datasa.finders.repository.TeamRepository;
 
 @Slf4j
 @Service
@@ -36,9 +48,6 @@ public class FindService {
 		for (MemberEntity memberEntity : memberEntityList) {
 			for (String field : fields) {
 				for (String area : areas) {
-					double totalRating = 0;
-
-					List<FreelancerReviewsEntity> freelancerReviewsEntityList = freelancerReviewsRepository.findByFreelancerId(memberEntity.getMemberId());
 
 					if(clientFieldRepository.findByClientIdAndFieldText(memberEntity, field).isPresent() && clientCategoryRepository.findByClientIdAndCategoryText(memberEntity, area).isPresent()) {
 						
