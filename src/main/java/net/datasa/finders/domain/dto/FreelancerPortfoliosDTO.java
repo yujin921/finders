@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 public class FreelancerPortfoliosDTO {
 	
     private int portfolioId;
-    private String projectTitle;
-    private String projectDescription;
+    private String portfolioTitle;
+    private String portfolioDescription;
     private String projectLink;
     private String freelancerId;
 }
