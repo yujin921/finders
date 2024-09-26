@@ -223,6 +223,13 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#task-modal').addClass('hidden').hide();
     });
 
+	// 모달 바깥 영역 클릭 시 모달 닫기
+	$('#task-modal').on('click', function(event) {
+		if (event.target === this) { // 모달 바깥 영역(오버레이)을 클릭했을 때만 닫기
+			$(this).addClass('hidden').hide();
+		}
+	});
+
     console.log("projectNum 체크용: ", projectNum);
 
     // 기능 분류 목록 로드 함수
@@ -1874,7 +1881,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 function loadApplicationList() {
-    fetch('/project/application-list')  // 서버에서 클라이언트의 지원자 목록을 가져옴
+	const projectNum = getQueryParam('projectNum');
+    fetch(`/project/application-list?projectNum=${projectNum}`)  // 서버에서 클라이언트의 지원자 목록을 가져옴
         .then(response => response.json())
         .then(applications => {
             let contentHtml = `
@@ -1986,7 +1994,7 @@ function loadTeamList() {
                     contentHtml += `
                     <tr>
                         <td>${member.memberId}</td>
-                        <td>${member.role || '팀원'}</td> <!-- 역할 정보가 있으면 표시, 없으면 '팀원' -->
+                        <td>${member.roleName === 'ROLE_CLIENT' ? '클라이언트' : '프리랜서'}</td> <!-- 역할 정보가 있으면 표시, 없으면 '팀원' -->
                         <td>${member.status || '활동 중'}</td> <!-- 상태 정보가 있으면 표시, 없으면 '활동 중' -->
                     </tr>
                     `;
