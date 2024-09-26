@@ -39,29 +39,41 @@ public class FindService {
 	private final ClientCategoryRepository clientCategoryRepository;
 	private final TeamRepository teamRepository;
 	
-	public List<FindFreelancerDTO> findFreelancerList(String[] fields, String[] areas, String search) {
+	public List<FindFreelancerDTO> findFreelancerList(List<String> fields, List<String> areas, String search) {
 		
 		List<MemberEntity> memberEntityList = memberRepository.findByRoleNameAndMemberIdContaining(RoleName.ROLE_FREELANCER, search);
 		
-		ArrayList<FindFreelancerDTO> findFreelancerDTOList = new ArrayList<>();
+		List<FindFreelancerDTO> findFreelancerDTOList = new ArrayList<>();
 		
-		for (MemberEntity memberEntity : memberEntityList) {
-			for (String field : fields) {
-				for (String area : areas) {
-
-					if(clientFieldRepository.findByClientIdAndFieldText(memberEntity, field).isPresent() && clientCategoryRepository.findByClientIdAndCategoryText(memberEntity, area).isPresent()) {
-						
-						FindFreelancerDTO findFreelancerDTO = findFreelancerDetail(memberEntity.getMemberId());
-						
-						if(!findFreelancerDTOList.contains(findFreelancerDTO)) {
-							findFreelancerDTOList.add(findFreelancerDTO);
-						} // 프리랜서 정보가 이미 들어가 있을 시 중복 제거를 위해 조건 추가
-						
-					};
-				};
-			};
-			
-		}
+		/*
+		 * for (MemberEntity memberEntity : memberEntityList) { for (String field :
+		 * fields) { for (String area : areas) {
+		 * 
+		 * if(clientFieldRepository.findByClientIdAndFieldText(memberEntity,
+		 * field).isPresent() &&
+		 * clientCategoryRepository.findByClientIdAndCategoryText(memberEntity,
+		 * area).isPresent()) {
+		 * 
+		 * FindFreelancerDTO findFreelancerDTO =
+		 * findFreelancerDetail(memberEntity.getMemberId());
+		 * 
+		 * if(!findFreelancerDTOList.contains(findFreelancerDTO)) {
+		 * findFreelancerDTOList.add(findFreelancerDTO); } // 프리랜서 정보가 이미 들어가 있을 시 중복
+		 * 제거를 위해 조건 추가
+		 * 
+		 * }; }; };
+		 * 
+		 * }
+		 */
+		memberEntityList.stream()
+	    .filter(memberEntity -> fields.stream()
+	        .anyMatch(field -> clientFieldRepository.findByClientIdAndFieldText(memberEntity, field).isPresent()) &&
+	        areas.stream()
+	        .anyMatch(area -> clientCategoryRepository.findByClientIdAndCategoryText(memberEntity, area).isPresent())
+	    )
+	    .map(memberEntity -> findFreelancerDetail(memberEntity.getMemberId()))  // FindFreelancerDTO로 변환
+	    .distinct()  // 중복 제거
+	    .forEach(findFreelancerDTOList::add);
 		
 		return findFreelancerDTOList;
 	}

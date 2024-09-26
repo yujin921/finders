@@ -35,14 +35,14 @@
 
     <div class="main-container">
         <aside>
-            <h2>포트폴리오 관리</h2>
-            <div class="sidebar-section">
-                <ul>
-                    <li>신유진 기획 포트폴리오</li>
-                    <li>신유진 개발 포트폴리오</li>
-                </ul>
-            </div>
-            <div class="sidebar-section">
+            <h2><a th:href="@{/member/myPage}">개인정보 수정</a></h2>
+		    <h2>포트폴리오 관리</h2>
+		    <div class="sidebar-section">
+		        <ul th:each="portfolio : ${portfoliosList}">
+		            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
+		        </ul>
+		    </div>
+		    <div class="sidebar-section">
                 <h3>개인 활동 페이지</h3>
                 <ul>
                     <li>VR 게임 프로젝트 활동</li>

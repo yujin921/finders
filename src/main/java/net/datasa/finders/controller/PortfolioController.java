@@ -30,7 +30,11 @@ public class PortfolioController {
 	private final FreelancerPortfoliosService freelancerPortfoliosService;
 
 	@GetMapping("create")
-    public String portfolio() {
+    public String portfolio(Model model
+    		,@AuthenticationPrincipal AuthenticatedUser user) {
+		List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(user.getId());
+		
+		model.addAttribute("portfoliosList", freelancerPortfoliosDTOList);
 		
         return "/portfolio/create";
     }
