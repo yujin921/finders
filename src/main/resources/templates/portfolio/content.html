@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko"
+		xmlns:th="http://www.thymeleaf.org"
+      	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finders</title>
+    <link rel="stylesheet" th:href="@{/css/portfolio/content.css}">
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+</head>
+<body>
+	
+
+	<div class="main-container">
+		<aside>
+			<h2><a th:href="@{/member/myPage}">개인정보 수정</a></h2>
+		    <h2>포트폴리오 관리<button class="add-btn">
+		            <a href="/portfolio/create" class="add-page-link">+</a>
+		            </button></h2>
+		    <div class="sidebar-section">
+		        <ul th:each="portfolio : ${portfoliosList}">
+		            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
+		        </ul>
+		    </div>
+		    <div class="sidebar-section">
+		        <h3>개인 활동 페이지</h3>
+		        <ul>
+		            <li>VR 게임 프로젝트 활동</li>
+		            <li>2D 방탈출 게임</li>
+		            <li>강화학습 프로젝트</li>
+		        </ul>
+		    </div>
+		</aside>
+		<main>
+		    <h1>CKEditor 내용 표시</h1>
+		    <div>제목 : <span id="title" th:text="${freelancerPortfolios.portfolioTitle}"></span><a th:href="@{/portfolio/edit?portfolioId={portfolioId}(portfolioId=${freelancerPortfolios.portfolioId})}">편집하기</a></div>
+		    
+		    <div id="content" th:utext="${freelancerPortfolios.portfolioDescription}">
+		        <!-- 여기에 저장된 내용이 표시됩니다 -->
+		    </div>
+		
+		    
+	    </main>
+    </div>
+</body>
+</html>

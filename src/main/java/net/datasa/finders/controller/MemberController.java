@@ -26,10 +26,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ClientDTO;
 import net.datasa.finders.domain.dto.FreelancerDTO;
+import net.datasa.finders.domain.dto.FreelancerPortfoliosDTO;
 import net.datasa.finders.domain.dto.FreelancerSkillDTO;
 import net.datasa.finders.domain.dto.MemberDTO;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.security.AuthenticatedUser;
+import net.datasa.finders.service.FreelancerPortfoliosService;
 import net.datasa.finders.service.MemberService;
 
 @Slf4j
@@ -39,6 +41,7 @@ import net.datasa.finders.service.MemberService;
 public class MemberController {
 
     private final MemberService memberService;
+	private final FreelancerPortfoliosService freelancerPortfoliosService;
 
     //application.properties 파일 관련 설정값
   	@Value("${member.uploadPath}")
@@ -136,7 +139,10 @@ public class MemberController {
     public String myPage(Model model, @AuthenticationPrincipal AuthenticatedUser user) {
     	String memberId = user.getUsername();
     	MemberDTO memberDTO = memberService.getMemberInfo(memberId);
-    	
+
+    	List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(memberId);
+		
+		model.addAttribute("portfoliosList", freelancerPortfoliosDTOList);
     	model.addAttribute("member", memberDTO);
     return "/member/myPage";
     }

@@ -1,14 +1,15 @@
 package net.datasa.finders.repository;
 
-import net.datasa.finders.domain.entity.MemberEntity;
-import net.datasa.finders.domain.entity.RoleName;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import net.datasa.finders.domain.entity.MemberEntity;
+import net.datasa.finders.domain.entity.RoleName;
 
 @Repository
 public interface MemberRepository extends JpaRepository<MemberEntity, String> {
@@ -24,8 +25,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
     // team 테이블의 데이터를 확인하기 위한 임시 메서드
     @Query(value = "SELECT project_num, member_id FROM team", nativeQuery = true)
     List<Object[]> findTeamEntries();
-
-    Optional<MemberEntity> findByMemberId(String memberId);
 
     // 새로운 쿼리 메서드 - JPQL 사용
     @Query("SELECT m FROM MemberEntity m WHERE m.memberId = :memberId")
@@ -49,5 +48,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
 
 
 	List<MemberEntity> findByRoleNameAndMemberIdContaining(RoleName roleFreelancer, String search);
-
+    // member_id로 멤버를 찾는 메서드
+    Optional<MemberEntity> findByMemberId(String memberId);
 }

@@ -34,9 +34,7 @@ public class FreelancerReviewController {
         String freelancerId = userDetails.getUsername(); // 프리랜서 ID 가져오기
         try {
             // 통합된 리뷰 DTO 리스트 조회 (클라이언트와 프리랜서가 남긴 리뷰 모두 포함)
-            List<UnifiedReviewDTO> reviews = freelancerReviewService.getAllReviewsForFreelancer(freelancerId);
-            model.addAttribute("reviews", reviews);
-            log.info("Retrieved reviews count: {}", reviews.size());
+            
             return "review/freelancerreview"; // Thymeleaf 템플릿 이름
         } catch (Exception e) {
             e.printStackTrace();

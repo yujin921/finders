@@ -35,19 +35,14 @@
 
     <div class="main-container">
         <aside>
-            <h2>포트폴리오 관리</h2>
-            <div class="sidebar-section">
-                <h3>포트폴리오 관리
-                <button class="add-btn">
-                    <a href="new_portfolio_page.html" class="add-page-link">+</a>
-                </button>
-                </h3>
-                <ul>
-                    <li>신유진 기획 포트폴리오</li>
-                    <li>신유진 개발 포트폴리오</li>
-                </ul>
-            </div>
-            <div class="sidebar-section">
+            <h2><a th:href="@{/member/myPage}">개인정보 수정</a></h2>
+		    <h2>포트폴리오 관리</h2>
+		    <div class="sidebar-section">
+		        <ul th:each="portfolio : ${portfoliosList}">
+		            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
+		        </ul>
+		    </div>
+		    <div class="sidebar-section">
                 <h3>개인 활동 페이지</h3>
                 <ul>
                     <li>VR 게임 프로젝트 활동</li>
@@ -61,8 +56,8 @@
             <form id="editorForm" class="editorForm" action="save" method="post">
 				<div class="titleContents">
 					<h1>제목</h1>
-					<div class="projectTitle">
-						 <input type="text" name="projectTitle" id="projectTitle">
+					<div class="portfolioTitle">
+						 <input type="text" name="portfolioTitle" id="portfolioTitle">
 					</div>
 					<button type="submit">포트폴리오 저장</button>
 				</div>
@@ -73,7 +68,7 @@
 							<div class="editor-container__toolbar" id="editor-toolbar"></div>
 							<div class="editor-container__editor-wrapper">
 								<div class="editor-container__editor">
-										<textarea name="projectDescription" id="projectDescription" style="display:none;"></textarea>
+										<textarea name="portfolioDescription" id="portfolioDescription" style="display:none;"></textarea>
 										<div id="editor"></div>
 								</div>
 							</div>

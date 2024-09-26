@@ -2,9 +2,11 @@ package net.datasa.finders.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,17 +27,21 @@ import net.datasa.finders.service.FreelancerPortfoliosService;
 @RequestMapping("portfolio")
 public class PortfolioController {
 	
-	private final FreelancerPortfoliosService FPService;
+	private final FreelancerPortfoliosService freelancerPortfoliosService;
 
 	@GetMapping("create")
-    public String portfolio() {
+    public String portfolio(Model model
+    		,@AuthenticationPrincipal AuthenticatedUser user) {
+		List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(user.getId());
+		
+		model.addAttribute("portfoliosList", freelancerPortfoliosDTOList);
 		
         return "/portfolio/create";
     }
 	
 	@PostMapping("save")
     public String save(@ModelAttribute FreelancerPortfoliosDTO FPDTO, @AuthenticationPrincipal AuthenticatedUser user) {
-		FPService.save(FPDTO, user);
+		freelancerPortfoliosService.save(FPDTO, user);
         return "/portfolio/portfolioList";
     }
 	
@@ -79,6 +85,19 @@ public class PortfolioController {
 
         // 저장된 파일의 경로를 반환
         return "{\"url\":\"http://localhost:8888/images/portfolio/" + file.getOriginalFilename() + "\"}";
+    }
+	
+	@GetMapping("content")
+    public String content(@RequestParam("portfolioId") int portfolioId
+    		,@AuthenticationPrincipal AuthenticatedUser user
+    		,Model model) {
+		FreelancerPortfoliosDTO freelancerPortfoliosDTO = freelancerPortfoliosService.findPortfolioById(portfolioId);
+		List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(user.getId());
+		
+		model.addAttribute("portfoliosList", freelancerPortfoliosDTOList);
+		
+		model.addAttribute("freelancerPortfolios", freelancerPortfoliosDTO);
+        return "portfolio/content";
     }
     
 }

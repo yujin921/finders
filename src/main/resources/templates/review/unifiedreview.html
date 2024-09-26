@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/review/writereview.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/review/writereview.js}"></script>
+    <title>평가 페이지</title>
+</head>
+<body>
+    <!-- Thymeleaf 변수를 JavaScript로 전달 -->
+    <div class="container">
+        <h1 class="title">평가 페이지</h1>
+        <div id="reviewData" 
+             th:data-user-id="${userId}" 
+             th:data-project-num="${projectNum}"></div>
+
+        <!-- 역할 선택 -->
+        <div class="role-selection">
+            <label for="roleSelect">평가할 대상 선택:</label>
+            <select id="roleSelect">
+                <option value="">-- 선택하세요 --</option>
+                <option value="client">클라이언트</option>
+                <option value="freelancer">프리랜서</option>
+            </select>
+        </div>
+        <br>
+
+        <!-- 프리랜서/클라이언트 선택 박스 -->
+        <div id="participantSelection" style="display: none;">
+            <label for="participantSelect">평가할 사람을 선택하세요:</label>
+            <select id="participantSelect"></select>
+        </div>
+        <br><br>
+
+        <!-- 프로젝트 만족도 평가 -->
+        <div id="ratingSection" style="display: none;">
+            <p class="subtitle">프로젝트는 만족하셨나요?</p>
+            <div class="stars">
+                <span class="star" data-value="1"></span>
+                <span class="star" data-value="2"></span>
+                <span class="star" data-value="3"></span>
+                <span class="star" data-value="4"></span>
+                <span class="star" data-value="5"></span>
+            </div>
+            <p id="rating-text" style="text-align: center;">선택하세요.</p>
+        </div>
+
+        <!-- 평가 항목 -->
+        <div id="checkboxGroup">
+            <!-- 체크박스 항목은 JavaScript에서 동적으로 생성 -->
+        </div>
+
+        <!-- 평가 코멘트 입력 -->
+        <div id="commentBox" class="comment-box" style="display: none;">
+            <textarea placeholder="어떤 점이 좋았나요?"></textarea>
+        </div>
+
+        <!-- 버튼 그룹 -->
+        <div id="buttonSection" class="buttons" style="display: none;">
+            <button class="button cancel" onclick="window.location.href='/project/list';">취소</button>
+            <button id="submitButton" class="button submit">등록</button>
+        </div>
+    </div>
+</body>
+</html>
