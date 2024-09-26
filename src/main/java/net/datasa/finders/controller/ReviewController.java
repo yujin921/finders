@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ClientDataDTO;
 import net.datasa.finders.domain.dto.ClientReviewDTO;
-import net.datasa.finders.domain.dto.FreelancerDataDTO;
 import net.datasa.finders.domain.dto.FreelancerReviewDTO;
 import net.datasa.finders.repository.ProjectPublishingRepository;
 import net.datasa.finders.service.ClientReviewService;
@@ -35,6 +34,7 @@ public class ReviewController {
     private final ClientReviewService clientReviewService;
     private final ProjectPublishingRepository projectRepository;
     
+   
     @PostMapping("/submitReview")
     public ResponseEntity<String> submitReview(
             @RequestBody FreelancerReviewDTO reviewDTO, 
@@ -78,7 +78,7 @@ public class ReviewController {
 
         try {
             // FreelancerReviewService의 getFreelancersByProject 호출
-            List<FreelancerDataDTO> freelancers = freelancerReviewService.getFreelancersByProject(projectNum, clientId);
+            List<ClientDataDTO> freelancers = freelancerReviewService.getFreelancersByProject(projectNum, clientId);
             log.info("프리랜서 목록: {}", freelancers);
             return ResponseEntity.ok(freelancers);
         } catch (Exception e) {
@@ -86,7 +86,6 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("프리랜서 목록을 가져오는 중 오류가 발생했습니다.");
         }
     }
-    
     @GetMapping("/getParticipants")
     public ResponseEntity<List<ClientDataDTO>> getParticipants(
             @RequestParam("projectNum") int projectNum,
@@ -129,7 +128,7 @@ public class ReviewController {
             if (!projectExists(reviewDTO.getProjectNum())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("존재하지 않는 프로젝트 번호입니다.");
             }
-
+            
             // 클라이언트 리뷰 저장
             clientReviewService.createClientReview(reviewDTO);
             return ResponseEntity.ok("리뷰가 성공적으로 저장되었습니다.");

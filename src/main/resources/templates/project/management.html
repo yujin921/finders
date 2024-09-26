@@ -88,12 +88,18 @@
         </aside>
         <!-- 메인 화면 -->
         <main class="main-content">
-            <!--  <header>
-                <div class="profile">
-                    <img src="/images/basicProfile.png" alt="프로필 이미지">
-                </div>
-                <h1>제목</h1>
-            </header>-->
+            
+            <!-- 선택 모달창 -->
+		    <div id="select-modal" class="modal hidden">
+		        <div class="modal-content">
+		            <h3>일정 추가</h3>
+		            <p>어떤 일정을 추가하시겠습니까?</p>
+		            <button id="add-task">업무 등록</button>
+		            <button id="add-event">업무 외 일정 추가</button>
+		            <button class="btn-close" id="close-select-modal">취소</button>
+		        </div>
+		    </div>
+            
             <section class="content">
                 <div id="task-content" class="tab-content active">                    
                     <div id="task-list">

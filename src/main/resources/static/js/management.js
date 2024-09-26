@@ -22,7 +22,7 @@ function updateProgressDisplay() {
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
-    let calendar;
+    const calendarEl = document.getElementById('calendar');
 	let ganttChart; // Gantt 차트 인스턴스를 저장할 변수
 	let timeline;
 	let ganttChartLoaded = false;
@@ -222,6 +222,13 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#close-task-modal').on('click', function() {
         $('#task-modal').addClass('hidden').hide();
     });
+
+	// 모달 바깥 영역 클릭 시 모달 닫기
+	$('#task-modal').on('click', function(event) {
+		if (event.target === this) { // 모달 바깥 영역(오버레이)을 클릭했을 때만 닫기
+			$(this).addClass('hidden').hide();
+		}
+	});
 
     console.log("projectNum 체크용: ", projectNum);
 
@@ -550,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	function loadCalendar() {
 	    if (calendar) return; // 이미 캘린더가 로드된 경우
 
-	    const calendarEl = document.getElementById('calendar');
+	    calendarEl = document.getElementById('calendar');
 	    if (!calendarEl) return;
 
 	    $.ajax({
@@ -606,6 +613,34 @@ document.addEventListener('DOMContentLoaded', function() {
 	            return 'gray'; // 기본 색상
 	    }
 	}
+	
+	calendarEl = document.getElementById('calendar');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        dateClick: function(info) {
+            // 선택 모달 열기
+            document.getElementById('select-modal').classList.remove('hidden');
+        }
+    });
+
+    calendar.render();
+
+    // 업무 등록 버튼 클릭 시
+    document.getElementById('add-task').addEventListener('click', function() {
+        document.getElementById('select-modal').classList.add('hidden');
+        document.getElementById('task-modal').classList.remove('hidden');
+    });
+
+    // 캘린더 업무 외 일정 추가 버튼 클릭 시
+    document.getElementById('add-event').addEventListener('click', function() {
+        document.getElementById('select-modal').classList.add('hidden');
+        document.getElementById('event-modal').classList.remove('hidden');
+    });
+
+    // 모달 닫기
+    document.getElementById('close-select-modal').addEventListener('click', function() {
+        document.getElementById('select-modal').classList.add('hidden');
+    });
 	
 	function handleEventFormSubmit(event) {
 	    event.preventDefault();
@@ -1846,7 +1881,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 function loadApplicationList() {
-    fetch('/project/application-list')  // 서버에서 클라이언트의 지원자 목록을 가져옴
+	const projectNum = getQueryParam('projectNum');
+    fetch(`/project/application-list?projectNum=${projectNum}`)  // 서버에서 클라이언트의 지원자 목록을 가져옴
         .then(response => response.json())
         .then(applications => {
             let contentHtml = `
@@ -1958,7 +1994,7 @@ function loadTeamList() {
                     contentHtml += `
                     <tr>
                         <td>${member.memberId}</td>
-                        <td>${member.role || '팀원'}</td> <!-- 역할 정보가 있으면 표시, 없으면 '팀원' -->
+                        <td>${member.roleName === 'ROLE_CLIENT' ? '클라이언트' : '프리랜서'}</td> <!-- 역할 정보가 있으면 표시, 없으면 '팀원' -->
                         <td>${member.status || '활동 중'}</td> <!-- 상태 정보가 있으면 표시, 없으면 '활동 중' -->
                     </tr>
                     `;
