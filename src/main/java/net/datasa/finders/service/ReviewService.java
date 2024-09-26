@@ -28,7 +28,7 @@ public class ReviewService {
     private final ProjectPublishingRepository projectPublishingRepository;
 
     @Transactional
-    public FreelancerReviewDTO createFreelancerReview(FreelancerReviewDTO reviewDTO) {
+    public void createFreelancerReview(FreelancerReviewDTO reviewDTO) {
         boolean isReviewCompleted = reviewRepository.existsByProjectNumAndClientIdAndFreelancerId(
                 reviewDTO.getProjectNum(), reviewDTO.getClientId(), reviewDTO.getFreelancerId());
 
@@ -39,7 +39,7 @@ public class ReviewService {
         FreelancerReviewsEntity savedReviewEntity = saveReviewEntity(reviewDTO);
         saveReviewItems(reviewDTO.getReviewItems(), savedReviewEntity);
 
-        return FreelancerReviewDTO.builder()
+        FreelancerReviewDTO.builder()
                 .reviewId(savedReviewEntity.getReviewId())
                 .projectNum(savedReviewEntity.getProjectNum())
                 .clientId(savedReviewEntity.getClientId())
