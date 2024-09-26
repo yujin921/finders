@@ -223,6 +223,13 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#task-modal').addClass('hidden').hide();
     });
 
+	// 모달 바깥 영역 클릭 시 모달 닫기
+	$('#task-modal').on('click', function(event) {
+		if (event.target === this) { // 모달 바깥 영역(오버레이)을 클릭했을 때만 닫기
+			$(this).addClass('hidden').hide();
+		}
+	});
+
     console.log("projectNum 체크용: ", projectNum);
 
     // 기능 분류 목록 로드 함수
