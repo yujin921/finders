@@ -68,7 +68,7 @@
     <div class="container">
         <!-- 사이드 바 -->
         <aside class="sidebar">
-            <button class="btn-create-project" id="add-task-button">업무 등록</button>
+            <button class="btn-create-project add-task-buttons" id="add-task-button">업무 등록</button>
             <nav class="nav1">
                 <ul>
                     
@@ -94,7 +94,7 @@
 		        <div class="modal-content">
 		            <h3>일정 추가</h3>
 		            <p>어떤 일정을 추가하시겠습니까?</p>
-		            <button id="add-task">업무 등록</button>
+		            <button id="add-task" class="add-task-buttons">업무 등록</button>
 		            <button id="add-event">업무 외 일정 추가</button>
 		            <button class="btn-close" id="close-select-modal">취소</button>
 		        </div>
@@ -294,7 +294,7 @@
                     <input type="time" id="event-end-time" required>
                 </div>
                 <div class="modal-buttons">
-                    <button type="button" class="btn-close">취소</button>
+                    <button type="button" class="btn-close" id="close-event-modal">취소</button>
                     <button type="submit" class="btn-save">저장</button>
                 </div>
             </form>

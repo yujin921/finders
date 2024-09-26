@@ -22,7 +22,10 @@ function updateProgressDisplay() {
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
+	let calendar;
     const calendarEl = document.getElementById('calendar');
+	let currentEventId; // 선택된 이벤트 ID를 저장하기 위한 변수
+	let selectedDate; // 선택한 날짜 저장 변수
 	let ganttChart; // Gantt 차트 인스턴스를 저장할 변수
 	let timeline;
 	let ganttChartLoaded = false;
@@ -194,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	*/
 
     // 업무 등록 버튼 클릭 시 모달 창 열기
-    $('#add-task-button').on('click', function() {
+    $('.add-task-buttons').on('click', function() {
 		
 		console.log('Opening task modal'); // 모달이 열릴 때 로그 출력
 		console.log('Project Number:', projectNum); // projectNum 값 로그 출력
@@ -416,6 +419,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	            // 업무 목록 업데이트
 	            loadTasks();
+				
+				// 캘린더 새로 고침(새로 등록한 업무 일정을 캘린더 화면에 반영하기 위해 호출함)
+				loadCalendar(); // 캘린더 새로 고침 호출
+
 	        },
 	        error: function(xhr) {
 	            alert('업무 등록에 실패했습니다: ' + xhr.responseText);
@@ -512,7 +519,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	    return `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
 	}
 
-
  	
 	// 프로젝트 완료 버튼 클릭 시
 	$('#project-completion-button').on('click', function() {
@@ -548,11 +554,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 	// 캘린더 로드
 	function loadCalendar() {
-	    if (calendar) return; // 이미 캘린더가 로드된 경우
+		if (calendar) {
+		        calendar.destroy(); // 기존 캘린더 제거
+			}
 
-	    calendarEl = document.getElementById('calendar');
-	    if (!calendarEl) return;
+	    if (!calendarEl) return; // 캘린더 엘리먼트가 없으면 함수를 종료
 
+	    // 먼저 업무 일정을 가져옵니다.
 	    $.ajax({
 	        url: `calendar?projectNum=${projectNum}`, // 프로젝트 번호를 쿼리 파라미터로 전달
 	        type: 'GET',
@@ -560,27 +568,95 @@ document.addEventListener('DOMContentLoaded', function() {
 	        success: function(tasks) {
 	            // 캘린더 초기화
 	            calendar = new FullCalendar.Calendar(calendarEl, {
-	                initialView: 'dayGridMonth',
+	                initialView: 'dayGridMonth', // 초기 뷰 설정
 	                headerToolbar: {
-	                    left: 'prev,next today',
-	                    center: 'title',
-	                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+	                    left: 'prev,next today', // 이전, 다음, 오늘 버튼
+	                    center: 'title', // 제목 중앙 배치
+	                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth' // 다양한 뷰 옵션
 	                },
-	                events: tasks.map(task => ({
-	                    title: task.taskTitle, // 업무 제목
-	                    start: task.actualStartDate ? task.actualStartDate : task.taskStartDate, // 실제 시작 날짜가 있으면 사용
-	                    end: task.actualEndDate ? task.actualEndDate : task.taskEndDate || undefined, // 실제 종료 날짜가 있으면 사용
-	                    color: getColorByStatus(task.taskStatus) // 상태에 따라 색상 변경
-	                })),
+	                events: [
+	                    ...tasks.map(task => ({
+	                        title: task.taskTitle, // 업무 제목
+	                        start: task.actualStartDate ? task.actualStartDate : task.taskStartDate, // 실제 시작 날짜가 있으면 사용
+	                        end: task.actualEndDate ? task.actualEndDate : task.taskEndDate || undefined, // 실제 종료 날짜가 있으면 사용
+	                        color: getColorByStatus(task.taskStatus) // 상태에 따라 색상 변경
+	                    }))
+	                ],
 	                dateClick: function(info) {
-	                    openEventModal(info.dateStr); // 날짜 클릭 시 이벤트 모달 열기
+	                    // 날짜 클릭 시 선택 모달 열기
+	                    document.getElementById('select-modal').classList.remove('hidden');
+	                    selectedDate = info.dateStr; // 선택한 날짜 저장
 	                },
-	                eventClick: function(info) {
+					eventClick: function(info) {
+					        currentEventId = info.event.extendedProps.eventId; // 클릭한 이벤트의 eventId 저장
+					        openEventDetailModal(info.event); // 상세 모달 열기
+					}
+					
+	                /*
+					eventClick: function(info) {
 	                    openEventDetailModal(info.event); // 이벤트 클릭 시 상세 모달 열기
 	                }
+					*/
 	            });
 
-	            calendar.render(); // 캘린더 렌더링
+	            // 이제 업무 외 일정을 가져오는 요청
+	            $.ajax({
+	                url: 'calendar/events?projectNum=' + projectNum, // 업무 외 일정을 가져올 API 경로
+	                method: 'GET',
+	                dataType: 'json',
+	                success: function(externalEvents) {
+	                    // 외부 이벤트를 캘린더에 추가
+	                    externalEvents.forEach(event => {
+	                        let eventColor;
+
+	                        // 색상 설정: 이벤트 유형에 따라 구분
+	                        if (event.eventType === '1') { // 반복 일정
+	                            eventColor = 'blue'; // 반복 일정의 색상
+
+	                            // 반복 일정의 각 날짜에 대해 이벤트 추가
+	                            const startDate = new Date(event.startDate); // 시작 날짜
+	                            const endDate = new Date(event.endDate); // 종료 날짜
+
+	                            // 시작 날짜부터 종료일 전날까지 반복
+	                            while (startDate < endDate) {
+	                                // 이벤트 시작과 종료 시간 설정
+	                                const eventStart = new Date(startDate); // 현재 날짜
+	                                const eventEnd = new Date(startDate); // 종료 날짜
+
+	                                // 시작 및 종료 시간을 설정
+	                                eventStart.setHours(event.startDate.split('T')[1].split(':')[0], event.startDate.split('T')[1].split(':')[1], 0); // 시작 시간
+	                                eventEnd.setHours(event.endDate.split('T')[1].split(':')[0], event.endDate.split('T')[1].split(':')[1], 0); // 종료 시간
+
+	                                // 이벤트 추가
+	                                calendar.addEvent({
+	                                    title: event.title,
+	                                    start: eventStart.toISOString(), // ISO 포맷의 시작 날짜
+	                                    end: eventEnd.toISOString(), // ISO 포맷의 종료 날짜
+	                                    color: eventColor // 반복 일정의 색상
+	                                });
+
+	                                // 다음 날로 이동
+	                                startDate.setDate(startDate.getDate() + 1);
+	                            }
+	                        } else if (event.eventType === '2') { // 단기 일정
+	                            eventColor = 'green'; // 단기 일정의 색상
+	                            calendar.addEvent({
+	                                title: event.title,
+	                                start: event.startDate,
+	                                end: event.endDate,
+	                                color: eventColor // 단기 일정의 색상
+	                            });
+	                        }
+	                    });
+
+	                    // 캘린더 렌더링
+	                    calendar.render();
+	                },
+	                error: function(xhr) {
+	                    console.error('업무 외 일정 로드 실패:', xhr.responseText); // 에러 로그
+	                    alert('업무 외 일정을 로드하는 데 실패했습니다.'); // 사용자 알림
+	                }
+	            });
 	        },
 	        error: function(xhr) {
 	            console.error('업무 로드 실패:', xhr.responseText); // 에러 로그
@@ -606,28 +682,30 @@ document.addEventListener('DOMContentLoaded', function() {
 	            return 'gray'; // 기본 색상
 	    }
 	}
-	
-	calendarEl = document.getElementById('calendar');
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        dateClick: function(info) {
-            // 선택 모달 열기
-            document.getElementById('select-modal').classList.remove('hidden');
-        }
+	// 선택 모달 이벤트 설정
+    calendarEl.addEventListener('dateClick', function(info) {
+        document.getElementById('select-modal').classList.remove('hidden');
     });
-
-    calendar.render();
 
     // 업무 등록 버튼 클릭 시
     document.getElementById('add-task').addEventListener('click', function() {
         document.getElementById('select-modal').classList.add('hidden');
         document.getElementById('task-modal').classList.remove('hidden');
+		
+		// 선택한 날짜를 업무 등록 모달에 설정할 수 있음
+	    document.getElementById('task-start-date').value = selectedDate;
+	    document.getElementById('task-end-date').value = selectedDate;
     });
 
     // 캘린더 업무 외 일정 추가 버튼 클릭 시
     document.getElementById('add-event').addEventListener('click', function() {
         document.getElementById('select-modal').classList.add('hidden');
         document.getElementById('event-modal').classList.remove('hidden');
+		
+		// 선택한 날짜를 일정 추가 모달에 설정할 수 있음
+	    document.getElementById('event-start-date').value = selectedDate;
+	    document.getElementById('event-end-date').value = selectedDate;
     });
 
     // 모달 닫기
@@ -635,65 +713,172 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('select-modal').classList.add('hidden');
     });
 	
-	function handleEventFormSubmit(event) {
+	// 모달 닫기 함수
+	function closeModal(modalId) {
+	    document.getElementById(modalId).classList.add('hidden');
+	}
+
+	// 'event-modal' 닫기 버튼
+	document.getElementById('close-event-modal').addEventListener('click', function() {
+	    closeModal('event-modal');
+	});
+
+	// 일정 추가 폼 제출 처리
+	document.getElementById('event-form').addEventListener('submit', function(event) {
 	    event.preventDefault();
 	    
 	    const title = document.getElementById('event-title').value;
+	    const type = document.getElementById('event-type').value; // 일정 유형
 	    const startDate = document.getElementById('event-start-date').value;
 	    const endDate = document.getElementById('event-end-date').value;
 	    const startTime = document.getElementById('event-start-time').value;
 	    const endTime = document.getElementById('event-end-time').value;
 
-	    const eventData = {
-	        title: title,
-	        startDate: `${startDate}T${startTime}:00`,
-	        endDate: `${endDate}T${endTime}:00`,
-	        eventType: document.getElementById('event-type').value,
-	        projectNum: projectNum // 추가: 현재 프로젝트 번호 전달
+	    // 중복 일정 체크를 위한 이벤트 가져오기
+	    const events = calendar.getEvents();
+	    const isDuplicate = (start, end) => {
+	        return events.some(event =>
+	            (event.title === title && 
+	            event.startStr === start && 
+	            event.endStr === end)
+	        );
 	    };
 
-	    $.ajax({
-	        url: '/calendar/event',
-	        type: 'POST',
-	        contentType: 'application/json',
-	        data: JSON.stringify(eventData),
-	        success: function(savedEvent) {
-	            calendar.addEvent({
-	                title: savedEvent.title,
-	                start: savedEvent.startDate,
-	                end: savedEvent.endDate,
-	            });
-	            document.getElementById('event-modal').classList.add('hidden');
-	            document.getElementById('event-form').reset();
-	        },
-	        error: function(xhr) {
-	            console.error('일정 등록 실패:', xhr.responseText);
-	            alert('일정을 등록하는 데 실패했습니다.');
+	    // 일정 등록 처리
+	    if (title && startDate && endDate) {
+	        let eventAdded = false; // 이벤트 추가 여부 플래그
+
+	        if (type === '1') {
+	            // 일일 일정 (반복 일정)
+	            let currentDate = new Date(startDate);
+	            const endDateObj = new Date(endDate);
+
+	            while (currentDate <= endDateObj) {
+	                const eventStart = `${currentDate.toISOString().split('T')[0]}T${startTime}:00`;
+	                const eventEnd = `${currentDate.toISOString().split('T')[0]}T${endTime}:00`;
+
+	                if (!isDuplicate(eventStart, eventEnd)) {
+	                    calendar.addEvent({
+	                        title: title,
+	                        start: eventStart,
+	                        end: eventEnd,
+							color: 'blue' // 반복 일정 색상
+	                    });
+	                    eventAdded = true; // 이벤트 추가됨
+	                }
+	                currentDate.setDate(currentDate.getDate() + 1);
+	            }
+	        } else if (type === '2') {
+	            // 단일 기간 일정
+	            const startDateTime = `${startDate}T${startTime}:00`;
+	            const endDateTime = `${endDate}T${endTime}:00`;
+
+	            if (!isDuplicate(startDateTime, endDateTime)) {
+	                calendar.addEvent({
+	                    title: title,
+	                    start: startDateTime,
+	                    end: endDateTime,
+						color: 'green' // 단일 기간 일정 색상
+	                });
+	                eventAdded = true; // 이벤트 추가됨
+	            }
 	        }
+
+	        // AJAX 요청 처리 (서버에 일정 저장)
+	        const eventData = {
+	            title: title,
+	            startDate: `${startDate}T${startTime}:00`,
+	            endDate: `${endDate}T${endTime}:00`,
+	            eventType: type,
+	            projectNum: projectNum // 현재 프로젝트 번호 전달
+	        };
+
+	        $.ajax({
+	            url: 'calendar/event',
+	            type: 'POST',
+	            contentType: 'application/json',
+	            data: JSON.stringify(eventData),
+	            success: function(savedEvent) {
+	                // 서버에서 반환된 이벤트 추가
+	                if (!eventAdded) {
+	                    calendar.addEvent({
+							id: savedEvent.eventId, // 서버에서 받은 eventId 저장
+	                        title: savedEvent.title,
+	                        start: savedEvent.startDate,
+	                        end: savedEvent.endDate
+	                    });
+	                }
+	                // 모달 닫기 및 폼 리셋
+	                closeModal('event-modal');
+	                document.getElementById('event-form').reset();
+	            },
+	            error: function(xhr) {
+	                console.error('일정 등록 실패:', xhr.responseText);
+	                alert('일정을 등록하는 데 실패했습니다.');
+	            }
+	        });
+	    }
+	});
+
+	// 일정 상세 모달 열기
+	function openEventDetailModal(event) {
+
+		console.log("eventId 확인용 : ", currentEventId);
+		
+	    const modal = document.createElement('div');
+	    modal.classList.add('modal');
+
+	    const modalContent = document.createElement('div');
+	    modalContent.classList.add('modal-content');
+
+	    const title = document.createElement('h3');
+	    title.textContent = event.title;
+
+	    const details = document.createElement('p');
+	    details.textContent = formatEventDetails(event);
+
+	    const closeButton = document.createElement('button');
+	    closeButton.textContent = 'Close';
+	    closeButton.classList.add('btn-close');
+	    closeButton.addEventListener('click', () => {
+	        document.body.removeChild(modal);
 	    });
+
+	    const deleteButton = document.createElement('button');
+	    deleteButton.textContent = 'Delete';
+	    deleteButton.classList.add('btn-delete');
+	    deleteButton.addEventListener('click', () => {
+			// 서버에 삭제 요청
+			$.ajax({
+			    url: 'calendar/deleteEvent?eventId=' + currentEventId, // URL에 eventId 포함
+			    type: 'POST', // POST 방식
+			    success: function() {
+			        // 삭제 성공 시 캘린더에서 이벤트 제거
+			        event.remove(); // 캘린더에서 이벤트 삭제
+			        document.body.removeChild(modal); // 모달 닫기
+			        alert('일정이 삭제되었습니다.'); // 사용자에게 알림
+			    },
+			    error: function(xhr) {
+			        console.error('일정 삭제 실패:', xhr.responseText);
+			        const errorMessage = xhr.status === 404 ? '일정을 찾을 수 없습니다.' : '일정을 삭제하는 데 실패했습니다.';
+			        alert(errorMessage); // 에러 메시지
+			    }
+			});
+	    });
+
+	    const buttonsContainer = document.createElement('div');
+	    buttonsContainer.classList.add('modal-buttons');
+	    buttonsContainer.appendChild(closeButton);
+	    buttonsContainer.appendChild(deleteButton);
+
+	    modalContent.appendChild(title);
+	    modalContent.appendChild(details);
+	    modalContent.appendChild(buttonsContainer);
+	    modal.appendChild(modalContent);
+
+	    document.body.appendChild(modal);
 	}
-
-    // 일정 추가 모달 열기
-    function openEventModal(dateStr) {
-		
-        const eventModal = document.getElementById('event-modal');
-        const eventForm = document.getElementById('event-form');
-
-        eventModal.classList.remove('hidden');
-        document.getElementById('event-start-date').value = dateStr;
-        document.getElementById('event-end-date').value = dateStr;
-
-        const closeButton = eventModal.querySelector('.btn-close');
-        closeButton.addEventListener('click', () => {
-            eventModal.classList.add('hidden');
-        });
-
-        // 기존의 이벤트 리스너를 제거하고 새로운 리스너를 추가
-        eventForm.removeEventListener('submit', handleEventFormSubmit);
-        eventForm.addEventListener('submit', handleEventFormSubmit);
-		
-    }
-
+	
 	/*
     // 이벤트 폼 제출 핸들러
     function handleEventFormSubmit(event) {
@@ -761,17 +946,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('event-form').reset();
         }
     }
-	*/
-
-    // 모달 내용 초기화
-    function resetEventForm() {
-        document.getElementById('event-title').value = '';
-        document.getElementById('event-type').value = '1';
-        document.getElementById('event-start-date').value = '';
-        document.getElementById('event-end-date').value = '';
-        document.getElementById('event-start-time').value = '';
-        document.getElementById('event-end-time').value = '';
-    }
 
     // 일정 상세 모달 열기
     function openEventDetailModal(event) {
@@ -814,6 +988,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.body.appendChild(modal);
     }
+	*/
 
     // 일정 상세 내용 포맷팅
     function formatEventDetails(event) {
