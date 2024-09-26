@@ -21,9 +21,9 @@ public class ManagementRestController {
     private final ProjectApplicationService projectApplicationService;
 
     @GetMapping("application-list")
-    public ResponseEntity<List<ProjectApplicationDTO>> getApplicationsForClient(@AuthenticationPrincipal AuthenticatedUser user) {
+    public ResponseEntity<List<ProjectApplicationDTO>> getApplicationsForClient(@AuthenticationPrincipal AuthenticatedUser user, @RequestParam("projectNum") int projectNum) {
         // 클라이언트가 작성한 프로젝트에 지원한 프리랜서 목록을 가져옴
-        List<ProjectApplicationDTO> applications = projectApplicationService.getApplicationsByClient(user.getUsername());
+        List<ProjectApplicationDTO> applications = projectApplicationService.getApplicationsByClient(projectNum, user.getUsername());
         return ResponseEntity.ok(applications);
     }
 

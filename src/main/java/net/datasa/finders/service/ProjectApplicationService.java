@@ -109,13 +109,15 @@ public class ProjectApplicationService {
     }
 
     // 클라이언트가 작성한 프로젝트에 지원한 프리랜서 목록을 조회하는 메서드
-    public List<ProjectApplicationDTO> getApplicationsByClient(String clientId) {
+    public List<ProjectApplicationDTO> getApplicationsByClient(int projectNum, String clientId) {
         // clientId를 기반으로 Client의 프로젝트 목록을 조회
         MemberEntity client = memberRepository.findByCustomMemberId(clientId)
                 .orElseThrow(() -> new RuntimeException("Client not found"));
+        ProjectPublishingEntity project = projectPublishingRepository.findById(projectNum)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
 
         // 클라이언트가 올린 프로젝트에 지원한 프리랜서 목록을 가져옴
-        List<ProjectApplicationEntity> applications = projectApplicationRepository.findByProjectNum_ClientId(client);
+        List<ProjectApplicationEntity> applications = projectApplicationRepository.findByProjectNumAndProjectNum_ClientId(project, client);
 
         // Entity 리스트를 DTO 리스트로 변환
         return applications.stream()
@@ -135,6 +137,7 @@ public class ProjectApplicationService {
                 .map(team -> TeamDTO.builder()
                         .projectNum(team.getProjectNum())
                         .memberId(team.getMemberId())
+                        .roleName(team.getMember().getRoleName().toString())
                         .build())
                 .collect(Collectors.toList());
     }
