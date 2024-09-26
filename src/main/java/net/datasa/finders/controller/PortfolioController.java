@@ -2,6 +2,7 @@ package net.datasa.finders.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -84,12 +85,14 @@ public class PortfolioController {
 	
 	@GetMapping("content")
     public String content(@RequestParam("portfolioId") int portfolioId
+    		,@AuthenticationPrincipal AuthenticatedUser user
     		,Model model) {
-		log.debug("출력 1");
 		FreelancerPortfoliosDTO freelancerPortfoliosDTO = freelancerPortfoliosService.findPortfolioById(portfolioId);
+		List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(user.getId());
+		
+		model.addAttribute("portfoliosList", freelancerPortfoliosDTOList);
 		
 		model.addAttribute("freelancerPortfolios", freelancerPortfoliosDTO);
-		log.debug("출력 2");
         return "portfolio/content";
     }
     
