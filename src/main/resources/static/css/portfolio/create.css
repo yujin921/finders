@@ -165,12 +165,13 @@ main {
 	padding: 20px 0;
 }
 
-.projectTitle {
+.portfolioTitle {
     flex-grow: 0.8;
     margin: 0 20px;
     position: relative;
 }
-.projectTitle input {
+
+.portfolioTitle input {
     width: 100%;
     padding: 12px 45px 12px 20px;
     border: 1px solid #ddd;

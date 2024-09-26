@@ -1,6 +1,7 @@
 package net.datasa.finders.controller;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,9 +14,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FindFreelancerDTO;
+import net.datasa.finders.domain.dto.FreelancerPortfoliosDTO;
+import net.datasa.finders.domain.dto.FreelancerReviewDTO;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.FindService;
+import net.datasa.finders.service.FreelancerPortfoliosService;
+import net.datasa.finders.service.FreelancerReviewService;
 import net.datasa.finders.service.MemberService;
 
 @Slf4j
@@ -31,6 +36,8 @@ public class FindController {
 	
 	private final MemberService memberService;
 	private final FindService findService;
+	private final FreelancerPortfoliosService freelancerPortfoliosService;
+	private final FreelancerReviewService freelancerReviewService;
 
   	@GetMapping("view")
   	public String view(Model model, Principal principal) {
@@ -50,12 +57,12 @@ public class FindController {
   	public String freelancerDetail(@RequestParam("memberId") String memberId
   			, Model model
   			, @AuthenticationPrincipal AuthenticatedUser user) {
-  	    if(user == null) {
-  	    	return "/member/loginForm";
-  	    }
   	    FindFreelancerDTO findFreelancerDTO = findService.findFreelancerDetail(memberId);
+  	    List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(memberId);
   	    
   	    
+  	    model.addAttribute("findFreelancerDTO", findFreelancerDTO);
+  	    model.addAttribute("freelancerPortfoliosDTOList", freelancerPortfoliosDTOList);
   	    
   	    return "/find/freelancerDetail"; // home.html 템플릿으로 이동
   	}

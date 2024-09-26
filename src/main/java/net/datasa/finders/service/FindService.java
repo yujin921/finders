@@ -44,45 +44,7 @@ public class FindService {
 
 					if(clientFieldRepository.findByClientIdAndFieldText(memberEntity, field).isPresent() && clientCategoryRepository.findByClientIdAndCategoryText(memberEntity, area).isPresent()) {
 						
-						List<FreelancerReviewsEntity> freelancerReviewsEntityList = freelancerReviewsRepository.findByFreelancerId(memberEntity.getMemberId());
-						
-						double totalRating = 0.0;
-						for (FreelancerReviewsEntity freelancerReviewsEntity : freelancerReviewsEntityList) {
-							
-							FreelancerReviewDTO freelancerReviewDTO = FreelancerReviewDTO.builder()
-									.rating(freelancerReviewsEntity.getRating())
-									.build();
-							totalRating += freelancerReviewDTO.getRating();
-						} // 모든 평점 합산
-						
-						totalRating /= freelancerReviewsEntityList.size();
-						
-						if(Double.isNaN(totalRating)) {
-							totalRating = 0.0;
-						} // 평점이 없을 경우 0점 입력
-						
-						List<FreelancerSkillEntity> freelancerSkillEntityList = freelancerSkillRepository.findByFreelancerId(memberEntity);
-	
-						String[] skills = new String[freelancerSkillEntityList.size()];
-						int i = 0;
-						for (FreelancerSkillEntity freelancerSkillEntity : freelancerSkillEntityList) {
-							skills[i] = freelancerSkillEntity.getSkillText();
-							i += 1;
-						} // 프리랜서 보유 스킬 찾기
-						
-						List<FreelancerPortfoliosEntity> freelancerPortfoliosEntityList = freelancerPortfoliosRepository.findByMember(memberEntity);
-						
-						List<TeamEntity> teamEntityList = teamRepository.findByMember(memberEntity);
-						
-						FindFreelancerDTO findFreelancerDTO = FindFreelancerDTO.builder()
-								.memberId(memberEntity.getMemberId())
-								.profileImg(memberEntity.getProfileImg())
-								.totalRating(totalRating)
-								.totalPortfolios(freelancerPortfoliosEntityList.size())
-								.totalReviews(freelancerReviewsEntityList.size())
-								.totalProjects(teamEntityList.size())
-								.skills(skills)
-								.build();
+						FindFreelancerDTO findFreelancerDTO = findFreelancerDetail(memberEntity.getMemberId());
 						
 						if(!findFreelancerDTOList.contains(findFreelancerDTO)) {
 							findFreelancerDTOList.add(findFreelancerDTO);

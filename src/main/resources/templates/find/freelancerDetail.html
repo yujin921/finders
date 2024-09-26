@@ -1,128 +1,147 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>finders</title>
-    <link rel="stylesheet" th:href="@{/css/find/view.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${findFreelancerDTO.name} + '의 상세 정보'">파트너 상세 정보</title>
+    <link rel="stylesheet" th:href="@{/css/find/freelancerDetail.css}">
     <!-- Font Awesome 추가 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-    <script th:src="@{/js/findFreelancer/view.js}"></script>
-
+    <script th:src="@{/js/findFreelancer/freelancerDetail.js}"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #3f51b5;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            margin-bottom: 20px;
+        }
+        .partner-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .rating .material-icons {
+            color: #ffc107;
+            font-size: 24px;
+        }
+        .partner-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .skills {
+            background-color: #e8eaf6;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .portfolio-section, .reviews-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .portfolio-item, .review-item {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px 0;
+        }
+        .portfolio-item:last-child, .review-item:last-child {
+            border-bottom: none;
+        }
+        @media (max-width: 768px) {
+            .partner-stats {
+                flex-direction: column;
+            }
+            .partner-stats span {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header Section -->
     <header>
         <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <a href="/">
-                        <img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
-                    </a>
-                </div>
-                <div class="login-actions">
-                    <!-- 비로그인 상태 -->
-                    <th:block sec:authorize="not isAuthenticated()">
-                        <a th:href="@{/member/join}">회원가입</a>
-                        <a th:href="@{/member/login}" class="btn">로그인</a>
-                    </th:block>
-                    
-                    <!-- 로그인 상태 -->
-                    <th:block sec:authorize="isAuthenticated()">
-                        <img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
-                        <a th:href="@{/project/view}">프로젝트 관리</a>
-                        <a th:href="@{/member/myPage}">마이페이지</a>
-                        <a th:href="@{/member/logout}" class="btn">로그아웃</a>
-                    </th:block>
-                </div>
-            </div>
+            <h1 th:text="${findFreelancerDTO.memberId} + '의 상세 정보'">파트너 상세 정보</h1>
         </div>
     </header>
 
-    <!-- Navigation Menu -->
-    <nav>
-        <ul>
-            <li sec:authorize="hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN')"><a href="board/write">프로젝트 등록</a></li>
-            <li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
-            <li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
-            <li><a href="#">서비스 안내</a></li>
-            <li><a href="#">이용 사례</a></li>
-            <li><a href="#">커뮤니티</a></li>
-            <span>│</span>
-            <li><a th:href="@{/myProject/view}">내 프로젝트 목록</a></li>
-            <li><a th:href="@{/project/management}">프로젝트 관리</a></li>
-            <li><a href="#">미팅룸</a></li>
-        </ul>
-    </nav>
+    <main class="container">
+        <section class="partner-info">
+            <h2 th:text="${findFreelancerDTO.memberId}">파트너 ID</h2>
+            <div class="rating">
+                <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                    <span class="material-icons" 
+                          th:text="${i <= findFreelancerDTO.totalRating} ? 'star' : (${i <= findFreelancerDTO.totalRating + 0.5} ? 'star_half' : 'star_border')">
+                    </span>
+                </th:block>
+                <span th:text="${#numbers.formatDecimal(findFreelancerDTO.totalRating, 1, 1)} + ' / 평가 ' + ${findFreelancerDTO.totalReviews} + '개'">
+                    0.0 / 평가 0개
+                </span>
+            </div>
+            <div class="partner-stats">
+                <span th:text="'계약한 프로젝트: ' + ${findFreelancerDTO.totalProjects} + '건'">계약한 프로젝트: 0건</span>
+                <span th:text="'포트폴리오: ' + ${findFreelancerDTO.totalPortfolios} + '개'">포트폴리오: 0개</span>
+            </div>
+            <div class="skills">
+                <strong>보유 기술:</strong>
+                <span th:text="${#strings.listJoin(findFreelancerDTO.skills, ', ')}">스킬 정보 없음</span>
+            </div>
+        </section>
 
-    <!-- 새로 추가된 파트너스 찾기 섹션 -->
-    <main>
-        <div class="container">
-            <h1>파트너스 찾기</h1>
-            <p>130,049명의 파트너스가 있습니다.</p>
-            <div class="search-bar">
-                <input type="text" id="freelancerSearch" placeholder="프리랜서명을 입력하세요">
-                <button id="freelancerSearchBtn">검색</button>
+        <section class="portfolio-section">
+            <h2>포트폴리오</h2>
+            <div th:each="portfolio : ${freelancerPortfoliosDTOList}" class="portfolio-item">
+                <h3 th:text="${portfolio.title}">프로젝트 제목</h3>
             </div>
-            
-            <div class="content-wrapper">
-                <aside class="filters">
-                    <h2>파트너스 필터</h2>
-                    <section>
-                        <h3>업무 범위</h3>
-                        <label><input type="checkbox" name="field" value="개발"> 개발</label>
-                        <label><input type="checkbox" name="field" value="디자인"> 디자인</label>
-                        <label><input type="checkbox" name="field" value="기획"> 기획</label>
-                        <label><input type="checkbox" name="field" value="기타"> 기타</label>
-                    </section>
-                    <section>
-                        <h3>업무 영역</h3>
-                        <label><input type="checkbox" name="area" value="웹"> 웹</label>
-                        <label><input type="checkbox" name="area" value="안드로이드"> 안드로이드</label>
-                        <label><input type="checkbox" name="area" value="iOS"> iOS</label>
-                        <label><input type="checkbox" name="area" value="PC프로그램"> PC프로그램</label>
-                        <label><input type="checkbox" name="area" value="임베디드"> 임베디드</label>
-                        <label><input type="checkbox" name="area" value="기타"> 기타</label>
-                    </section>
-                    <!-- 다른 필터 섹션들 추가 -->
-                </aside>
-                
-                <section id="results">
-                    <div id="sort">
-                        <button class="active">기본 정렬순</button>
-                        <button>평점 높은순</button>
-                        <button>포트폴리오 많은순</button>
-                        <button>최근 업데이트순</button>
-                    </div>
-                    
-                    <div id="partners">
-                        <!-- 파트너 카드들이 여기에 동적으로 추가됩니다 -->
-                    </div>
-                    
-                    <div id="partnerModal" class="modal">
-					    <div class="modal-content">
-					        <div class="modal-header">
-					            <h2>파트너 상세 정보</h2>
-					            <span class="close">&times;</span>
-					        </div>
-					        <div class="modal-body">
-					            <!-- 모달 내용은 JavaScript로 동적으로 채워집니다 -->
-					        </div>
-					    </div>
-					</div>
-                </section>
+            <p th:if="${#lists.isEmpty(freelancerPortfoliosDTOList)}">등록된 포트폴리오가 없습니다.</p>
+        </section>
+
+        <section class="reviews-section">
+            <h2>리뷰</h2>
+            <div th:each="review : ${findFreelancerDTO.reviews}" class="review-item">
+                <div class="rating">
+                    <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                        <span class="material-icons" 
+                              th:text="${i <= review.rating} ? 'star' : (${i <= review.rating + 0.5} ? 'star_half' : 'star_border')">
+                        </span>
+                    </th:block>
+                    <span th:text="${#numbers.formatDecimal(review.rating, 1, 1)}">0.0</span>
+                </div>
+                <p th:text="${review.comment}">리뷰 내용</p>
             </div>
-        </div>
+            <p th:if="${#lists.isEmpty(findFreelancerDTO.reviews)}">아직 리뷰가 없습니다.</p>
+        </section>
     </main>
-
-    <!-- Footer Section -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 프리랜서 마켓플레이스. All rights reserved.</p>
-            <p><a href="#">개인정보 처리방침</a> | <a href="#">이용 약관</a> | <a href="#">연락처</a></p>
-        </div>
-    </footer>
 </body>
 </html>

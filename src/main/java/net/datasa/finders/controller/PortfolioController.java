@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ import net.datasa.finders.service.FreelancerPortfoliosService;
 @RequestMapping("portfolio")
 public class PortfolioController {
 	
-	private final FreelancerPortfoliosService FPService;
+	private final FreelancerPortfoliosService freelancerPortfoliosService;
 
 	@GetMapping("create")
     public String portfolio() {
@@ -35,7 +36,7 @@ public class PortfolioController {
 	
 	@PostMapping("save")
     public String save(@ModelAttribute FreelancerPortfoliosDTO FPDTO, @AuthenticationPrincipal AuthenticatedUser user) {
-		FPService.save(FPDTO, user);
+		freelancerPortfoliosService.save(FPDTO, user);
         return "/portfolio/portfolioList";
     }
 	
@@ -79,6 +80,17 @@ public class PortfolioController {
 
         // 저장된 파일의 경로를 반환
         return "{\"url\":\"http://localhost:8888/images/portfolio/" + file.getOriginalFilename() + "\"}";
+    }
+	
+	@GetMapping("content")
+    public String content(@RequestParam("portfolioId") int portfolioId
+    		,Model model) {
+		log.debug("출력 1");
+		FreelancerPortfoliosDTO freelancerPortfoliosDTO = freelancerPortfoliosService.findPortfolioById(portfolioId);
+		
+		model.addAttribute("freelancerPortfolios", freelancerPortfoliosDTO);
+		log.debug("출력 2");
+        return "portfolio/content";
     }
     
 }

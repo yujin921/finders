@@ -23,11 +23,77 @@ body {
     min-width: 1200px; 
 }
 
-.sidebar {
-  width: 200px; /* 적당한 크기로 조정 */
-  background-color: #f0f0f0;
-  padding: 20px;
-  box-sizing: border-box;
+.main-container {
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+	width: fit-content;
+}
+
+aside {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    padding: 20px;
+    height: 100vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+aside h2 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.add-btn {
+    background-color: var(--secondary-color);
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.add-btn:hover {
+    background-color: #27ae60;
+}
+
+a.add-page-link {
+    text-decoration: none;
+    color: white;
+}
+
+.sidebar-section {
+    margin-bottom: 20px;
+}
+
+.sidebar-section h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-section ul {
+    list-style: none;
+}
+
+.sidebar-section ul li a {
+    margin-bottom: 8px;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.3s;
+    text-decoration: none;
+}
+
+.sidebar-section ul li a:hover {
+    color: var(--primary-color);
 }
 
 .main-content {
