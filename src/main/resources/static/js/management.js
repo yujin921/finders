@@ -1874,7 +1874,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 function loadApplicationList() {
-    fetch('/project/application-list')  // 서버에서 클라이언트의 지원자 목록을 가져옴
+	const projectNum = getQueryParam('projectNum');
+    fetch(`/project/application-list?projectNum=${projectNum}`)  // 서버에서 클라이언트의 지원자 목록을 가져옴
         .then(response => response.json())
         .then(applications => {
             let contentHtml = `
@@ -1986,7 +1987,7 @@ function loadTeamList() {
                     contentHtml += `
                     <tr>
                         <td>${member.memberId}</td>
-                        <td>${member.role || '팀원'}</td> <!-- 역할 정보가 있으면 표시, 없으면 '팀원' -->
+                        <td>${member.roleName === 'ROLE_CLIENT' ? '클라이언트' : '프리랜서'}</td> <!-- 역할 정보가 있으면 표시, 없으면 '팀원' -->
                         <td>${member.status || '활동 중'}</td> <!-- 상태 정보가 있으면 표시, 없으면 '활동 중' -->
                     </tr>
                     `;
