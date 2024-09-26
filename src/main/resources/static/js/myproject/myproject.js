@@ -18,9 +18,9 @@ function list() {
                     let remainingDays = calculateRemainingDays(obj.projectStartDate, obj.projectEndDate);
 
                     let html = `
-                        <div class="post">
+                        <div class="post" onclick="location.href='/myProject/management?projectNum=${obj.projectNum}';">
                             <div class="post-info">
-                                <a href="/myProject/management?projectNum=${obj.projectNum}">${obj.projectTitle}</a>
+                                <span>${obj.projectTitle}</span>
                                 <span>금액: ${obj.projectBudget}원</span>
                                 <span>기간: ${remainingDays}일</span>
                                 <span>작성자: ${obj.clientId}</span>
