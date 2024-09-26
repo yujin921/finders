@@ -1,5 +1,7 @@
 package net.datasa.finders.domain.dto;
 
+import java.util.ArrayList;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

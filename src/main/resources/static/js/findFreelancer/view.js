@@ -17,6 +17,8 @@ $(document).ready(function() {
         	loadPartners();
         }
     });
+	
+	
 });
 
 function loadPartners() {
@@ -57,6 +59,9 @@ function loadPartners() {
         success: function(response) {
             console.log(response);
             updatePartnerList(response);
+			$('.partner-card').on('click', function() {
+					window.location.href="/find/freelancerDetail?memberId="+ $('.partner-id').html();
+				});
         },
         error: function(xhr, status, error) {
             console.error("파트너 데이터를 불러오는 데 실패했습니다:", error);
@@ -80,12 +85,20 @@ function updatePartnerList(response) {
 }
 
 function createPartnerCard(partner) {
+	function getStarRating(rating) {
+	        const fullStars = Math.floor(rating);
+	        const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+	        const emptyStars = 5 - fullStars - halfStar;
+	        
+	        return '★'.repeat(fullStars) + (halfStar ? '½' : '') + '☆'.repeat(emptyStars);
+	    }
+	
     return `
         <div class="partner-card">
             <img src="${partner.profileImg}" alt="${partner.name}" class="partner-image">
             <div class="partner-info">
-                <h3>${partner.memberId || '아이디 없음'}</h3>
-                <div class="rating">★★★★★ ${partner.totalRating || 0} / 평가 ${partner.totalReviews || 0}개</div>
+                <h3 class="partner-id">${partner.memberId || '아이디 없음'}</h3>
+                <div class="rating">${getStarRating(partner.totalRating)} ${partner.totalRating} / 평가 ${partner.totalReviews || 0}개</div>
                 <div class="partner-stats">
                     <span>계약한 프로젝트: ${partner.totalProjects || 0}건</span>
                     <span>포트폴리오: ${partner.totalPortfolios || 0}개</span>
