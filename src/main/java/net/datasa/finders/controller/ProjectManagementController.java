@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -158,6 +157,54 @@ public class ProjectManagementController {
         } catch (Exception e) {
             log.error("Error retrieving tasks", e);
             return Collections.emptyList();
+        }
+    }
+    
+    // 업무 삭제 요청 처리
+    @PostMapping("deleteTask")
+    public ResponseEntity<String> deleteTask(@RequestParam("taskId") int taskId) {
+        try {
+            // 업무 삭제
+            boolean isDeleted = projectManagementService.deleteTask(taskId);
+            if (isDeleted) {
+                // 업무 삭제 후 기능 삭제 여부 체크
+                Integer functionTitleId = projectManagementService.getFunctionTitleIdByTaskId(taskId);
+                if (functionTitleId != null && projectManagementService.isFunctionEmpty(functionTitleId)) {
+                    projectManagementService.deleteFunction(functionTitleId); // 기능 삭제
+                }
+                return ResponseEntity.ok("업무가 성공적으로 삭제되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("업무를 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("서버 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    // 특정 업무 ID로 업무 정보 조회
+    @GetMapping("getTaskById")
+    public ResponseEntity<TaskManagementDTO> getTaskById(@RequestParam("taskId") int taskId) {
+        TaskManagementDTO task = projectManagementService.getTaskById(taskId);
+        return task != null ? ResponseEntity.ok(task) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    // 특정 기능에 해당하는 업무 목록 조회
+    @GetMapping("getTasksByFunction")
+    public ResponseEntity<List<TaskManagementDTO>> getTasksByFunction(@RequestParam("functionTitleId") int functionTitleId) {
+        List<TaskManagementDTO> tasks = projectManagementService.getTasksByFunction(functionTitleId);
+        return ResponseEntity.ok(tasks);
+    }
+
+    // 기능 삭제 요청 처리
+    @PostMapping("deleteFunction")
+    public ResponseEntity<String> deleteFunction(@RequestParam("functionTitleId") int functionTitleId) {
+        try {
+            projectManagementService.deleteFunction(functionTitleId);
+            return ResponseEntity.ok("기능이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("기능 삭제에 실패했습니다: " + e.getMessage());
         }
     }
     

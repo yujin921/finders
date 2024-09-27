@@ -653,6 +653,79 @@ public class ProjectManagementService {
             .map(function -> new FunctionDTO(function.getFunctionTitleId(), function.getTitleName()))
             .collect(Collectors.toList());
     }
+    
+    // 업무 삭제 메소드
+    public boolean deleteTask(int taskId) {
+        if (taskManagementRepository.existsById(taskId)) {
+            taskManagementRepository.deleteById(taskId);
+            return true; // 삭제 성공
+        }
+        return false; // 삭제할 업무가 없음
+    }
+
+    // 특정 업무 ID로 기능 ID 조회
+    public Integer getFunctionTitleIdByTaskId(int taskId) {
+        return taskManagementRepository.findFunctionTitleIdByTaskId(taskId); // 업무에 해당하는 기능 ID 반환
+    }
+
+    // 특정 기능에 업무가 남아 있는지 확인
+    public boolean isFunctionEmpty(int functionTitleId) {
+        return taskManagementRepository.countTasksByFunctionTitleId(functionTitleId) == 0; // 해당 기능에 업무가 남아 있는지 확인
+    }
+
+    // 특정 업무 ID로 업무 정보 조회
+    public TaskManagementDTO getTaskById(int taskId) {
+        return taskManagementRepository.findById(taskId)
+                .map(task -> new TaskManagementDTO(
+                    task.getTaskId(),
+                    task.getProjectPublishingEntity().getProjectNum(),
+                    task.getMemberEntity().getMemberId(),
+                    task.getFunctionTitleEntity().getFunctionTitleId(),
+                    task.getFunctionTitleEntity().getTitleName(),
+                    task.getTaskTitle(),
+                    task.getTaskDescription(),
+                    task.getTaskStatus(),
+                    task.getTaskPriority(),
+                    task.getTaskStartDate(),
+                    task.getTaskEndDate(),
+                    task.getActualStartDate(),
+                    task.getActualEndDate(),
+                    task.getTaskProcessivity()
+                ))
+                .orElse(null); // 업무 정보 반환
+    }
+
+    // 특정 기능에 해당하는 업무 목록 조회
+    public List<TaskManagementDTO> getTasksByFunction(int functionTitleId) {
+        List<TaskManagementEntity> tasks = taskManagementRepository.findTasksByFunctionTitleId(functionTitleId);
+        return tasks.stream()
+                    .map(task -> new TaskManagementDTO(
+                        task.getTaskId(),
+                        task.getProjectPublishingEntity().getProjectNum(),
+                        task.getMemberEntity().getMemberId(),
+                        task.getFunctionTitleEntity().getFunctionTitleId(),
+                        task.getFunctionTitleEntity().getTitleName(),
+                        task.getTaskTitle(),
+                        task.getTaskDescription(),
+                        task.getTaskStatus(),
+                        task.getTaskPriority(),
+                        task.getTaskStartDate(),
+                        task.getTaskEndDate(),
+                        task.getActualStartDate(),
+                        task.getActualEndDate(),
+                        task.getTaskProcessivity()
+                    ))
+                    .collect(Collectors.toList());
+    }
+    
+    // 기능 삭제 메소드
+    public void deleteFunction(int functionTitleId) {
+        if (functionTitleRepository.existsById(functionTitleId)) {
+            functionTitleRepository.deleteById(functionTitleId);
+        } else {
+            throw new IllegalArgumentException("기능이 존재하지 않습니다.");
+        }
+    }
 
     // 실제 일정 업데이트
     public void updateSchedule(String entityType, int dbId, String actualStartDateStr, String actualEndDateStr) {

@@ -32,5 +32,14 @@ public interface TaskManagementRepository extends JpaRepository<TaskManagementEn
 	
     // 특정 프로젝트의 모든 FunctionTitleEntity를 찾기
     List<FunctionTitleEntity> findDistinctFunctionTitlesByProjectPublishingEntity_ProjectNum(int projectNum);
+
+    @Query("SELECT t.functionTitleEntity.functionTitleId FROM TaskManagementEntity t WHERE t.taskId = :taskId")
+    Integer findFunctionTitleIdByTaskId(@Param("taskId") int taskId);
+
+    @Query("SELECT COUNT(t) FROM TaskManagementEntity t WHERE t.functionTitleEntity.functionTitleId = :functionTitleId")
+    long countTasksByFunctionTitleId(@Param("functionTitleId") int functionTitleId);
+
+    @Query("SELECT t FROM TaskManagementEntity t WHERE t.functionTitleEntity.functionTitleId = :functionTitleId")
+    List<TaskManagementEntity> findTasksByFunctionTitleId(@Param("functionTitleId") int functionTitleId);
     
 }

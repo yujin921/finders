@@ -436,6 +436,238 @@ document.addEventListener('DOMContentLoaded', function() {
 	    });
 	});
     
+	// 업무 목록 로드(조회)
+	function loadTasks() {
+	    $.ajax({
+	        url: 'getTasks',
+	        type: 'get',
+	        data: { projectNum: projectNum },
+	        success: function(response) {
+	            console.log('업무 목록:', response);
+
+	            const $taskList = $('#task-list');
+	            $taskList.empty();
+
+	            if (response.length === 0) {
+	                $taskList.append('<p>업무가 없습니다.</p>');
+	            } else {
+	                const functionTitleIds = [...new Set(response.map(task => task.functionTitleId))];
+
+	                functionTitleIds.forEach(functionId => {
+	                    const filteredTasks = response.filter(task => task.functionTitleId === functionId);
+
+	                    if (filteredTasks.length > 0) {
+	                        const title = filteredTasks[0].functionTitleName; // 제목을 가져옵니다.
+	                        const dropdownContainer = $('<div class="dropdown-container"></div>');
+	                        const dropdownToggle = $(`<div class="dropdown-toggle">
+	                            ${functionId}) ${title}
+	                        </div>`);
+	                        const dropdownContent = $('<div class="dropdown-content"></div>');
+
+	                        const table = $('<table class="task-table"></table>');
+	                        const thead = $(`<thead>
+	                            <tr>
+	                                <th>업무 제목</th>
+	                                <th>설명</th>
+	                                <th>상태</th>
+	                                <th>우선순위</th>
+	                                <th>시작 날짜</th>
+	                                <th>종료 날짜</th>
+	                                <th>프리랜서 ID</th>
+	                                <th>삭제</th>
+	                            </tr>
+	                        </thead>`);
+	                        const tbody = $('<tbody></tbody>');
+
+	                        filteredTasks.forEach(task => {
+	                            const priorityClass = task.taskPriority.toLowerCase();
+	                            const formattedStartDate = formatDateTime(task.taskStartDate);
+	                            const formattedEndDate = formatDateTime(task.taskEndDate);
+
+	                            tbody.append(`
+	                                <tr class="task-row" data-task-id="${task.taskId}">
+	                                    <td>${task.taskTitle}</td>
+	                                    <td>${task.taskDescription}</td>
+	                                    <td>${task.taskStatus}</td>
+	                                    <td class="priority-${priorityClass}">${task.taskPriority}</td>
+	                                    <td>${formattedStartDate}</td>
+	                                    <td>${formattedEndDate}</td>
+	                                    <td>${task.freelancerId}</td>
+	                                    <td><button class="btn-delete-task" data-task-id="${task.taskId}">삭제</button></td>
+	                                </tr>
+	                            `);
+	                        });
+
+	                        table.append(thead).append(tbody);
+	                        dropdownContent.append(table);
+	                        dropdownContainer.append(dropdownToggle).append(dropdownContent);
+	                        $taskList.append(dropdownContainer);
+	                    }
+	                });
+
+	                // 드롭다운 토글 기능
+	                $('.dropdown-toggle').on('click', function() {
+	                    const $container = $(this).parent('.dropdown-container');
+	                    $container.toggleClass('open');  // 클래스 추가로 드롭다운 토글
+	                });
+
+	                // 업무 삭제 클릭 이벤트
+	                $('tbody .task-row').on('click', function() {
+	                    const taskId = $(this).data('task-id');
+	                    openDeleteModal(taskId);
+	                });
+	            }
+	        },
+	        error: function() {
+	            alert('업무 목록을 불러오는 데 실패했습니다.');
+	        }
+	    });
+	}
+
+	// 업무 삭제 모달 창 열기
+	function openDeleteModal(taskId) {
+	    const modal = document.createElement('div');
+	    modal.classList.add('modal');
+
+	    const modalContent = document.createElement('div');
+	    modalContent.classList.add('modal-content');
+
+	    const title = document.createElement('h3');
+	    title.textContent = '해당 업무를 삭제하시겠습니까?';
+
+	    const cancelButton = document.createElement('button');
+	    cancelButton.textContent = '취소';
+	    cancelButton.classList.add('btn-cancel');
+	    cancelButton.addEventListener('click', () => {
+	        document.body.removeChild(modal);
+	    });
+
+	    const deleteButton = document.createElement('button');
+	    deleteButton.textContent = '삭제';
+	    deleteButton.classList.add('btn-delete');
+	    deleteButton.addEventListener('click', () => {
+	        deleteTask(taskId, modal); // 업무 삭제 함수 호출
+	    });
+
+	    const buttonsContainer = document.createElement('div');
+	    buttonsContainer.classList.add('modal-buttons');
+	    buttonsContainer.appendChild(cancelButton);
+	    buttonsContainer.appendChild(deleteButton);
+
+	    modalContent.appendChild(title);
+	    modalContent.appendChild(buttonsContainer);
+	    modal.appendChild(modalContent);
+
+	    document.body.appendChild(modal);
+	}
+
+	// 업무 삭제 AJAX 요청 처리
+	function deleteTask(taskId, modal) {
+	    $.ajax({
+	        url: 'deleteTask?taskId=' + taskId, // 삭제 요청을 보낼 URL
+	        type: 'POST',
+	        success: function(response) {
+	            console.log('업무 삭제 성공:', response);
+
+	            // UI에서 해당 업무 항목 제거
+	            $(`tr[data-task-id="${taskId}"]`).remove();
+	            alert('업무가 성공적으로 삭제되었습니다.');
+
+	            // 기능 삭제 여부 확인
+	            checkAndDeleteFunctionIfNecessary(taskId, modal);
+	        },
+	        error: function(xhr) {
+	            alert('업무 삭제에 실패했습니다: ' + xhr.responseText);
+	        }
+	    });
+	}
+
+	// 기능 삭제 여부 확인 및 관련 업무 삭제
+	function checkAndDeleteFunctionIfNecessary(taskId, modal) {
+	    $.ajax({
+	        url: 'getTaskById?taskId=' + taskId, // 특정 업무 ID로 요청
+	        type: 'GET',
+	        success: function(task) {
+	            if (task && task.functionTitleId) {
+	                // 해당 기능의 업무 개수 확인
+	                $.ajax({
+	                    url: 'getTasksByFunction?functionTitleId=' + task.functionTitleId,
+	                    type: 'GET',
+	                    success: function(tasks) {
+	                        if (tasks.length === 0) {
+	                            // 업무가 없으면 기능 삭제 요청
+	                            openDeleteFunctionModal(task.functionTitleId);
+	                        }
+	                    },
+	                    error: function(xhr) {
+	                        alert('기능의 업무를 확인하는 데 실패했습니다.');
+	                    }
+	                });
+	            }
+	            document.body.removeChild(modal); // 모달 닫기
+	            loadTasks(); // 업무 목록 새로 고침
+	        },
+	        error: function(xhr) {
+	            alert('업무 정보를 불러오는 데 실패했습니다: ' + xhr.responseText);
+	        }
+	    });
+	}
+
+	// 기능 삭제 모달 창 열기
+	function openDeleteFunctionModal(functionTitleId) {
+	    const modal = document.createElement('div');
+	    modal.classList.add('modal');
+
+	    const modalContent = document.createElement('div');
+	    modalContent.classList.add('modal-content');
+
+	    const title = document.createElement('h3');
+	    title.textContent = '해당 기능을 삭제하시겠습니까?';
+
+	    const cancelButton = document.createElement('button');
+	    cancelButton.textContent = '취소';
+	    cancelButton.classList.add('btn-cancel');
+	    cancelButton.addEventListener('click', () => {
+	        document.body.removeChild(modal);
+	    });
+
+	    const deleteButton = document.createElement('button');
+	    deleteButton.textContent = '삭제';
+	    deleteButton.classList.add('btn-delete');
+	    deleteButton.addEventListener('click', () => {
+	        deleteFunction(functionTitleId, modal);
+	    });
+
+	    const buttonsContainer = document.createElement('div');
+	    buttonsContainer.classList.add('modal-buttons');
+	    buttonsContainer.appendChild(cancelButton);
+	    buttonsContainer.appendChild(deleteButton);
+
+	    modalContent.appendChild(title);
+	    modalContent.appendChild(buttonsContainer);
+	    modal.appendChild(modalContent);
+
+	    document.body.appendChild(modal);
+	}
+
+	// 기능 삭제 AJAX 요청 처리
+	function deleteFunction(functionTitleId, modal) {
+	    $.ajax({
+	        url: 'deleteFunction?functionTitleId=' + functionTitleId,
+	        type: 'POST',
+	        success: function() {
+	            alert('해당 기능이 삭제되었습니다.');
+	            document.body.removeChild(modal); // 모달 닫기
+	            loadTasks(); // 업무 목록 새로 고침
+	        },
+	        error: function(xhr) {
+	            console.error('기능 삭제 실패:', xhr.responseText);
+	            alert('기능 삭제에 실패했습니다.');
+	        }
+	    });
+	}
+	
+	/*
 	function loadTasks() {
 	    $.ajax({
 	        url: 'getTasks',
@@ -480,7 +712,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                            const formattedEndDate = formatDateTime(task.taskEndDate);
 
 	                            tbody.append(`
-	                                <tr>
+	                                <tr data-task-id="${task.taskId}">
 	                                    <td>${task.taskTitle}</td>
 	                                    <td>${task.taskDescription}</td>
 	                                    <td>${task.taskStatus}</td>
@@ -504,6 +736,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	                    const $container = $(this).parent('.dropdown-container');
 	                    $container.toggleClass('open');  // 클래스 추가로 드롭다운 토글
 	                });
+
+	                // 전체 행 클릭 시 모달 열기
+	                $('tbody tr').on('click', function() {
+	                    const taskId = $(this).data('task-id');
+	                    openDeleteModal(taskId);
+	                });
 	            }
 	        },
 	        error: function() {
@@ -511,6 +749,65 @@ document.addEventListener('DOMContentLoaded', function() {
 	        }
 	    });
 	}
+	
+	// 모달 창 열기 및 삭제 기능 구현
+	function openDeleteModal(taskId) {
+	    const modal = document.createElement('div');
+	    modal.classList.add('modal');
+
+	    const modalContent = document.createElement('div');
+	    modalContent.classList.add('modal-content');
+
+	    const title = document.createElement('h3');
+	    title.textContent = '해당 업무를 삭제하시겠습니까?';
+
+	    const cancelButton = document.createElement('button');
+	    cancelButton.textContent = '취소';
+	    cancelButton.classList.add('btn-cancel');
+	    cancelButton.addEventListener('click', () => {
+	        document.body.removeChild(modal);
+	    });
+
+	    const deleteButton = document.createElement('button');
+	    deleteButton.textContent = '삭제';
+	    deleteButton.classList.add('btn-delete');
+	    deleteButton.addEventListener('click', () => {
+	        deleteTask(taskId, modal);
+	    });
+
+	    const buttonsContainer = document.createElement('div');
+	    buttonsContainer.classList.add('modal-buttons');
+	    buttonsContainer.appendChild(cancelButton);
+	    buttonsContainer.appendChild(deleteButton);
+
+	    modalContent.appendChild(title);
+	    modalContent.appendChild(buttonsContainer);
+	    modal.appendChild(modalContent);
+
+	    document.body.appendChild(modal);
+	}
+	
+	// 업무 삭제 AJAX 요청 처리
+	function deleteTask(taskId, modal) {
+	    $.ajax({
+	        url: 'deleteTask?taskId=' + taskId, // 삭제 요청을 보낼 URL
+	        type: 'POST',
+	        success: function(response) {
+	            console.log('업무 삭제 성공:', response);
+	            // UI에서 해당 업무 항목 제거
+	            $(`.task-title[data-task-id="${taskId}"]`).closest('tr').remove();
+	            alert('업무가 성공적으로 삭제되었습니다.');
+	            document.body.removeChild(modal); // 모달 닫기
+				
+				// 업무 목록을 새로 고침
+				loadTasks();
+	        },
+	        error: function(xhr) {
+	            alert('업무 삭제에 실패했습니다: ' + xhr.responseText);
+	        }
+	    });
+	}
+	*/
 
 	function formatDateTime(dateString) {
 	    const date = new Date(dateString);
@@ -580,17 +877,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                    center: 'title', // 제목 중앙 배치
 	                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth' // 다양한 뷰 옵션
 	                },
-	                events: [
-	                    ...tasks.map(task => ({
-	                        title: task.taskTitle, // 업무 제목
-	                        start: task.actualStartDate ? task.actualStartDate : task.taskStartDate, // 실제 시작 날짜가 있으면 사용
-	                        end: task.actualEndDate ? task.actualEndDate : task.taskEndDate || undefined, // 실제 종료 날짜가 있으면 사용
-	                        color: getColorByStatus(task.taskStatus), // 상태에 따라 색상 변경
-	                        extendedProps: {
-	                            taskId: task.taskId // 추가 속성으로 taskId 포함
-	                        }
-	                    }))
-	                ],
+	                events: [], // 초기 이벤트 배열을 비워둠
 	                dateClick: function(info) {
 	                    // 날짜 클릭 시 선택 모달 열기
 	                    document.getElementById('select-modal').classList.remove('hidden');
@@ -601,8 +888,23 @@ document.addEventListener('DOMContentLoaded', function() {
 	                    openEventDetailModal(info.event); // FullCalendar 이벤트 객체 전달
 	                }
 	            });
+				
+				// 이제 각 업무 일정을 캘린더에 추가
+	            tasks.forEach(task => {
+	                calendar.addEvent({
+	                    id: task.taskId, // 업무 ID
+	                    title: task.taskTitle, // 업무 제목
+	                    start: task.actualStartDate ? task.actualStartDate : task.taskStartDate, // 실제 시작 날짜가 있으면 사용
+	                    end: task.actualEndDate ? task.actualEndDate : task.taskEndDate || undefined, // 실제 종료 날짜가 있으면 사용
+	                    color: getColorByStatus(task.taskStatus), // 상태에 따라 색상 변경
+	                    extendedProps: {
+	                        eventType: 'task', // 'task'로 설정
+	                        taskId: task.taskId // 추가 속성으로 taskId 포함
+	                    }
+	                });
+	            });
 
-	            // 이제 업무 외 일정을 가져오는 요청
+	            // 업무 외 일정을 가져오는 요청
 	            $.ajax({
 	                url: 'calendar/events?projectNum=' + projectNum, // 업무 외 일정을 가져올 API 경로
 	                method: 'GET',
@@ -839,8 +1141,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// 일정 상세 모달 열기
 	function openEventDetailModal(event) {
-
-	    const currentEventId = event.extendedProps.eventId; // FullCalendar 이벤트의 eventId 가져오기
+	    const currentEventId = event.extendedProps.eventId; // FullCalendar 상 업무 외 일정의 eventId 가져오기
+	    const currentTaskId = event.extendedProps.taskId; // FullCalendar 상 업무 일정의 taskId 가져오기
+		
 	    console.log("eventId 확인용 : ", currentEventId);
 
 	    const modal = document.createElement('div');
@@ -866,28 +1169,50 @@ document.addEventListener('DOMContentLoaded', function() {
 	    deleteButton.textContent = 'Delete';
 	    deleteButton.classList.add('btn-delete');
 	    deleteButton.addEventListener('click', () => {
-			// 반복 일정인지 확인
-		    if (isRecurringEvent(event)) {
-		        const confirmDelete = confirm('이 반복 일정을 모두 삭제하시겠습니까?');
-		        if (!confirmDelete) return; // 사용자가 삭제를 원하지 않을 경우 종료
-		    }
-			
-	        // 서버에 삭제 요청
-		    $.ajax({
-		        url: 'calendar/deleteEvent?eventId=' + currentEventId, // URL에 eventId 포함
-		        type: 'POST', // POST 방식
-		        success: function() {
-		            // 삭제 성공 시 캘린더에서 반복 일정의 모든 인스턴스 제거
-		            removeAllRecurringEvents(event); 
-		            document.body.removeChild(modal); // 모달 닫기
-		            alert('일정이 삭제되었습니다.'); // 사용자에게 알림
-		        },
-		        error: function(xhr) {
-		            console.error('일정 삭제 실패:', xhr.responseText);
-		            const errorMessage = xhr.status === 404 ? '일정을 찾을 수 없습니다.' : '일정을 삭제하는 데 실패했습니다.';
-		            alert(errorMessage); // 에러 메시지
-		        }
-		    });
+	        // 반복 일정인지 확인
+	        if (isRecurringEvent(event)) {
+	            const confirmDelete = confirm('이 반복 일정을 모두 삭제하시겠습니까?');
+	            if (!confirmDelete) return; // 사용자가 삭제를 원하지 않을 경우 종료
+	            
+	            // 서버에 반복 일정 삭제 요청
+	            $.ajax({
+	                url: 'calendar/deleteEvent?eventId=' + currentEventId, // URL에 eventId 포함
+	                type: 'POST', // POST 방식
+	                success: function() {
+	                    // 삭제 성공 시 캘린더에서 반복 일정의 모든 인스턴스 제거
+	                    removeAllRecurringEvents(event);
+	                    alertAndCloseModal(modal, '일정이 모두 삭제되었습니다.'); // 메시지와 함께 모달 닫기
+	                },
+	                error: function(xhr) {
+	                    console.error('일정 삭제 실패:', xhr.responseText);
+	                    alert('일정을 삭제하는 데 실패했습니다.');
+	                }
+	            });
+	        } else {
+	            const confirmDelete = confirm('이 일정을 정말 삭제하시겠습니까?');
+	            if (!confirmDelete) return; // 사용자가 삭제를 원하지 않을 경우 종료
+
+	            // 서버에 삭제 요청
+	            const deleteUrl = event.extendedProps.eventType === 'task' 
+	                ? 'deleteTask?taskId=' + currentTaskId // 업무 일정 삭제 요청
+	                : 'calendar/deleteEvent?eventId=' + currentEventId; // 업무 외 일정 삭제 요청
+	            
+	            $.ajax({
+	                url: deleteUrl,
+	                type: 'POST',
+	                success: function() {
+	                    const message = event.extendedProps.eventType === 'task' 
+	                        ? '업무 일정이 삭제되었습니다.' 
+	                        : '업무 외 일정이 삭제되었습니다.';
+	                    
+	                    alertAndCloseModal(modal, message); // 메시지와 함께 모달 닫기
+	                },
+	                error: function(xhr) {
+	                    console.error('일정 삭제 실패:', xhr.responseText);
+	                    alert('일정을 삭제하는 데 실패했습니다.');
+	                }
+	            });
+	        }
 	    });
 
 	    const buttonsContainer = document.createElement('div');
@@ -902,12 +1227,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	    document.body.appendChild(modal);
 	}
-	
+
+	// 메시지를 보여주고 모달을 닫는 함수
+	function alertAndCloseModal(modal, message) {
+	    alert(message); // 사용자에게 메시지 표시
+	    document.body.removeChild(modal); // 모달 닫기
+	    loadCalendar(); // 캘린더 새로고침
+	}
+
 	// 반복 일정 확인 함수
 	function isRecurringEvent(event) {
 	    return event.extendedProps.eventType === '1'; // 1은 반복 일정을 의미
 	}
-	
+
 	// 모든 반복 일정 제거 함수 구현
 	function removeAllRecurringEvents(event) {
 	    const eventId = event.extendedProps.eventId;
