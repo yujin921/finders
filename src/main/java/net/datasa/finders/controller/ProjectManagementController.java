@@ -169,8 +169,11 @@ public class ProjectManagementController {
             if (isDeleted) {
                 // 업무 삭제 후 기능 삭제 여부 체크
                 Integer functionTitleId = projectManagementService.getFunctionTitleIdByTaskId(taskId);
-                if (functionTitleId != null && projectManagementService.isFunctionEmpty(functionTitleId)) {
-                    projectManagementService.deleteFunction(functionTitleId); // 기능 삭제
+                if (functionTitleId != null) {
+                    // 해당 기능이 비어 있는지 확인
+                    if (projectManagementService.isFunctionEmpty(functionTitleId)) {
+                        projectManagementService.deleteFunction(functionTitleId); // 기능 삭제
+                    }
                 }
                 return ResponseEntity.ok("업무가 성공적으로 삭제되었습니다.");
             } else {

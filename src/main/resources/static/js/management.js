@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	                    if (filteredTasks.length > 0) {
 	                        const title = filteredTasks[0].functionTitleName; // 제목을 가져옵니다.
-	                        const dropdownContainer = $('<div class="dropdown-container"></div>');
+	                        const dropdownContainer = $('<div class="dropdown-container open"></div>');
 	                        const dropdownToggle = $(`<div class="dropdown-toggle">
 	                            ${functionId}) ${title}
 	                        </div>`);
@@ -563,93 +563,70 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// 업무 삭제 AJAX 요청 처리
 	function deleteTask(taskId, modal) {
+	    // 먼저 삭제할 업무의 functionTitleId를 확인
 	    $.ajax({
-	        url: 'deleteTask?taskId=' + taskId, // 삭제 요청을 보낼 URL
-	        type: 'POST',
-	        success: function(response) {
-	            console.log('업무 삭제 성공:', response);
-
-	            // UI에서 해당 업무 항목 제거
-	            $(`tr[data-task-id="${taskId}"]`).remove();
-	            alert('업무가 성공적으로 삭제되었습니다.');
-
-	            // 기능 삭제 여부 확인
-	            checkAndDeleteFunctionIfNecessary(taskId, modal);
-	        },
-	        error: function(xhr) {
-	            alert('업무 삭제에 실패했습니다: ' + xhr.responseText);
-	        }
-	    });
-	}
-
-	// 기능 삭제 여부 확인 및 관련 업무 삭제
-	function checkAndDeleteFunctionIfNecessary(taskId, modal) {
-	    $.ajax({
-	        url: 'getTaskById?taskId=' + taskId, // 특정 업무 ID로 요청
+	        url: 'getTaskById?taskId=' + taskId,
 	        type: 'GET',
 	        success: function(task) {
+	            // 업무 정보를 가져온 후 삭제 요청
 	            if (task && task.functionTitleId) {
-	                // 해당 기능의 업무 개수 확인
+	                // 삭제 요청
 	                $.ajax({
-	                    url: 'getTasksByFunction?functionTitleId=' + task.functionTitleId,
-	                    type: 'GET',
-	                    success: function(tasks) {
-	                        if (tasks.length === 0) {
-	                            // 업무가 없으면 기능 삭제 요청
-	                            openDeleteFunctionModal(task.functionTitleId);
-	                        }
+	                    url: 'deleteTask?taskId=' + taskId,
+	                    type: 'POST',
+	                    success: function(response) {
+	                        console.log('업무 삭제 성공:', response);
+	                        // UI에서 해당 업무 항목 제거
+	                        $(`tr[data-task-id="${taskId}"]`).remove();
+	                        alert('업무가 성공적으로 삭제되었습니다.');
+
+	                        // 삭제된 업무의 functionTitleId로 기능의 업무 개수 확인
+	                        checkIfFunctionCanBeDeleted(task.functionTitleId, modal);
+							
+							// 캘린더 새로 고침
+							loadCalendar();
 	                    },
 	                    error: function(xhr) {
-	                        alert('기능의 업무를 확인하는 데 실패했습니다.');
+	                        alert('업무 삭제에 실패했습니다: ' + xhr.responseText);
 	                    }
 	                });
+	            } else {
+	                console.error('업무 정보를 찾을 수 없습니다.');
+	                document.body.removeChild(modal); // 모달 닫기
+	                loadTasks(); // 업무 목록 새로 고침
 	            }
-	            document.body.removeChild(modal); // 모달 닫기
-	            loadTasks(); // 업무 목록 새로 고침
 	        },
 	        error: function(xhr) {
-	            alert('업무 정보를 불러오는 데 실패했습니다: ' + xhr.responseText);
+	            console.error('업무를 찾는 데 실패했습니다: ' + xhr.responseText);
+	            document.body.removeChild(modal); // 모달 닫기
+	            loadTasks(); // 업무 목록 새로 고침
 	        }
 	    });
 	}
 
-	// 기능 삭제 모달 창 열기
-	function openDeleteFunctionModal(functionTitleId) {
-	    const modal = document.createElement('div');
-	    modal.classList.add('modal');
-
-	    const modalContent = document.createElement('div');
-	    modalContent.classList.add('modal-content');
-
-	    const title = document.createElement('h3');
-	    title.textContent = '해당 기능을 삭제하시겠습니까?';
-
-	    const cancelButton = document.createElement('button');
-	    cancelButton.textContent = '취소';
-	    cancelButton.classList.add('btn-cancel');
-	    cancelButton.addEventListener('click', () => {
-	        document.body.removeChild(modal);
+	// 기능의 업무 개수를 확인하고 필요 시 기능 삭제
+	function checkIfFunctionCanBeDeleted(functionTitleId, modal) {
+	    $.ajax({
+	        url: 'getTasksByFunction?functionTitleId=' + functionTitleId,
+	        type: 'GET',
+	        success: function(tasks) {
+	            console.log('해당 기능의 업무:', tasks);
+	            if (tasks.length === 0) {
+	                console.log('업무가 없으므로 기능 삭제 요청');
+	                deleteFunction(functionTitleId, modal);
+	            } else {
+	                document.body.removeChild(modal); // 모달 닫기
+	                loadTasks(); // 업무 목록 새로 고침
+	            }
+	        },
+	        error: function() {
+	            alert('기능의 업무를 확인하는 데 실패했습니다.');
+	            document.body.removeChild(modal); // 모달 닫기
+	            loadTasks(); // 업무 목록 새로 고침
+	        }
 	    });
-
-	    const deleteButton = document.createElement('button');
-	    deleteButton.textContent = '삭제';
-	    deleteButton.classList.add('btn-delete');
-	    deleteButton.addEventListener('click', () => {
-	        deleteFunction(functionTitleId, modal);
-	    });
-
-	    const buttonsContainer = document.createElement('div');
-	    buttonsContainer.classList.add('modal-buttons');
-	    buttonsContainer.appendChild(cancelButton);
-	    buttonsContainer.appendChild(deleteButton);
-
-	    modalContent.appendChild(title);
-	    modalContent.appendChild(buttonsContainer);
-	    modal.appendChild(modalContent);
-
-	    document.body.appendChild(modal);
 	}
-
+	
 	// 기능 삭제 AJAX 요청 처리
 	function deleteFunction(functionTitleId, modal) {
 	    $.ajax({
@@ -1145,6 +1122,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    const currentTaskId = event.extendedProps.taskId; // FullCalendar 상 업무 일정의 taskId 가져오기
 		
 	    console.log("eventId 확인용 : ", currentEventId);
+		console.log("currentTaskId 확인용 : ", currentTaskId);
 
 	    const modal = document.createElement('div');
 	    modal.classList.add('modal');
@@ -1194,24 +1172,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	            // 서버에 삭제 요청
 	            const deleteUrl = event.extendedProps.eventType === 'task' 
-	                ? 'deleteTask?taskId=' + currentTaskId // 업무 일정 삭제 요청
+	                ? 'getTaskById?taskId=' + currentTaskId // 업무 일정 삭제 요청
 	                : 'calendar/deleteEvent?eventId=' + currentEventId; // 업무 외 일정 삭제 요청
-	            
-	            $.ajax({
-	                url: deleteUrl,
-	                type: 'POST',
-	                success: function() {
-	                    const message = event.extendedProps.eventType === 'task' 
-	                        ? '업무 일정이 삭제되었습니다.' 
-	                        : '업무 외 일정이 삭제되었습니다.';
-	                    
-	                    alertAndCloseModal(modal, message); // 메시지와 함께 모달 닫기
-	                },
-	                error: function(xhr) {
-	                    console.error('일정 삭제 실패:', xhr.responseText);
-	                    alert('일정을 삭제하는 데 실패했습니다.');
-	                }
-	            });
+
+				// 삭제 요청을 위한 AJAX 호출
+				const requestType = event.extendedProps.eventType === 'task' ? 'GET' : 'POST';
+
+				$.ajax({
+				    url: deleteUrl,
+				    type: requestType,
+				    success: function(task) {
+				        if (event.extendedProps.eventType === 'task') {
+				            // 업무 일정 삭제 시 deleteTask 호출
+				            deleteTask(task.taskId, modal);
+				        } else {
+				            const message = '업무 외 일정이 삭제되었습니다.';
+				            alertAndCloseModal(modal, message); // 메시지와 함께 모달 닫기
+				        }
+				    },
+				    error: function(xhr) {
+				        console.error('일정 삭제 실패:', xhr.responseText);
+				        alert('일정을 삭제하는 데 실패했습니다.');
+				    }
+				});
 	        }
 	    });
 
