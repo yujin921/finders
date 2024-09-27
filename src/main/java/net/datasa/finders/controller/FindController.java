@@ -46,6 +46,7 @@ public class FindController {
   	    return "/find/view"; // home.html 템플릿으로 이동
   	}
   	
+  	/*
   	@GetMapping("freelancerDetail")
   	public String freelancerDetail(@RequestParam("memberId") String memberId
   			, Model model
@@ -58,5 +59,5 @@ public class FindController {
   	    
   	    
   	    return "/find/freelancerDetail"; // home.html 템플릿으로 이동
-  	}
+  	}*/
 }

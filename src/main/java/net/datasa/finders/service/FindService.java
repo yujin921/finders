@@ -38,8 +38,9 @@ public class FindService {
 	private final ClientFieldRepository clientFieldRepository;
 	private final ClientCategoryRepository clientCategoryRepository;
 	private final TeamRepository teamRepository;
-	
+	/*
 	public List<FindFreelancerDTO> findFreelancerList(String[] fields, String[] areas, String search) {
+	
 		
 		List<MemberEntity> memberEntityList = memberRepository.findByRoleNameAndMemberIdContaining(RoleName.ROLE_FREELANCER, search);
 		
@@ -102,8 +103,9 @@ public class FindService {
 		}
 		
 		return findFreelancerDTOList;
-	}
+	}*/
 
+	/*
 	public FindFreelancerDTO findFreelancerDetail(String memberId) {
 		MemberEntity memberEntity = memberRepository.findById(memberId)
 				.orElseThrow(() -> new EntityNotFoundException("아이디를 찾을 수 없습니다."));
@@ -148,7 +150,7 @@ public class FindService {
 				.build();
 		
 		return findFreelancerDTO;
-	}
+	}*/
 	
-	
+
 }

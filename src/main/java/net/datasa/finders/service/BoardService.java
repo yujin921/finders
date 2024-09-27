@@ -215,7 +215,8 @@ public class BoardService {
         projectPublishingRepository.deleteById(pNum);
     }
     
+    /*
     public List<ClientReviewsEntity> getClientReviews(String clientId) {
         return clientReviewsRepository.findByClientId(clientId);
-    }
+    }*/
 }

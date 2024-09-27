@@ -19,7 +19,7 @@ import net.datasa.finders.service.FindService;
 public class FindRestController {
 	
 	private final FindService findService;
-	
+	/*
 	@GetMapping("findFreelancer")
 	public List<FindFreelancerDTO> findFreelancer(@RequestParam("fields") String[] fields
 			,@RequestParam("areas") String[] areas
@@ -32,5 +32,5 @@ public class FindRestController {
 		log.debug("{}", findFreelancerList);
 		
 		return findFreelancerList;
-	}
+	}*/
 }

@@ -25,29 +25,28 @@ import lombok.NoArgsConstructor;
 @Table(name = "freelancer_reviews")
 public class FreelancerReviewsEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_id") // 리뷰 ID
-    private int reviewId;
+	  @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    @Column(name = "review_id")
+	    private int reviewId;
 
-    @Column(name = "project_num", nullable = false) // 프로젝트 번호
-    private int projectNum;
+	    @Column(name = "project_num", nullable = false)
+	    private int projectNum;
 
-    @Column(name = "send_id", nullable = false, length = 20) // 평가를 남긴 클라이언트 ID
-    private String clientId;
+	    @Column(name = "send_id", nullable = false)
+	    private String sendId;  // 리뷰 작성자 (프리랜서)
 
-    @Column(name = "received_id", nullable = false, length = 20) // 평가를 받은 프리랜서 ID
-    private String freelancerId;
+	    @Column(name = "received_id", nullable = false)
+	    private String receivedId;  // 평가 대상 (클라이언트)
 
-    @Column(name = "rating", nullable = false) // 총 평점 (0.5~5점)
-    private float rating;
+	    @Column(name = "rating", nullable = false)
+	    private float rating;
 
-    @Column(name = "comment") // 코멘트
-    private String comment;
+	    @Column(name = "comment", nullable = false)
+	    private String comment;
 
-    @Column(name = "review_date", nullable = false) // 리뷰 작성 시간
-    private LocalDateTime reviewDate;
+	    @Column(name = "review_date", nullable = false)
+	    private LocalDateTime reviewDate;
 
-    @OneToMany(mappedBy = "freelancerReview", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<FreelancerReviewItemEntity> reviewItems; // 선택된 평가 항목 리스트
-}
+	    @OneToMany(mappedBy = "freelancerReview", cascade = CascadeType.ALL, orphanRemoval = true)
+	    private List<FreelancerReviewItemEntity> reviewItems;}

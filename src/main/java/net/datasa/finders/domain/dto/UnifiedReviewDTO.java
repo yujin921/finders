@@ -29,8 +29,8 @@ public class UnifiedReviewDTO {
     public static UnifiedReviewDTO fromClientReview(ClientReviewsEntity clientReview) {
         return UnifiedReviewDTO.builder()
                 .reviewType("클라이언트 리뷰")
-                .reviewerId(clientReview.getFreelancerId())
-                .receivedId(clientReview.getClientId())
+                .reviewerId(clientReview.getSendId()) // send_id로 수정
+                .receivedId(clientReview.getReceivedId()) // received_id로 수정
                 .rating(clientReview.getRating())
                 .comment(clientReview.getComment())
                 .reviewDate(clientReview.getReviewDate())
@@ -41,12 +41,13 @@ public class UnifiedReviewDTO {
                 .build();
     }
 
+
     // 프리랜서 리뷰를 DTO로 변환하는 메서드
     public static UnifiedReviewDTO fromFreelancerReview(FreelancerReviewsEntity freelancerReview) {
         return UnifiedReviewDTO.builder()
                 .reviewType("프리랜서 리뷰")
-                .reviewerId(freelancerReview.getClientId())
-                .receivedId(freelancerReview.getFreelancerId())
+                .reviewerId(freelancerReview.getSendId()) // send_id로 수정
+                .receivedId(freelancerReview.getReceivedId()) // received_id로 수정
                 .rating(freelancerReview.getRating())
                 .comment(freelancerReview.getComment())
                 .reviewDate(freelancerReview.getReviewDate())

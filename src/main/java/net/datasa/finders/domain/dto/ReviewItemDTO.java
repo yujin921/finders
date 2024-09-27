@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor // 기본 생성자 추가
-@AllArgsConstructor // 모든 필드를 받는 생성자 추가
+@AllArgsConstructor
+@NoArgsConstructor
 public class ReviewItemDTO {
-    private String itemName; // 평가 항목 이름 (예: "응답이 빨라요")
-    private boolean selected; // 해당 항목이 선택되었는지 여부
+    private String itemName;  // 체크박스 항목 이름
+    private boolean selected;  // 선택 여부
 }
+

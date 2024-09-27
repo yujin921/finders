@@ -1,12 +1,12 @@
 package net.datasa.finders.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,17 +45,21 @@ public class UnifiedReviewController {
             @RequestParam("projectNum") int projectNum,
             @AuthenticationPrincipal UserDetails userDetails,
             Model model) {
-        // 로그인된 사용자의 ID를 가져옴
-        String userId = userDetails.getUsername(); 
-
-        // 모델에 userId와 projectNum을 추가
+        String userId = userDetails.getUsername();
+        
+        // 사용자 정보 확인
+        MemberEntity member = memberRepository.findByMemberId(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+        
+        // 사용자 역할 가져오기
+        RoleName userRole = member.getRoleName();  // ROLE_CLIENT 또는 ROLE_FREELANCER
+        
+        // 모델에 사용자 ID, 프로젝트 번호, 사용자 역할 추가
         model.addAttribute("userId", userId);
         model.addAttribute("projectNum", projectNum);
+        model.addAttribute("userRole", userRole.name());  // 역할을 문자열로 넘김
         
-        log.info("userid = {}, projectnum = {}", userId, projectNum);
-
-        // 뷰 이름 반환
-        return "review/unifiedreview"; // Thymeleaf 템플릿 경로
+        return "review/unifiedreview";  // 템플릿 경로
     }
     
     
@@ -66,7 +70,6 @@ public class UnifiedReviewController {
             @RequestParam("role") String role) {
 
         String userId = userDetails.getUsername();  // 로그인된 사용자 ID
-        log.info("getParticipants 호출됨: projectNum = {}, userId = {}, role = {}", projectNum, userId, role);
 
         try {
             List<ClientDataDTO> participants = reviewService.getParticipantsByRole(projectNum, userId, role);
@@ -82,21 +85,15 @@ public class UnifiedReviewController {
     
     
     
-    
-    // 클라이언트 리뷰 제출
     @PostMapping("/submitClientReview")
     public ResponseEntity<String> submitClientReview(
             @RequestBody ClientReviewDTO reviewDTO,
             @AuthenticationPrincipal UserDetails userDetails) {
         try {
             String clientId = userDetails.getUsername();
-            reviewDTO.setClientId(clientId); // 클라이언트 ID 설정
+            reviewDTO.setSendId(clientId);  // 현재 로그인한 사용자 ID 설정
 
-            if (!projectExists(reviewDTO.getProjectNum())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("존재하지 않는 프로젝트 번호입니다.");
-            }
-
-            clientReviewService.createClientReview(reviewDTO);
+            clientReviewService.saveClientReview(reviewDTO);
             return ResponseEntity.ok("클라이언트 리뷰가 성공적으로 저장되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,20 +101,16 @@ public class UnifiedReviewController {
         }
     }
 
-    // 프리랜서 리뷰 제출
     @PostMapping("/submitFreelancerReview")
     public ResponseEntity<String> submitFreelancerReview(
             @RequestBody FreelancerReviewDTO reviewDTO,
             @AuthenticationPrincipal UserDetails userDetails) {
         try {
+        	log.info("Submitting freelancer review for projectNum: {}", reviewDTO.getProjectNum());
             String freelancerId = userDetails.getUsername();
-            reviewDTO.setFreelancerId(freelancerId); // 프리랜서 ID 설정
+            reviewDTO.setSendId(freelancerId);  // 현재 로그인한 사용자 ID 설정
 
-            if (!projectExists(reviewDTO.getProjectNum())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("존재하지 않는 프로젝트 번호입니다.");
-            }
-
-            freelancerReviewService.createFreelancerReview(reviewDTO);
+            freelancerReviewService.saveFreelancerReview(reviewDTO);
             return ResponseEntity.ok("프리랜서 리뷰가 성공적으로 저장되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,27 +118,9 @@ public class UnifiedReviewController {
         }
     }
 
-    // 클라이언트 또는 프리랜서가 받은 리뷰 조회
-    @GetMapping("/received")
-    public String getReceivedReviewsPage(
-            @AuthenticationPrincipal UserDetails userDetails,
-            Model model) {
-        String userId = userDetails.getUsername();
-        try {
-            List<ClientReviewDTO> clientReviews = clientReviewService.getReceivedReviews(userId);
-            List<FreelancerReviewDTO> freelancerReviews = freelancerReviewService.getReceivedReviews(userId);
-
-            model.addAttribute("clientReviews", clientReviews);
-            model.addAttribute("freelancerReviews", freelancerReviews);
-
-            log.info("Retrieved reviews count: 클라이언트 = {}, 프리랜서 = {}", clientReviews.size(), freelancerReviews.size());
-            return "review/unifiedreview"; // 통합된 리뷰 목록 템플릿
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "error";
-        }
-    }
-
+    
+    
+  
     // 프로젝트 존재 여부 확인
     private boolean projectExists(int projectNum) {
         return projectRepository.existsById(projectNum);
