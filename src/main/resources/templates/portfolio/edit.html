@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko"
+		xmlns:th="http://www.thymeleaf.org"
+      	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" th:href="@{/css/portfolio/create.css}">
+	<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.0.0/ckeditor5.css">
+    <title>Finders</title>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+        	<a href="/">
+				<img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
+			</a>
+        </div>
+        <nav>
+            <a href="#">프로젝트 찾기</a>
+            <a href="#">파트너스 찾기</a>
+            <a href="#">이용 후기</a>
+            <a href="#">포트폴리오 관리</a>
+            <a href="#">프로젝트 관리</a>
+            <a href="#">미팅룸</a>
+        </nav>
+        
+        <div class="login-actions">
+  			<img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
+  		    <a th:href="@{/member/myPage}">마이페이지</a>
+  			<a th:href="@{/member/logout}" class="btn">로그아웃</a>
+      	</div>
+    </header>
+
+    <div class="main-container">
+        <aside>
+            <h2><a th:href="@{/member/myPage}">개인정보 수정</a></h2>
+		    <h2>포트폴리오 관리</h2>
+		    <div class="sidebar-section">
+		        <ul th:each="portfolio : ${portfoliosList}">
+		            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
+		        </ul>
+		    </div>
+		    <div class="sidebar-section">
+                <h3>개인 활동 페이지</h3>
+                <ul>
+                    <li>VR 게임 프로젝트 활동</li>
+                    <li>2D 방탈출 게임</li>
+                    <li>강화학습 프로젝트</li>
+                </ul>
+            </div>
+        </aside>
+
+        <main>
+            <form id="editorForm" class="editorForm" action="update" method="post">
+            	<input type="hidden" name="portfolioId" th:value="${portfolio.portfolioId}">
+				<div class="titleContents">
+					<h1>제목</h1>
+					<div class="portfolioTitle">
+						 <input type="text" name="portfolioTitle" id="portfolioTitle" th:value="${portfolio.portfolioTitle}">
+					</div>
+					<button type="submit">포트폴리오 저장</button>
+				</div>
+				<div>
+					<div class="ckeditor-main-container">
+						<div class="editor-container editor-container_document-editor" id="editor-container">
+							<div class="editor-container__menu-bar" id="editor-menu-bar"></div>
+							<div class="editor-container__toolbar" id="editor-toolbar"></div>
+							<div class="editor-container__editor-wrapper">
+								<div class="editor-container__editor">
+										<textarea name="portfolioDescription" id="portfolioDescription" style="display:none;" th:utext="${portfolio.portfolioDescription}"></textarea>
+										<div id="editor"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				</form>
+        </main>
+    </div>
+	<script type="importmap">
+		{
+			"imports": {
+				"ckeditor5": "https://cdn.ckeditor.com/ckeditor5/43.0.0/ckeditor5.js",
+				"ckeditor5/": "https://cdn.ckeditor.com/ckeditor5/43.0.0/"
+			}
+		}
+
+		</script>
+		<script type="module" src="/js/editCKEditor.js"></script>
+</body>
+</html>
+
+

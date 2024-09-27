@@ -36,7 +36,7 @@ public class FreelancerPortfoliosEntity {
     @Column(name = "project_link")
     private String portfolioLink;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "member_id", referencedColumnName = "member_id", nullable = false)
     private MemberEntity member;
 }
