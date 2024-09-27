@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const contents = document.querySelectorAll('.tab-content');
 	let calendar;
     const calendarEl = document.getElementById('calendar');
-	let currentEventId; // 선택된 이벤트 ID를 저장하기 위한 변수
 	let selectedDate; // 선택한 날짜 저장 변수
 	let ganttChart; // Gantt 차트 인스턴스를 저장할 변수
 	let timeline;
@@ -561,9 +560,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 	// 캘린더 로드
 	function loadCalendar() {
-		if (calendar) {
-		        calendar.destroy(); // 기존 캘린더 제거
-			}
+	    if (calendar) {
+	        calendar.destroy(); // 기존 캘린더 제거
+	    }
 
 	    if (!calendarEl) return; // 캘린더 엘리먼트가 없으면 함수를 종료
 
@@ -586,7 +585,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	                        title: task.taskTitle, // 업무 제목
 	                        start: task.actualStartDate ? task.actualStartDate : task.taskStartDate, // 실제 시작 날짜가 있으면 사용
 	                        end: task.actualEndDate ? task.actualEndDate : task.taskEndDate || undefined, // 실제 종료 날짜가 있으면 사용
-	                        color: getColorByStatus(task.taskStatus) // 상태에 따라 색상 변경
+	                        color: getColorByStatus(task.taskStatus), // 상태에 따라 색상 변경
+	                        extendedProps: {
+	                            taskId: task.taskId // 추가 속성으로 taskId 포함
+	                        }
 	                    }))
 	                ],
 	                dateClick: function(info) {
@@ -594,16 +596,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	                    document.getElementById('select-modal').classList.remove('hidden');
 	                    selectedDate = info.dateStr; // 선택한 날짜 저장
 	                },
-					eventClick: function(info) {
-					        currentEventId = info.event.extendedProps.eventId; // 클릭한 이벤트의 eventId 저장
-					        openEventDetailModal(info.event); // 상세 모달 열기
-					}
-					
-	                /*
-					eventClick: function(info) {
-	                    openEventDetailModal(info.event); // 이벤트 클릭 시 상세 모달 열기
+	                eventClick: function(info) {
+	                    // 클릭한 이벤트 정보를 모달로 전달하여 열기
+	                    openEventDetailModal(info.event); // FullCalendar 이벤트 객체 전달
 	                }
-					*/
 	            });
 
 	            // 이제 업무 외 일정을 가져오는 요청
@@ -612,6 +608,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	                method: 'GET',
 	                dataType: 'json',
 	                success: function(externalEvents) {
+						console.log('externalEvents 체크용 : ', externalEvents);
+						
 	                    // 외부 이벤트를 캘린더에 추가
 	                    externalEvents.forEach(event => {
 	                        let eventColor;
@@ -620,26 +618,27 @@ document.addEventListener('DOMContentLoaded', function() {
 	                        if (event.eventType === '1') { // 반복 일정
 	                            eventColor = 'blue'; // 반복 일정의 색상
 
-	                            // 반복 일정의 각 날짜에 대해 이벤트 추가
 	                            const startDate = new Date(event.startDate); // 시작 날짜
 	                            const endDate = new Date(event.endDate); // 종료 날짜
 
 	                            // 시작 날짜부터 종료일 전날까지 반복
 	                            while (startDate < endDate) {
-	                                // 이벤트 시작과 종료 시간 설정
-	                                const eventStart = new Date(startDate); // 현재 날짜
-	                                const eventEnd = new Date(startDate); // 종료 날짜
+	                                const eventStart = new Date(startDate);
+	                                const eventEnd = new Date(startDate);
 
-	                                // 시작 및 종료 시간을 설정
-	                                eventStart.setHours(event.startDate.split('T')[1].split(':')[0], event.startDate.split('T')[1].split(':')[1], 0); // 시작 시간
-	                                eventEnd.setHours(event.endDate.split('T')[1].split(':')[0], event.endDate.split('T')[1].split(':')[1], 0); // 종료 시간
+	                                eventStart.setHours(event.startDate.split('T')[1].split(':')[0], event.startDate.split('T')[1].split(':')[1], 0);
+	                                eventEnd.setHours(event.endDate.split('T')[1].split(':')[0], event.endDate.split('T')[1].split(':')[1], 0);
 
 	                                // 이벤트 추가
 	                                calendar.addEvent({
 	                                    title: event.title,
-	                                    start: eventStart.toISOString(), // ISO 포맷의 시작 날짜
-	                                    end: eventEnd.toISOString(), // ISO 포맷의 종료 날짜
-	                                    color: eventColor // 반복 일정의 색상
+	                                    start: eventStart.toISOString(),
+	                                    end: eventEnd.toISOString(),
+	                                    color: eventColor,
+	                                    extendedProps: {
+	                                        eventId: event.eventId, // eventId 추가
+											eventType: event.eventType // eventType 추가
+	                                    }
 	                                });
 
 	                                // 다음 날로 이동
@@ -651,7 +650,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	                                title: event.title,
 	                                start: event.startDate,
 	                                end: event.endDate,
-	                                color: eventColor // 단기 일정의 색상
+	                                color: eventColor,
+	                                extendedProps: {
+	                                    eventId: event.eventId, // eventId 추가
+										eventType: event.eventType // eventType 추가
+	                                }
 	                            });
 	                        }
 	                    });
@@ -806,18 +809,25 @@ document.addEventListener('DOMContentLoaded', function() {
 	            contentType: 'application/json',
 	            data: JSON.stringify(eventData),
 	            success: function(savedEvent) {
+					console.log("savedEvent 체크용 : ", savedEvent)
+					
 	                // 서버에서 반환된 이벤트 추가
 	                if (!eventAdded) {
 	                    calendar.addEvent({
-							id: savedEvent.eventId, // 서버에서 받은 eventId 저장
 	                        title: savedEvent.title,
 	                        start: savedEvent.startDate,
-	                        end: savedEvent.endDate
+	                        end: savedEvent.endDate,
+							extendedProps: {
+			                                    eventId: savedEvent.eventId, // eventId 추가
+												eventType: savedEvent.eventType // eventType 추가
+			                                }
 	                    });
 	                }
 	                // 모달 닫기 및 폼 리셋
 	                closeModal('event-modal');
 	                document.getElementById('event-form').reset();
+					
+					loadCalendar()
 	            },
 	            error: function(xhr) {
 	                console.error('일정 등록 실패:', xhr.responseText);
@@ -830,8 +840,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 일정 상세 모달 열기
 	function openEventDetailModal(event) {
 
-		console.log("eventId 확인용 : ", currentEventId);
-		
+	    const currentEventId = event.extendedProps.eventId; // FullCalendar 이벤트의 eventId 가져오기
+	    console.log("eventId 확인용 : ", currentEventId);
+
 	    const modal = document.createElement('div');
 	    modal.classList.add('modal');
 
@@ -855,22 +866,28 @@ document.addEventListener('DOMContentLoaded', function() {
 	    deleteButton.textContent = 'Delete';
 	    deleteButton.classList.add('btn-delete');
 	    deleteButton.addEventListener('click', () => {
-			// 서버에 삭제 요청
-			$.ajax({
-			    url: 'calendar/deleteEvent?eventId=' + currentEventId, // URL에 eventId 포함
-			    type: 'POST', // POST 방식
-			    success: function() {
-			        // 삭제 성공 시 캘린더에서 이벤트 제거
-			        event.remove(); // 캘린더에서 이벤트 삭제
-			        document.body.removeChild(modal); // 모달 닫기
-			        alert('일정이 삭제되었습니다.'); // 사용자에게 알림
-			    },
-			    error: function(xhr) {
-			        console.error('일정 삭제 실패:', xhr.responseText);
-			        const errorMessage = xhr.status === 404 ? '일정을 찾을 수 없습니다.' : '일정을 삭제하는 데 실패했습니다.';
-			        alert(errorMessage); // 에러 메시지
-			    }
-			});
+			// 반복 일정인지 확인
+		    if (isRecurringEvent(event)) {
+		        const confirmDelete = confirm('이 반복 일정을 모두 삭제하시겠습니까?');
+		        if (!confirmDelete) return; // 사용자가 삭제를 원하지 않을 경우 종료
+		    }
+			
+	        // 서버에 삭제 요청
+		    $.ajax({
+		        url: 'calendar/deleteEvent?eventId=' + currentEventId, // URL에 eventId 포함
+		        type: 'POST', // POST 방식
+		        success: function() {
+		            // 삭제 성공 시 캘린더에서 반복 일정의 모든 인스턴스 제거
+		            removeAllRecurringEvents(event); 
+		            document.body.removeChild(modal); // 모달 닫기
+		            alert('일정이 삭제되었습니다.'); // 사용자에게 알림
+		        },
+		        error: function(xhr) {
+		            console.error('일정 삭제 실패:', xhr.responseText);
+		            const errorMessage = xhr.status === 404 ? '일정을 찾을 수 없습니다.' : '일정을 삭제하는 데 실패했습니다.';
+		            alert(errorMessage); // 에러 메시지
+		        }
+		    });
 	    });
 
 	    const buttonsContainer = document.createElement('div');
@@ -885,6 +902,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	    document.body.appendChild(modal);
 	}
+	
+	// 반복 일정 확인 함수
+	function isRecurringEvent(event) {
+	    return event.extendedProps.eventType === '1'; // 1은 반복 일정을 의미
+	}
+	
+	// 모든 반복 일정 제거 함수 구현
+	function removeAllRecurringEvents(event) {
+	    const eventId = event.extendedProps.eventId;
+
+	    // 반복 일정의 모든 인스턴스를 삭제
+	    calendar.getEvents().forEach(calEvent => {
+	        if (calEvent.extendedProps.eventId === eventId) {
+	            calEvent.remove(); // 이벤트 삭제
+	        }
+	    });
+	}
+	
 	
 	/*
     // 이벤트 폼 제출 핸들러

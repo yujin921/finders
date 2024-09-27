@@ -271,8 +271,13 @@ public class ProjectManagementController {
     // 캘린더에 표시할 업무 외 일정 조회
     @GetMapping("calendar/events")
     public ResponseEntity<List<CalendarEventDTO>> getExternalEvents(@RequestParam("projectNum") Integer projectNum) {
-        try {
+    	log.debug("Requested projectNum 체크용 : {}", projectNum);
+    	
+    	try {
             List<CalendarEventDTO> events = projectManagementService.getExternalEventsByProjectNum(projectNum);
+            
+            log.debug("Fetched events 체크용 : {}" + events);
+            
             return ResponseEntity.ok(events);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

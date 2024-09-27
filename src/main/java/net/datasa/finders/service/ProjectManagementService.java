@@ -742,7 +742,12 @@ public class ProjectManagementService {
     }
 
 	public List<CalendarEventDTO> getExternalEventsByProjectNum(int projectNum) {
+		log.debug("Fetching events for projectNum 체크용 : {}", projectNum);
+		
 		List<CalendarEventEntity> events = calendarEventRepository.findByProject_ProjectNum(projectNum);
+		
+		log.debug("Events fetched from repository 체크용 : {}", events);
+		
 		List<CalendarEventDTO> eventDTOs = new ArrayList<>();
 
 		for (CalendarEventEntity event : events) {
