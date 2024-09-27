@@ -57,7 +57,7 @@
             <h4>세부 평가</h4>
             <ul>
                 <li th:each="item : ${review.reviewItems}">
-                    <span th:text="${item.itemName} + ': ' + (${item.itemValue} ? '예' : '아니오')"></span>
+                    <span th:text="${item.itemName}"></span>
                 </li>
             </ul>
             <hr>
