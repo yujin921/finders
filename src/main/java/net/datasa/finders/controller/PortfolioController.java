@@ -2,6 +2,9 @@ package net.datasa.finders.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -76,6 +79,12 @@ public class PortfolioController {
 	@ResponseBody
     @PostMapping("/upload-image")
     public String uploadImage(@RequestParam("upload") MultipartFile file) throws IOException {
+		// 디렉토리 생성
+        Path uploadPath = Paths.get(UPLOAD_DIR);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+		
         // 파일을 저장할 경로 설정
         String filePath = UPLOAD_DIR + file.getOriginalFilename();
 
