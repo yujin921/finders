@@ -12,13 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientReviewDTO {
-    private int reviewId;
     private int projectNum;
-    private String freelancerId;
-    private String clientId;
+    private String sendId; // 평가를 남긴 사용자
+    private String participantId; // 평가받는 사용자
     private float rating;
     private String comment;
-    private LocalDateTime reviewDate; // 추가된 필드
-    private List<ReviewItemDTO> reviewItems;
-    private List<FreelancerDataDTO> freelancerData; // 프리랜서 리스트 추가
-}
+    private List<ReviewItemDTO> reviewItems;}

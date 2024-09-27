@@ -239,7 +239,11 @@ DecoupledEditor.create(document.querySelector('#editor'), editorConfig)
         document.querySelector('form').addEventListener('submit', (event) => {
             document.querySelector('#portfolioDescription').value = editor.getData();
         });
-
+		
+		// 기존 내용을 에디터에 설정
+		var content = document.getElementById('portfolioDescription').value;
+		        editor.setData(content);
+				
         window.editor = editor;  // 전역으로 에디터 참조 저장
     })
     .catch(error => {

@@ -42,7 +42,7 @@ aside {
     width: var(--sidebar-width);
     background-color: var(--sidebar-bg);
     padding: 20px;
-    height: 100vh;
+    min-height: 100vh;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
 }
@@ -395,11 +395,11 @@ form input[type="file"]::file-selector-button:hover {
     padding: 20px;
     position: absolute;
     top: 160px;
-    bottom: 20px;
     left: 20px;
     border-radius: 12px;
     box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    min-height: 120px;
 }
 
 /* 사이드바 메뉴 리스트 */

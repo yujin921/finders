@@ -2,6 +2,9 @@ package net.datasa.finders.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,14 +39,55 @@ public class PortfolioController {
 		
 		model.addAttribute("portfoliosList", freelancerPortfoliosDTOList);
 		
+		
         return "/portfolio/create";
     }
 	
 	@PostMapping("save")
-    public String save(@ModelAttribute FreelancerPortfoliosDTO FPDTO, @AuthenticationPrincipal AuthenticatedUser user) {
+    public String save(@ModelAttribute FreelancerPortfoliosDTO FPDTO
+    		, @AuthenticationPrincipal AuthenticatedUser user
+    		, Model model) {
 		freelancerPortfoliosService.save(FPDTO, user);
-        return "/portfolio/portfolioList";
+		model.addAttribute("freelancerPortfolios", FPDTO);
+
+		List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(user.getId());
+		
+		model.addAttribute("portfoliosList", freelancerPortfoliosDTOList);
+        return "/portfolio/content";
     }
+	
+	@GetMapping("delete")
+    public String delete(@RequestParam("portfolioId") int portfolioId, 
+                         @AuthenticationPrincipal AuthenticatedUser user, 
+                         Model model) {
+        // 포트폴리오 삭제
+        freelancerPortfoliosService.deletePortfolio(portfolioId, user.getId());
+
+        // 삭제 후 남은 포트폴리오 목록 조회
+        List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = 
+            freelancerPortfoliosService.findPortfolioList(user.getId());
+
+        model.addAttribute("portfoliosList", freelancerPortfoliosDTOList);
+
+        // 포트폴리오 목록 페이지로 리다이렉트
+        return "redirect:/member/myPage";
+    }
+	
+	@GetMapping("edit")
+	public String editPortfolio(@RequestParam("portfolioId") int portfolioId
+			, Model model
+			, @AuthenticationPrincipal AuthenticatedUser user) throws Exception {
+	    FreelancerPortfoliosDTO portfolio = freelancerPortfoliosService.getPortfolioById(portfolioId, user.getId());
+	    model.addAttribute("portfolio", portfolio);
+	    return "/portfolio/edit";
+	}
+	
+	@PostMapping("update")
+	public String updatePortfolio(@ModelAttribute FreelancerPortfoliosDTO updatedPortfolio,
+	                              @AuthenticationPrincipal AuthenticatedUser user) throws Exception {
+	    freelancerPortfoliosService.updatePortfolio(updatedPortfolio, user.getId());
+	    return "redirect:/portfolio/content?portfolioId=" + updatedPortfolio.getPortfolioId();
+	}
 	
 	// 이미지 업로드 경로 설정 (로컬 경로 예시)
 	private static final String UPLOAD_DIR = "C:/upload/portfolio/";
@@ -76,6 +120,12 @@ public class PortfolioController {
 	@ResponseBody
     @PostMapping("/upload-image")
     public String uploadImage(@RequestParam("upload") MultipartFile file) throws IOException {
+		// 디렉토리 생성
+        Path uploadPath = Paths.get(UPLOAD_DIR);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+		
         // 파일을 저장할 경로 설정
         String filePath = UPLOAD_DIR + file.getOriginalFilename();
 
@@ -90,8 +140,8 @@ public class PortfolioController {
 	@GetMapping("content")
     public String content(@RequestParam("portfolioId") int portfolioId
     		,@AuthenticationPrincipal AuthenticatedUser user
-    		,Model model) {
-		FreelancerPortfoliosDTO freelancerPortfoliosDTO = freelancerPortfoliosService.findPortfolioById(portfolioId);
+    		,Model model) throws Exception {
+		FreelancerPortfoliosDTO freelancerPortfoliosDTO = freelancerPortfoliosService.getPortfolioById(portfolioId, user.getId());
 		List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(user.getId());
 		
 		model.addAttribute("portfoliosList", freelancerPortfoliosDTOList);

@@ -2,6 +2,7 @@ package net.datasa.finders.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,19 +21,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "freelancer_review_item")
 public class FreelancerReviewItemEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id") // 평가 항목의 고유 ID
+    @Column(name = "item_id")
     private int itemId;
 
     @ManyToOne
-    @JoinColumn(name = "review_id") // 해당 항목이 속한 프리랜서 리뷰 ID
+    @JoinColumn(name = "review_id", nullable = false)  // 리뷰 엔터티와 연결
     private FreelancerReviewsEntity freelancerReview;
 
-    @Column(name = "item_name", nullable = false) // 평가 항목 이름
+    @Column(name = "item_name", nullable = false)
     private String itemName;
 
-    @Column(name = "item_value", nullable = false) // 해당 항목이 선택되었는지 여부 (TRUE/FALSE)
-    private boolean itemValue;
-}
+    @Column(name = "item_value", nullable = false)
+    private boolean itemValue;}
