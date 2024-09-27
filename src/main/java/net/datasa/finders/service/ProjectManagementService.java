@@ -712,7 +712,7 @@ public class ProjectManagementService {
     }
     
     public CalendarEventDTO createEvent(CalendarEventDTO calendarEventDTO) {
-        CalendarEventEntity event = new CalendarEventEntity();
+        CalendarEventEntity event = new CalendarEventEntity();;
         event.setTitle(calendarEventDTO.getTitle());
         event.setStartDate(calendarEventDTO.getStartDate());
         event.setEndDate(calendarEventDTO.getEndDate());
@@ -739,6 +739,41 @@ public class ProjectManagementService {
                     return new TeamDTO(entity.getTeamNum(), entity.getProjectNum(), member.getMemberId(), member.getRoleName().name());
                 })
                 .collect(Collectors.toList());
+    }
+
+	public List<CalendarEventDTO> getExternalEventsByProjectNum(int projectNum) {
+		log.debug("Fetching events for projectNum 체크용 : {}", projectNum);
+		
+		List<CalendarEventEntity> events = calendarEventRepository.findByProject_ProjectNum(projectNum);
+		
+		log.debug("Events fetched from repository 체크용 : {}", events);
+		
+		List<CalendarEventDTO> eventDTOs = new ArrayList<>();
+
+		for (CalendarEventEntity event : events) {
+		    CalendarEventDTO dto = CalendarEventDTO.builder()
+		        .eventId(event.getEventId())
+		        .title(event.getTitle())
+		        .startDate(event.getStartDate())
+		        .endDate(event.getEndDate())
+		        .eventType(event.getEventType())
+		        .projectNum(event.getProject().getProjectNum())
+		        .build();
+		    
+		    eventDTOs.add(dto);
+		}
+
+		return eventDTOs;
+
+	}
+
+	// 일정 삭제 메소드
+    public boolean deleteEvent(Integer eventId) {
+        if (calendarEventRepository.existsById(eventId)) {
+            calendarEventRepository.deleteById(eventId);
+            return true; // 삭제 성공
+        }
+        return false; // 삭제할 일정이 없음
     }
     
     

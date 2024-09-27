@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -267,12 +268,45 @@ public class ProjectManagementController {
         }
     }
     
+    // 캘린더에 표시할 업무 외 일정 조회
+    @GetMapping("calendar/events")
+    public ResponseEntity<List<CalendarEventDTO>> getExternalEvents(@RequestParam("projectNum") Integer projectNum) {
+    	log.debug("Requested projectNum 체크용 : {}", projectNum);
+    	
+    	try {
+            List<CalendarEventDTO> events = projectManagementService.getExternalEventsByProjectNum(projectNum);
+            
+            log.debug("Fetched events 체크용 : {}" + events);
+            
+            return ResponseEntity.ok(events);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    
+    // 캘린더 일정 생성
     @ResponseBody
     @PostMapping("calendar/event")
     public ResponseEntity<?> createCalendarEvent(@RequestBody CalendarEventDTO calendarEventDTO) {
         try {
             CalendarEventDTO savedEvent = projectManagementService.createEvent(calendarEventDTO);
             return ResponseEntity.ok(savedEvent);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+    
+    // 캘린더 일정 삭제
+    @ResponseBody
+    @PostMapping("calendar/deleteEvent")
+    public ResponseEntity<?> deleteCalendarEvent(@RequestParam("eventId") Integer eventId) {
+        try {
+            boolean isDeleted = projectManagementService.deleteEvent(eventId);
+            if (isDeleted) {
+                return ResponseEntity.noContent().build(); // 삭제 성공
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("일정을 찾을 수 없습니다."); // 일정이 존재하지 않음
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
         }
