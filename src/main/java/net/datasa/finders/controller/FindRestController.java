@@ -21,8 +21,8 @@ public class FindRestController {
 	private final FindService findService;
 	/*
 	@GetMapping("findFreelancer")
-	public List<FindFreelancerDTO> findFreelancer(@RequestParam("fields") String[] fields
-			,@RequestParam("areas") String[] areas
+	public List<FindFreelancerDTO> findFreelancer(@RequestParam("fields") List<String> fields
+			,@RequestParam("areas") List<String> areas
 			,@RequestParam("search") String search) {
 		
 		log.debug("{}, {}",fields, areas);

@@ -51,21 +51,33 @@
             <li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
             <li><a th:href="@{/support/guide}">서비스 안내</a></li>
         	<li><a th:href="@{/support/example}">이용 사례</a></li>
-            <!--  <li><a href="#">커뮤니티</a></li> -->
+			<!--  <li><a href="#">커뮤니티</a></li> -->
             <span style="color:white;">│</span>
             <li><a th:href="@{/myProject/view}">내 프로젝트 목록</a></li>
             <li><a th:href="@{/webrtc}">미팅룸</a></li>
         </ul>
     </nav>
 
-<div class="main-layout">
-  <aside class="sidebar">
-    <!-- 사이드바 내용 -->
-  <ul>
-    <li><a th:href="@{/member/myPage}">개인정보 수정</a></li>
-    <li><a th:href="@{/portfolio/create}">포트폴리오 작성</a></li>
-  </ul>
-  </aside>
+	<div class="main-container">
+	<aside class="sidebar">
+		<a th:href="@{/member/myPage}">개인정보 수정</a>
+	    <h2>포트폴리오 관리<button class="add-btn">
+	            <a href="/portfolio/create" class="add-page-link">+</a>
+	            </button></h2>
+	    <div class="sidebar-section">
+	        <ul th:each="portfolio : ${portfoliosList}">
+	            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
+	        </ul>
+	    </div>
+	    <div class="sidebar-section">
+	        <h3>개인 활동 페이지</h3>
+	        <ul>
+	            <li>VR 게임 프로젝트 활동</li>
+	            <li>2D 방탈출 게임</li>
+	            <li>강화학습 프로젝트</li>
+	        </ul>
+	    </div>
+	</aside>
 
 
 	<main>
@@ -231,8 +243,7 @@
             </form>
         </div>
         </main>
-</div>
-        
+        </div>
         	<!-- Footer -->
 	<footer>
 		<div class="container">

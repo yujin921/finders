@@ -110,17 +110,6 @@ aside h2 {
     align-items: center;
 }
 
-.add-btn {
-    background-color: var(--secondary-color);
-    border: none;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 50%;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
 .add-btn:hover {
     background-color: #27ae60;
 }
@@ -141,14 +130,18 @@ aside h2 {
     list-style: none;
 }
 
-.sidebar-section ul li {
+.sidebar-section ul li{
     margin-bottom: 8px;
-    cursor: pointer;
-    color: var(--text-color);
     transition: color 0.3s;
 }
 
-.sidebar-section ul li:hover {
+.sidebar-section ul li a {
+    text-decoration: none;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.sidebar-section ul li a:hover {
     color: var(--primary-color);
 }
 
@@ -165,12 +158,13 @@ main {
 	padding: 20px 0;
 }
 
-.projectTitle {
+.portfolioTitle {
     flex-grow: 0.8;
     margin: 0 20px;
     position: relative;
 }
-.projectTitle input {
+
+.portfolioTitle input {
     width: 100%;
     padding: 12px 45px 12px 20px;
     border: 1px solid #ddd;

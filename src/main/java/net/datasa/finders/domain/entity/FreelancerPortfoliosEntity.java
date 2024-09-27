@@ -28,13 +28,13 @@ public class FreelancerPortfoliosEntity {
     private int portfolioId;
 
     @Column(name = "project_title", nullable = false, length = 255)
-    private String projectTitle;
+    private String portfolioTitle;
 
     @Column(name = "project_description")
-    private String projectDescription;
+    private String portfolioDescription;
 
     @Column(name = "project_link")
-    private String projectLink;
+    private String portfolioLink;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id", referencedColumnName = "member_id", nullable = false)

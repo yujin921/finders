@@ -215,8 +215,13 @@ public class BoardService {
         projectPublishingRepository.deleteById(pNum);
     }
     
-    /*
+//    public List<ClientReviewsEntity> getClientReviews(String clientId) {
+//        return clientReviewsRepository.findByClientId(clientId);
+//    }
+    
     public List<ClientReviewsEntity> getClientReviews(String clientId) {
-        return clientReviewsRepository.findByClientId(clientId);
-    }*/
+        List<ClientReviewsEntity> reviews = clientReviewsRepository.findByClientId(clientId);
+        log.debug("Found {} reviews for client {}", reviews.size(), clientId);
+        return reviews;
+    }
 }
