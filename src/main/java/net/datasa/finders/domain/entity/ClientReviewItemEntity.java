@@ -1,13 +1,6 @@
 package net.datasa.finders.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,16 +16,16 @@ public class ClientReviewItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id") // 평가 항목의 고유 ID
+    @Column(name = "item_id")
     private int itemId;
 
-    @ManyToOne
-    @JoinColumn(name = "review_id") // 해당 항목이 속한 클라이언트 아이디
-    private ClientReviewsEntity clientReview;
+    @ManyToOne(fetch = FetchType.LAZY)  // 연관 관계 설정
+    @JoinColumn(name = "review_id")  // 외래 키 설정
+    private ClientReviewsEntity clientReview;  // ClientReviewsEntity와의 연관 관계 설정
 
-    @Column(name = "item_name", nullable = false) // 평가 항목 이름
+    @Column(name = "item_name", nullable = false)
     private String itemName;
 
-    @Column(name = "item_value", nullable = false) // 해당 항목이 선택되었는지 여부 (TRUE/FALSE)
+    @Column(name = "item_value", nullable = false)
     private boolean itemValue;
 }

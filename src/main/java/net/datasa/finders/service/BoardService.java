@@ -219,9 +219,10 @@ public class BoardService {
 //        return clientReviewsRepository.findByClientId(clientId);
 //    }
     
+    /*
     public List<ClientReviewsEntity> getClientReviews(String clientId) {
         List<ClientReviewsEntity> reviews = clientReviewsRepository.findByClientId(clientId);
         log.debug("Found {} reviews for client {}", reviews.size(), clientId);
         return reviews;
-    }
+    }*/
 }

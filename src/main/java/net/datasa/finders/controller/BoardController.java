@@ -44,6 +44,7 @@ public class BoardController {
         return "board/writeForm";
     }
 
+	/*
     @ResponseBody
     @GetMapping("list")
     public List<ProjectPublishingDTO> list() {
@@ -55,7 +56,7 @@ public class BoardController {
         }
 
         return list;
-    }
+    }*/
 
     @PostMapping("write")
     public String write(
@@ -107,10 +108,10 @@ public class BoardController {
                 model.addAttribute("applicationStatus", applicationStatus);
             }
             
-            // 클라이언트에 대한 프리랜서 후기 조회
+            /*// 클라이언트에 대한 프리랜서 후기 조회
             List<ClientReviewsEntity> clientReviews = boardService.getClientReviews(projectPublishingDTO.getClientId());
             model.addAttribute("clientReviews", clientReviews);
-
+*/
             return "board/read";  // 'read.html'로 반환
         } catch (Exception e) {
             e.printStackTrace();
