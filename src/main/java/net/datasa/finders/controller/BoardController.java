@@ -44,19 +44,19 @@ public class BoardController {
         return "board/writeForm";
     }
 
-	/*
+	
     @ResponseBody
     @GetMapping("list")
     public List<ProjectPublishingDTO> list() {
         List<ProjectPublishingDTO> list = boardService.getList();
 
-        for (ProjectPublishingDTO project : list) {
-            Optional<Float> averageRating = clientReviewService.getAverageRatingForProject(project.getProjectNum());
-            project.setAverageRating(averageRating.orElse(0.0f));  // 평점이 없을 경우 0점 설정
-        }
+//        for (ProjectPublishingDTO project : list) {
+//            Optional<Float> averageRating = clientReviewService.getAverageRatingForProject(project.getProjectNum());
+//            project.setAverageRating(averageRating.orElse(0.0f));  // 평점이 없을 경우 0점 설정
+//        }
 
         return list;
-    }*/
+    }
 
     @PostMapping("write")
     public String write(
