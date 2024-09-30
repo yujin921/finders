@@ -50,6 +50,9 @@ public class FindController {
   	        log.debug(member.getProfileImg());
   	        model.addAttribute("profileImgUrl", member.getProfileImg());
   	    }
+  	    int countFreelancer = memberService.countFreelancer();
+  	    model.addAttribute("countFreelancer", countFreelancer);
+  	    
   	    return "/find/view"; // home.html 템플릿으로 이동
   	}
   	

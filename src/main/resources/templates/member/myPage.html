@@ -74,13 +74,15 @@
 	            <li>강화학습 프로젝트</li>
 	        </ul>
 	    </div>
-	    <h2>포트폴리오 관리<button class="add-btn">
-	            <a href="/portfolio/create" class="add-page-link">+</a>
-	            </button></h2>
-	    <div class="sidebar-section">
-	        <ul th:each="portfolio : ${portfoliosList}">
-	            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
-	        </ul>
+	    <div sec:authorize="hasRole('ROLE_FREELANCER')">
+		    <h2>포트폴리오 관리<button class="add-btn">
+		            <a href="/portfolio/create" class="add-page-link">+</a>
+		            </button></h2>
+		    <div class="sidebar-section">
+		        <ul th:each="portfolio : ${portfoliosList}">
+		            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
+		        </ul>
+		    </div>
 	    </div>
 	    
 	</aside>

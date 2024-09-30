@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ClientDTO;
+import net.datasa.finders.domain.dto.FindFreelancerDTO;
 import net.datasa.finders.domain.dto.FreelancerDTO;
 import net.datasa.finders.domain.dto.FreelancerSkillDTO;
 import net.datasa.finders.domain.dto.MemberDTO;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -425,4 +427,15 @@ public class MemberService {
         }
         return false;
     }
+
+	public int countFreelancer() {
+		List<MemberEntity> memberEntityList = memberRepository.findByRoleName(RoleName.ROLE_FREELANCER);
+		
+		int i = 0;
+		
+		for (MemberEntity memeberEntity : memberEntityList) {
+			i++;
+		}
+		return i;
+	}
 }
