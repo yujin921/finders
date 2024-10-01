@@ -116,12 +116,12 @@ public class BoardService {
             throw new RuntimeException("파일을 Base64로 변환하는 데 실패했습니다.", e);
         }
     }
-	
+   
     public List<ProjectPublishingDTO> getList() {
         
-    	Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
-    	List<ProjectPublishingEntity> entityList = projectPublishingRepository.findAll(sort);
-    	List<ProjectPublishingDTO> dtoList = new ArrayList<>();
+       Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
+       List<ProjectPublishingEntity> entityList = projectPublishingRepository.findAll(sort);
+       List<ProjectPublishingDTO> dtoList = new ArrayList<>();
 
         for (ProjectPublishingEntity entity : entityList) {
             ProjectPublishingDTO dto = ProjectPublishingDTO.builder()
