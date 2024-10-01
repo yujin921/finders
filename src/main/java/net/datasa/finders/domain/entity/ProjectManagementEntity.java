@@ -36,15 +36,7 @@ public class ProjectManagementEntity {
     @JoinColumn(name = "project_num", referencedColumnName = "project_num")
     private ProjectPublishingEntity projectPublishing;
 
-    @Column(name = "actual_start_date")
-    private LocalDateTime actualStartDate;
+    @Column(name = "complete_status", columnDefinition = "TINYINT(1) DEFAULT 0 CHECK (complete_status IN (0, 1))")
+    private Boolean completeStatus;
 
-    @Column(name = "actual_end_date")
-    private LocalDateTime actualEndDate;
-
-    @Column(name = "delayed_status", columnDefinition = "TINYINT(1) DEFAULT 0 CHECK (delayed_status IN (0, 1))")
-    private Boolean delayedStatus;
-    
-    @Column(name = "delayed_date", nullable = false, columnDefinition = "DEFAULT 0")
-    private Integer delayedDate;
 }

@@ -56,6 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 페이지 로드 시 기본적으로 업무 목록 로드
 	loadTasks();
 	
+	// 페이지 로드 시 기본적으로 프로젝트 완료 여부 체크 후 버튼 표시
+	completeStatusCheck();
+	
     tabs.forEach(tab => {
         tab.addEventListener('click', function(event) {
             event.preventDefault();
@@ -802,7 +805,6 @@ document.addEventListener('DOMContentLoaded', function() {
  	
 	// 프로젝트 완료 버튼 클릭 시
 	$('#project-completion-button').on('click', function() {
-	    
 	    if (!projectNum) {
 	        alert('프로젝트 번호를 찾을 수 없습니다.');
 	        return;
@@ -811,12 +813,18 @@ document.addEventListener('DOMContentLoaded', function() {
 	    console.log('프로젝트 완료 - projectNum 체크용: ', projectNum);
 	    
 	    $.ajax({
-	        url: 'completeProject?projectNum=' + projectNum, // URL 쿼리 파라미터로 전송
+	        url: 'completeProject?projectNum=' + projectNum,
 	        type: 'post',
-	        dataType: 'text', // 서버에서 반환하는 데이터 형식
+	        dataType: 'text',
 	        success: function(response) {
 	            if (response === 'success') {
 	                alert('프로젝트가 완료되었습니다.');
+	                
+	                // "프로젝트 완료" 버튼 숨기기
+	                document.getElementById('project-completion-button').style.display = 'none';
+
+	                // "리뷰 작성" 버튼 보이기
+	                document.getElementById('project-review-button').style.display = 'block';
 	                
 	                // 목록 화면 업데이트
 	                loadTasks();
@@ -830,6 +838,28 @@ document.addEventListener('DOMContentLoaded', function() {
 	        }
 	    });
 	});
+	
+	// 페이지 로드 시 상태 확인
+	function completeStatusCheck() {
+	    // 프로젝트 상태를 서버에 확인 요청
+	    $.ajax({
+	        url: 'checkProjectStatus?projectNum=' + projectNum,
+	        type: 'GET',
+	        dataType: 'json',
+	        success: function(response) {
+	            if (response && response.completeStatus) {
+	                // "프로젝트 완료" 버튼 숨기기
+	                document.getElementById('project-completion-button').style.display = 'none';
+
+	                // "리뷰 작성" 버튼 보이기
+	                document.getElementById('project-review-button').style.display = 'block';
+	            }
+	        },
+	        error: function(xhr, status, error) {
+	            console.error('프로젝트 상태 확인 요청 실패:', status, error);
+	        }
+	    });
+	};
 	
 	
 	// 캘린더 로드
@@ -868,6 +898,19 @@ document.addEventListener('DOMContentLoaded', function() {
 				
 				// 이제 각 업무 일정을 캘린더에 추가
 	            tasks.forEach(task => {
+					// 각 작업의 속성을 로그로 출력
+				    console.log('추가할 일정:', {
+				        id: task.taskId, // 업무 ID
+				        title: task.taskTitle, // 업무 제목
+				        start: task.actualStartDate ? task.actualStartDate : task.taskStartDate, // 실제 시작 날짜
+				        end: task.actualEndDate ? task.actualEndDate : task.taskEndDate || undefined, // 실제 종료 날짜
+				        color: getColorByStatus(task.taskStatus), // 상태에 따라 색상 변경
+				        extendedProps: {
+				            eventType: 'task', // 'task'로 설정
+				            taskId: task.taskId // 추가 속성으로 taskId 포함
+				        }
+				    });
+					
 	                calendar.addEvent({
 	                    id: task.taskId, // 업무 ID
 	                    title: task.taskTitle, // 업무 제목
@@ -1550,6 +1593,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	        ganttChart.fitAll();
 	        ganttChartLoaded = true;
+			
+			// 간트차트 데이터 업데이트 후 캘린더를 다시 로드합니다
+		    ganttChart.listen('dataChange', function() {
+		        // 간트차트 데이터가 변경되면 캘린더를 업데이트
+		        loadCalendar(); // 캘린더 갱신 함수 호출
+		    });
+			
 	    });
 		
 		// loadEntityNames(진행도)

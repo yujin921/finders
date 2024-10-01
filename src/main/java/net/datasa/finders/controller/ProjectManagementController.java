@@ -2,6 +2,7 @@ package net.datasa.finders.controller;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.dto.TeamDTO;
+import net.datasa.finders.domain.entity.ProjectManagementEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ProjectManagementService;
@@ -226,6 +228,23 @@ public class ProjectManagementController {
             // 다른 예외가 발생할 경우 스택 트레이스 출력 후 500 INTERNAL SERVER ERROR 응답 반환
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("failure");
+        }
+    }
+    
+    @ResponseBody
+    @GetMapping("checkProjectStatus")
+    public ResponseEntity<Map<String, Boolean>> checkProjectStatus(@RequestParam("projectNum") int projectNum) {
+        Map<String, Boolean> response = new HashMap<>();
+        try {
+            boolean completeStatus = projectManagementService.isProjectCompleted(projectNum);
+            response.put("completeStatus", completeStatus); // 완료 여부 추가
+
+            return ResponseEntity.ok(response);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
     

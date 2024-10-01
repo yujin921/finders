@@ -29,7 +29,6 @@ import net.datasa.finders.domain.dto.FunctionDTO;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
-import net.datasa.finders.domain.dto.TaskDateRangeDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.dto.TeamDTO;
 import net.datasa.finders.domain.entity.CalendarEventEntity;
@@ -392,26 +391,33 @@ public class ProjectManagementService {
 
     // ProjectNum을 기준으로 데이터를 가져오는 서비스 메서드
     public void projectCompletion(int projectNum) {
-        TaskDateRangeDTO taskDateRange = taskManagementRepository.findTaskDateRangeByProjectNum(projectNum)
-                .orElseThrow(() -> new EntityNotFoundException("업무가 존재하지 않아 일정 조회가 불가합니다."));
         
         ProjectPublishingEntity project = projectPublishingRepository.findById(projectNum)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
         
+        /*
+        TaskDateRangeDTO taskDateRange = taskManagementRepository.findTaskDateRangeByProjectNum(projectNum)
+                .orElseThrow(() -> new EntityNotFoundException("업무가 존재하지 않아 일정 조회가 불가합니다."));
+                
         LocalDateTime projectEndDateTime = project.getProjectEndDate().atStartOfDay(); // LocalDateTime으로 변환
         LocalDateTime latestEndDate = taskDateRange.getLatestEndDate(); // 이미 LocalDateTime인 경우
 
         long delayedDays = ChronoUnit.DAYS.between(projectEndDateTime, latestEndDate);
+        */
 
         ProjectManagementEntity projectManagementEntity = ProjectManagementEntity.builder()
                 .projectPublishing(project)
-                .actualStartDate(taskDateRange.getEarliestStartDate())
-                .actualEndDate(latestEndDate) // 사용자의 요구 사항에 따라 다를 수 있음
-                .delayedStatus(delayedDays > 0) // 지연 여부
-                .delayedDate((int) delayedDays)
+                .completeStatus(true) // 완료 여부
                 .build();
         
         projectManagementRepository.save(projectManagementEntity);
+    }
+    
+    // 프로젝트 상태 확인 메서드
+    public boolean isProjectCompleted(int projectNum) {
+        ProjectManagementEntity project = projectManagementRepository.findById(projectNum)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
+        return project.getCompleteStatus(); // 완료 여부 반환
     }
 	
     public Map<String, Object> getGanttChartData(int projectNum) {
@@ -776,8 +782,8 @@ public class ProjectManagementService {
                 .map(task -> TaskManagementDTO.builder()
                         .taskId(task.getTaskId())
                         .taskTitle(task.getTaskTitle())
-                        .taskStartDate(task.getTaskStartDate()) // LocalDateTime 그대로 사용
-                        .taskEndDate(task.getTaskEndDate()) // LocalDateTime 그대로 사용
+                        .taskStartDate(task.getActualStartDate()) // LocalDateTime 그대로 사용
+                        .taskEndDate(task.getActualEndDate()) // LocalDateTime 그대로 사용
                         .taskStatus(task.getTaskStatus()) // Enum 그대로 사용
                         .taskPriority(task.getTaskPriority()) // Enum 그대로 사용
                         .build())

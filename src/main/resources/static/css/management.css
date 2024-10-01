@@ -473,8 +473,13 @@ h1 {
     margin-bottom: 20px;
 }
 
-#project-completion-button {
-    padding: 10px 20px;
+.btn-project{
+	display : block;
+	width:100%;
+	background-color :  #E53E3E;
+	font-size : 16px;
+	transition : background-color 0.3s ease, transform 0.2s ease;
+	padding: 10px 20px;
     color: white;
     border: none;
     border-radius: 5px;
@@ -482,15 +487,7 @@ h1 {
     margin-bottom: 20px;
 }
 
-.btn-delete-project{
-	display : block;
-	width:100%;
-	background-color :  #E53E3E;
-	font-size : 16px;
-	transition : background-color 0.3s ease, transform 0.2s ease;
-}
-
-.btn-delete-project:hover{
+.btn-project:hover{
 	background-color:#C53030;
 	transform:translateY(-3px);
 }
