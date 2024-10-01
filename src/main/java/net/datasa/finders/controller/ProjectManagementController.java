@@ -29,8 +29,8 @@ import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.dto.TeamDTO;
-import net.datasa.finders.domain.entity.ProjectManagementEntity;
 import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.domain.entity.TaskStatus;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ProjectManagementService;
 
@@ -245,6 +245,17 @@ public class ProjectManagementController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    
+    @ResponseBody
+    @PostMapping("changeTaskStatus")
+    public ResponseEntity<String> changeTaskStatus(@RequestParam("taskId") Integer taskId, @RequestParam("taskStatus") TaskStatus status) {
+        try {
+            projectManagementService.updateTaskStatus(taskId, status);
+            return ResponseEntity.ok("업무 상태가 성공적으로 변경되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("업무 상태 변경 실패: " + e.getMessage());
         }
     }
     

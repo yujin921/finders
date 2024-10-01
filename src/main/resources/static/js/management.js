@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 페이지 로드 시 기본적으로 업무 목록 로드
 	loadTasks();
 	
-	// 페이지 로드 시 기본적으로 프로젝트 완료 여부 체크 후 버튼 표시
+	// 페이지 로드 시 기본적으로 프로젝트 완료 여부 체크 후 버튼(프로젝트 완료 or 리뷰 작성) 표시
 	completeStatusCheck();
 	
     tabs.forEach(tab => {
@@ -470,14 +470,14 @@ document.addEventListener('DOMContentLoaded', function() {
 	                        const table = $('<table class="task-table"></table>');
 	                        const thead = $(`<thead>
 	                            <tr>
-	                                <th>업무 제목</th>
-	                                <th>설명</th>
-	                                <th>상태</th>
-	                                <th>우선순위</th>
-	                                <th>시작 날짜</th>
-	                                <th>종료 날짜</th>
-	                                <th>프리랜서 ID</th>
-	                                <th>삭제</th>
+	                                <th style="width: 180px; text-align: center;">업무 제목</th>
+	                                <th style="text-align: center;">설명</th>
+	                                <th style="text-align: center;">상태</th>
+	                                <th style="text-align: center;">우선순위</th>
+	                                <th style="width: 150px; text-align: center;">시작 날짜</th>
+	                                <th style="width: 150px; text-align: center;">종료 날짜</th>
+	                                <th style="text-align: center;">프리랜서 ID</th>
+	                                <th style="width: 100px; text-align: center;">상태 변경</th>
 	                            </tr>
 	                        </thead>`);
 	                        const tbody = $('<tbody></tbody>');
@@ -489,14 +489,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	                            tbody.append(`
 	                                <tr class="task-row" data-task-id="${task.taskId}">
-	                                    <td>${task.taskTitle}</td>
-	                                    <td>${task.taskDescription}</td>
-	                                    <td>${task.taskStatus}</td>
-	                                    <td class="priority-${priorityClass}">${task.taskPriority}</td>
-	                                    <td>${formattedStartDate}</td>
-	                                    <td>${formattedEndDate}</td>
-	                                    <td>${task.freelancerId}</td>
-	                                    <td><button class="btn-delete-task" data-task-id="${task.taskId}">삭제</button></td>
+	                                    <td style="text-align: center;">${task.taskTitle}</td>
+	                                    <td style="width: 120px; text-align: center;">${task.taskDescription}</td>
+	                                    <td style="text-align: center;">${task.taskStatus}</td>
+	                                    <td class="priority-${priorityClass}" style="text-align: center;">${task.taskPriority}</td>
+	                                    <td style="text-align: center;">${formattedStartDate}</td>
+	                                    <td style="text-align: center;">${formattedEndDate}</td>
+	                                    <td style="text-align: center;">${task.freelancerId}</td>
+										<td style="width: 100px; text-align: center;"><button class="btn-change-status" data-task-id="${task.taskId}">변경</button></td> <!-- 상태 변경 버튼 -->
 	                                </tr>
 	                            `);
 	                        });
@@ -519,10 +519,96 @@ document.addEventListener('DOMContentLoaded', function() {
 	                    const taskId = $(this).data('task-id');
 	                    openDeleteModal(taskId);
 	                });
+					
+					// 상태 변경 버튼 클릭 이벤트
+	                $('.btn-change-status').on('click', function(event) {
+	                    event.stopPropagation(); // 드롭다운이 열리는 것을 방지하기 위해 이벤트 전파 중지
+	                    const taskId = $(this).data('task-id');
+	                    openStatusChangeModal(taskId); // 상태 변경 모달 열기
+	                });
 	            }
 	        },
 	        error: function() {
 	            alert('업무 목록을 불러오는 데 실패했습니다.');
+	        }
+	    });
+	}
+	
+	// 업무 상태 변경 모달 창 열기
+	function openStatusChangeModal(taskId) {
+	    const modal = document.createElement('div');
+	    modal.classList.add('modal');
+
+	    const modalContent = document.createElement('div');
+	    modalContent.classList.add('modal-content');
+
+	    const title = document.createElement('h3');
+	    title.textContent = '업무 상태 변경';
+
+	    const statusLabel = document.createElement('label');
+	    statusLabel.textContent = '새로운 상태 선택:';
+
+	    const statusSelect = document.createElement('select');
+	    statusSelect.id = 'new-status';
+
+	    // 상태 옵션 추가
+	    const statuses = ['REQUEST', 'INPROGRESS', 'FEEDBACK', 'COMPLETED', 'HOLD'];
+	    statuses.forEach(status => {
+	        const option = document.createElement('option');
+	        option.value = status;
+	        option.textContent = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase().replace('_', ' '); // 옵션 이름 포맷
+	        statusSelect.appendChild(option);
+	    });
+
+	    const cancelButton = document.createElement('button');
+	    cancelButton.textContent = '취소';
+	    cancelButton.classList.add('btn-cancel');
+	    cancelButton.addEventListener('click', () => {
+	        document.body.removeChild(modal);
+	    });
+
+	    const changeButton = document.createElement('button');
+	    changeButton.textContent = '변경';
+	    changeButton.classList.add('btn-change');
+	    changeButton.addEventListener('click', () => {
+	        changeTaskStatus(taskId, statusSelect.value, modal); // 상태 변경 함수 호출
+	    });
+
+	    const buttonsContainer = document.createElement('div');
+	    buttonsContainer.classList.add('modal-buttons');
+	    buttonsContainer.appendChild(cancelButton);
+	    buttonsContainer.appendChild(changeButton);
+
+	    modalContent.appendChild(title);
+	    modalContent.appendChild(statusLabel);
+	    modalContent.appendChild(statusSelect);
+	    modalContent.appendChild(buttonsContainer);
+	    modal.appendChild(modalContent);
+
+	    document.body.appendChild(modal);
+	}
+
+	// 업무 상태 변경 AJAX 요청 처리
+	function changeTaskStatus(taskId, newStatus, modal) {
+	    $.ajax({
+	        url: `changeTaskStatus?taskId=${taskId}&taskStatus=${newStatus}`, // 상태 변경 API 호출
+	        type: 'POST',
+	        success: function(response) {
+	            console.log('업무 상태 변경 성공:', response);
+	            alert('업무 상태가 변경되었습니다.');
+
+	            // UI에서 해당 업무 항목 업데이트 (상태 변경)
+	            $(`tr[data-task-id="${taskId}"] td:nth-child(3)`).text(newStatus); // 상태 열 업데이트
+
+	            // 캘린더 새로 고침
+	            loadCalendar();
+
+	            // 모달 닫기
+	            document.body.removeChild(modal);
+	        },
+	        error: function(xhr) {
+	            alert('업무 상태 변경에 실패했습니다: ' + xhr.responseText);
+	            document.body.removeChild(modal); // 모달 닫기
 	        }
 	    });
 	}
@@ -799,7 +885,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	    const hours = String(date.getHours()).padStart(2, '0');
 	    const minutes = String(date.getMinutes()).padStart(2, '0');
 
-	    return `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
+	    return `${year}.${month}.${day} ${hours}:${minutes}`;
+		// return `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
 	}
 
  	
