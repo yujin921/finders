@@ -26,4 +26,19 @@ public class HomeController {
   	public String homePage() {
   	    return "home"; // home.html 템플릿으로 이동
   	}
+  	
+  	@GetMapping("header")
+  	public String header() {
+  	    return "header";
+  	}
+  	
+  	@GetMapping("nav")
+  	public String nav() {
+  		return "nav";
+  	}
+  	
+  	@GetMapping("footer")
+  	public String footer() {
+  		return "footer";
+  	}
 }

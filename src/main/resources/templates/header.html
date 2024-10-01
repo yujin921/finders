@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>finders</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+</head>
+<body>
+	<div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <a href="/">
+                    <img th:src="@{/images/wordmark-logo.png}" alt="Finders Logo" class="logo-img">
+                </a>
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="프로젝트 또는 프리랜서 검색">
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="login-actions">
+                <th:block sec:authorize="not isAuthenticated()">
+                    <a th:href="@{/member/join}">회원가입</a>
+                    <a th:href="@{/member/login}" class="btn">로그인</a>
+                </th:block>
+                <th:block sec:authorize="isAuthenticated()">
+                    <img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;">
+                    <a th:href="@{/project/view}">프로젝트 관리</a>
+                    <a th:href="@{/member/myPage}">마이페이지</a>
+                    <a th:href="@{/member/logout}" class="btn">로그아웃</a>
+                </th:block>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
