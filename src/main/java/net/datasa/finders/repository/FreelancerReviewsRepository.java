@@ -15,4 +15,6 @@ public interface FreelancerReviewsRepository extends JpaRepository<FreelancerRev
 
     boolean existsByProjectNumAndSendIdAndReceivedId(int projectNum, String sendId, String receivedId);
 
+	List<FreelancerReviewsEntity> findByreceivedId(String receivedId);
+
 }

@@ -56,18 +56,34 @@ public class FindController {
   	    return "/find/view"; // home.html 템플릿으로 이동
   	}
   	
-  	/*
+  	
   	@GetMapping("freelancerDetail")
   	public String freelancerDetail(@RequestParam("memberId") String memberId
   			, Model model
   			, @AuthenticationPrincipal AuthenticatedUser user) {
+  		if (user != null) {
+  	        // principal.getName()은 현재 로그인한 사용자의 username을 가져옴
+  	        String userId = user.getId();
+  	        
+  	        // MemberService를 통해 사용자의 정보 가져오기
+  	        MemberEntity member = memberService.findByMemberId(userId);
+  	        log.debug(member.getProfileImg());
+  	        model.addAttribute("profileImgUrl", member.getProfileImg());
+  	    }
+  		
   	    FindFreelancerDTO findFreelancerDTO = findService.findFreelancerDetail(memberId);
   	    List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(memberId);
+  	    List<FreelancerReviewDTO> freelancerReviewDTOList = freelancerReviewService.findFreelancerReviewList(memberId);
+  	    
+  	    log.debug("프리랜서 DTO : {}",findFreelancerDTO);
+  	    log.debug("포트폴리오 DTO : {}",freelancerPortfoliosDTOList);
+  	    log.debug("리뷰 DTO : {}",freelancerReviewDTOList);
   	    
   	    
-  	    model.addAttribute("findFreelancerDTO", findFreelancerDTO);
-  	    model.addAttribute("freelancerPortfoliosDTOList", freelancerPortfoliosDTOList);
+  	    model.addAttribute("findFreelancer", findFreelancerDTO);
+  	    model.addAttribute("freelancerPortfoliosList", freelancerPortfoliosDTOList);
+  	    model.addAttribute("freelancerReviewList", freelancerReviewDTOList);
   	    
-  	    return "/find/freelancerDetail"; // home.html 템플릿으로 이동
-  	}*/
+  	    return "find/freelancerDetail"; // home.html 템플릿으로 이동
+  	}
 }

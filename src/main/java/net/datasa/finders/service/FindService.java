@@ -84,8 +84,8 @@ public class FindService {
 		MemberEntity memberEntity = memberRepository.findById(memberId)
 				.orElseThrow(() -> new EntityNotFoundException("아이디를 찾을 수 없습니다."));
 		
-		//List<FreelancerReviewsEntity> freelancerReviewsEntityList = freelancerReviewsRepository.findByFreelancerId(memberEntity.getMemberId());
-		/*
+		List<FreelancerReviewsEntity> freelancerReviewsEntityList = freelancerReviewsRepository.findByreceivedId(memberEntity.getMemberId());
+		
 		double totalRating = 0.0;
 		for (FreelancerReviewsEntity freelancerReviewsEntity : freelancerReviewsEntityList) {;
 			FreelancerReviewDTO freelancerReviewDTO = FreelancerReviewDTO.builder()
@@ -99,7 +99,7 @@ public class FindService {
 		if(Double.isNaN(totalRating)) {
 			totalRating = 0.0;
 		} // 평점이 없을 경우 0점 입력
-		*/
+		
 		List<FreelancerSkillEntity> freelancerSkillEntityList = freelancerSkillRepository.findByFreelancerId(memberEntity);
 		
 		String[] skills = new String[freelancerSkillEntityList.size()];
@@ -117,9 +117,9 @@ public class FindService {
 		FindFreelancerDTO findFreelancerDTO = FindFreelancerDTO.builder()
 				.memberId(memberEntity.getMemberId())
 				.profileImg(memberEntity.getProfileImg())
-				//.totalRating(totalRating)
+				.totalRating(totalRating)
 				.totalPortfolios(freelancerPortfoliosEntityList.size())
-				//.totalReviews(freelancerReviewsEntityList.size())
+				.totalReviews(freelancerReviewsEntityList.size())
 				.totalProjects(teamEntityList.size())
 				.skills(skills)
 				.build();
