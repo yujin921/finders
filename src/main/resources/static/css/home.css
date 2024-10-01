@@ -404,5 +404,11 @@ footer a:hover {
     color: var(--highlight-color);
 }
 
-
+#chat-container {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 1000;
+            overflow: hidden;
+        }
 
