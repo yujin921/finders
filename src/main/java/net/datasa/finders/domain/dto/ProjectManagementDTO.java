@@ -14,8 +14,5 @@ import lombok.NoArgsConstructor;
 public class ProjectManagementDTO {
 	private Integer managementNum;
 	private Integer projectNum;
-    private LocalDateTime actualStartDate;
-    private LocalDateTime actualEndDate;
-    private Boolean delayedStatus;
-    private Integer delayedDate;
+    private Boolean completeStatus;
 }
