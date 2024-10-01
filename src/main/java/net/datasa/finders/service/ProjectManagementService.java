@@ -419,6 +419,15 @@ public class ProjectManagementService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
         return project.getCompleteStatus(); // 완료 여부 반환
     }
+    
+    // 업무 상태 변경
+    public void updateTaskStatus(Integer taskId, TaskStatus status) {
+        TaskManagementEntity task = taskManagementRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("업무를 찾을 수 없습니다."));
+        
+        task.setTaskStatus(status);
+        taskManagementRepository.save(task); // 상태 변경 후 저장
+    }
 	
     public Map<String, Object> getGanttChartData(int projectNum) {
         List<TaskManagementEntity> taskEntities = taskManagementRepository.findByProjectPublishingEntity_ProjectNum(projectNum);
