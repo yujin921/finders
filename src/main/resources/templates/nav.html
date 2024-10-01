@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>finders</title>
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+</head>
+<body>
+	<ul>
+            <li sec:authorize="hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN')">
+                <a th:href="@{/board/write}">프로젝트 등록</a></li>
+            <li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
+            <li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
+            <li><a th:href="@{/support/guide}">서비스 안내</a></li>
+        	<li><a th:href="@{/support/example}">이용 사례</a></li>
+            <!--  <li><a href="#">커뮤니티</a></li> -->
+            <span style="color:white;">│</span>
+            <li><a th:href="@{/myProject/view}">내 프로젝트 목록</a></li>
+            <li><a th:href="@{/webrtc}">미팅룸</a></li>
+        </ul>
+</body>
+</html>
+
