@@ -11,7 +11,7 @@
 	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 </head>
 <body>
- <header>
+  <header>
     <div class="container">
         <div class="header-content">
             <div class="logo">
@@ -56,111 +56,95 @@
     </nav>
     
     
-	 <div class="main">
- <div class="project-header">
-        <h1 th:text="${board.projectTitle}" class="project-title">프로젝트 제목</h1>
-        <div class="project-meta">
-            <div class="meta-item">
-                <i class="fas fa-user"></i>
-                <span>작성자: <span th:text="${board.clientId}"></span></span>
-            </div>
-            <div class="meta-item">
-                <i class="fas fa-calendar-alt"></i>
-                <span>근무 시작일: <span th:text="${board.projectStartDate}"></span></span>
-            </div>
-            <div class="meta-item">
-                <i class="fas fa-calendar-day"></i>
-                <span>모집 마감일: <span th:text="${#temporals.format(board.recruitDeadline, 'yyyy-MM-dd')}"></span></span>
-            </div>
-            <div class="meta-item">
-                <i class="fas fa-clock"></i>
-                <span>예상일수: <span th:text="${board.estimatedDay} + '일'"></span></span>
-            </div>
-            <div class="meta-item">
-                <i class="fas fa-wallet"></i>
-                <span>예산: <span th:text="${board.projectBudget}"></span>원</span>
-            </div>
-        </div>
-    </div>
-	   
-	<!-- 카테고리 및 업무 범위별 인원수 -->
-	<div class="category-section">
-	    <h3>카테고리 및 업무 범위별 인원수</h3>
-	    <div class="category-list">
-	        <div th:each="output : ${board.outputList}" class="category-item">
-	            <h4 th:text="${output['workScope']}"></h4>
-	            <p th:text="'카테고리: ' + ${output['category']}"></p>
-	            <p th:text="'인원수: ' + ${output['requiredNum']} + '명'"></p>
+<div class="container2">
+    <!-- 왼쪽 메인 콘텐츠 -->
+	   <div class="main-content">
+	    <div class="project-header">
+	        <div class="header-title-container">
+	            <h1 th:text="${board.projectTitle}" class="project-title">프로젝트 제목</h1>
+	            <span class="register-date" th:text="'등록 일자  ' + ${#temporals.format(board.projectCreateDate, 'yyyy-MM-dd')}"></span>
+	        </div>
+	        <div class="project-meta">
+	            <div class="meta-item">
+	                <i class="fas fa-user"></i>
+	                <span>작성자: <span th:text="${board.clientId}"></span></span>
+	            </div>
+	            <div class="meta-item">
+	                <i class="fas fa-calendar-alt"></i>
+	                <span>근무 시작일: <span th:text="${board.projectStartDate}"></span></span>
+	            </div>
+	            <div class="meta-item">
+	                <i class="fas fa-calendar-day"></i>
+	                <span>모집 마감일: <span th:text="${#temporals.format(board.recruitDeadline, 'yyyy-MM-dd')}"></span></span>
+	            </div>
+	            <div class="meta-item">
+	                <i class="fas fa-clock"></i>
+	                <span>예상일수: <span th:text="${board.estimatedDay} + '일'"></span></span>
+	            </div>
+	            <div class="meta-item">
+	                <i class="fas fa-wallet"></i>
+	                <span>예산: <span th:text="${board.projectBudget}"></span>원</span>
+	            </div>
 	        </div>
 	    </div>
-	</div>
 	
-	 <!-- 요구 기술 스택 -->
-	<div class="skills-section">
-	    <h3>요구 기술 스택</h3>
-	    <div class="skills-list">
-	        <span th:each="skill : ${board.selectedSkills}" class="skill-item">
-	            <span th:text="${skill}"></span>
-	        </span>
+	    <!-- 카테고리 및 업무 범위별 인원수 -->
+	    <div class="category-section">
+	        <h3>카테고리 및 업무 범위별 인원수</h3>
+	        <div class="category-list">
+	            <div th:each="output : ${board.outputList}" class="category-item">
+	                <div class="category-content">
+	                    <h4 th:text="${output['workScope']}"></h4>
+	                    <p th:text="'카테고리: ' + ${output['category']}"></p>
+	                    <p th:text="'인원수: ' + ${output['requiredNum']} + '명'"></p>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	
+	    <!-- 요구 기술 스택 -->
+	    <div class="skills-section">
+	        <h3>요구 기술 스택</h3>
+	        <div class="skills-list">
+	            <span th:each="skill : ${board.selectedSkills}" class="skill-item">
+	                <span th:text="${skill}"></span>
+	            </span>
+	        </div>
 	    </div>
 	</div>
     
-	    <!-- 사전 검증 질문 -->
-	    <div>
-	        <h3>사전 검증 질문</h3>
-	        <ul>
-	            <li th:each="question, iterStat : ${board.prequalificationQuestions}">
-	                <span th:text="${iterStat.count} + '. ' + ${question}"></span>
-	            </li>
-	        </ul>
-	    </div>
-	
-	    <!-- 클라이언트 후기 -->
-	    <div>
-	        <h3>클라이언트 후기</h3>
-	        <div th:if="${not #lists.isEmpty(clientReviews)}">
-	            <div th:each="review : ${clientReviews}" class="review-item">
-	                <p>평점: <span th:text="${review.rating}"></span>/5</p>
-	                <p>코멘트: <span th:text="${review.comment}"></span></p>
-	                <p>작성자: <span th:text="${review.freelancerId}"></span></p>
-	                <p>작성일: <span th:text="${#temporals.format(review.reviewDate, 'yyyy-MM-dd HH:mm')}"></span></p>
-	                <h4>세부 평가</h4>
-	                <ul>
-	                    <li th:each="item : ${review.reviewItems}">
-	                        <span th:text="${item.itemName}"></span>
-	                    </li>
-	                </ul>
-	                <hr>
-	            </div>
-	        </div>
-	        <p th:if="${#lists.isEmpty(clientReviews)}">아직 이 클라이언트에 대한 후기가 없습니다.</p>
-	    </div>
-	
-	    <!-- 게시판 작성자와 로그인한 사용자가 같을 경우 삭제 버튼 표시 -->
-	    <span th:if="${board.clientId == user.username}">
-	        <form action="/board/delete" method="post">
-	            <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
-	            <button type="submit">삭제하기</button>
-	        </form>
-	    </span>
-	
-	    <!-- ROLE_FREELANCER일 경우 신청하기 버튼 또는 지원 상태 표시 -->
-	    <span th:if="${roleName.name() == 'ROLE_FREELANCER'}">
-	        <div th:if="${applied}">
-	            <p>지원 결과:
-	                <span th:if="${applicationStatus == 'PENDING'}" class="support-status">지원중</span>
-	                <span th:if="${applicationStatus == 'ACCEPTED'}" class="support-status">합격</span>
-	                <span th:if="${applicationStatus == 'REJECTED'}" class="support-status">불합격</span>
-	            </p>
-	        </div>
-	        <div th:unless="${applied}">
-	            <form action="/board/apply" method="post">
-	                <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
-	                <button type="submit">신청하기</button>
-	            </form>
-	        </div>
-	    </span>
-	</div>
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="apply-box">
+            <!-- 게시판 작성자와 로그인한 사용자가 같을 경우 삭제 버튼 표시 -->
+            <span th:if="${board.clientId == user.username}">
+                <h3>프로젝트 관리</h3>
+                <form action="/board/delete" method="post">
+                    <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
+                    <button type="submit" class="apply-button delete-button">삭제하기</button>
+                </form>
+            </span>
+
+            <!-- ROLE_FREELANCER일 경우 신청하기 버튼 또는 지원 상태 표시 -->
+            <span th:if="${roleName.name() == 'ROLE_FREELANCER'}">
+                <h3>프로젝트 신청하기</h3>
+                <div th:if="${applied}">
+                    <p>지원 결과:
+                        <span th:if="${applicationStatus == 'PENDING'}" class="support-status">지원중</span>
+                        <span th:if="${applicationStatus == 'ACCEPTED'}" class="support-status">합격</span>
+                        <span th:if="${applicationStatus == 'REJECTED'}" class="support-status">불합격</span>
+                    </p>
+                </div>
+                <div th:unless="${applied}">
+                    <form action="/board/apply" method="post">
+                        <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
+                        <button type="submit" class="apply-button">신청하기</button>
+                    </form>
+                </div>
+            </span>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

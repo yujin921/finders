@@ -155,6 +155,7 @@ public class BoardService {
                 .projectDescription(entity.getProjectDescription())
                 .projectImage(entity.getProjectImage())  // 조회 시 Base64로 저장된 이미지 데이터
                 .projectStatus(entity.getProjectStatus())
+                .projectCreateDate(entity.getProjectCreateDate())
                 .build();
     }
     
@@ -167,6 +168,8 @@ public class BoardService {
 
         LocalDate projectStartDate = entity.getProjectStartDate();
         LocalDate projectEndDate = entity.getProjectEndDate();
+        LocalDateTime projectCreateDate = entity.getProjectCreateDate();
+        
         long estimatedDays = ChronoUnit.DAYS.between(projectStartDate, projectEndDate);
 
         List<PrequalificationQuestionEntity> questions = prequalificationQuestionRepository.findByProjectPublishingEntity(entity);
@@ -207,6 +210,7 @@ public class BoardService {
         dto.setOutputList(matchedOutputs);
         dto.setSelectedSkills(selectedSkills);
         dto.setPrequalificationQuestions(questionTexts);
+        dto.setProjectCreateDate(projectCreateDate);
 
         return dto;
     }
