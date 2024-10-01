@@ -1,7 +1,6 @@
-/* 색상 팔레트 */
 :root {
     --primary-color: #1A202C;    /* 매우 짙은 회색-블루 */
-    --secondary-color: #4FD1C5;  /* 청록색 */
+    --secondary-color: #2C7A7B;  /* 청록색 */
     --accent-color: #F6AD55;     /* 오렌지 */
     --highlight-color: #38B2AC;  /* 밝은 청록색 */
     --text-color: #2D3748;       /* 어두운 회색 */
@@ -10,6 +9,9 @@
     --border-color: #E2E8F0;     /* 테두리 색상 */
     --button-hover: #2C7A7B;     /* 버튼 호버 시 청록색 톤 */
 }
+
+
+
 
 /* 전체 요소에 대한 기본 스타일 */
 * {
