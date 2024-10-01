@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${findFreelancerDTO.name} + '의 상세 정보'">파트너 상세 정보</title>
+    <title th:text="${findFreelancer.memberId} + '의 상세 정보'">파트너 상세 정보</title>
     <link rel="stylesheet" th:href="@{/css/find/freelancerDetail.css}">
     <!-- Font Awesome 추가 -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -92,44 +92,44 @@
 <body>
     <header>
         <div class="container">
-            <h1 th:text="${findFreelancerDTO.memberId} + '의 상세 정보'">파트너 상세 정보</h1>
+            <h1 th:text="${findFreelancer.memberId} + '의 상세 정보'">파트너 상세 정보</h1>
         </div>
     </header>
 
     <main class="container">
         <section class="partner-info">
-            <h2 th:text="${findFreelancerDTO.memberId}">파트너 ID</h2>
+            <h2 th:text="${findFreelancer.memberId}">파트너 ID</h2>
             <div class="rating">
                 <th:block th:each="i : ${#numbers.sequence(1, 5)}">
                     <span class="material-icons" 
-                          th:text="${i <= findFreelancerDTO.totalRating} ? 'star' : (${i <= findFreelancerDTO.totalRating + 0.5} ? 'star_half' : 'star_border')">
+                          th:text="${i <= findFreelancer.totalRating} ? 'star' : (${i <= findFreelancer.totalRating + 0.5} ? 'star_half' : 'star_border')">
                     </span>
                 </th:block>
-                <span th:text="${#numbers.formatDecimal(findFreelancerDTO.totalRating, 1, 1)} + ' / 평가 ' + ${findFreelancerDTO.totalReviews} + '개'">
+                <span th:text="${#numbers.formatDecimal(findFreelancer.totalRating, 1, 1)} + ' / 평가 ' + ${findFreelancer.totalReviews} + '개'">
                     0.0 / 평가 0개
                 </span>
             </div>
             <div class="partner-stats">
-                <span th:text="'계약한 프로젝트: ' + ${findFreelancerDTO.totalProjects} + '건'">계약한 프로젝트: 0건</span>
-                <span th:text="'포트폴리오: ' + ${findFreelancerDTO.totalPortfolios} + '개'">포트폴리오: 0개</span>
+                <span th:text="'계약한 프로젝트: ' + ${findFreelancer.totalProjects} + '건'">계약한 프로젝트: 0건</span>
+                <span th:text="'포트폴리오: ' + ${findFreelancer.totalPortfolios} + '개'">포트폴리오: 0개</span>
             </div>
             <div class="skills">
                 <strong>보유 기술:</strong>
-                <span th:text="${#strings.listJoin(findFreelancerDTO.skills, ', ')}">스킬 정보 없음</span>
+                <span th:text="${#strings.listJoin(findFreelancer.skills, ', ')}">스킬 정보 없음</span>
             </div>
         </section>
 
         <section class="portfolio-section">
             <h2>포트폴리오</h2>
-            <div th:each="portfolio : ${freelancerPortfoliosDTOList}" class="portfolio-item">
-                <h3 th:text="${portfolio.title}">프로젝트 제목</h3>
+            <div th:each="portfolio : ${freelancerPortfoliosList}" class="portfolio-item">
+                <h3 th:text="${portfolio.portfolioTitle}">프로젝트 제목</h3>
             </div>
-            <p th:if="${#lists.isEmpty(freelancerPortfoliosDTOList)}">등록된 포트폴리오가 없습니다.</p>
+            <p th:if="${#lists.isEmpty(freelancerPortfoliosList)}">등록된 포트폴리오가 없습니다.</p>
         </section>
 
         <section class="reviews-section">
             <h2>리뷰</h2>
-            <div th:each="review : ${findFreelancerDTO.reviews}" class="review-item">
+            <div th:each="review : ${freelancerReviewList}" class="review-item">
                 <div class="rating">
                     <th:block th:each="i : ${#numbers.sequence(1, 5)}">
                         <span class="material-icons" 
@@ -140,7 +140,7 @@
                 </div>
                 <p th:text="${review.comment}">리뷰 내용</p>
             </div>
-            <p th:if="${#lists.isEmpty(findFreelancerDTO.reviews)}">아직 리뷰가 없습니다.</p>
+            <p th:if="${#lists.isEmpty(freelancerReviewList)}">아직 리뷰가 없습니다.</p>
         </section>
     </main>
 </body>

@@ -60,7 +60,7 @@ function loadPartners() {
             console.log(response);
             updatePartnerList(response);
 			$('.partner-card').on('click', function() {
-					window.location.href="/find/freelancerDetail?memberId="+ $('.partner-id').html();
+					window.location.href="/find/freelancerDetail?memberId="+ $(this).attr('data');
 				});
         },
         error: function(xhr, status, error) {
@@ -94,7 +94,7 @@ function createPartnerCard(partner) {
 	    }
 	
     return `
-        <div class="partner-card">
+        <div class="partner-card" data="${partner.memberId}">
             <img src="${partner.profileImg}" alt="${partner.name}" class="partner-image">
             <div class="partner-info">
                 <h3 class="partner-id">${partner.memberId || '아이디 없음'}</h3>
