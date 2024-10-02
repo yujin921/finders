@@ -1,15 +1,3 @@
-window.addEventListener('load', adjustSidebarHeight);
-window.addEventListener('resize', adjustSidebarHeight);
-
-function adjustSidebarHeight() {
-    const container = document.querySelector('.container');
-    const sidebar = document.querySelector('.sidebar');
-    const mainContent = document.querySelector('.main-content');
-
-    // 사이드바의 높이를 전체 컨테이너 높이에서 main-content의 높이를 뺀 값으로 설정
-    sidebar.style.height = `${container.clientHeight}px`;
-}
-
 // 간트차트 진행도 표시 함수
 function updateProgressDisplay() {
 	// 스크롤바에서 현재 값 가져오기
@@ -28,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	let ganttChart; // Gantt 차트 인스턴스를 저장할 변수
 	let timeline;
 	let ganttChartLoaded = false;
+	// AJAX 요청 상태를 추적하기 위한 변수
+	let isUpdatingSchedule = false;
+	let isUpdatingProgress = false;
 	
 	// 사용자 정보를 담은 객체 생성
     const userData = {
@@ -55,7 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// 페이지 로드 시 기본적으로 업무 목록 로드
 	loadTasks();
-	
+
+	// 페이지 로드 시 기본적으로 업무 알림 목록 로드
+	loadNotifications();
+		
 	// 페이지 로드 시 기본적으로 프로젝트 완료 여부 체크 후 버튼(프로젝트 완료 or 리뷰 작성) 표시
 	completeStatusCheck();
 	
@@ -71,8 +65,11 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById(targetId).classList.add('active');
 
             if (targetId === 'task-content') {
-				// 페이지 로드 시 업무 목록을 불러옴
+				// 업무 목록을 불러옴
 				loadTasks();
+			} else if (targetId === 'notification-content') {
+				// 업무 알림 목록 로드 함수
+				loadNotifications();
 			} else if (targetId === 'calendar-content') {
                 loadCalendar();
             } else if (targetId === 'gantt-content') {
@@ -397,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        functionTitleName: functionTitleName, // 기능 제목 추가
 	        taskTitle: $('#task-title').val(),
 	        taskDescription: $('#task-description').val(),
-	        taskStatus: $('#task-status').val().toUpperCase(), // Enum을 위해 대문자로 변환
+	        taskStatus: "REQUEST", // 신규 업무 등록 시 업무 상태 default 값은 "REQUEST(요청)"로 설정함
 	        taskPriority: $('#task-priority').val().toUpperCase(), // Enum을 위해 대문자로 변환
 	        taskStartDate: formattedStartDate, // 변환된 시작 날짜
 	        taskEndDate: formattedEndDate, // 변환된 종료 날짜
@@ -536,56 +533,23 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 	// 업무 상태 변경 모달 창 열기
 	function openStatusChangeModal(taskId) {
-	    const modal = document.createElement('div');
-	    modal.classList.add('modal');
+	    const modal = document.getElementById('status-change-modal');
+	    const statusSelect = document.getElementById('new-status');
 
-	    const modalContent = document.createElement('div');
-	    modalContent.classList.add('modal-content');
+	    // 상태 선택 초기화
+	    statusSelect.value = 'INPROGRESS'; // 기본 값 설정 (필요에 따라 조정 가능)
 
-	    const title = document.createElement('h3');
-	    title.textContent = '업무 상태 변경';
+	    // 취소 버튼 클릭 이벤트
+	    document.getElementById('cancel-button').onclick = () => {
+	        modal.classList.add('hidden'); // 모달 숨김
+	    };
 
-	    const statusLabel = document.createElement('label');
-	    statusLabel.textContent = '새로운 상태 선택:';
-
-	    const statusSelect = document.createElement('select');
-	    statusSelect.id = 'new-status';
-
-	    // 상태 옵션 추가
-	    const statuses = ['REQUEST', 'INPROGRESS', 'FEEDBACK', 'COMPLETED', 'HOLD'];
-	    statuses.forEach(status => {
-	        const option = document.createElement('option');
-	        option.value = status;
-	        option.textContent = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase().replace('_', ' '); // 옵션 이름 포맷
-	        statusSelect.appendChild(option);
-	    });
-
-	    const cancelButton = document.createElement('button');
-	    cancelButton.textContent = '취소';
-	    cancelButton.classList.add('btn-cancel');
-	    cancelButton.addEventListener('click', () => {
-	        document.body.removeChild(modal);
-	    });
-
-	    const changeButton = document.createElement('button');
-	    changeButton.textContent = '변경';
-	    changeButton.classList.add('btn-change');
-	    changeButton.addEventListener('click', () => {
+	    // 변경 버튼 클릭 이벤트
+	    document.getElementById('change-button').onclick = () => {
 	        changeTaskStatus(taskId, statusSelect.value, modal); // 상태 변경 함수 호출
-	    });
+	    };
 
-	    const buttonsContainer = document.createElement('div');
-	    buttonsContainer.classList.add('modal-buttons');
-	    buttonsContainer.appendChild(cancelButton);
-	    buttonsContainer.appendChild(changeButton);
-
-	    modalContent.appendChild(title);
-	    modalContent.appendChild(statusLabel);
-	    modalContent.appendChild(statusSelect);
-	    modalContent.appendChild(buttonsContainer);
-	    modal.appendChild(modalContent);
-
-	    document.body.appendChild(modal);
+	    modal.classList.remove('hidden'); // 모달 보이기
 	}
 
 	// 업무 상태 변경 AJAX 요청 처리
@@ -732,148 +696,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	        }
 	    });
 	}
-	
-	/*
-	function loadTasks() {
-	    $.ajax({
-	        url: 'getTasks',
-	        type: 'get',
-	        data: { projectNum: projectNum },
-	        success: function(response) {
-	            console.log('업무 목록:', response);
-
-	            const $taskList = $('#task-list');
-	            $taskList.empty();
-
-	            if (response.length === 0) {
-	                $taskList.append('<p>업무가 없습니다.</p>');
-	            } else {
-	                const uniqueFunctionTitles = [...new Set(response.map(task => task.functionTitleName))];
-
-	                uniqueFunctionTitles.forEach(title => {
-	                    const filteredTasks = response.filter(task => task.functionTitleName === title);
-
-	                    if (filteredTasks.length > 0) {
-	                        const dropdownContainer = $('<div class="dropdown-container"></div>');
-	                        const dropdownToggle = $(`<button class="dropdown-toggle">${title}</button>`);
-	                        const dropdownContent = $('<div class="dropdown-content"></div>');
-
-	                        const table = $('<table class="task-table"></table>');
-	                        const thead = $(`<thead>
-	                            <tr>
-	                                <th>업무 제목</th>
-	                                <th>설명</th>
-	                                <th>상태</th>
-	                                <th>우선순위</th>
-	                                <th>시작 날짜</th>
-	                                <th>종료 날짜</th>
-	                                <th>프리랜서 ID</th>
-	                            </tr>
-	                        </thead>`);
-	                        const tbody = $('<tbody></tbody>');
-
-	                        filteredTasks.forEach(task => {
-	                            const priorityClass = task.taskPriority.toLowerCase();
-	                            const formattedStartDate = formatDateTime(task.taskStartDate);
-	                            const formattedEndDate = formatDateTime(task.taskEndDate);
-
-	                            tbody.append(`
-	                                <tr data-task-id="${task.taskId}">
-	                                    <td>${task.taskTitle}</td>
-	                                    <td>${task.taskDescription}</td>
-	                                    <td>${task.taskStatus}</td>
-	                                    <td class="priority-${priorityClass}">${task.taskPriority}</td>
-	                                    <td>${formattedStartDate}</td>
-	                                    <td>${formattedEndDate}</td>
-	                                    <td>${task.freelancerId}</td>
-	                                </tr>
-	                            `);
-	                        });
-
-	                        table.append(thead).append(tbody);
-	                        dropdownContent.append(table);
-	                        dropdownContainer.append(dropdownToggle).append(dropdownContent);
-	                        $taskList.append(dropdownContainer);
-	                    }
-	                });
-
-	                // 드롭다운 토글 기능
-	                $('.dropdown-toggle').on('click', function() {
-	                    const $container = $(this).parent('.dropdown-container');
-	                    $container.toggleClass('open');  // 클래스 추가로 드롭다운 토글
-	                });
-
-	                // 전체 행 클릭 시 모달 열기
-	                $('tbody tr').on('click', function() {
-	                    const taskId = $(this).data('task-id');
-	                    openDeleteModal(taskId);
-	                });
-	            }
-	        },
-	        error: function() {
-	            alert('업무 목록을 불러오는 데 실패했습니다.');
-	        }
-	    });
-	}
-	
-	// 모달 창 열기 및 삭제 기능 구현
-	function openDeleteModal(taskId) {
-	    const modal = document.createElement('div');
-	    modal.classList.add('modal');
-
-	    const modalContent = document.createElement('div');
-	    modalContent.classList.add('modal-content');
-
-	    const title = document.createElement('h3');
-	    title.textContent = '해당 업무를 삭제하시겠습니까?';
-
-	    const cancelButton = document.createElement('button');
-	    cancelButton.textContent = '취소';
-	    cancelButton.classList.add('btn-cancel');
-	    cancelButton.addEventListener('click', () => {
-	        document.body.removeChild(modal);
-	    });
-
-	    const deleteButton = document.createElement('button');
-	    deleteButton.textContent = '삭제';
-	    deleteButton.classList.add('btn-delete');
-	    deleteButton.addEventListener('click', () => {
-	        deleteTask(taskId, modal);
-	    });
-
-	    const buttonsContainer = document.createElement('div');
-	    buttonsContainer.classList.add('modal-buttons');
-	    buttonsContainer.appendChild(cancelButton);
-	    buttonsContainer.appendChild(deleteButton);
-
-	    modalContent.appendChild(title);
-	    modalContent.appendChild(buttonsContainer);
-	    modal.appendChild(modalContent);
-
-	    document.body.appendChild(modal);
-	}
-	
-	// 업무 삭제 AJAX 요청 처리
-	function deleteTask(taskId, modal) {
-	    $.ajax({
-	        url: 'deleteTask?taskId=' + taskId, // 삭제 요청을 보낼 URL
-	        type: 'POST',
-	        success: function(response) {
-	            console.log('업무 삭제 성공:', response);
-	            // UI에서 해당 업무 항목 제거
-	            $(`.task-title[data-task-id="${taskId}"]`).closest('tr').remove();
-	            alert('업무가 성공적으로 삭제되었습니다.');
-	            document.body.removeChild(modal); // 모달 닫기
-				
-				// 업무 목록을 새로 고침
-				loadTasks();
-	        },
-	        error: function(xhr) {
-	            alert('업무 삭제에 실패했습니다: ' + xhr.responseText);
-	        }
-	    });
-	}
-	*/
 
 	function formatDateTime(dateString) {
 	    const date = new Date(dateString);
@@ -887,6 +709,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	    return `${year}.${month}.${day} ${hours}:${minutes}`;
 		// return `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
+	}
+	
+	
+	// 업무 알림 기능 구현
+	// 알림 목록 로드 함수
+	function loadNotifications() {
+	    // 예시 데이터, 실제로는 서버에서 받아오는 데이터로 변경
+	    const notifications = [
+	        { message: "신규 업무 생성되어 업무 요청이 왔습니다.", read: false },
+	        { message: "업무 요청이 진행되고 있습니다.", read: false },
+	        { message: "업무가 완료되었습니다.", read: false },
+	        { message: "해당 업무에 대한 피드백이 도착했습니다. 확인 부탁드립니다.", read: false }
+	    ];
+
+	    const $notificationList = $('#notification-list');
+	    $notificationList.empty(); // 기존 목록 비우기
+
+	    if (notifications.length === 0) {
+	        $notificationList.append('<li>알림이 없습니다.</li>');
+	    } else {
+	        notifications.forEach((notification, index) => {
+	            const readStatus = notification.read ? "읽음" : "안읽음";
+	            const listItem = $(`<li data-index="${index}">
+	                ${notification.message} - <span class="status">${readStatus}</span>
+	            </li>`);
+
+	            // 클릭 이벤트로 상태 변경
+	            listItem.on('click', function() {
+	                if (!notification.read) {
+	                    notification.read = true; // 상태 변경
+	                    $(this).find('.status').text("읽음");
+	                }
+	            });
+
+	            $notificationList.append(listItem);
+	        });
+	    }
 	}
 
  	
@@ -1364,118 +1223,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	        }
 	    });
 	}
-	
-	
-	/*
-    // 이벤트 폼 제출 핸들러
-    function handleEventFormSubmit(event) {
-        event.preventDefault();
-		
-        const title = document.getElementById('event-title').value;
-        const type = document.getElementById('event-type').value;
-        const startDate = document.getElementById('event-start-date').value;
-        const endDate = document.getElementById('event-end-date').value;
-        const startTime = document.getElementById('event-start-time').value;
-        const endTime = document.getElementById('event-end-time').value;
-
-		console.log(`Event submitted - Title: ${title}, Type: ${type}, Start Date: ${startDate}, End Date: ${endDate}, Start Time: ${startTime}, End Time: ${endTime}`);
-		
-        if (title && startDate && endDate) {
-            let startDateTime, endDateTime;
-
-            // 중복 일정 체크
-            const events = calendar.getEvents();
-            const isDuplicate = (start, end) => {
-                return events.some(event =>
-                    (event.title === title && 
-                    event.startStr === start && 
-                    event.endStr === end)
-                );
-            };
-
-            if (type === '1') {
-                // 일일 일정 (반복 일정)
-                const startOfDayTime = `${startDate}T${startTime}:00`;
-                const endOfDayTime = `${endDate}T${endTime}:00`;
-
-                let currentDate = new Date(startDate);
-                const endDateObj = new Date(endDate);
-
-                while (currentDate <= endDateObj) {
-                    const eventStart = `${currentDate.toISOString().split('T')[0]}T${startTime}:00`;
-                    const eventEnd = `${currentDate.toISOString().split('T')[0]}T${endTime}:00`;
-
-                    if (!isDuplicate(eventStart, eventEnd)) {
-                        calendar.addEvent({
-                            title: title,
-                            start: eventStart,
-                            end: eventEnd
-                        });
-                    }
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-            } else if (type === '2') {
-                // 시간 기반 일정
-                startDateTime = `${startDate}T${startTime}:00`;
-                endDateTime = `${endDate}T${endTime}:00`;
-
-                if (!isDuplicate(startDateTime, endDateTime)) {
-                    calendar.addEvent({
-                        title: title,
-                        start: startDateTime,
-                        end: endDateTime
-                    });
-                }
-            }
-
-            // 모달 닫기 및 폼 리셋
-            document.getElementById('event-modal').classList.add('hidden');
-            document.getElementById('event-form').reset();
-        }
-    }
-
-    // 일정 상세 모달 열기
-    function openEventDetailModal(event) {
-        const modal = document.createElement('div');
-        modal.classList.add('modal');
-
-        const modalContent = document.createElement('div');
-        modalContent.classList.add('modal-content');
-
-        const title = document.createElement('h3');
-        title.textContent = event.title;
-
-        const details = document.createElement('p');
-        details.textContent = formatEventDetails(event);
-
-        const closeButton = document.createElement('button');
-        closeButton.textContent = 'Close';
-        closeButton.classList.add('btn-close');
-        closeButton.addEventListener('click', () => {
-            document.body.removeChild(modal);
-        });
-
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.classList.add('btn-delete');
-        deleteButton.addEventListener('click', () => {
-            event.remove();
-            document.body.removeChild(modal);
-        });
-
-        const buttonsContainer = document.createElement('div');
-        buttonsContainer.classList.add('modal-buttons');
-        buttonsContainer.appendChild(closeButton);
-        buttonsContainer.appendChild(deleteButton);
-
-        modalContent.appendChild(title);
-        modalContent.appendChild(details);
-        modalContent.appendChild(buttonsContainer);
-        modal.appendChild(modalContent);
-
-        document.body.appendChild(modal);
-    }
-	*/
 
     // 일정 상세 내용 포맷팅
     function formatEventDetails(event) {
@@ -1686,7 +1433,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		        // 간트차트 데이터가 변경되면 캘린더를 업데이트
 		        loadCalendar(); // 캘린더 갱신 함수 호출
 		    });
-			
 	    });
 		
 		// loadEntityNames(진행도)
@@ -1717,7 +1463,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		        }
 		    });
 		}
-		
+
 		// loadEntityNames(실제 진행 일정)
 		function loadNamesForDate(projectNum, entityType) {
 		    console.log(`Loading names for date select box, projectNum: ${projectNum}, entityType: ${entityType}`); // 디버깅용 로그
@@ -1746,104 +1492,61 @@ document.addEventListener('DOMContentLoaded', function() {
 		        }
 		    });
 		}
-
-		// 페이지 로드 시 기본값으로 'task'를 선택하여 이름을 로드
-		$(document).ready(function() {
-		    let projectNumber = new URLSearchParams(window.location.search).get('projectNum');
+		
+		// 간트차트 실제 일정 및 진행도 업데이트를 위한 초기화 수행(페이지 로드 시 기본값으로 'task'를 선택하여 이름을 로드)
+		let projectNumber = new URLSearchParams(window.location.search).get('projectNum');
+		
+		// 실제 진행 업데이트를 위한 초기화 함수
+		function initializeActualDateUpdate() {
+			// 날짜 선택 필드 초기화
+		    $('#actual-start-date').val(''); // 실제 시작일 초기화
+		    $('#actual-end-date').val('');   // 실제 종료일 초기화
+			
 		    if (projectNumber) {
-		        $('#entityType-select').val('task');  // 기본값으로 'task' 선택
-				$('#entityType-selectDate').val('task'); // 기본값으로 'task' 선택
-				loadNamesForProgress(projectNumber, 'task');  // 기본값으로 'task' 로드
-				loadNamesForDate(projectNum, 'task'); // 기본값으로 'task' 로드
-			}
-			
-			// 기존 이벤트 리스너를 제거하고 새로운 리스너를 추가
-			$('#update-progress-button').off('click').on('click', updateProgress);
-			$('#update-schedule-button').off('click').on('click', updateActualDate);
-			
-			// Entity Type select box 변경 시 처리 (진행도)
-			$('#entityType-select').change(function() {
-			    const entityType = $(this).val();
-			    const projectNum = getQueryParam('projectNum'); // URL 쿼리 스트링에서 projectNum을 가져옴
-
-			    console.log(`Entity Type Selected for progress: ${entityType}`); // 디버깅용 로그
-			    console.log(`Project Num: ${projectNum}`); // 디버깅용 로그
-			    
-			    if (entityType && projectNum) {
-			        loadNamesForProgress(projectNum, entityType);
-			        $('#name-select').prop('disabled', false);
-			    } else {
-			        $('#name-select').prop('disabled', true);
-			        $('#name-select').empty().append('<option value="">선택</option>');
-			    }
-			});
-
-			// Entity Type select box 변경 시 처리 (실제 일정 업데이트)
-			$('#entityType-selectDate').change(function() {
-			    const entityType = $(this).val();
-			    const projectNum = getQueryParam('projectNum'); // URL 쿼리 스트링에서 projectNum을 가져옴
-
-			    console.log(`Entity Type Selected for date: ${entityType}`); // 디버깅용 로그
-			    console.log(`Project Num: ${projectNum}`); // 디버깅용 로그
-			    
-			    if (entityType && projectNum) {
-			        loadNamesForDate(projectNum, entityType);
-			        $('#name-selectDate').prop('disabled', false);
-			    } else {
-			        $('#name-selectDate').prop('disabled', true);
-			        $('#name-selectDate').empty().append('<option value="">선택</option>');
-			    }
-			});
-
-		});
-
-		// 진행도 업데이트 함수
-		function updateProgress() {
-		    let ganttId = $('#name-select').val();
-		    let entityType = $('#entityType-select').val();
-		    let progressValue = $('#progress-value').val() + "%"; // 스크롤바 값을 가져와서 "%" 추가
-
-		    // 입력 값 유효성 검사
-		    if (!ganttId || !entityType || !progressValue) {
-		        alert('모든 필드를 입력해 주세요');
-		        return;
+		        $('#entityType-selectDate').val('task');
+		        loadNamesForDate(projectNumber, 'task');
 		    }
 
-		    // AJAX 요청을 통해 서버에 진행도 업데이트 요청
-		    $.ajax({
-		        url: 'updateProgress',
-		        type: 'POST',
-		        data: {
-		            entityType: entityType,
-		            id: ganttId,  // 실제 DB ID
-		            progressValue: progressValue
-		        },
-		        success: function(response) {
-		            if (response === 'success') {
-		                alert('진행도가 업데이트되었습니다.');
+		    // Entity Type select box 변경 시 처리 (실제 일정 업데이트)
+		    $('#entityType-selectDate').off('change').on('change', function() {
+		        const entityType = $(this).val();
+		        const projectNum = getQueryParam('projectNum');
 
-		                // 간트차트를 새로고침하여 반영된 진행도 확인
-		                refreshGanttChart();
-		                
-		                // 입력 박스와 select 박스 값을 초기화
-		                $('#progress-value').val(0); // 스크롤바 초기화
-		                // $('#progress-value-display').text('0%'); // 진행도 표시 초기화
-						
-						updateProgressDisplay();
-						
-		            } else {
-		                alert('진행도 업데이트에 실패했습니다.');
-		            }
-		        },
-		        error: function(xhr, status, error) {
-		            console.error('AJAX Error:', status, error);
-		            alert('서버 요청 중 오류가 발생했습니다.');
+		        if (entityType && projectNum) {
+		            loadNamesForDate(projectNum, entityType);
+		            $('#name-selectDate').prop('disabled', false);
+		        } else {
+		            $('#name-selectDate').prop('disabled', true).empty().append('<option value="">선택</option>');
 		        }
 		    });
 		}
-		
-		// 실제 일정 업데이트 버튼 클릭 이벤트 핸들러
+
+		// 진행도 업데이트를 위한 초기화 함수
+		function initializeProgressUpdate() {
+		    if (projectNumber) {
+		        $('#entityType-select').val('task');
+		        loadNamesForProgress(projectNumber, 'task');
+		    }
+
+		    // Entity Type select box 변경 시 처리 (진행도)
+		    $('#entityType-select').off('change').on('change', function() {
+		        const entityType = $(this).val();
+		        const projectNum = getQueryParam('projectNum');
+
+		        if (entityType && projectNum) {
+		            loadNamesForProgress(projectNum, entityType);
+		            $('#name-select').prop('disabled', false);
+		        } else {
+		            $('#name-select').prop('disabled', true).empty().append('<option value="">선택</option>');
+		        }
+		    });
+		}
+
+		// 실제 일정 업데이트 함수
 		function updateActualDate() {
+		    if (isUpdatingSchedule) return; // 요청이 진행 중이면 함수 종료
+		    isUpdatingSchedule = true; // 요청 시작
+
 		    let ganttId = $('#name-selectDate').val();
 		    let entityType = $('#entityType-selectDate').val();
 		    let actualStart = $('#actual-start-date').val();
@@ -1852,6 +1555,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		    // 입력 값 유효성 검사
 		    if (!ganttId || !entityType || !actualStart || !actualEnd) {
 		        alert('모든 필드를 입력해 주세요');
+		        isUpdatingSchedule = false; // 요청 종료
 		        return;
 		    }
 
@@ -1862,6 +1566,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		    // UTC ISO 문자열 생성
 		    const formattedStart = new Date(startDate.getTime() - (startDate.getTimezoneOffset() * 60000)).toISOString().split('.')[0] + 'Z';
 		    const formattedEnd = new Date(endDate.getTime() - (endDate.getTimezoneOffset() * 60000)).toISOString().split('.')[0] + 'Z';
+
+		    // 실제 일정 업데이트 버튼 비활성화
+		    $('#update-schedule-confirm').prop('disabled', true);
 
 		    // AJAX 요청을 통해 서버에 실제 일정 업데이트 요청
 		    $.ajax({
@@ -1878,8 +1585,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		            if (response === 'success') {
 		                alert('실제 일정이 업데이트되었습니다.');
 		                refreshGanttChart(ganttId, entityType, formattedStart, formattedEnd);
-		                $('#actual-start-date').val(''); // 초기화
-		                $('#actual-end-date').val('');   // 초기화
+		                $('#update-schedule-modal').hide(); // 모달 닫기
 		            } else {
 		                alert('실제 일정 업데이트에 실패했습니다.');
 		            }
@@ -1887,7 +1593,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		        error: function(xhr, status, error) {
 		            console.error('AJAX Error:', status, error);
 		            console.log('Sent Data:', { entityType, ganttId, actualStart: formattedStart, actualEnd: formattedEnd });
-		            
+
 		            if (xhr.status === 400) {
 		                alert('유효하지 않은 Entity 유형입니다.');
 		            } else if (xhr.status === 404) {
@@ -1895,9 +1601,104 @@ document.addEventListener('DOMContentLoaded', function() {
 		            } else {
 		                alert('서버 요청 중 오류가 발생했습니다.');
 		            }
+		        },
+		        complete: function() {
+		            // AJAX 요청이 완료된 후 버튼 다시 활성화
+		            $('#update-schedule-confirm').prop('disabled', false);
+		            isUpdatingSchedule = false; // 요청 종료
 		        }
 		    });
 		}
+
+		// 진행도 업데이트 함수
+		function updateProgress() {
+		    if (isUpdatingProgress) return; // 요청이 진행 중이면 함수 종료
+		    isUpdatingProgress = true; // 요청 시작
+
+		    let ganttId = $('#name-select').val();
+		    let entityType = $('#entityType-select').val();
+		    let progressValue = $('#progress-value').val() + "%"; // 스크롤바 값을 가져와서 "%" 추가
+
+		    // 입력 값 유효성 검사
+		    if (!ganttId || !entityType || !progressValue) {
+		        alert('모든 필드를 입력해 주세요');
+		        isUpdatingProgress = false; // 요청 종료
+		        return;
+		    }
+
+		    // 진행도 업데이트 버튼 비활성화
+		    $('#update-progress-confirm').prop('disabled', true);
+
+		    // AJAX 요청을 통해 서버에 진행도 업데이트 요청
+		    $.ajax({
+		        url: 'updateProgress',
+		        type: 'POST',
+		        data: {
+		            entityType: entityType,
+		            id: ganttId,  // 실제 DB ID
+		            progressValue: progressValue
+		        },
+		        success: function(response) {
+		            if (response === 'success') {
+		                alert('진행도가 업데이트되었습니다.');
+
+		                // 간트차트를 새로고침하여 반영된 진행도 확인
+		                refreshGanttChart();
+
+		                // 모달 닫기
+		                $('#update-progress-modal').hide(); // 모달 닫기
+		                // 입력 박스와 select 박스 값을 초기화
+		                $('#progress-value').val(0); // 스크롤바 초기화
+		                updateProgressDisplay();
+		            } else {
+		                alert('진행도 업데이트에 실패했습니다.');
+		            }
+		        },
+		        error: function(xhr, status, error) {
+		            console.error('AJAX Error:', status, error);
+		            alert('서버 요청 중 오류가 발생했습니다.');
+		        },
+		        complete: function() {
+		            // AJAX 요청이 완료된 후 버튼 다시 활성화
+		            $('#update-progress-confirm').prop('disabled', false);
+		            isUpdatingProgress = false; // 요청 종료
+		        }
+		    });
+		}
+		
+		// "실제 일정 업데이트" 버튼 클릭 시 이벤트 처리
+		$('#open-update-schedule-modal').off('click').on('click', function() {
+		    initializeActualDateUpdate();
+		    $('#update-schedule-modal').show(); // 모달 열기
+		});
+
+		// "진행도 업데이트" 버튼 클릭 시 이벤트 처리
+		$('#open-update-progress-modal').off('click').on('click', function() {
+		    initializeProgressUpdate();
+		    $('#update-progress-modal').show(); // 모달 열기
+		});
+
+		// 모달에서 확인 버튼 클릭 시 이벤트 처리
+		$('#update-schedule-confirm').on('click', function() {
+		    updateActualDate();
+		});
+
+		$('#update-progress-confirm').on('click', function() {
+		    updateProgress();
+		});
+
+		// 모달 닫기 버튼 클릭 시 이벤트 처리
+		$('.close').off('click').on('click', function() {
+		    $(this).closest('.gantt-modal').hide(); // '.gantt-modal'로 모달을 정확히 찾아서 닫음
+		});
+		
+		// 간트차트 진행도 및 실제 일정 업데이트 모달창 각각에 대해 외부 영역 클릭 시 모달창 닫기
+		$('#update-schedule-modal, #update-progress-modal').on('click', function(event) {
+		    // 클릭한 요소가 모달의 바로 바깥 영역일 경우에만 닫기
+		    if (event.target === this) { // 모달의 배경 영역을 클릭했을 때
+		        $(this).addClass('hidden').hide(); // 모달 닫기
+		    }
+		});
 
 		// 간트차트 새로고침 함수
 		function refreshGanttChart(ganttId, entityType, actualStart, actualEnd) {

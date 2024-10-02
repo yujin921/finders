@@ -1,28 +1,32 @@
 package net.datasa.finders.controller;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.domain.dto.ProjectPublishingDTO;
-import net.datasa.finders.domain.entity.ApplicationResult;
-import net.datasa.finders.domain.entity.ClientReviewsEntity;
-import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
-import net.datasa.finders.domain.entity.RoleName;
-import net.datasa.finders.security.AuthenticatedUser;
-import net.datasa.finders.service.BoardService;
-import net.datasa.finders.service.ClientReviewService;
-import net.datasa.finders.service.ProjectApplicationService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.ProjectPublishingDTO;
+import net.datasa.finders.domain.entity.ApplicationResult;
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
+import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.security.AuthenticatedUser;
+import net.datasa.finders.service.BoardService;
+import net.datasa.finders.service.ClientReviewService;
+import net.datasa.finders.service.ProjectApplicationService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -102,16 +106,17 @@ public class BoardController {
             boolean applied = projectApplicationService.hasApplied(projectNum, freelancerUsername);
             model.addAttribute("applied", applied);
 
+            
             // 지원 상태가 있으면 설정
             if (applied) {
                 String applicationStatus = projectApplicationService.getApplicationStatus(projectNum, freelancerUsername);
                 model.addAttribute("applicationStatus", applicationStatus);
             }
             
-            /*// 클라이언트에 대한 프리랜서 후기 조회
-            List<ClientReviewsEntity> clientReviews = boardService.getClientReviews(projectPublishingDTO.getClientId());
+            // 클라이언트 ID 기반으로 후기를 가져옴 (게시글 작성자의 ID)
+            List<ClientReviewsEntity> clientReviews = clientReviewService.getClientReviewsByClientId( projectPublishingDTO.getClientId());
             model.addAttribute("clientReviews", clientReviews);
-*/
+
             return "board/read";  // 'read.html'로 반환
         } catch (Exception e) {
             e.printStackTrace();

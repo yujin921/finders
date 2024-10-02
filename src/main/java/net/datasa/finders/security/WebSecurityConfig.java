@@ -36,6 +36,7 @@ public class WebSecurityConfig {
             , "/member/resetPw"
             , "/member/verifyUser"
             , "/member/resetPassword"
+            , "/support/guide"
     };
     
     // 프리랜서 회원 접근 가능
