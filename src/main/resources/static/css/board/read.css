@@ -475,7 +475,7 @@ button:hover {
     width: 300px;
     margin-left: 20px;
     position: sticky;
-    top: 20px;
+    top: 120px;
     align-self: flex-start;
 }
 

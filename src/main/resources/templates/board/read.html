@@ -151,7 +151,7 @@
             </span>
 
             <!-- ROLE_FREELANCER일 경우 신청하기 버튼 또는 지원 상태 표시 -->
-            <span th:if="${roleName.name() == 'ROLE_FREELANCER'}">
+            <div th:if="${roleName.name() == 'ROLE_FREELANCER'}">
                 <h3>프로젝트 신청하기</h3>
                 <div th:if="${applied}">
                     <p>지원 결과:
@@ -166,7 +166,7 @@
                         <button type="submit" class="apply-button">신청하기</button>
                     </form>
                 </div>
-            </span>
+            </div>
         </div>
     </div>
 </div>
