@@ -169,6 +169,7 @@ public class BoardService {
         LocalDate projectStartDate = entity.getProjectStartDate();
         LocalDate projectEndDate = entity.getProjectEndDate();
         LocalDateTime projectCreateDate = entity.getProjectCreateDate();
+        String projectDescription = entity.getProjectDescription();
         
         long estimatedDays = ChronoUnit.DAYS.between(projectStartDate, projectEndDate);
 
@@ -211,6 +212,7 @@ public class BoardService {
         dto.setSelectedSkills(selectedSkills);
         dto.setPrequalificationQuestions(questionTexts);
         dto.setProjectCreateDate(projectCreateDate);
+        dto.setProjectDescription(projectDescription);
 
         return dto;
     }
