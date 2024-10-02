@@ -7,44 +7,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finders</title>
     <link rel="stylesheet" th:href="@{/css/portfolio/content.css}">
+    <link rel="stylesheet" th:href="@{/css/primary.css}">
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 </head>
 <body>
+	<header></header>
+	<nav></nav>
 	
-
+	
 	<div class="main-container">
-		<aside>
-			<h2><a th:href="@{/member/myPage}">개인정보 수정</a></h2>
-		    <h2>포트폴리오 관리<button class="add-btn">
-		            <a href="/portfolio/create" class="add-page-link">+</a>
-		            </button></h2>
-		    <div class="sidebar-section">
-		        <ul th:each="portfolio : ${portfoliosList}">
-		            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
-		        </ul>
-		    </div>
-		    <div class="sidebar-section">
-		        <h3>개인 활동 페이지</h3>
-		        <ul>
-		            <li>VR 게임 프로젝트 활동</li>
-		            <li>2D 방탈출 게임</li>
-		            <li>강화학습 프로젝트</li>
-		        </ul>
-		    </div>
-		</aside>
-		<main>
-		    <h1>CKEditor 내용 표시</h1>
-		    <div>제목 : <span id="title" th:text="${freelancerPortfolios.portfolioTitle}"></span>
-		    <a th:href="@{/portfolio/edit?portfolioId={portfolioId}(portfolioId=${freelancerPortfolios.portfolioId})}">편집하기</a>
-		    <a th:href="@{/portfolio/delete?portfolioId={portfolioId}(portfolioId=${freelancerPortfolios.portfolioId})}">삭제하기</a>
-		    </div>
+		<aside class="sidebar"></aside>
+		<main class="portfolio-display">
+		    <h1 class="content-title">포트폴리오 관리</h1>
 		    
-		    <div id="content" th:utext="${freelancerPortfolios.portfolioDescription}">
-		        <!-- 여기에 저장된 내용이 표시됩니다 -->
+		    <div class="portfolio-header">
+		    <h2 class="portfolio-title">제목 : <span id="title" th:text="${freelancerPortfolios.portfolioTitle}"></span>
+            </h2>
+		        <div class="action-buttons">
+		            <button class="btn btn-edit">편집하기</button>
+		            <button class="btn btn-delete">삭제하기</button>
+		        </div>
 		    </div>
-		
-		    
-	    </main>
+	        <div class="portfolio-content" th:utext="${freelancerPortfolios.portfolioDescription}">
+            <!-- 여기에 저장된 내용이 표시됩니다 -->
+            </div>
+		</main>
     </div>
+    <footer></footer>
+    <div id="chat-container"></div>
 </body>
+<script>
+$(document).ready(function () {
+	$('.btn-edit').on('click', function() {
+		window.location.href="/portfolio/edit?portfolioId=" + '[[${freelancerPortfolios.portfolioId}]]';
+	});
+	
+	$('.btn-delete').on('click', function() {
+		window.location.href="/portfolio/delete?portfolioId=" + '[[${freelancerPortfolios.portfolioId}]]';
+	});
+
+    $("#chat-container").load("/chat/view", function () {
+        // 외부 스타일시트 처리
+        $("#chat-container link[rel='stylesheet']").each(function() {
+            var href = $(this).attr('href');
+            $.get(href, function(css) {
+                var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+                $('<style>').text(modifiedCss).appendTo('head');
+            });
+            $(this).remove(); // 원래의 link 태그 제거
+        });
+
+        // 인라인 스타일 처리
+        $("#chat-container style").each(function() {
+            var css = $(this).text();
+            var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+            $(this).text(modifiedCss);
+        });
+    });
+    
+    $('header').load("/header", function () {
+    	});
+    $('nav').load("/nav", function () {
+	});
+    $('footer').load("/footer", function () {
+	});
+    $('aside').load("/aside", function () {
+	});
+});
+</script>
 </html>

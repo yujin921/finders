@@ -4,7 +4,8 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Finders</title>
+	<link rel="stylesheet" th:href="@{/css/primary.css}">
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
@@ -14,78 +15,13 @@
     <script th:src="@{/js/popup_2.js}"></script>
 </head>
 <body>
-     <header>
-    <div class="container">
-        <div class="header-content">
-            <div class="logo">
-                <a href="/">
-                    <img th:src="@{/images/wordmark-logo.png}" alt="Finders Logo" class="logo-img">
-                </a>
-            </div>
-            <div class="search-bar">
-                <input type="text" placeholder="프로젝트 또는 프리랜서 검색">
-                <button type="submit"><i class="fas fa-search"></i></button>
-            </div>
-            <div class="login-actions">
-                <th:block sec:authorize="not isAuthenticated()">
-                    <a th:href="@{/member/join}">회원가입</a>
-                    <a th:href="@{/member/login}" class="btn">로그인</a>
-                </th:block>
-                <th:block sec:authorize="isAuthenticated()">
-                    <img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;">
-                    <a th:href="@{/project/view}">프로젝트 관리</a>
-                    <a th:href="@{/member/myPage}">마이페이지</a>
-                    <a th:href="@{/member/logout}" class="btn">로그아웃</a>
-                </th:block>
-            </div>
-        </div>
-    </div>
-</header>
+     <header></header>
 
     <!-- Navigation Menu -->
-    <nav>
-        <ul>
-            <li sec:authorize="hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN')">
-                <a th:href="@{/board/write}">프로젝트 등록</a></li>
-            <li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
-            <li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
-            <li><a th:href="@{/support/guide}">서비스 안내</a></li>
-        	<li><a th:href="@{/support/example}">이용 사례</a></li>
-			<!--  <li><a href="#">커뮤니티</a></li> -->
-            <span style="color:white;">│</span>
-            <li><a th:href="@{/myProject/view}">내 프로젝트 목록</a></li>
-            <li><a th:href="@{/webrtc}">미팅룸</a></li>
-        </ul>
-    </nav>
+    <nav></nav>
 
 	<div class="main-container">
-	<aside class="sidebar">
-		<h2>개인정보 관리</h2>
-		<div class="sidebar-section">
-	        <ul>
-	            <li><a th:href="@{/member/myPage}">개인정보 수정</a></li>
-	        </ul>
-	    </div>
-	    <h2>프로젝트관리</h2>
-		<div class="sidebar-section">
-	        <ul>
-	            <li>VR 게임 프로젝트 활동</li>
-	            <li>2D 방탈출 게임</li>
-	            <li>강화학습 프로젝트</li>
-	        </ul>
-	    </div>
-	    <div sec:authorize="hasRole('ROLE_FREELANCER')">
-		    <h2>포트폴리오 관리<button class="add-btn">
-		            <a href="/portfolio/create" class="add-page-link">+</a>
-		            </button></h2>
-		    <div class="sidebar-section">
-		        <ul th:each="portfolio : ${portfoliosList}">
-		            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
-		        </ul>
-		    </div>
-	    </div>
-	    
-	</aside>
+	<aside class="sidebar"></aside>
 
 
 	<main>
@@ -254,14 +190,9 @@
         </div>
         	<!-- Footer -->
 	<footer>
-		<div class="container">
-			<p>&copy; 2024 프리랜서 마켓플레이스. All rights reserved.</p>
-			<p>
-				<a href="#">개인정보 처리방침</a> | <a href="#">이용 약관</a> | <a href="#">연락처</a>
-			</p>
-		</div>
 	</footer>
-        
+	<div id="chat-container"></div>
+</body>
 <script>
 function previewImage(input, previewId) {
     var file = input.files[0];
@@ -276,8 +207,36 @@ function previewImage(input, previewId) {
     }
 }
 
-</script>
-</body>
+$(document).ready(function () {
+    $("#chat-container").load("/chat/view", function () {
+        // 외부 스타일시트 처리
+        $("#chat-container link[rel='stylesheet']").each(function() {
+            var href = $(this).attr('href');
+            $.get(href, function(css) {
+                var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+                $('<style>').text(modifiedCss).appendTo('head');
+            });
+            $(this).remove(); // 원래의 link 태그 제거
+        });
 
+        // 인라인 스타일 처리
+        $("#chat-container style").each(function() {
+            var css = $(this).text();
+            var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+            $(this).text(modifiedCss);
+        });
+    });
+    
+    $('header').load("/header", function () {
+    	});
+    $('nav').load("/nav", function () {
+	});
+    $('footer').load("/footer", function () {
+	});
+    $('aside').load("/aside", function () {
+	});    
+});
+
+</script>
   <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </html>
