@@ -135,3 +135,27 @@ button[type="submit"]:hover {
     font-size: 0.9rem;
     margin-top: 10px;
 }
+
+/* 아이디 찾기 및 비밀번호 재설정 버튼 스타일 */
+.find-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.find-links button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.find-links button:hover {
+    background-color: var(--button-hover);
+}
