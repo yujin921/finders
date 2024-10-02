@@ -1,29 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-:root {
-    --primary-color: #6C63FF;
-    --secondary-color: #4CAF50;
-    --background-color: #F0F2F5;
-    --text-color: #333;
-    --card-bg: #FFFFFF;
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.6;
-}
-
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-
-
 /* Main Container Styles */
 .main-container {
     padding: 50px 0;
@@ -227,22 +203,6 @@ body {
     nav ul li {
         margin: 5px 10px;
     }
-}
-
-:root {
-    --primary-color: #6C63FF;
-    --secondary-color: #4CAF50;
-    --text-color: #333;
-    --background-color: #F0F2F5;
-    --white: #FFFFFF;
-}
-
-body {
-    font-family: 'Noto Sans KR', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--background-color);
-    color: var(--text-color);
 }
 
 .main-search-section {

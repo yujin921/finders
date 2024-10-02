@@ -29,19 +29,7 @@ function updateChatRoomList() {
 
             chatrooms.forEach(room => {
                 // 참가자 수를 확인하고 필요시 메시지를 삭제하는 부분 추가
-                fetch(`/chat/countParticipants?chatRoomId=${room.chatroomId}`)
-                    .then(response => response.json())
-                    .then(participantCount => {
-                        if (participantCount === 0) {
-                            // 참가자가 0명이면 메시지와 채팅방 삭제
-                            fetch(`/chat/deleteMessagesIfNoParticipants?chatRoomId=${room.chatroomId}`, {
-                                method: 'DELETE'
-                            })
-                            .then(() => console.log(`참가자가 없는 채팅방(${room.chatroomName})의 메시지를 삭제했습니다.`))
-                            .catch(error => console.error('메시지 삭제 중 오류:', error));
-                        }
-                    })
-                    .catch(error => console.error('참가자 수 조회 중 오류:', error));
+                
 
                 // 채팅방을 UI에 추가
                 const roomContainer = document.createElement('div');
