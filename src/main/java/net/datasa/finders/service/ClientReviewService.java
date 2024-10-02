@@ -58,4 +58,9 @@ public class ClientReviewService {
 
         clientReviewItemRepository.saveAll(reviewItems);
     }
+    
+    public List<ClientReviewsEntity> getClientReviewsByClientId(String clientId) {
+        // 클라이언트 ID를 기준으로 해당 클라이언트에 대한 모든 프로젝트 리뷰를 조회
+        return clientReviewsRepository.findByReceivedId(clientId);
+    }
 }

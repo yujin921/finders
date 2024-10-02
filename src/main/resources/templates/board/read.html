@@ -58,6 +58,7 @@
     
 <div class="container2">
     <!-- 왼쪽 메인 콘텐츠 -->
+    	<div class = "main">
 			<div class="main-content">
 		    <div class="project-header">
 		        <div class="header-title-container">
@@ -88,7 +89,6 @@
 		        </div>
 		    </div>
 		
-			<!-- 카테고리 및 인원수 섹션 -->
 			<div class="category-section">
 			    <h3>모집 유형</h3>
 			    <div class="category-list">
@@ -105,9 +105,9 @@
 			                        (${output['workScope'] == '개발' ? 'fa-code' : 
 			                          output['workScope'] == '기획' ? 'fa-lightbulb' : 
 			                          output['workScope'] == '디자인' ? 'fa-paint-brush' : 'fa-tasks'})"></i>
-			                    <h4 th:text="${output['workScope']}" style="margin-left: 10px;"></h4> <!-- 아이콘 옆에 workScope -->
+			                    <h4 th:text="${output['workScope']}" style="margin-left: 10px;"></h4>
 			                </div>
-			                <p th:text="${output['category']}"></p> <!-- 기존 workScope 자리에 category -->
+			                <p th:text="${output['category']}"></p>
 			            </div>
 			            <div class="personnel-count">
 			                <i class="fas fa-users"></i>
@@ -116,7 +116,6 @@
 			        </div>
 			    </div>
 			</div>
-
 								
 		    <!-- 요구 기술 스택 -->
 		    <div class="skills-section">
@@ -132,26 +131,79 @@
 		    <div class="description-section">
 		        <h3>상세 설명</h3>
 		        <div class="description-detail">
-		            <p th:text="${board.projectDescription}"></p>
+		            <pre th:text="${board.projectDescription}"></pre>
 		        </div>
 		    </div>
 		</div>
+		
+		<div class="main-content">
+   			 <!-- 클라이언트 후기 -->
+<div class="review-section">
+    <h3>클라이언트 후기</h3>
+    <div th:if="${not #lists.isEmpty(clientReviews)}">
+        <div th:each="review : ${clientReviews}" class="review-item">
+            <!-- 프로젝트 정보 및 이미지 추가 -->
+            <div class="project-info">
+                <img th:src="${review.projectImage}" alt="프로젝트 이미지" class="project-image">
+                <h4 th:text="${review.projectTitle}"></h4> <!-- 프로젝트 제목 -->
+            </div>
+
+            <div class="review-header">
+                <div class="rating">
+                    <!-- 별표와 평점 표시 -->
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <span th:text="'(' + review.rating + '/5)'"></span>
+                </div>
+                <p class="review-author">
+                    작성자: <span th:text="${review.receivedId}"></span>
+                </p>
+                <p class="review-date">
+                    작성일: <span th:text="${#temporals.format(review.reviewDate, 'yyyy-MM-dd HH:mm')}"></span>
+                </p>
+            </div>
+
+            <div class="review-body">
+                <p th:text="${review.comment}"></p>
+            </div>
+
+            <div class="review-details">
+                <h4>세부 평가</h4>
+                <ul class="detail-list">
+                    <li th:each="item : ${review.reviewItems}">
+                        <i class="fas fa-check-circle"></i>
+                        <span th:text="${item.itemName}"></span>
+                    </li>
+                </ul>
+            </div>
+            <hr>
+        </div>
+    </div>
+    <p th:if="${#lists.isEmpty(clientReviews)}">아직 이 클라이언트에 대한 후기가 없습니다.</p>
+</div>
+
+
+		</div>
+	</div>
 	
 	
     <!-- 사이드바 -->
     <div class="sidebar">
         <div class="apply-box">
             <!-- 게시판 작성자와 로그인한 사용자가 같을 경우 삭제 버튼 표시 -->
-            <span th:if="${board.clientId == user.username}">
+            <div th:if="${board.clientId == user.username}">
                 <h3>프로젝트 관리</h3>
                 <form action="/board/delete" method="post">
                     <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
                     <button type="submit" class="apply-button delete-button">삭제하기</button>
                 </form>
-            </span>
+            </div>
 
             <!-- ROLE_FREELANCER일 경우 신청하기 버튼 또는 지원 상태 표시 -->
-            <span th:if="${roleName.name() == 'ROLE_FREELANCER'}">
+            <div th:if="${roleName.name() == 'ROLE_FREELANCER'}">
                 <h3>프로젝트 신청하기</h3>
                 <div th:if="${applied}">
                     <p>지원 결과:
@@ -166,7 +218,7 @@
                         <button type="submit" class="apply-button">신청하기</button>
                     </form>
                 </div>
-            </span>
+            </div>
         </div>
     </div>
 </div>

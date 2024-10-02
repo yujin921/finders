@@ -1,23 +1,45 @@
 package net.datasa.finders.service;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.domain.dto.ProjectPublishingDTO;
-import net.datasa.finders.domain.entity.*;
-import net.datasa.finders.repository.*;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.ProjectPublishingDTO;
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
+import net.datasa.finders.domain.entity.MemberEntity;
+import net.datasa.finders.domain.entity.PrequalificationQuestionEntity;
+import net.datasa.finders.domain.entity.ProjectCategoryEntity;
+import net.datasa.finders.domain.entity.ProjectPublishingEntity;
+import net.datasa.finders.domain.entity.ProjectRequiredSkillEntity;
+import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.domain.entity.WorkScopeEntity;
+import net.datasa.finders.repository.ClientReviewItemRepository;
+import net.datasa.finders.repository.ClientReviewsRepository;
+import net.datasa.finders.repository.MemberRepository;
+import net.datasa.finders.repository.PrequalificationQuestionRepository;
+import net.datasa.finders.repository.ProjectCategoryRepository;
+import net.datasa.finders.repository.ProjectPublishingRepository;
+import net.datasa.finders.repository.ProjectRequiredSkillRepository;
+import net.datasa.finders.repository.WorkScopeRepository;
 
 /**
  * 게시판 서비스
@@ -158,7 +180,6 @@ public class BoardService {
                 .projectCreateDate(entity.getProjectCreateDate())
                 .build();
     }
-    
     public ProjectPublishingDTO getBoard(int pNum, String memberId, RoleName roleName) {
         ProjectPublishingEntity entity = projectPublishingRepository.findById(pNum)
                 .orElseThrow(() -> new EntityNotFoundException("해당 번호의 글이 없습니다."));
@@ -170,7 +191,7 @@ public class BoardService {
         LocalDate projectEndDate = entity.getProjectEndDate();
         LocalDateTime projectCreateDate = entity.getProjectCreateDate();
         String projectDescription = entity.getProjectDescription();
-        
+
         long estimatedDays = ChronoUnit.DAYS.between(projectStartDate, projectEndDate);
 
         List<PrequalificationQuestionEntity> questions = prequalificationQuestionRepository.findByProjectPublishingEntity(entity);
@@ -186,23 +207,32 @@ public class BoardService {
                 .collect(Collectors.toList());
 
         List<Map<String, Object>> matchedOutputs = new ArrayList<>();
+        Set<String> seenPairs = new HashSet<>();
 
         // 카테고리와 업무 범위를 매칭할 때, required_num이 같은 경우 매칭
         for (ProjectCategoryEntity category : categories) {
             for (WorkScopeEntity workScope : workScopes) {
                 // required_num이 같은 경우 매칭
                 if (category.getRequiredNum() == workScope.getRequiredNum()) {
-                    Map<String, Object> output = new HashMap<>();
-                    output.put("category", category.getCategory());
-                    output.put("workScope", workScope.getWorkType());
-                    output.put("requiredNum", category.getRequiredNum());  // 동일한 required_num
-                    matchedOutputs.add(output);
+                    String uniqueKey = category.getCategory() + ":" + workScope.getWorkType();
+                    if (!seenPairs.contains(uniqueKey)) {
+                        Map<String, Object> output = new HashMap<>();
+                        output.put("category", category.getCategory());
+                        output.put("workScope", workScope.getWorkType());
+                        output.put("requiredNum", category.getRequiredNum());  // 동일한 required_num
+                        matchedOutputs.add(output);
+                        seenPairs.add(uniqueKey);  // 중복 방지용 키 추가
+                    } else {
+                        log.debug("중복된 항목: 카테고리 {}, 업무 범위 {}",
+                                category.getCategory(), workScope.getWorkType());
+                    }
                 } else {
                     log.debug("매칭되지 않은 required_num: 카테고리 {}, 업무 범위 {}",
                             category.getRequiredNum(), workScope.getRequiredNum());
                 }
             }
         }
+
         MemberEntity member = memberRepository.findByMemberIdAndRoleName(memberId, roleName);
         RoleName role = member.getRoleName();
 
@@ -217,9 +247,11 @@ public class BoardService {
         return dto;
     }
 
+
     public void deleteBoard(int pNum) {
         projectPublishingRepository.deleteById(pNum);
     }
+    
     
 //    public List<ClientReviewsEntity> getClientReviews(String clientId) {
 //        return clientReviewsRepository.findByClientId(clientId);
