@@ -41,4 +41,9 @@ public class HomeController {
   	public String footer() {
   		return "footer";
   	}
+  	
+  	@GetMapping("base")
+  	public String base() {
+  		return "baseHTML";
+  	}
 }
