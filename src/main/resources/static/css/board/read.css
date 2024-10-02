@@ -228,6 +228,7 @@ nav ul li a:hover {
     background-color: #ffffff;
     padding: 20px;
     border-radius: 12px;
+    margin-bottom : 20px;
 }
 
 
@@ -381,24 +382,13 @@ nav ul li a:hover {
 
 
 
-/* 클라이언트 후기 스타일 */
-.review-item {
-    background-color: #edf2f7;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-}
 
 /* 상세 설명 스타일 */
 .description-section {
     padding-bottom: 20px;
     margin-bottom: 20px;
     border-bottom: 1px solid #e2e8f0;
-    background-color: #f9fafb;
-    padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .description-detail p {
@@ -408,15 +398,75 @@ nav ul li a:hover {
     margin: 0;
 }
 
-.review-item p {
-    margin-bottom: 10px;
-    color: #4a5568;
+/*리뷰*/
+.review-section {
+    margin-top: 30px;
 }
 
-.review-item h4 {
-    margin-bottom: 10px;
-    font-size: 1.2em;
+.review-item {
+    background-color: #f9fafb;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.review-item .project-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.review-item .project-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.review-item .rating {
+    display: flex;
+    align-items: center;
+    color: #f6ad55;
+}
+
+.review-item .rating i {
+    margin-right: 5px;
+}
+
+.review-item .review-author,
+.review-item .review-date {
+    color: #4a5568;
+    font-size: 0.9em;
+}
+
+.review-item .review-body {
+    margin-top: 15px;
     color: #2d3748;
+}
+
+.review-item .review-details h4 {
+    margin-top: 20px;
+    font-size: 1.1em;
+    color: #2d3748;
+}
+
+.review-item .detail-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.review-item .detail-list li {
+    display: flex;
+    align-items: center;
+    color: #48bb78;
+    margin-bottom: 5px;
+}
+
+.review-item .detail-list i {
+    margin-right: 10px;
 }
 
 /* 버튼 스타일 */
@@ -475,7 +525,7 @@ button:hover {
     width: 300px;
     margin-left: 20px;
     position: sticky;
-    top: 20px;
+    top: 120px;
     align-self: flex-start;
 }
 

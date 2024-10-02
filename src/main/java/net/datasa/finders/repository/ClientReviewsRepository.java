@@ -15,4 +15,6 @@ public interface ClientReviewsRepository extends JpaRepository<ClientReviewsEnti
 
     boolean existsByProjectNumAndReceivedIdAndSendId(int projectNum, String receivedId, String sendId);
 
+    // 클라이언트 ID로 리뷰 조회
+    List<ClientReviewsEntity> findByReceivedId(String clientId);
 }
