@@ -228,6 +228,8 @@ nav ul li a:hover {
     background-color: #ffffff;
     padding: 20px;
     border-radius: 12px;
+    margin-bottom : 20px;
+    width : 900px;
 }
 
 
@@ -381,24 +383,12 @@ nav ul li a:hover {
 
 
 
-/* 클라이언트 후기 스타일 */
-.review-item {
-    background-color: #edf2f7;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-}
 
 /* 상세 설명 스타일 */
 .description-section {
     padding-bottom: 20px;
     margin-bottom: 20px;
-    border-bottom: 1px solid #e2e8f0;
-    background-color: #f9fafb;
-    padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .description-detail p {
@@ -408,16 +398,105 @@ nav ul li a:hover {
     margin: 0;
 }
 
-.review-item p {
-    margin-bottom: 10px;
+/* 후기 섹션 스타일 */
+.review-section {
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+/* 각 후기 카드 스타일 */
+.review-item {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.review-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 후기 헤더 */
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.review-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.review-author, .review-date {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1.1rem;
     color: #4a5568;
 }
 
-.review-item h4 {
-    margin-bottom: 10px;
-    font-size: 1.2em;
-    color: #2d3748;
+.review-author i, .review-date i {
+    color: #38b2ac;
 }
+
+/* 평점 스타일 */
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.rating i {
+    color: #d1d5db; /* 기본 별 색상 (비어있는 별) */
+}
+
+.rating .filled {
+    color: #f6ad55; /* 채워진 별 색상 */
+}
+
+/* 후기 본문 */
+.review-body {
+    font-size: 1rem;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+/* 세부 평가 */
+.review-details {
+    background-color: #edf2f7;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.review-details h4 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.detail-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.detail-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.detail-list i {
+    color: #38b2ac;
+}
+
 
 /* 버튼 스타일 */
 button {
@@ -475,7 +554,7 @@ button:hover {
     width: 300px;
     margin-left: 20px;
     position: sticky;
-    top: 20px;
+    top: 120px;
     align-self: flex-start;
 }
 
@@ -518,7 +597,7 @@ button:hover {
 }
 
 .delete-button:hover {
-    background-color: #fdd;
+    background-color: #dc3545;
     transform: translateY(-3px);
 }
 

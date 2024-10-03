@@ -15,4 +15,11 @@ public interface ClientReviewsRepository extends JpaRepository<ClientReviewsEnti
 
     boolean existsByProjectNumAndReceivedIdAndSendId(int projectNum, String receivedId, String sendId);
 
+    // 클라이언트 ID로 리뷰 조회
+    List<ClientReviewsEntity> findByReceivedId(String clientId);
+    
+    
+    @Query("SELECT AVG(c.rating) FROM ClientReviewsEntity c WHERE c.receivedId = :clientId")
+    Optional<Float> findAverageRatingByReceivedId(@Param("clientId") String clientId);
+    
 }

@@ -1,215 +1,17 @@
-:root {
-    --primary-color: #1A202C;    /* 매우 짙은 회색-블루 */
-    --secondary-color: #2C7A7B;  /* 청록색 */
-    --accent-color: #F6AD55;     /* 오렌지 */
-    --highlight-color: #38B2AC;  /* 밝은 청록색 */
-    --text-color: #2D3748;       /* 어두운 회색 */
-    --background-color: #EDF2F7; /* 밝은 회색 배경 */
-    --light-gray: #CBD5E0;       /* 중립적인 회색 */
-    --border-color: #E2E8F0;     /* 테두리 색상 */
-    --button-hover: #2C7A7B;     /* 버튼 호버 시 청록색 톤 */
+
+.main-search-section {
+    padding: 50px 0;
+    text-align: center;
 }
 
-/* 전체 요소에 대한 기본 스타일 */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
-}
-
-/* Global Styles */
-body {
-    font-family: 'Noto Sans', sans-serif;
-    background-color: var(--background-color);
-    margin: 0;
-    padding: 0;
-    color: var(--text-color);
-    line-height: 1.6;
-    min-width: 1200px; 
+.main-search-section h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    font-weight: 700;
 }
 
 
-/* 컨테이너 클래스 스타일 */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* 헤더 고정 */
-header {
-    background-color: var(--primary-color);
-    position: sticky;
-    top: 0;
-    z-index: 1000; /* header의 z-index를 높게 설정 */
-    width: 100%;
-    height: 100px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    color: white;
-}
-
-header .search-bar, header .login-actions {
-    pointer-events: auto; /* 검색창과 로그인 버튼은 여전히 클릭 가능하도록 */
-}
-
-/* header 내부 콘텐츠 스타일 */
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-
-/* 로고 영역 */
-.logo {
-    font-weight: bold;
-    color: var(--primary-color);
-}
-.logo a {
-    display: flex;
-    align-items: center;
-}
-
-.logo a img {
-    height: 100px;
-    width: auto;
-    object-fit: contain;
-    cursor: pointer;
-}
-
-
-/* 검색창 스타일 수정 */
-header .search-bar {
-	flex-grow: 1;
-	position: relative;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-    display: flex;
-    align-items: center;
-    background-color: white;
-    border-radius: 30px;
-    padding: 5px 15px;
-    width: 500px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-left: 20px;
-	margin-right : 20px;
-}
-
-header .search-bar input {
-    border: none;
-    outline: none;
-    padding: 10px;
-    width: 100%;
-    font-size: 1rem;
-    border-radius: 30px;
-    font-size:16px
-}
-
-header .search-bar button {
-    background-color: var(--highlight-color);
-    transform: translateY(-50%);
-    top : 50%;
-    right:15px;
-    position:absolute;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 30px;
-    margin-left: 10px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-}
-header .search-bar button:hover {
-    background-color: var(--button-hover); /* 버튼 색상만 변경 */
-}
-
-
-
-/* 로그인 액션 */
-.login-actions{
-	display:flex;
-	align-items:center;
-}
-header .login-actions a {
-    color: white;
-    margin-left: 20px;
-    font-weight: bold;
-    text-decoration : none;
-    
-}
-
-header .login-actions a.btn {
-    background-color: var(--accent-color);
-    color : white;
-    padding: 10px 20px;
-    border-radius: 30px;
-    transition: background-color 0.3s ease, transform 0.2s;
-}
-
-header .login-actions a.btn:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-3px);
-    color : white;
-}
-
-header .login-actions a:hover {
-    color: var(--accent-color);
-    
-}
-/* 일반 버튼 스타일 */
-.btn {
-    background-color: var(--primary-color);
-    color: #fff;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-/* 버튼 호버 효과 */
-.btn:hover {
-    background-color: #2980b9;
-    transform: translateY(-3px);
-}
-
-
-/* 네비게이션 */
-nav {
-    background-color: var(--secondary-color);
-    padding: 12px 0;
-    border-bottom: 1px solid #ddd;
-    z-index: 999; /* header보다 높은 값을 사용하여 nav가 상단에 위치하게 */
-}
-
-nav ul {
-    display: flex;
-    justify-content: center;
-    padding: 0;
-    list-style: none;
-    margin: 0;
-}
-
-nav ul li {
-    margin: 0 20px;
-}
-
-nav ul li a {
-	text-decoration:none;
-    color: #fff;
-    font-weight: bold;
-    transition: color 0.3s ease;
-}
-
-nav ul li a:hover {
-    color: var(--accent-color);
-}
-
-.search-bar {
+.main-search-section .search-bar {
     margin: 40px auto;
     display: flex;
     justify-content: center;
@@ -217,7 +19,7 @@ nav ul li a:hover {
     width: 100%;
 }
 
-.search-bar input {
+.main-search-section .search-bar input {
     width: 40%;
     padding: 12px 20px;
     border-radius: 30px;
@@ -225,7 +27,7 @@ nav ul li a:hover {
     font-size: 16px;
 }
 
-.search-bar button {
+.main-search-section .search-bar button {
     background-color: var(--secondary-color);
     color: #fff;
     padding: 12px 25px;
@@ -252,29 +54,6 @@ nav ul li a:hover {
     cursor: pointer;
 }
 
-/* Footer */
-footer {
-    background-color: var(--primary-color);
-    color: white;
-    text-align: center;
-    padding: 30px 20px;
-    margin-top:50px;
-}
-
-footer p {
-    margin: 10px 0;
-    font-size:0.9em;
-}
-
-footer a {
-    color: var(--accent-color);
-    text-decoration: underline;
-}
-
-footer a:hover {
-    color: var(--highlight-color);
-}
-
 .table-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -296,7 +75,7 @@ footer a:hover {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow: hidden; /* 내부 요소가 넘치지 않게 설정 */
+    overflow: hidden;
     position: relative;
 }
 
@@ -304,15 +83,15 @@ footer a:hover {
     transform: translateY(-10px) scale(1.03);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%);
-	color: white; /* 모든 글자 색상을 흰색으로 변경 */
+    color: white;
 }
 
 .post:hover .post-info a {
-    color: white; /* 호버 시 제목 색상 변경 */
+    color: white;
 }
 
 .post:hover .post-info p {
-    color: white; /* 호버 시 본문 텍스트 색상 변경 */
+    color: white;
 }
 
 .post .thumbnail {
@@ -335,96 +114,118 @@ footer a:hover {
     z-index: 2;
 }
 
-.post .post-info .author,
-.post .post-info .date,
-.post .post-info .status,
-.post .post-info a {
-    display: block;
+
+/* 제목 스타일링 */
+.post .post-info .title {
+    font-weight: 700;
+    font-size: 1.4rem; /* 제목의 크기를 더 키움 */
+    color: var(--primary-color);
+    text-decoration: none;
     margin-bottom: 12px;
-    font-size: 14px;
+    transition: color 0.3s ease, transform 0.3s ease;
 }
 
-/* post 내부 텍스트 스타일링 */
+.post .post-info a:hover {
+    color: var(--highlight-color);
+    transform: scale(1.05);
+}
+
+/* 텍스트 스타일링 */
 .post .post-info span {
     display: block;
-    color: #6b7280;
+    color: #4a5568;
     font-size: 1rem;
     margin-bottom: 8px;
     line-height: 1.5;
     font-weight: 500;
 }
 
-/* 제목 및 링크 스타일링 */
-.post .post-info a {
-    font-weight: 700;
-    font-size: 1.5em;
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: color 0.3s ease, transform 0.3s ease;
-    margin-bottom: 12px;
+/* 작성자, 날짜, 상태 정보에 아이콘 추가 */
+.post-info .rating::before {
+    content: "\f005"; /* Font Awesome 별 아이콘 */
+    font-family: "Font Awesome 5 Free"; /* 아이콘 폰트 */
+    font-weight: 900;
+    margin-right: 8px;
 }
 
-.post .post-info a:hover {
+.post-info .startdate::before {
+    content: "\f073"; /* Font Awesome 달력 아이콘 */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
+}
+
+.post-info .budget::before {
+    content: "\f0d6"; /* Font Awesome 돈 아이콘 */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
+}
+
+.post .post-info .icon {
+    font-size: 1rem;
+    margin-right: 8px;
     color: var(--secondary-color);
-    transform: scale(1.02);
 }
 
-/* 본문 텍스트 */
-.post .post-info p {
-    color: var(--text-color);
-    font-size: 1.1rem;
-    line-height: 1.6;
+.post .post-info .date:before {
+    content: "\f017"; /* FontAwesome 시계 아이콘 */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
 }
 
-/* 가격 등 강조 텍스트 스타일 */
-.post .post-info .price {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: var(--secondary-color);
-    margin-top: 15px;
-    letter-spacing: 1px; /* 가격 글씨를 더 두드러지게 */
+.post .post-info .author:before {
+    content: "\f007"; /* FontAwesome 사용자 아이콘 */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
 }
 
-/* 날짜 및 작성자 정보 스타일 */
-.post .post-info .date,
-.post .post-info .author {
-    font-size: 0.95rem;
-    color: #a0aec0;
+.post .post-info .status:before {
+    content: "\f05d"; /* FontAwesome 확인 아이콘 */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
 }
 
-/* 상태 정보 스타일 (ex: 상태, 완료 여부) */
+/* 상태 정보 스타일 */
 .post .post-info .status {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #ff6347; /* 빨간색 톤으로 강조 */
-    background-color: #fdd; /* 연한 빨간색 배경 추가 */
-    padding: 10px 20px; /* 패딩을 늘려서 가운데 정렬 시 더 넓게 보이도록 */
+    color: #ff6347;
+    background-color: #fdd;
+    padding: 10px 20px;
     border-radius: 8px;
     display: inline-block;
     text-align: center;
-    width: 100%; /* 전체 너비 차지 */
+    width: 100%;
     transition: background-color 0.3s ease, color 0.3s ease;
     margin-top: 10px;
-    box-sizing: border-box;
 }
 
-
-.post:hover .post-info a {
-    color: #ffffff; /* 링크 색상 흰색으로 변경 */
+.post:hover .post-info .status {
+    color: white;
+    background-color: #ff6347;
+    transform: scale(1.1);
 }
 
+/* 호버 시 텍스트 스타일 */
 .post:hover .post-info span,
+.post:hover .post-info .rating,
+.post:hover .post-info .startdate,
+.post:hover .post-info .baudget,
 .post:hover .post-info .date,
 .post:hover .post-info .author,
 .post:hover .post-info .price {
-    color: #ffffff; /* 나머지 모든 텍스트 요소도 흰색으로 변경 */
+    color: white;
 }
 
 /* 호버 시 상태 강조 */
 .post:hover .post-info .status {
-    color: white; /* 호버 시 글자 색상을 흰색으로 변경 */
-    background-color: #ff6347; /* 호버 시 배경색을 더 진한 빨간색으로 */
-    transform: scale(1.1); /* 호버 시 약간 커지도록 설정 */
+    color: white;
+    background-color: #ff6347;
+    transform: scale(1.1);
 }
 
 /* 버튼 효과 */
@@ -441,4 +242,12 @@ footer a:hover {
 .btn:hover {
     background-color: var(--secondary-color);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#chat-container {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 1000;
+    overflow: hidden;
 }

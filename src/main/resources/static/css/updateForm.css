@@ -1,7 +1,7 @@
 /* 색상 팔레트 */
 :root {
     --primary-color: #1A202C;    /* 매우 짙은 회색-블루 */
-    --secondary-color: #2C7A7B;  /* 청록색 */
+    --secondary-color: #4FD1C5;  /* 청록색 */
     --accent-color: #F6AD55;     /* 오렌지 */
     --highlight-color: #38B2AC;  /* 밝은 청록색 */
     --text-color: #2D3748;       /* 어두운 회색 */
@@ -9,14 +9,13 @@
     --light-gray: #CBD5E0;       /* 중립적인 회색 */
     --border-color: #E2E8F0;     /* 테두리 색상 */
     --button-hover: #2C7A7B;     /* 버튼 호버 시 청록색 톤 */
-
-    --card-background-color: #F7FAFC; /* 카드 배경색 */
-    --icon-color: #2C7A7B;       /* 아이콘 색상 */
-    --border-color: #CBD5E0;     /* 테두리 색상 */
-
 }
 
-
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
     font-family: 'Noto Sans', sans-serif;
@@ -25,45 +24,114 @@ body {
     padding-top: var(--header-height);
 }
 
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: var(--box-shadow);
+    padding: 40px;
+}
 
 .category-container, 
 .image-upload-section, 
 .tech-section {
     margin-top: 30px; /* 각 섹션 내용과 제목 사이에 여백 추가 */
 }
+header {
+    background-color: var(--primary-color);
+    height: 80px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 40px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 1200px;
+}
 
+.logo img {
+    width: 100px;
+    height: auto;
+}
+
+nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap : nowrap;
+    white-space : nowrap;
+    align-items:center;
+}
+
+nav a {
+    text-decoration: none;
+    color: #ffffff;
+    padding: 10px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    white-space:nowrap;
+    align-items:center;
+}
+
+nav a:hover {
+    color: var(--accent-color);
+}
+
+.login-actions{
+	display: flex;
+	align-items:center;
+	white-space : nowrap;
+	flex-shrink: 0;
+	gap : 10px;
+	
+}
+.login-actions a {
+    text-decoration: none;
+    color: #ffffff;
+    padding: 10px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    white-space:nowrap;
+    align-items:center;
+}
+
+.login-actions .btn {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--input-radius);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    align-items : center;
+    white-space : nowrap;
+    flex-shrink :  0;
+}
+.login-actions a:hover {
+	color: var(--accent-color);
+}
+
+.login-actions .btn:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
 
 .content {
     display: flex;
+    padding: 40px;
     align-items: flex-start;
 }
 
-.main-content{
-	margin-top : 20px;
-	flex: 1;
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom : 20px;
-    width : 900px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    
-}
 .sidebar {
     position: sticky;
     top: 100px;
     align-self: flex-start;
     width: 250px;
-    padding : 20px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-top : 20px;
-    
-}
-.content{
-	gap : 20px;
+    padding-right: 20px;
+    border-right: 2px solid var(--background-color);
 }
 
 #step-list {
@@ -211,8 +279,8 @@ textarea:focus {
     color: #ffffff;
 }
 
-.submit2{
-	background-color: var(--primary-color);
+button[type="submit"] {
+    background-color: var(--primary-color);
     color: white;
     padding: 15px 20px;
     border-radius: var(--input-radius);
@@ -224,12 +292,9 @@ textarea:focus {
     transition: background-color 0.3s ease;
 }
 
-.submit2:hover{
-	    background-color: var(--accent-color);
-	
+button[type="submit"]:hover {
+    background-color: var(--button-hover-color);
 }
-
-
 
 /* Selected Skills (Tech Buttons) */
 .selected-techs {
@@ -245,7 +310,6 @@ textarea:focus {
     max-height: 150px; /* 최대 높이 설정, 필요 시 스크롤 */
     overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
 }
-
 
 .selected-tech {
     background-color: var(--secondary-color); /* 선택된 기술의 배경색 */

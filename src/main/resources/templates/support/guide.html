@@ -55,7 +55,7 @@
     </nav>
 
 	<div class="guide-text">
-		<h2>서비스 안내</h2>
+		<h1>서비스 안내</h1>
 	</div>
 
 	<!-- Main Content -->
@@ -64,64 +64,95 @@
 			<button class="tab active" data-tab="client-guide">클라이언트
 				이용방법</button>
 			<button class="tab" data-tab="freelancer-guide">프리랜서 이용방법</button>
-			<button class="tab" data-tab="pay-guide">결제 방식</button>
 		</div>
 
 		<div class="tab-content active" id="client-guide">
 			<h1>의뢰하고 싶은 프로젝트를 무료로 등록해보세요.</h1>
-			<p>프로젝트는 파인더스 매니저와 상담 후 공개됩니다.</p>
-			<p>파인더스 매니저와 상담하며 내용을 수정 및 보완할 수 있으니 편하게 작성하세요.</p>
+			<p>파인더스에서 제공하는 프로젝트 작성 가이드를 따라 프로젝트를 게시할 수 있습니다.</p>
+			<p>수많은 파인더스의 전문가들이 여러분의 프로젝트를 기다리고 있습니다.</p>
 			<a th:href="@{/board/write}" class="button">프로젝트 등록하기 ></a>
 			
 			<div class="faq-container">
 				<div class="faq-item">
 					<div class="faq-icon">💼</div>
 					<div class="faq-content">
-						<div class="faq-question">의뢰하려는 프로젝트의 견적이 궁금하신가요?</div>
-						<div class="faq-answer">프로젝트를 등록하면 파인더스 매니저가 업무범위에 맞는 적정 금액 및
-							기간을 무료로 상담해드립니다.</div>
+						<div class="faq-question">다양한 분야의 전문가들이 기다립니다.</div>
+						<div class="faq-answer">원하는 분야, 업무 범위, 심지어는 원하는 기술 스택까지 직접 결정해서 게시할 수 있습니다.</div>
 					</div>
 				</div>
+				<br>
+				<div class="faq-image">
+					<img src="/images/support/publishing.jpg" width="700px" height="400px" alt="포트폴리오">
+				</div>
+				<br><br>
 				<div class="faq-item">
 					<div class="faq-icon">💡</div>
 					<div class="faq-content">
-						<div class="faq-question">아이디어 유출이 걱정되시나요?</div>
-						<div class="faq-answer">프로젝트는 파인더스 매니저와 사전 상담 후 등록되며, 사전 상담 시
-							공개하고 싶지 않은 내용은 공개되지 않습니다.</div>
+						<div class="faq-question">누구에게 맡길 것인지, 결정은 여러분의 몫입니다.</div>
+						<div class="faq-answer">프로젝트 관리 툴에서 프리랜서의 능력을 검증하고 직접 팀원을 선정해보세요.</div>
 					</div>
+				</div>
+				<div class="faq-image">
+					<img src="/images/support/apply.jpg" width="800px" height="400px" alt="포트폴리오">
 				</div>
 				<div class="faq-item">
 					<div class="faq-icon">📊</div>
 					<div class="faq-content">
-						<div class="faq-question">회사 정보가 공개될까 봐 걱정되시나요?</div>
-						<div class="faq-answer">회사 정보는 공개되지 않으니 걱정하지 마시고 등록해주세요.</div>
+						<div class="faq-question">프로젝트가 얼마나 진행되었는지 알고 싶어요.</div>
+						<div class="faq-answer">내 프로젝트 보기에서 프로젝트의 진척도를 확인할 수 있도록 간트차트, 캘린더 등의 다양한 자료를 제공합니다.</div>
 					</div>
 				</div>
-				<div class="more-questions">
-					<h3>자주 묻는 질문</h3>
-					<ul>
-						<li>위시켓에서 정부지원사업도 진행이 가능한가요?</li>
-						<li>상주 프리랜서나 기간 단위로도 인력을 구인할 수 있나요?</li>
-					</ul>
+				<div class="faq-image">
+					<img src="/images/support/ganttchart.jpg" width="800px" height="400px" alt="포트폴리오">
+					<br><br><br>
+					<img src="/images/support/callender.jpg" width="800px" height="400px" alt="포트폴리오">
 				</div>
 			</div>
 		</div>
-
+		<!-- 프리랜서 가이드 -->
 		<div class="tab-content" id="freelancer-guide">
 			<h1>참가하고 싶은 프로젝트에 직접 지원해보세요.</h1>
-			<p>클라이언트에게 자신을 소개할 포트폴리오를 작성할 수 있습니다.</p>
-			<p>포트폴리오 양식은 파인더스에서 지원합니다.</p>
-			<a th:href="@{/board/view}" class="button">프로젝트 신청하기 ></a> <a
-				th:href="@{/portfolio/create}" class="button">포트폴리오 작성하기 ></a>
-			<h1>프리프리</h1>
-		</div>
-
-		<div class="tab-content" id="pay-guide">
-			<h1>돈 걱정하지 마세요. 파인더스가 결제까지 지원합니다.</h1>
-			<p>금액은 클라이언트와 프리랜서 간의 상담을 통해 조정 가능합니다.</p>
-			<p>파인더스는 공정한 거래를 위해 노력합니다.</p>
-			<a href="#" class="button">결제 방식 알아보기 ></a>
-			<h1>결제결제</h1>
+			<p>프로젝트에서 사용될 기술 스택이나 업무 분야에 따라 검색할 수 있습니다.</p>
+			<p>다양한 규모의 프로젝트들을 직접, 원하는 대로 선택해서 진행해보세요.</p>
+			<a th:href="@{/board/view}" class="button">프로젝트 신청하기 ></a>
+			<a th:href="@{/portfolio/create}" class="button">포트폴리오 작성하기 ></a>
+			
+			<div class="faq-container">
+				<div class="faq-item">
+					<div class="faq-icon">💼</div>
+					<div class="faq-content">
+						<div class="faq-question">포트폴리오를 통해 클라이언트에게 자신을 소개해보세요.</div>
+						<div class="faq-answer">포트폴리오 양식은 파인더스에서 지원합니다.</div>
+					</div>
+				</div>
+				<br>
+				<div class="faq-image">
+					<img src="/images/support/portfolio.jpg" width="800px" height="400px" alt="포트폴리오">
+				</div>
+				<br><br>
+				<div class="faq-item">
+					<div class="faq-icon">💡</div>
+					<div class="faq-content">
+						<div class="faq-question">언제 어디서든 아이디어가 떠오르면 컨펌받으세요.</div>
+						<div class="faq-answer">파인더스는 채팅방 기능을 통해 같은 프로젝트 구성원들과의 연락망을 서포트합니다.</div>
+					</div>
+				</div>
+				<div class="faq-image">
+					<img src="/images/support/chat.jpg" width="550px" height="800px" alt="포트폴리오">
+				</div>
+				<div class="faq-item">
+					<div class="faq-icon">📊</div>
+					<div class="faq-content">
+						<div class="faq-question">아직도 카톡으로 업무 내용 공유하시나요?</div>
+						<div class="faq-answer">파인더스가 제공하는 프로젝트 관리 툴을 통해 한 눈에 업무를 파악하고 일정을 공유할 수 있습니다.</div>
+					</div>
+				</div>
+				<div class="faq-image">
+					<img src="/images/support/ganttchart.jpg" width="800px" height="400px" alt="포트폴리오">
+					<br><br><br>
+					<img src="/images/support/callender.jpg" width="800px" height="400px" alt="포트폴리오">
+				</div>
+			</div>
 		</div>
 	</main>
 

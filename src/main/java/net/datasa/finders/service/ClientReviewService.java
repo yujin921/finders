@@ -2,6 +2,7 @@ package net.datasa.finders.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class ClientReviewService {
 
     @Transactional
     public void saveClientReview(ClientReviewDTO clientreviewDTO) {
-        
+
         // 리뷰가 이미 작성되었는지 확인: 프로젝트 번호, 보내는 사람, 받는 사람 기준
         boolean reviewExists = clientReviewsRepository.existsByProjectNumAndSendIdAndReceivedId(
                 clientreviewDTO.getProjectNum(), 
@@ -57,5 +58,16 @@ public class ClientReviewService {
             .collect(Collectors.toList());
 
         clientReviewItemRepository.saveAll(reviewItems);
+    }
+    
+    public List<ClientReviewsEntity> getClientReviewsByClientId(String clientId) {
+        // 클라이언트 ID를 기준으로 해당 클라이언트에 대한 모든 프로젝트 리뷰를 조회
+        return clientReviewsRepository.findByReceivedId(clientId);
+        }
+    
+    // 클라이언트의 평균 평점 계산
+    @Transactional(readOnly = true)
+    public Optional<Float> getAverageRatingForClient(String clientId) {
+        return clientReviewsRepository.findAverageRatingByReceivedId(clientId);
     }
 }

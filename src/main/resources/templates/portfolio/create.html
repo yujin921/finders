@@ -6,53 +6,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" th:href="@{/css/portfolio/create.css}">
+	<link rel="stylesheet" th:href="@{/css/primary.css}">
 	<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.0.0/ckeditor5.css">
     <title>Finders</title>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 </head>
 <body>
 
-    <header>
-        <div class="logo">
-        	<a href="/">
-				<img th:src="@{/images/findersLogo.png}" alt="Finders Logo">
-			</a>
-        </div>
-        <nav>
-            <a href="#">프로젝트 찾기</a>
-            <a href="#">파트너스 찾기</a>
-            <a href="#">이용 후기</a>
-            <a href="#">포트폴리오 관리</a>
-            <a href="#">프로젝트 관리</a>
-            <a href="#">미팅룸</a>
-        </nav>
-        
-        <div class="login-actions">
-  			<img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
-  		    <a th:href="@{/member/myPage}">마이페이지</a>
-  			<a th:href="@{/member/logout}" class="btn">로그아웃</a>
-      	</div>
-    </header>
+    <header></header>
+    <nav></nav>
 
     <div class="main-container">
-        <aside>
-            <h2><a th:href="@{/member/myPage}">개인정보 수정</a></h2>
-		    <h2>포트폴리오 관리</h2>
-		    <div class="sidebar-section">
-		        <ul th:each="portfolio : ${portfoliosList}">
-		            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
-		        </ul>
-		    </div>
-		    <div class="sidebar-section">
-                <h3>개인 활동 페이지</h3>
-                <ul>
-                    <li>VR 게임 프로젝트 활동</li>
-                    <li>2D 방탈출 게임</li>
-                    <li>강화학습 프로젝트</li>
-                </ul>
-            </div>
+        <aside class="sidebar">
         </aside>
 
-        <main>
+        <main class="portfolio-display">
             <form id="editorForm" class="editorForm" action="save" method="post">
 				<div class="titleContents">
 					<h1>제목</h1>
@@ -78,6 +46,8 @@
 				</form>
         </main>
     </div>
+    <footer></footer>
+    <div id="chat-contaniner"></div>
 	<script type="importmap">
 		{
 			"imports": {
@@ -89,6 +59,39 @@
 		</script>
 		<script type="module" src="/js/CKEditor.js"></script>
 </body>
+<script>
+
+$(document).ready(function () {
+    $("#chat-container").load("/chat/view", function () {
+        // 외부 스타일시트 처리
+        $("#chat-container link[rel='stylesheet']").each(function() {
+            var href = $(this).attr('href');
+            $.get(href, function(css) {
+                var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+                $('<style>').text(modifiedCss).appendTo('head');
+            });
+            $(this).remove(); // 원래의 link 태그 제거
+        });
+
+        // 인라인 스타일 처리
+        $("#chat-container style").each(function() {
+            var css = $(this).text();
+            var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+            $(this).text(modifiedCss);
+        });
+    });
+    
+    $('header').load("/header", function () {
+    	});
+    $('nav').load("/nav", function () {
+	});
+    $('footer').load("/footer", function () {
+	});
+    $('aside').load("/aside", function () {
+	});
+});
+
+</script>
 </html>
 
 
