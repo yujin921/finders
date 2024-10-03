@@ -387,7 +387,6 @@ nav ul li a:hover {
 .description-section {
     padding-bottom: 20px;
     margin-bottom: 20px;
-    border-bottom: 1px solid #e2e8f0;
     border-radius: 12px;
 }
 
@@ -398,76 +397,105 @@ nav ul li a:hover {
     margin: 0;
 }
 
-/*리뷰*/
+/* 후기 섹션 스타일 */
 .review-section {
-    margin-top: 30px;
+    border-radius: 10px;
+    margin-top: 20px;
 }
 
+/* 각 후기 카드 스타일 */
 .review-item {
-    background-color: #f9fafb;
+    background-color: #fff;
     padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
+    border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.review-item .project-info {
+.review-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 후기 헤더 */
+.review-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
 }
 
-.review-item .project-image {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    object-fit: cover;
-    margin-right: 15px;
+.review-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.review-item .rating {
+.review-author, .review-date {
     display: flex;
     align-items: center;
-    color: #f6ad55;
-}
-
-.review-item .rating i {
-    margin-right: 5px;
-}
-
-.review-item .review-author,
-.review-item .review-date {
+    gap: 5px;
+    font-size: 1.1rem;
     color: #4a5568;
-    font-size: 0.9em;
 }
 
-.review-item .review-body {
-    margin-top: 15px;
-    color: #2d3748;
+.review-author i, .review-date i {
+    color: #38b2ac;
 }
 
-.review-item .review-details h4 {
-    margin-top: 20px;
-    font-size: 1.1em;
-    color: #2d3748;
-}
-
-.review-item .detail-list {
-    list-style: none;
-    padding: 0;
-    margin-top: 10px;
-}
-
-.review-item .detail-list li {
+/* 평점 스타일 */
+.rating {
     display: flex;
     align-items: center;
-    color: #48bb78;
-    margin-bottom: 5px;
+    gap: 5px;
 }
 
-.review-item .detail-list i {
-    margin-right: 10px;
+.rating i {
+    color: #d1d5db; /* 기본 별 색상 (비어있는 별) */
 }
+
+.rating .filled {
+    color: #f6ad55; /* 채워진 별 색상 */
+}
+
+/* 후기 본문 */
+.review-body {
+    font-size: 1rem;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+/* 세부 평가 */
+.review-details {
+    background-color: #edf2f7;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.review-details h4 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.detail-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.detail-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.detail-list i {
+    color: #38b2ac;
+}
+
 
 /* 버튼 스타일 */
 button {

@@ -5,6 +5,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -54,10 +55,11 @@ public class BoardController {
     public List<ProjectPublishingDTO> list() {
         List<ProjectPublishingDTO> list = boardService.getList();
 
-//        for (ProjectPublishingDTO project : list) {
-//            Optional<Float> averageRating = clientReviewService.getAverageRatingForProject(project.getProjectNum());
-//            project.setAverageRating(averageRating.orElse(0.0f));  // 평점이 없을 경우 0점 설정
-//        }
+        for (ProjectPublishingDTO project : list) {
+            // 프로젝트를 등록한 클라이언트의 평균 평점 구하기
+            Optional<Float> averageRating = clientReviewService.getAverageRatingForClient(project.getClientId());
+            project.setAverageRating(averageRating.orElse(0.0f));  // 평점이 없을 경우 0점 설정
+        }
 
         return list;
     }

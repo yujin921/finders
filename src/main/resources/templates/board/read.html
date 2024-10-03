@@ -142,34 +142,27 @@
     <h3>클라이언트 후기</h3>
     <div th:if="${not #lists.isEmpty(clientReviews)}">
         <div th:each="review : ${clientReviews}" class="review-item">
-            <!-- 프로젝트 정보 및 이미지 추가 -->
-            <div class="project-info">
-                <img th:src="${review.projectImage}" alt="프로젝트 이미지" class="project-image">
-                <h4 th:text="${review.projectTitle}"></h4> <!-- 프로젝트 제목 -->
-            </div>
-
             <div class="review-header">
-                <div class="rating">
-                    <!-- 별표와 평점 표시 -->
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <span th:text="'(' + review.rating + '/5)'"></span>
+                <div class="review-info">
+                    <div class="review-author">
+                        <i class="fas fa-user"></i>
+                        <span th:text="${review.receivedId}"></span>
+                    </div>
+                    <div class="review-date">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span th:text="${#temporals.format(review.reviewDate, 'yyyy-MM-dd HH:mm')}"></span>
+                    </div>
                 </div>
-                <p class="review-author">
-                    작성자: <span th:text="${review.receivedId}"></span>
-                </p>
-                <p class="review-date">
-                    작성일: <span th:text="${#temporals.format(review.reviewDate, 'yyyy-MM-dd HH:mm')}"></span>
-                </p>
+<div class="rating">
+    <span th:each="i : ${#numbers.sequence(1, 5)}">
+        <i th:class="${i <= review.rating ? 'fas fa-star filled' : 'fas fa-star'}"></i>
+    </span>
+    <span th:text="${review.rating}"></span>
+</div>
             </div>
-
             <div class="review-body">
                 <p th:text="${review.comment}"></p>
             </div>
-
             <div class="review-details">
                 <h4>세부 평가</h4>
                 <ul class="detail-list">
@@ -179,11 +172,12 @@
                     </li>
                 </ul>
             </div>
-            <hr>
         </div>
     </div>
     <p th:if="${#lists.isEmpty(clientReviews)}">아직 이 클라이언트에 대한 후기가 없습니다.</p>
 </div>
+
+
 
 
 		</div>
