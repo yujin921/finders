@@ -95,7 +95,7 @@ function createPartnerCard(partner) {
 	
     return `
         <div class="partner-card" data="${partner.memberId}">
-            <img src="${partner.profileImg}" alt="${partner.name}" class="partner-image">
+            <img src="${partner.profileImg}" alt="${partner.name}" class="partner-image" width="300px" height="300px">
             <div class="partner-info">
                 <h3 class="partner-id">${partner.memberId || '아이디 없음'}</h3>
                 <div class="rating">${getStarRating(partner.totalRating)} ${partner.totalRating} / 평가 ${partner.totalReviews || 0}개</div>

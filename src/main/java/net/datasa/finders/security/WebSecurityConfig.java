@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 /**
  * 시큐리티 환경설정
@@ -36,6 +37,7 @@ public class WebSecurityConfig {
             , "/member/resetPw"
             , "/member/verifyUser"
             , "/member/resetPassword"
+            , "/support/guide"
     };
     
     // 프리랜서 회원 접근 가능
@@ -62,7 +64,11 @@ public class WebSecurityConfig {
                 .requestMatchers(FREELANCER_URLS).hasAnyRole("FREELANCER", "ADMIN") //관리자는 모두 접근 가능
                 .requestMatchers(CLIENT_URLS).hasAnyRole("CLIENT", "ADMIN") //관리자는 모두 접근 가능
                 .requestMatchers(ADMIN_URLS).hasAnyRole("ADMIN")
+                .requestMatchers("/board/write").hasRole("CLIENT") // 클라이언트만 접근 가능
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .accessDeniedHandler(customAccessDeniedHandler())
             )
             .httpBasic(Customizer.withDefaults())
             .formLogin(formLogin -> formLogin
@@ -96,4 +102,8 @@ public class WebSecurityConfig {
         return new CustomAuthenticationSuccessHandler();
     }
 
+    @Bean
+    public AccessDeniedHandler customAccessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
 }

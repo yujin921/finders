@@ -1,0 +1,153 @@
+	
+aside {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    padding: 20px;
+    min-height: 100vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+aside h2 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.add-btn {
+    background-color: var(--secondary-color);
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.add-btn:hover {
+    background-color: #27ae60;
+}
+
+a.add-page-link {
+    text-decoration: none;
+    color: white;
+}
+
+.main-container .sidebar-section {
+    margin-bottom: 20px;
+}
+
+.main-container .sidebar-section h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-container .sidebar-section ul {
+    list-style: none;
+}
+
+.main-container .sidebar-section ul li a {
+    margin-bottom: 8px;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.3s;
+    text-decoration: none;
+}
+
+.main-container .sidebar-section ul li a:hover {
+    color: var(--primary-color);
+}
+
+/* 사이드바 스타일 */
+.main-container .sidebar {
+    width: 240px;
+    background-color: #f4f5f7;
+    color: #333;
+    padding: 20px;
+    position: absolute;
+    top: 160px;
+    left: 20px;
+    border-radius: 12px;
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    min-height: 120px;
+}
+
+/* 사이드바 메뉴 리스트 */
+.main-container .sidebar ul {
+    list-style: none;
+    width: 100%;
+    padding: 0;
+    border-left: 3px solid var(--highlight-color);
+}
+.main-container .sidebar ul li {
+	display: list-item;
+    margin-bottom: 15px;
+    width: 100%;
+    text-align: left;
+    unicode-bidi: isolate;
+}
+
+/* 사이드바 링크 스타일 */
+.main-container .sidebar ul li a {
+    display: block;
+    padding: 10px;
+    color: var(--text-color);
+    font-size: 16px;
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+/* 사이드바 링크 hover 효과 */
+.main-container .sidebar ul li a:hover {
+    color: var(--highlight-color); /* 호버 시 강조된 색상으로 */
+    transform: translateX(5px); /* 오른쪽으로 살짝 이동 */
+}
+
+
+/* 아이콘 추가 */
+.main-container .sidebar ul li a::before {
+    content: '\f105'; /* FontAwesome 아이콘 (화살표 모양) */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    margin-right: 10px;
+    display: inline-block;
+    color: var(--light-gray); /* 아이콘 기본 색상 */
+}
+
+.main-container .sidebar ul li a:hover::before {
+    color: var(--highlight-color); /* 호버 시 아이콘 색상 변경 */
+}
+/* 활성화된 메뉴 스타일 */
+.main-container .sidebar ul li a.active {
+    background-color: #ffdc7f; /* 따뜻한 노란색 */
+    color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 활성화된 메뉴에도 그림자 */
+    border-left: 4px solid #f6ad55; /* 왼쪽에 오렌지색 강조선 */
+    transform: none; /* 활성화된 메뉴는 이동하지 않음 */
+}
+
+/* 사이드바 하단 추가 공간 */
+.main-container .sidebar .sidebar-footer {
+    margin-top: auto;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* 메인 콘텐츠 여백 */
+main {
+    margin-left: 280px;
+    padding: 30px;
+    background-color: var(--background-color);
+    transition: margin-left 0.3s ease;
+}
