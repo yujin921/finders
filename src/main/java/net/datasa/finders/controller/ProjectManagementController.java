@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.CalendarEventDTO;
 import net.datasa.finders.domain.dto.FunctionDTO;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
+import net.datasa.finders.domain.dto.FunctionTitleWithTaskIdDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
@@ -125,7 +126,7 @@ public class ProjectManagementController {
             String functionTitleName = taskDTO.getFunctionTitleName();
 
             // 서비스 계층에서 기능 제목과 업무 데이터 저장 처리
-            FunctionTitleDTO savedFunction = projectManagementService.saveFunctionAndTask(projectNum, functionTitleName, taskDTO);
+            FunctionTitleWithTaskIdDTO savedFunction = projectManagementService.saveFunctionAndTask(projectNum, functionTitleName, taskDTO);
 
             return ResponseEntity.ok(savedFunction);
         } catch (IllegalArgumentException e) {
@@ -418,6 +419,29 @@ public class ProjectManagementController {
     public void markNotificationAsRead(@RequestParam("notificationId") int notificationId) {
         projectManagementService.markNotificationAsRead(notificationId);
     }
+    
+    @ResponseBody
+    @PostMapping("sendNotificationToClient")
+    public ResponseEntity<String> sendNotification(
+            @RequestParam("message") String message,
+            @RequestParam("taskId") int taskId,
+            @AuthenticationPrincipal AuthenticatedUser user) {  // @AuthenticatedUser를 사용하여 ID를 가져옴
+
+    	// 로그 추가
+        log.debug("Received message!! :" + message);
+        log.debug("Received taskId!! :" + taskId);
+        log.debug("Received user!! :" + user);
+    	
+    	projectManagementService.sendNotificationToClient(message, taskId, user.getUsername());
+        return ResponseEntity.ok("알림 전송 완료");
+    }
+    
+    @GetMapping("getTaskTitle")
+    public ResponseEntity<String> getTaskTitle(@RequestParam("taskId") int taskId) {
+        String taskTitle = projectManagementService.getTaskTitle(taskId);
+        return ResponseEntity.ok(taskTitle);
+    }
+    
     
     
 //    @GetMapping("/project/application-list")

@@ -502,11 +502,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	        success: function(response) {
 	            console.log('서버 응답:', response);
 
+				// 새로 생성된 taskId를 응답에서 가져옴
+				const taskId = response.taskId; // 서버 응답에서 taskId 가져오기
+				
 	            // 알림 데이터 생성
 	            const notificationData = {
 	                notificationMessage: `${$('#task-title').val()} 업무가 등록되었습니다.`,
-	                senderId: userData.id,  // 로그인한 기업 회원 ID
-	                recipientId: $('#task-assignee').val(),  // 프리랜서 ID
+	                sender: userData.id,  // 로그인한 기업 회원 ID
+	                recipient: $('#task-assignee').val(),  // 프리랜서 ID
+					task: taskId,
 	                createDate: new Date().toISOString()
 	            };
 
@@ -657,7 +661,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	                                    <td style="text-align: center;">${formattedStartDate}</td>
 	                                    <td style="text-align: center;">${formattedEndDate}</td>
 	                                    <td style="text-align: center;">${task.freelancerId}</td>
-										<td style="width: 100px; text-align: center;"><button class="btn-change-status" data-task-id="${task.taskId}">변경</button></td> <!-- 상태 변경 버튼 -->
+										<td style="width: 100px; text-align: center;">
+			                                <button class="btn-change-status" data-task-id="${task.taskId}" ${task.freelancerId === userData.id ? '' : 'disabled'}>변경</button>
+			                            </td>
 	                                </tr>
 	                            `);
 	                        });
@@ -730,6 +736,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	            // 캘린더 새로 고침
 	            loadCalendar();
+				
+				// 알림 메시지 전송
+				sendNotificationToClient(taskId, newStatus);
 
 	            // 모달 닫기
 	            document.body.removeChild(modal);
@@ -737,6 +746,44 @@ document.addEventListener('DOMContentLoaded', function() {
 	        error: function(xhr) {
 	            alert('업무 상태 변경에 실패했습니다: ' + xhr.responseText);
 	            document.body.removeChild(modal); // 모달 닫기
+	        }
+	    });
+	}
+	
+	// 알림 메시지(프리랜서 진행 or 보류로 업무 상태 선택 시에 해당) 전송 함수
+	function sendNotificationToClient(taskId, newStatus) {
+	    const freelancerId = userData.id; // 현재 로그인한 프리랜서 ID
+
+	    // AJAX 호출을 통해 업무 제목을 가져옴
+	    $.ajax({
+	        url: `getTaskTitle?taskId=${taskId}`, // 업무 제목 조회 API 호출
+	        type: 'GET',
+	        success: function(taskTitle) {
+	            // 알림 메시지 작성
+	            const message = newStatus === 'INPROGRESS'
+	                ? `${freelancerId}가 ${taskTitle} 업무를 진행하기 시작했습니다.`
+	                : `${freelancerId}가 ${taskTitle} 업무를 보류하였습니다.`;
+
+				console.log("taskTitle 체크용!! : ", taskTitle);
+					
+	            // 알림 전송
+	            $.ajax({
+	                url: 'sendNotificationToClient', // 알림 전송 API 경로
+	                type: 'POST',
+	                data: {
+	                    message: message,
+	                    taskId: taskId // 업무 ID도 함께 전송 (필요 시)
+	                },
+	                success: function(response) {
+	                    console.log('알림 메시지 전송 성공:', response);
+	                },
+	                error: function(xhr) {
+	                    console.error('알림 메시지 전송 실패:', xhr.responseText);
+	                }
+	            });
+	        },
+	        error: function(xhr) {
+	            console.error('업무 제목을 가져오는 데 실패했습니다:', xhr.responseText);
 	        }
 	    });
 	}

@@ -40,11 +40,15 @@ public class TaskNotificationsEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", referencedColumnName = "member_id")
-    private MemberEntity senderId;
+    private MemberEntity sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id", referencedColumnName = "member_id")
-    private MemberEntity recipientId;
+    private MemberEntity recipient;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", referencedColumnName = "task_id")
+    private TaskManagementEntity task; // 업무와의 관계
 
     @CreatedDate
     @Column(name = "create_date", columnDefinition = "timestamp default current_timestamp", updatable = false)
