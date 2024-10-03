@@ -189,7 +189,7 @@
         <div class="apply-box">
             <!-- 게시판 작성자와 로그인한 사용자가 같을 경우 삭제 버튼 표시 -->
             <div th:if="${board.clientId == user.username}">
-                <h3>프로젝트 관리</h3>
+                
                 <form action="/board/update" method="get">
                     <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
                     <button type="submit" class="apply-button update-button">수정하기</button>

@@ -597,7 +597,7 @@ button:hover {
 }
 
 .delete-button:hover {
-    background-color: #fdd;
+    background-color: #dc3545;
     transform: translateY(-3px);
 }
 
