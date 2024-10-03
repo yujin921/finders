@@ -368,6 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    });
 	}
 
+	/*
 	// 폼 제출 이벤트 핸들러
 	$('#save-function-and-task-btn').on('click', function() {
 	    const newFunctionName = $('#new-function-name').val();
@@ -432,6 +433,169 @@ document.addEventListener('DOMContentLoaded', function() {
 	        },
 	        error: function(xhr) {
 	            alert('업무 등록에 실패했습니다: ' + xhr.responseText);
+	        }
+	    });
+	});
+	*/
+	
+	// 폼 제출 이벤트 핸들러
+	$('#save-function-and-task-btn').on('click', function() {
+	    const newFunctionName = $('#new-function-name').val();
+	    const projectNum = $('#project-num').val(); 
+	    const selectedFunctionId = $('#function-select').val(); 
+
+	    if (newFunctionName.trim() === '' && selectedFunctionId === '') {
+	        alert('기능 이름을 입력해 주세요 또는 기능을 선택해 주세요.');
+	        return;
+	    }
+	    
+	    const functionTitleName = newFunctionName.trim() !== '' ? newFunctionName : $('#function-select option:selected').text();
+
+	    const taskStartDate = new Date($('#task-start-date').val());
+	    const taskEndDate = new Date($('#task-end-date').val());
+
+	    const formattedStartDate = new Date(taskStartDate.getTime() - (taskStartDate.getTimezoneOffset() * 60000)).toISOString().split('.')[0] + 'Z';
+	    const formattedEndDate = new Date(taskEndDate.getTime() - (taskEndDate.getTimezoneOffset() * 60000)).toISOString().split('.')[0] + 'Z';
+
+	    const taskData = {
+	        functionTitleId: selectedFunctionId || null,
+	        functionTitleName: functionTitleName,
+	        taskTitle: $('#task-title').val(),
+	        taskDescription: $('#task-description').val(),
+	        taskStatus: "REQUEST",
+	        taskPriority: $('#task-priority').val().toUpperCase(),
+	        taskStartDate: formattedStartDate,
+	        taskEndDate: formattedEndDate,
+	        freelancerId: $('#task-assignee').val()  // 프리랜서 ID
+	    };
+
+	    console.log('taskData 체크용: ', taskData);
+
+	    // 프리랜서 ID를 가져와서 EventSource 생성
+	    const freelancerId = $('#task-assignee').val();
+	    if (freelancerId) {
+	        const eventSource = new EventSource('notification-subscribe?loginId=' + freelancerId);
+
+	        eventSource.onmessage = function(event) {
+	            const messageData = JSON.parse(event.data); // JSON 파싱
+	            const message = messageData.message;
+	            const notificationId = messageData.notificationId; // ID 가져오기
+	            const notificationItem = `<li>${message} (받은 시간: ${new Date().toLocaleString()}) <button class="mark-as-read" data-id="${notificationId}">읽음으로 표시</button></li>`;
+	            $('#notification-list').append(notificationItem);
+			};
+
+	        eventSource.onerror = function(event) {
+	            console.error('EventSource 오류:', event);
+	            eventSource.close(); // 오류 발생 시 연결 종료
+	        };
+	    } else {
+	        console.warn('프리랜서 ID가 없습니다.');
+	    }
+
+	    // AJAX 요청
+	    $.ajax({
+	        url: 'saveFunctionAndTask?projectNum=' + projectNum,
+	        type: 'post',
+	        data: JSON.stringify(taskData),
+	        contentType: 'application/json',
+	        dataType: 'json',
+	        success: function(response) {
+	            console.log('서버 응답:', response);
+
+	            // 알림 데이터 생성
+	            const notificationData = {
+	                notificationMessage: `${$('#task-title').val()} 업무가 등록되었습니다.`,
+	                senderId: userData.id,  // 로그인한 기업 회원 ID
+	                recipientId: $('#task-assignee').val(),  // 프리랜서 ID
+	                createDate: new Date().toISOString()
+	            };
+
+	            // 알림 전송
+	            $.ajax({
+	                url: 'send-notification',
+	                type: 'post',
+	                data: JSON.stringify(notificationData),
+	                contentType: 'application/json',
+	                success: function() {
+	                    alert('업무와 알림이 성공적으로 등록되었습니다.');
+
+	                    $('#task-modal').addClass('hidden').hide();
+	                    
+	                    // 알림을 ul에 추가
+	                    const notificationItem = `<li>${notificationData.notificationMessage} (보낸 시간: ${new Date().toLocaleString()})</li>`;
+	                    $('#notification-list').append(notificationItem);
+	                    
+	                    // 업무 목록 업데이트
+	                    loadTasks();
+	                    
+	                    // 캘린더 새로 고침(새로 등록한 업무 일정을 캘린더 화면에 반영하기 위해 호출함)
+	                    loadCalendar(); // 캘린더 새로 고침 호출
+	                },
+	                error: function(xhr) {
+	                    alert('알림 전송에 실패했습니다: ' + xhr.responseText);
+	                }
+	            });
+	        },
+	        error: function(xhr) {
+	            alert('업무 등록에 실패했습니다: ' + xhr.responseText);
+	        }
+	    });
+	});
+	
+	// 알림 목록을 로드하는 함수(읽음 상태 반영)
+	function loadNotifications() {
+	    const recipientId = userData.id;
+
+	    $.ajax({
+	        url: 'notifications?recipientId=' + recipientId,
+	        type: 'get',
+	        success: function(response) {
+	            $('#notification-list').empty();
+
+	            // 읽음/안 읽음 알림 처리
+	            response.unread.forEach(function(notification) {
+	                const notificationItem = `<li>${notification.notificationMessage} (받은 시간: ${new Date(notification.createDate).toLocaleString()}) <button class="mark-as-read" data-id="${notification.notificationId}">안 읽음</button></li>`;
+	                $('#notification-list').append(notificationItem);
+	            });
+
+	            response.read.forEach(function(notification) {
+	                const notificationItem = `<li style="text-decoration: line-through;">${notification.notificationMessage} (받은 시간: ${new Date(notification.createDate).toLocaleString()}) <button class="mark-as-read" data-id="${notification.notificationId}" disabled>읽음</button></li>`;
+	                $('#notification-list').append(notificationItem);
+	            });
+	        },
+	        error: function(xhr) {
+	            alert('알림 목록을 가져오는 데 실패했습니다: ' + xhr.responseText);
+	        }
+	    });
+	}
+
+	// 읽음으로 표시 버튼 클릭 이벤트 핸들러
+	$(document).on('click', '.mark-as-read', function() {
+	    const notificationId = $(this).data('id');
+
+	    if (typeof notificationId === 'undefined') {
+	        alert('알림 ID가 유효하지 않습니다.');
+	        return;
+	    }
+
+	    console.log('읽음으로 표시할 알림 ID:', notificationId);
+
+	    const $listItem = $(this).closest('li');
+	    const $button = $(this); // 버튼 요소 저장
+
+	    $.ajax({
+	        url: 'mark-notification-as-read',
+	        type: 'post',
+	        data: { notificationId: notificationId },
+	        success: function() {
+	            alert('알림이 읽음으로 표시되었습니다.');
+	            // 버튼 텍스트 변경 및 비활성화
+	            $button.text('읽음').prop('disabled', true);
+	            // 해당 알림 항목의 스타일을 변경할 수 있다면 여기서 추가
+	            $listItem.css('text-decoration', 'line-through'); // 읽음으로 표시된 알림은 취소선 추가
+	        },
+	        error: function(xhr) {
+	            alert('알림 읽음 표시 실패: ' + xhr.responseText);
 	        }
 	    });
 	});
@@ -709,43 +873,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	    return `${year}.${month}.${day} ${hours}:${minutes}`;
 		// return `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
-	}
-	
-	
-	// 업무 알림 기능 구현
-	// 알림 목록 로드 함수
-	function loadNotifications() {
-	    // 예시 데이터, 실제로는 서버에서 받아오는 데이터로 변경
-	    const notifications = [
-	        { message: "신규 업무 생성되어 업무 요청이 왔습니다.", read: false },
-	        { message: "업무 요청이 진행되고 있습니다.", read: false },
-	        { message: "업무가 완료되었습니다.", read: false },
-	        { message: "해당 업무에 대한 피드백이 도착했습니다. 확인 부탁드립니다.", read: false }
-	    ];
-
-	    const $notificationList = $('#notification-list');
-	    $notificationList.empty(); // 기존 목록 비우기
-
-	    if (notifications.length === 0) {
-	        $notificationList.append('<li>알림이 없습니다.</li>');
-	    } else {
-	        notifications.forEach((notification, index) => {
-	            const readStatus = notification.read ? "읽음" : "안읽음";
-	            const listItem = $(`<li data-index="${index}">
-	                ${notification.message} - <span class="status">${readStatus}</span>
-	            </li>`);
-
-	            // 클릭 이벤트로 상태 변경
-	            listItem.on('click', function() {
-	                if (!notification.read) {
-	                    notification.read = true; // 상태 변경
-	                    $(this).find('.status').text("읽음");
-	                }
-	            });
-
-	            $notificationList.append(listItem);
-	        });
-	    }
 	}
 
  	

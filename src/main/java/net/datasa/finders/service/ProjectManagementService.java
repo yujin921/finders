@@ -1,5 +1,6 @@
 package net.datasa.finders.service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -14,11 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -30,6 +33,7 @@ import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
+import net.datasa.finders.domain.dto.TaskNotificationsDTO;
 import net.datasa.finders.domain.dto.TeamDTO;
 import net.datasa.finders.domain.entity.CalendarEventEntity;
 import net.datasa.finders.domain.entity.FunctionTitleEntity;
@@ -41,6 +45,7 @@ import net.datasa.finders.domain.entity.ProjectPublishingEntity;
 import net.datasa.finders.domain.entity.ProjectRequiredSkillEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.domain.entity.TaskManagementEntity;
+import net.datasa.finders.domain.entity.TaskNotificationsEntity;
 import net.datasa.finders.domain.entity.TaskPriority;
 import net.datasa.finders.domain.entity.TaskStatus;
 import net.datasa.finders.domain.entity.TeamEntity;
@@ -54,6 +59,7 @@ import net.datasa.finders.repository.ProjectManagementRepository;
 import net.datasa.finders.repository.ProjectPublishingRepository;
 import net.datasa.finders.repository.ProjectRequiredSkillRepository;
 import net.datasa.finders.repository.TaskManagementRepository;
+import net.datasa.finders.repository.TaskNotificationsRepository;
 import net.datasa.finders.repository.TeamRepository;
 import net.datasa.finders.repository.WorkScopeRepository;
 
@@ -63,6 +69,8 @@ import net.datasa.finders.repository.WorkScopeRepository;
 @Transactional
 public class ProjectManagementService {
 
+	private final ConcurrentHashMap<String, SseEmitter> emitterMap = new ConcurrentHashMap<>();
+    private final TaskNotificationsRepository taskNotificationsRepository;
 	private final ProjectPublishingRepository projectPublishingRepository;
     private final MemberRepository memberRepository;
     private final WorkScopeRepository workScopeRepository;
@@ -862,6 +870,108 @@ public class ProjectManagementService {
             return true; // 삭제 성공
         }
         return false; // 삭제할 일정이 없음
+    }
+    
+    // 업무 알림 관련 메소드
+    public SseEmitter subscribe(String loginId) {
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        emitterMap.put(loginId, emitter);
+
+        emitter.onCompletion(() -> emitterMap.remove(loginId));
+        emitter.onTimeout(() -> emitterMap.remove(loginId));
+
+        return emitter;
+    }
+
+    public TaskNotificationsDTO sendMessage(TaskNotificationsDTO notificationDTO) {
+        // 프리랜서 회원의 MemberEntity를 가져옴
+        MemberEntity sender = memberRepository.findById(notificationDTO.getSenderId())
+                .orElseThrow(() -> new EntityNotFoundException("보낸 회원의 아이디가 없습니다."));
+
+        // 수신 회원의 MemberEntity를 가져옴
+        MemberEntity recipient = memberRepository.findById(notificationDTO.getRecipientId())
+                .orElseThrow(() -> new EntityNotFoundException("받는 회원의 아이디가 없습니다."));
+
+        // DTO를 엔티티로 변환하여 저장
+        TaskNotificationsEntity notification = TaskNotificationsEntity.builder()
+                .notificationMessage(notificationDTO.getNotificationMessage())
+                .readStatus(false) // 기본값 설정
+                .senderId(sender) // 가져온 MemberEntity 설정
+                .recipientId(recipient) // 가져온 MemberEntity 설정
+                .createDate(LocalDateTime.now()) // 현재 시간 설정
+                .build();
+
+        TaskNotificationsEntity savedNotification = taskNotificationsRepository.save(notification);
+
+        // 로그 추가
+        log.debug("알림 저장 완료: {}", savedNotification);
+        log.debug("저장된 알림 ID: {}", savedNotification.getNotificationId());
+        
+        // SseEmitter 전송
+        SseEmitter emitter = emitterMap.get(notificationDTO.getRecipientId());
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event().name("message").data(
+                    String.format("{\"message\":\"%s\", \"notificationId\":%d}", notification.getNotificationMessage(), savedNotification.getNotificationId())
+                ));
+                log.info("알림 전송 성공: {}", notification.getNotificationMessage());
+            } catch (IOException e) {
+                log.error("메시지 전송 중 오류 발생: ", e);
+            }
+        } else {
+            log.warn("프리랜서 {}에 대한 SseEmitter가 등록되어 있지 않습니다.", notificationDTO.getRecipientId());
+        }
+
+        return TaskNotificationsDTO.fromEntity(savedNotification); // 알림 DTO 반환
+    }
+
+    public Map<String, List<TaskNotificationsDTO>> getNotifications(String recipientId) {
+        MemberEntity recipient = memberRepository.findById(recipientId)
+                .orElseThrow(() -> new EntityNotFoundException("받는 회원의 아이디가 없습니다."));
+
+        List<TaskNotificationsEntity> notifications = taskNotificationsRepository.findByRecipientId(recipient);
+        
+        // 읽음과 안 읽음 알림을 구분
+        List<TaskNotificationsDTO> unreadNotifications = notifications.stream()
+                .filter(notification -> !notification.isReadStatus())
+                .map(notification -> {
+                    TaskNotificationsDTO dto = new TaskNotificationsDTO();
+                    dto.setNotificationId(notification.getNotificationId());
+                    dto.setNotificationMessage(notification.getNotificationMessage());
+                    dto.setReadStatus(notification.isReadStatus());
+                    dto.setSenderId(notification.getSenderId().getMemberId());
+                    dto.setRecipientId(recipient.getMemberId());
+                    dto.setCreateDate(notification.getCreateDate());
+                    return dto;
+                }).collect(Collectors.toList());
+
+        List<TaskNotificationsDTO> readNotifications = notifications.stream()
+                .filter(TaskNotificationsEntity::isReadStatus)
+                .map(notification -> {
+                    TaskNotificationsDTO dto = new TaskNotificationsDTO();
+                    dto.setNotificationId(notification.getNotificationId());
+                    dto.setNotificationMessage(notification.getNotificationMessage());
+                    dto.setReadStatus(notification.isReadStatus());
+                    dto.setSenderId(notification.getSenderId().getMemberId());
+                    dto.setRecipientId(recipient.getMemberId());
+                    dto.setCreateDate(notification.getCreateDate());
+                    return dto;
+                }).collect(Collectors.toList());
+
+        // 결과를 Map으로 반환
+        Map<String, List<TaskNotificationsDTO>> result = new HashMap<>();
+        result.put("unread", unreadNotifications);
+        result.put("read", readNotifications);
+        
+        return result;
+    }
+    
+    public void markNotificationAsRead(int notificationId) {
+        TaskNotificationsEntity notification = taskNotificationsRepository.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("알림이 없습니다."));
+
+        notification.setReadStatus(true); // 읽음으로 설정
+        taskNotificationsRepository.save(notification);
     }
     
     

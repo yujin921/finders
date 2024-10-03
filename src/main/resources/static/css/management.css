@@ -1274,3 +1274,13 @@ h1 {
     color: var(--text-color);
     margin: 20px 0;
 }
+
+/* 업무 알림 읽음 여부 구분 */
+.unread {
+    font-weight: bold;
+    color: red;
+}
+
+.read {
+    color: gray;
+}

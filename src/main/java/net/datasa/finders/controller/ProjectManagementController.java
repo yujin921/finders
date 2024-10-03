@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
+import net.datasa.finders.domain.dto.TaskNotificationsDTO;
 import net.datasa.finders.domain.dto.TeamDTO;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.domain.entity.TaskStatus;
@@ -390,6 +392,31 @@ public class ProjectManagementController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다: " + e.getMessage());
         }
+    }
+    
+    // 업무 알림 관련 Controller
+    @ResponseBody
+    @PostMapping("send-notification")
+    public TaskNotificationsDTO sendNotification(@RequestBody TaskNotificationsDTO notificationDTO) {
+        TaskNotificationsDTO savedNotification = projectManagementService.sendMessage(notificationDTO);
+        return savedNotification; // 저장된 알림을 반환
+    }
+    
+    @ResponseBody
+    @GetMapping("notifications")
+    public Map<String, List<TaskNotificationsDTO>> getNotifications(@RequestParam("recipientId") String recipientId) {
+        return projectManagementService.getNotifications(recipientId);
+    }
+    
+    @GetMapping("notification-subscribe")
+    public SseEmitter subscribe(@RequestParam("loginId") String loginId) {
+        return projectManagementService.subscribe(loginId);
+    }
+    
+    @ResponseBody
+    @PostMapping("mark-notification-as-read")
+    public void markNotificationAsRead(@RequestParam("notificationId") int notificationId) {
+        projectManagementService.markNotificationAsRead(notificationId);
     }
     
     
