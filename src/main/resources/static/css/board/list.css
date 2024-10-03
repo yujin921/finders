@@ -75,7 +75,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow: hidden; /* 내부 요소가 넘치지 않게 설정 */
+    overflow: hidden;
     position: relative;
 }
 
@@ -83,15 +83,15 @@
     transform: translateY(-10px) scale(1.03);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%);
-	color: white; /* 모든 글자 색상을 흰색으로 변경 */
+    color: white;
 }
 
 .post:hover .post-info a {
-    color: white; /* 호버 시 제목 색상 변경 */
+    color: white;
 }
 
 .post:hover .post-info p {
-    color: white; /* 호버 시 본문 텍스트 색상 변경 */
+    color: white;
 }
 
 .post .thumbnail {
@@ -114,96 +114,118 @@
     z-index: 2;
 }
 
-.post .post-info .author,
-.post .post-info .date,
-.post .post-info .status,
-.post .post-info a {
-    display: block;
+
+/* 제목 스타일링 */
+.post .post-info .title {
+    font-weight: 700;
+    font-size: 1.4rem; /* 제목의 크기를 더 키움 */
+    color: var(--primary-color);
+    text-decoration: none;
     margin-bottom: 12px;
-    font-size: 14px;
+    transition: color 0.3s ease, transform 0.3s ease;
 }
 
-/* post 내부 텍스트 스타일링 */
+.post .post-info a:hover {
+    color: var(--highlight-color);
+    transform: scale(1.05);
+}
+
+/* 텍스트 스타일링 */
 .post .post-info span {
     display: block;
-    color: #6b7280;
+    color: #4a5568;
     font-size: 1rem;
     margin-bottom: 8px;
     line-height: 1.5;
     font-weight: 500;
 }
 
-/* 제목 및 링크 스타일링 */
-.post .post-info a {
-    font-weight: 700;
-    font-size: 1.5em;
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: color 0.3s ease, transform 0.3s ease;
-    margin-bottom: 12px;
+/* 작성자, 날짜, 상태 정보에 아이콘 추가 */
+.post-info .rating::before {
+    content: "\f005"; /* Font Awesome 별 아이콘 */
+    font-family: "Font Awesome 5 Free"; /* 아이콘 폰트 */
+    font-weight: 900;
+    margin-right: 8px;
 }
 
-.post .post-info a:hover {
+.post-info .startdate::before {
+    content: "\f073"; /* Font Awesome 달력 아이콘 */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
+}
+
+.post-info .budget::before {
+    content: "\f0d6"; /* Font Awesome 돈 아이콘 */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
+}
+
+.post .post-info .icon {
+    font-size: 1rem;
+    margin-right: 8px;
     color: var(--secondary-color);
-    transform: scale(1.02);
 }
 
-/* 본문 텍스트 */
-.post .post-info p {
-    color: var(--text-color);
-    font-size: 1.1rem;
-    line-height: 1.6;
+.post .post-info .date:before {
+    content: "\f017"; /* FontAwesome 시계 아이콘 */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
 }
 
-/* 가격 등 강조 텍스트 스타일 */
-.post .post-info .price {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: var(--secondary-color);
-    margin-top: 15px;
-    letter-spacing: 1px; /* 가격 글씨를 더 두드러지게 */
+.post .post-info .author:before {
+    content: "\f007"; /* FontAwesome 사용자 아이콘 */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
 }
 
-/* 날짜 및 작성자 정보 스타일 */
-.post .post-info .date,
-.post .post-info .author {
-    font-size: 0.95rem;
-    color: #a0aec0;
+.post .post-info .status:before {
+    content: "\f05d"; /* FontAwesome 확인 아이콘 */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
 }
 
-/* 상태 정보 스타일 (ex: 상태, 완료 여부) */
+/* 상태 정보 스타일 */
 .post .post-info .status {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #ff6347; /* 빨간색 톤으로 강조 */
-    background-color: #fdd; /* 연한 빨간색 배경 추가 */
-    padding: 10px 20px; /* 패딩을 늘려서 가운데 정렬 시 더 넓게 보이도록 */
+    color: #ff6347;
+    background-color: #fdd;
+    padding: 10px 20px;
     border-radius: 8px;
     display: inline-block;
     text-align: center;
-    width: 100%; /* 전체 너비 차지 */
+    width: 100%;
     transition: background-color 0.3s ease, color 0.3s ease;
     margin-top: 10px;
-    box-sizing: border-box;
 }
 
-
-.post:hover .post-info a {
-    color: #ffffff; /* 링크 색상 흰색으로 변경 */
+.post:hover .post-info .status {
+    color: white;
+    background-color: #ff6347;
+    transform: scale(1.1);
 }
 
+/* 호버 시 텍스트 스타일 */
 .post:hover .post-info span,
+.post:hover .post-info .rating,
+.post:hover .post-info .startdate,
+.post:hover .post-info .baudget,
 .post:hover .post-info .date,
 .post:hover .post-info .author,
 .post:hover .post-info .price {
-    color: #ffffff; /* 나머지 모든 텍스트 요소도 흰색으로 변경 */
+    color: white;
 }
 
 /* 호버 시 상태 강조 */
 .post:hover .post-info .status {
-    color: white; /* 호버 시 글자 색상을 흰색으로 변경 */
-    background-color: #ff6347; /* 호버 시 배경색을 더 진한 빨간색으로 */
-    transform: scale(1.1); /* 호버 시 약간 커지도록 설정 */
+    color: white;
+    background-color: #ff6347;
+    transform: scale(1.1);
 }
 
 /* 버튼 효과 */
