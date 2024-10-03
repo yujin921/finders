@@ -18,8 +18,8 @@ function list(sortValue = 'projectCreateDate,asc') {
                <div class="post" onclick="location.href='/board/read?projectNum=${obj.projectNum}';">
                   <img src="data:image/jpeg;base64,${obj.projectImage}" alt="Project Image" class="thumbnail">
                   <div class="post-info">
-                     <span>${obj.projectTitle}</span>
-                     <span>평점: ${obj.averageRating}점</span><br>
+                     <span class="title">${obj.projectTitle}</span>
+                     <span class="rating">평점: ${obj.averageRating}점</span><br>
                      <span class="startdate">시작일 : ${obj.projectStartDate}</span><br>
                      <span class="budget">금액 : ${obj.projectBudget}</span>
                      <span class="author">작성자 : ${obj.clientId}</span>

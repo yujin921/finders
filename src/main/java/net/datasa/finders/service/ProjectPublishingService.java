@@ -33,6 +33,8 @@ public class ProjectPublishingService {
     private final ProjectCategoryRepository categoryRepository;
     private final ProjectRequiredSkillRepository skillRepository;
     private final PrequalificationQuestionRepository prequalificationQuestionRepository;
+    private final ClientReviewsRepository clientReviewsRepository;
+    private final ClientReviewItemRepository clientReviewItemRepository;
     private final ProjectRequiredSkillRepository projectRequiredSkillRepository;
     private final ProjectCategoryRepository projectCategoryRepository;
 
@@ -186,23 +188,32 @@ public class ProjectPublishingService {
                 .collect(Collectors.toList());
 
         List<Map<String, Object>> matchedOutputs = new ArrayList<>();
+        Set<String> seenPairs = new HashSet<>();
 
         // 카테고리와 업무 범위를 매칭할 때, required_num이 같은 경우 매칭
         for (ProjectCategoryEntity category : categories) {
             for (WorkScopeEntity workScope : workScopes) {
                 // required_num이 같은 경우 매칭
                 if (category.getRequiredNum() == workScope.getRequiredNum()) {
-                    Map<String, Object> output = new HashMap<>();
-                    output.put("category", category.getCategory());
-                    output.put("workScope", workScope.getWorkType());
-                    output.put("requiredNum", category.getRequiredNum());  // 동일한 required_num
-                    matchedOutputs.add(output);
+                    String uniqueKey = category.getCategory() + ":" + workScope.getWorkType();
+                    if (!seenPairs.contains(uniqueKey)) {
+                        Map<String, Object> output = new HashMap<>();
+                        output.put("category", category.getCategory());
+                        output.put("workScope", workScope.getWorkType());
+                        output.put("requiredNum", category.getRequiredNum());  // 동일한 required_num
+                        matchedOutputs.add(output);
+                        seenPairs.add(uniqueKey);  // 중복 방지용 키 추가
+                    } else {
+                        log.debug("중복된 항목: 카테고리 {}, 업무 범위 {}",
+                                category.getCategory(), workScope.getWorkType());
+                    }
                 } else {
                     log.debug("매칭되지 않은 required_num: 카테고리 {}, 업무 범위 {}",
                             category.getRequiredNum(), workScope.getRequiredNum());
                 }
             }
         }
+
         MemberEntity member = memberRepository.findByMemberIdAndRoleName(memberId, roleName);
         RoleName role = member.getRoleName();
 
@@ -254,4 +265,16 @@ public class ProjectPublishingService {
         // 필요하다면 더 많은 필드 추가
         projectPublishingRepository.save(projectPublishingEntity);
     }
+
+
+//    public List<ClientReviewsEntity> getClientReviews(String clientId) {
+//        return clientReviewsRepository.findByClientId(clientId);
+//    }
+
+    /*
+    public List<ClientReviewsEntity> getClientReviews(String clientId) {
+        List<ClientReviewsEntity> reviews = clientReviewsRepository.findByClientId(clientId);
+        log.debug("Found {} reviews for client {}", reviews.size(), clientId);
+        return reviews;
+    }*/
 }

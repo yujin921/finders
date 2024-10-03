@@ -3,11 +3,12 @@ package net.datasa.finders.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
-import net.datasa.finders.service.ProjectPublishingService;
 import net.datasa.finders.service.ClientReviewService;
 import net.datasa.finders.service.ProjectApplicationService;
+import net.datasa.finders.service.ProjectPublishingService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +20,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,6 +47,12 @@ public class BoardController {
     @GetMapping("list")
     public List<ProjectPublishingDTO> list() {
         List<ProjectPublishingDTO> list = projectPublishingService.getList();
+
+        for (ProjectPublishingDTO project : list) {
+            // 프로젝트를 등록한 클라이언트의 평균 평점 구하기
+            Optional<Float> averageRating = clientReviewService.getAverageRatingForClient(project.getClientId());
+            project.setAverageRating(averageRating.orElse(0.0f));  // 평점이 없을 경우 0점 설정
+        }
 
         return list;
     }
@@ -99,10 +107,10 @@ public class BoardController {
                 model.addAttribute("applicationStatus", applicationStatus);
             }
             
-            /*// 클라이언트에 대한 프리랜서 후기 조회
-            List<ClientReviewsEntity> clientReviews = boardService.getClientReviews(projectPublishingDTO.getClientId());
+            // 클라이언트 ID 기반으로 후기를 가져옴 (게시글 작성자의 ID)
+            List<ClientReviewsEntity> clientReviews = clientReviewService.getClientReviewsByClientId( projectPublishingDTO.getClientId());
             model.addAttribute("clientReviews", clientReviews);
-*/
+
             return "board/read";  // 'read.html'로 반환
         } catch (Exception e) {
             e.printStackTrace();
