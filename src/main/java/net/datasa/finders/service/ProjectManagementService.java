@@ -436,8 +436,9 @@ public class ProjectManagementService {
     // 업무 상태 변경
     public void updateTaskStatus(Integer taskId, TaskStatus status) {
         TaskManagementEntity task = taskManagementRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("업무를 찾을 수 없습니다."));
-        
+                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+
+        // 상태 변경
         task.setTaskStatus(status);
         taskManagementRepository.save(task); // 상태 변경 후 저장
     }
@@ -948,14 +949,19 @@ public class ProjectManagementService {
         return TaskNotificationsDTO.fromEntity(savedNotification); // 알림 DTO 반환
     }
 
-    public Map<String, List<TaskNotificationsDTO>> getNotifications(String recipientId) {
+    public Map<String, List<TaskNotificationsDTO>> getNotifications(String recipientId, Integer projectNum) {
         MemberEntity recipient = memberRepository.findById(recipientId)
                 .orElseThrow(() -> new EntityNotFoundException("받는 회원의 아이디가 없습니다."));
 
         List<TaskNotificationsEntity> notifications = taskNotificationsRepository.findByRecipient(recipient);
-        
+
+        // projectNum에 해당하는 알림만 필터링
+        List<TaskNotificationsEntity> filteredNotifications = notifications.stream()
+                .filter(notification -> notification.getTask().getProjectPublishingEntity().getProjectNum().equals(projectNum))
+                .collect(Collectors.toList());
+
         // 읽음과 안 읽음 알림을 구분
-        List<TaskNotificationsDTO> unreadNotifications = notifications.stream()
+        List<TaskNotificationsDTO> unreadNotifications = filteredNotifications.stream()
                 .filter(notification -> !notification.isReadStatus())
                 .map(notification -> {
                     TaskNotificationsDTO dto = new TaskNotificationsDTO();
@@ -969,7 +975,7 @@ public class ProjectManagementService {
                     return dto;
                 }).collect(Collectors.toList());
 
-        List<TaskNotificationsDTO> readNotifications = notifications.stream()
+        List<TaskNotificationsDTO> readNotifications = filteredNotifications.stream()
                 .filter(TaskNotificationsEntity::isReadStatus)
                 .map(notification -> {
                     TaskNotificationsDTO dto = new TaskNotificationsDTO();

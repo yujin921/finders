@@ -253,14 +253,20 @@ public class ProjectManagementController {
     
     @ResponseBody
     @PostMapping("changeTaskStatus")
-    public ResponseEntity<String> changeTaskStatus(@RequestParam("taskId") Integer taskId, @RequestParam("taskStatus") TaskStatus status) {
+    public ResponseEntity<String> changeTaskStatus(
+            @RequestParam("taskId") Integer taskId, 
+            @RequestParam("taskStatus") TaskStatus status
+    ) {
         try {
-            projectManagementService.updateTaskStatus(taskId, status);
+            projectManagementService.updateTaskStatus(taskId, status); // 상태 변경 호출
             return ResponseEntity.ok("업무 상태가 성공적으로 변경되었습니다.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(404).body("업무를 찾을 수 없습니다: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("업무 상태 변경 실패: " + e.getMessage());
         }
     }
+
     
     @ResponseBody
     @GetMapping("getGanttChartData")
@@ -405,8 +411,8 @@ public class ProjectManagementController {
     
     @ResponseBody
     @GetMapping("notifications")
-    public Map<String, List<TaskNotificationsDTO>> getNotifications(@RequestParam("recipientId") String recipientId) {
-        return projectManagementService.getNotifications(recipientId);
+    public Map<String, List<TaskNotificationsDTO>> getNotifications(@RequestParam("recipientId") String recipientId, @RequestParam("projectNum") Integer projectNum) {
+        return projectManagementService.getNotifications(recipientId, projectNum);
     }
     
     @GetMapping("notification-subscribe")

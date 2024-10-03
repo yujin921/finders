@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	loadTasks();
 
 	// 페이지 로드 시 기본적으로 업무 알림 목록 로드
-	loadNotifications();
+	loadNotifications(projectNum);
 		
 	// 페이지 로드 시 기본적으로 프로젝트 완료 여부 체크 후 버튼(프로젝트 완료 or 리뷰 작성) 표시
 	completeStatusCheck();
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				loadTasks();
 			} else if (targetId === 'notification-content') {
 				// 업무 알림 목록 로드 함수
-				loadNotifications();
+				loadNotifications(projectNum);
 			} else if (targetId === 'calendar-content') {
                 loadCalendar();
             } else if (targetId === 'gantt-content') {
@@ -547,15 +547,21 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 	
 	// 알림 목록을 로드하는 함수(읽음 상태 반영)
-	function loadNotifications() {
+	function loadNotifications(projectNum) {
 	    const recipientId = userData.id;
 
 	    $.ajax({
-	        url: 'notifications?recipientId=' + recipientId,
+	        url: `notifications?recipientId=${recipientId}&projectNum=${projectNum}`, // projectNum 추가
 	        type: 'get',
 	        success: function(response) {
 	            $('#notification-list').empty();
 
+				// 알림이 없는 경우 메시지 표시
+	            if (response.unread.length === 0 && response.read.length === 0) {
+	                $('#notification-list').append('<li>알림이 없습니다.</li>');
+	                return;
+	            }
+				
 	            // 읽음/안 읽음 알림 처리
 	            response.unread.forEach(function(notification) {
 	                const notificationItem = `<li>${notification.notificationMessage} (받은 시간: ${new Date(notification.createDate).toLocaleString()}) <button class="mark-as-read" data-id="${notification.notificationId}">안 읽음</button></li>`;
@@ -653,7 +659,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                            const formattedEndDate = formatDateTime(task.taskEndDate);
 
 	                            tbody.append(`
-	                                <tr class="task-row" data-task-id="${task.taskId}">
+	                                <tr class="task-row" data-task-id="${task.taskId}" data-task-status="${task.taskStatus}">
 	                                    <td style="text-align: center;">${task.taskTitle}</td>
 	                                    <td style="width: 120px; text-align: center;">${task.taskDescription}</td>
 	                                    <td style="text-align: center;">${task.taskStatus}</td>
@@ -661,9 +667,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	                                    <td style="text-align: center;">${formattedStartDate}</td>
 	                                    <td style="text-align: center;">${formattedEndDate}</td>
 	                                    <td style="text-align: center;">${task.freelancerId}</td>
-										<td style="width: 100px; text-align: center;">
-			                                <button class="btn-change-status" data-task-id="${task.taskId}" ${task.freelancerId === userData.id ? '' : 'disabled'}>변경</button>
-			                            </td>
+	                                    <td style="width: 100px; text-align: center;">
+	                                        <button class="btn-change-status" data-task-id="${task.taskId}" data-task-status="${task.taskStatus}" ${task.freelancerId === userData.id ? '' : 'disabled'}>변경</button>
+	                                    </td>
 	                                </tr>
 	                            `);
 	                        });
@@ -686,12 +692,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	                    const taskId = $(this).data('task-id');
 	                    openDeleteModal(taskId);
 	                });
-					
-					// 상태 변경 버튼 클릭 이벤트
+	                
+	                // 상태 변경 버튼 클릭 이벤트
 	                $('.btn-change-status').on('click', function(event) {
 	                    event.stopPropagation(); // 드롭다운이 열리는 것을 방지하기 위해 이벤트 전파 중지
 	                    const taskId = $(this).data('task-id');
-	                    openStatusChangeModal(taskId); // 상태 변경 모달 열기
+	                    const currentStatus = $(this).data('task-status');
+	                    openStatusChangeModal(taskId, currentStatus); // 상태 변경 모달 열기
 	                });
 	            }
 	        },
@@ -700,14 +707,30 @@ document.addEventListener('DOMContentLoaded', function() {
 	        }
 	    });
 	}
-	
+
 	// 업무 상태 변경 모달 창 열기
-	function openStatusChangeModal(taskId) {
+	function openStatusChangeModal(taskId, currentStatus) {
 	    const modal = document.getElementById('status-change-modal');
 	    const statusSelect = document.getElementById('new-status');
 
 	    // 상태 선택 초기화
-	    statusSelect.value = 'INPROGRESS'; // 기본 값 설정 (필요에 따라 조정 가능)
+	    const options = [];
+	    if (currentStatus === 'INPROGRESS') {
+	        options.push('COMPLETED', 'HOLD'); // 진행 중인 경우 완료 및 보류 선택
+	    } else if (currentStatus === 'HOLD') {
+	        options.push('INPROGRESS'); // 보류인 경우 진행 선택
+	    } else {
+	        options.push('INPROGRESS', 'HOLD'); // 그 외의 경우 진행 및 보류 선택
+	    }
+
+	    // 옵션 설정
+	    statusSelect.innerHTML = ''; // 기존 옵션 제거
+	    options.forEach(option => {
+	        const opt = document.createElement('option');
+	        opt.value = option;
+	        opt.text = option;
+	        statusSelect.appendChild(opt);
+	    });
 
 	    // 취소 버튼 클릭 이벤트
 	    document.getElementById('cancel-button').onclick = () => {
@@ -727,6 +750,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    $.ajax({
 	        url: `changeTaskStatus?taskId=${taskId}&taskStatus=${newStatus}`, // 상태 변경 API 호출
 	        type: 'POST',
+	        contentType: 'application/json',
 	        success: function(response) {
 	            console.log('업무 상태 변경 성공:', response);
 	            alert('업무 상태가 변경되었습니다.');
@@ -736,21 +760,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	            // 캘린더 새로 고침
 	            loadCalendar();
-				
-				// 알림 메시지 전송
-				sendNotificationToClient(taskId, newStatus);
+	            
+	            // 알림 메시지 전송
+	            sendNotificationToClient(taskId, newStatus);
 
 	            // 모달 닫기
-	            document.body.removeChild(modal);
+	            if (modal) {
+	                document.body.removeChild(modal);
+	            }
 	        },
 	        error: function(xhr) {
 	            alert('업무 상태 변경에 실패했습니다: ' + xhr.responseText);
-	            document.body.removeChild(modal); // 모달 닫기
+	            if (modal) {
+	                document.body.removeChild(modal); // 모달 닫기
+	            }
 	        }
 	    });
 	}
-	
-	// 알림 메시지(프리랜서 진행 or 보류로 업무 상태 선택 시에 해당) 전송 함수
+
+	// 알림 메시지(프리랜서 진행, 보류, 완료로 업무 상태 선택 시에 해당) 전송 함수
 	function sendNotificationToClient(taskId, newStatus) {
 	    const freelancerId = userData.id; // 현재 로그인한 프리랜서 ID
 
@@ -759,13 +787,19 @@ document.addEventListener('DOMContentLoaded', function() {
 	        url: `getTaskTitle?taskId=${taskId}`, // 업무 제목 조회 API 호출
 	        type: 'GET',
 	        success: function(taskTitle) {
-	            // 알림 메시지 작성
-	            const message = newStatus === 'INPROGRESS'
-	                ? `${freelancerId}가 ${taskTitle} 업무를 진행하기 시작했습니다.`
-	                : `${freelancerId}가 ${taskTitle} 업무를 보류하였습니다.`;
+	            let message;
 
-				console.log("taskTitle 체크용!! : ", taskTitle);
-					
+	            // 알림 메시지 작성
+	            if (newStatus === 'INPROGRESS') {
+	                message = `${freelancerId}가 ${taskTitle} 업무를 진행하기 시작했습니다.`;
+	            } else if (newStatus === 'HOLD') {
+	                message = `${freelancerId}가 ${taskTitle} 업무를 보류하였습니다.`;
+	            } else if (newStatus === 'COMPLETED') {
+	                message = `${freelancerId}가 ${taskTitle} 업무를 완료하였습니다.`;
+	            }
+
+	            console.log("taskTitle 체크용!! : ", taskTitle);
+	                
 	            // 알림 전송
 	            $.ajax({
 	                url: 'sendNotificationToClient', // 알림 전송 API 경로
