@@ -88,7 +88,6 @@ public class BoardController {
         try {
             // 사용자 역할 확인
             RoleName roleName = RoleName.valueOf(user.getRoleName());
-            log.debug("현재 사용자의 역할: {}", roleName);
 
             // 게시물 정보 불러오기
             ProjectPublishingDTO projectPublishingDTO = projectPublishingService.getBoard(projectNum, user.getUsername(), roleName);
@@ -149,13 +148,28 @@ public class BoardController {
     public String showUpdateForm(@RequestParam("projectNum") int projectNum, Model model) {
         ProjectPublishingDTO board = projectPublishingService.getBoardByProjectNum(projectNum); // 프로젝트 번호로 게시글 데이터 가져오기
         model.addAttribute("board", board); // 모델에 기존 데이터를 담아서 수정 페이지로 보냄
-        log.debug("{}",board);
         return "board/updateForm"; // 수정 페이지로 이동
     }
 
     @PostMapping("/update")
-    public String updateBoard(@ModelAttribute ProjectPublishingDTO projectPublishingDTO) {
-        projectPublishingService.updateBoard(projectPublishingDTO); // 수정된 데이터 저장
+    public String updateBoard(@ModelAttribute ProjectPublishingDTO projectPublishingDTO,
+                              @RequestParam("projectImageFile") MultipartFile projectImageFile, // 이미지 파일
+                              @RequestParam("selectedSkills") String selectedSkills,  // 관련 기술
+                              @RequestParam("projectDescription") String projectDescription,  // 상세 업무 내용
+                              @RequestParam("projectBudget") BigDecimal projectBudget,  // 지출 예산
+                              @RequestParam("projectStartDate") LocalDate projectStartDate,  // 프로젝트 시작일
+                              @RequestParam("projectEndDate") LocalDate projectEndDate,  // 프로젝트 종료일
+                              @RequestParam("recruitDeadline") LocalDateTime recruitDeadline,
+                              @RequestParam("role") List<String> roles, // 모집 인원 역할
+                              @RequestParam("category") List<String> categories, // 모집 인원 카테고리
+                              @RequestParam("teamSize[]") List<Integer> teamSizes, // 모집 인원
+                              @RequestParam("question[]") List<String> questions, // 사전 질문
+                              @AuthenticationPrincipal AuthenticatedUser user){
+        projectPublishingDTO.setClientId(user.getUsername());
+
+        projectPublishingService.updateBoard(projectPublishingDTO, projectImageFile, selectedSkills, projectDescription, projectBudget,
+                projectStartDate, projectEndDate, recruitDeadline, roles, categories, teamSizes, questions);
+
         return "redirect:/board/view?projectNum=" + projectPublishingDTO.getProjectNum(); // 수정 후 해당 게시글로 리다이렉트
     }
 }

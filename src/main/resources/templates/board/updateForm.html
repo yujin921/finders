@@ -57,6 +57,7 @@
 
         <div class="main-content">
             <form method="POST" action="/board/update" enctype="multipart/form-data">
+                <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
                 <div id="section1" class="section">
                     <h2>프로젝트 제목</h2>
                     <div class="project-title-container">
