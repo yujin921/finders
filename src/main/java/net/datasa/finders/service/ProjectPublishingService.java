@@ -26,15 +26,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class BoardService {
+public class ProjectPublishingService {
     private final ProjectPublishingRepository projectPublishingRepository;
     private final MemberRepository memberRepository;
     private final WorkScopeRepository workScopeRepository;
     private final ProjectCategoryRepository categoryRepository;
     private final ProjectRequiredSkillRepository skillRepository;
     private final PrequalificationQuestionRepository prequalificationQuestionRepository;
-    private final ClientReviewsRepository clientReviewsRepository;
-    private final ClientReviewItemRepository clientReviewItemRepository;
+    private final ProjectRequiredSkillRepository projectRequiredSkillRepository;
+    private final ProjectCategoryRepository projectCategoryRepository;
 
     public void write(ProjectPublishingDTO projectPublishingDTO, MultipartFile imageFile, String selectedSkills
             , String projectDescription, BigDecimal projectBudget
@@ -220,15 +220,38 @@ public class BoardService {
     public void deleteBoard(int pNum) {
         projectPublishingRepository.deleteById(pNum);
     }
-    
-//    public List<ClientReviewsEntity> getClientReviews(String clientId) {
-//        return clientReviewsRepository.findByClientId(clientId);
-//    }
-    
-    /*
-    public List<ClientReviewsEntity> getClientReviews(String clientId) {
-        List<ClientReviewsEntity> reviews = clientReviewsRepository.findByClientId(clientId);
-        log.debug("Found {} reviews for client {}", reviews.size(), clientId);
-        return reviews;
-    }*/
+
+    public ProjectPublishingDTO getBoardByProjectNum(int projectNum) {
+        ProjectPublishingEntity projectEntity = projectPublishingRepository.findById(projectNum)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid project number"));
+
+        List<WorkScopeEntity> workScopes = workScopeRepository.findByProjectPublishingEntity(projectEntity);
+        List<ProjectRequiredSkillEntity> skills = projectRequiredSkillRepository.findByProjectPublishingEntity(projectEntity);
+        List<ProjectCategoryEntity> categories = projectCategoryRepository.findByProjectPublishingEntity(projectEntity);
+
+        // DTO에 값 채우기
+        return ProjectPublishingDTO.builder()
+                .projectNum(projectEntity.getProjectNum())
+                .clientId(projectEntity.getClientId().getMemberId())
+                .projectTitle(projectEntity.getProjectTitle())
+                .recruitDeadline(projectEntity.getRecruitDeadline())
+                .projectStartDate(projectEntity.getProjectStartDate())
+                .projectEndDate(projectEntity.getProjectEndDate())
+                .projectBudget(projectEntity.getProjectBudget())
+                .projectDescription(projectEntity.getProjectDescription())
+                .selectedSkills(skills.stream().map(ProjectRequiredSkillEntity::getSkillText).collect(Collectors.toList()))
+                .selectedCategories(categories.stream().map(ProjectCategoryEntity::getCategory).collect(Collectors.toList()))
+                .selectedWorkScopes(workScopes.stream().map(WorkScopeEntity::getWorkType).collect(Collectors.toList()))
+                .build();
+    }
+
+    public void updateBoard(ProjectPublishingDTO projectPublishingDTO) {
+        // 수정된 데이터를 DB에 저장
+        ProjectPublishingEntity projectPublishingEntity = projectPublishingRepository.findById(projectPublishingDTO.getProjectNum()).orElseThrow();
+        projectPublishingEntity.setProjectTitle(projectPublishingDTO.getProjectTitle());
+        projectPublishingEntity.setProjectDescription(projectPublishingDTO.getProjectDescription());
+        projectPublishingEntity.setProjectBudget(projectPublishingDTO.getProjectBudget());
+        // 필요하다면 더 많은 필드 추가
+        projectPublishingRepository.save(projectPublishingEntity);
+    }
 }

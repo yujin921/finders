@@ -132,7 +132,7 @@
 		    <div class="description-section">
 		        <h3>상세 설명</h3>
 		        <div class="description-detail">
-		            <p th:text="${board.projectDescription}"></p>
+		            <pre th:text="${board.projectDescription}"></pre>
 		        </div>
 		    </div>
 		</div>
@@ -144,6 +144,10 @@
             <!-- 게시판 작성자와 로그인한 사용자가 같을 경우 삭제 버튼 표시 -->
             <span th:if="${board.clientId == user.username}">
                 <h3>프로젝트 관리</h3>
+                <form action="/board/update" method="get">
+                    <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
+                    <button type="submit" class="apply-button update-button">수정하기</button>
+                </form>
                 <form action="/board/delete" method="post">
                     <input type="hidden" name="projectNum" th:value="${board.projectNum}" />
                     <button type="submit" class="apply-button delete-button">삭제하기</button>

@@ -3,12 +3,9 @@ package net.datasa.finders.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
-import net.datasa.finders.domain.entity.ApplicationResult;
-import net.datasa.finders.domain.entity.ClientReviewsEntity;
-import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
-import net.datasa.finders.service.BoardService;
+import net.datasa.finders.service.ProjectPublishingService;
 import net.datasa.finders.service.ClientReviewService;
 import net.datasa.finders.service.ProjectApplicationService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +19,6 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,7 +26,7 @@ import java.util.Optional;
 @RequestMapping("board")
 public class BoardController {
 	
-	private final BoardService boardService;
+	private final ProjectPublishingService projectPublishingService;
     private final ProjectApplicationService projectApplicationService;
     private final ClientReviewService clientReviewService;
 	
@@ -48,12 +44,7 @@ public class BoardController {
     @ResponseBody
     @GetMapping("list")
     public List<ProjectPublishingDTO> list() {
-        List<ProjectPublishingDTO> list = boardService.getList();
-
-//        for (ProjectPublishingDTO project : list) {
-//            Optional<Float> averageRating = clientReviewService.getAverageRatingForProject(project.getProjectNum());
-//            project.setAverageRating(averageRating.orElse(0.0f));  // 평점이 없을 경우 0점 설정
-//        }
+        List<ProjectPublishingDTO> list = projectPublishingService.getList();
 
         return list;
     }
@@ -78,7 +69,7 @@ public class BoardController {
         projectPublishingDTO.setClientId(user.getUsername());
 
         // BoardService 호출해서 프로젝트 및 관련 데이터 저장
-        boardService.write(projectPublishingDTO, projectImageFile, selectedSkills
+        projectPublishingService.write(projectPublishingDTO, projectImageFile, selectedSkills
                 , projectDescription, projectBudget, projectStartDate, projectEndDate, recruitDeadline, roles, categories, teamSizes, questions);
 
         return "redirect:view";
@@ -92,7 +83,7 @@ public class BoardController {
             log.debug("현재 사용자의 역할: {}", roleName);
 
             // 게시물 정보 불러오기
-            ProjectPublishingDTO projectPublishingDTO = boardService.getBoard(projectNum, user.getUsername(), roleName);
+            ProjectPublishingDTO projectPublishingDTO = projectPublishingService.getBoard(projectNum, user.getUsername(), roleName);
             model.addAttribute("board", projectPublishingDTO);
             model.addAttribute("user", user);
             model.addAttribute("roleName", projectPublishingDTO.getRoleName());
@@ -123,11 +114,11 @@ public class BoardController {
     public String deletePost(@RequestParam("projectNum") int pNum, @AuthenticationPrincipal AuthenticatedUser user) {
         try {
             RoleName roleName = RoleName.valueOf(user.getRoleName());
-            ProjectPublishingDTO projectPublishingDTO = boardService.getBoard(pNum, user.getUsername(), roleName);
+            ProjectPublishingDTO projectPublishingDTO = projectPublishingService.getBoard(pNum, user.getUsername(), roleName);
 
             // 로그인된 사용자와 게시글 작성자가 같은지 확인
             if (projectPublishingDTO.getClientId().equals(user.getUsername())) {
-                boardService.deleteBoard(pNum);
+                projectPublishingService.deleteBoard(pNum);
                 return "redirect:/board/view"; // 게시글 목록 페이지로 리다이렉트
             } else {
                 return "redirect:/board/view?error=deletePermission"; // 권한 오류 페이지로 리다이렉트
@@ -146,19 +137,17 @@ public class BoardController {
         return "redirect:/board/read?projectNum=" + projectNum;  // 신청 후 페이지 리디렉션
     }
 
-    @PostMapping("update-status")
-    public String updateApplicationStatus(@RequestParam("projectNum") int projectNum
-            , @RequestParam("freelancerUsername") String freelancerUsername
-            , @RequestParam("status") String status) {
-        if (status == null || status.trim().isEmpty()) {
-            throw new IllegalArgumentException("Status is missing or empty");
-        }
+    @GetMapping("/update")
+    public String showUpdateForm(@RequestParam("projectNum") int projectNum, Model model) {
+        ProjectPublishingDTO board = projectPublishingService.getBoardByProjectNum(projectNum); // 프로젝트 번호로 게시글 데이터 가져오기
+        model.addAttribute("board", board); // 모델에 기존 데이터를 담아서 수정 페이지로 보냄
+        log.debug("{}",board);
+        return "board/updateForm"; // 수정 페이지로 이동
+    }
 
-        log.debug("Received status value: {}", status);
-        ApplicationResult result = ApplicationResult.valueOf(status.toUpperCase());  // 'accepted', 'rejected' 등 입력값을 ENUM으로 변환
-
-        projectApplicationService.updateApplicationStatus(projectNum, freelancerUsername, result);  // 상태 업데이트
-
-        return "redirect:/board/read?projectNum=" + projectNum;  // 업데이트 후 페이지 리디렉션
+    @PostMapping("/update")
+    public String updateBoard(@ModelAttribute ProjectPublishingDTO projectPublishingDTO) {
+        projectPublishingService.updateBoard(projectPublishingDTO); // 수정된 데이터 저장
+        return "redirect:/board/view?projectNum=" + projectPublishingDTO.getProjectNum(); // 수정 후 해당 게시글로 리다이렉트
     }
 }

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트 등록 - Finder</title>
+    <link rel="stylesheet" th:href="@{/css/updateForm.css}">
+</head>
+<body>
+<header>
+    <div class="logo">
+        <a href="/">
+            <img th:src="@{/images/wordmark-logo.png}" alt="Finders Logo">
+        </a>
+    </div>
+    <nav>
+        <a th:href="@{/board/write}">프로젝트 등록</a>
+        <a th:href="@{/board/view}">프로젝트 찾기</a>
+        <a th:href="@{/find/view}">프리랜서 찾기</a>
+        <a th:href="@{/support/guide}">서비스 안내</a>
+        <a th:href="@{/support/example}">이용사례</a>
+        <a th:href="@{/myProject/view}">내 프로젝트 목록</a>
+        <a th:href="@{/webrtc}">미팅룸</a>
+    </nav>
+
+    <div class="login-actions">
+        <th:block sec:authorize="not isAuthenticated()">
+            <a th:href="@{/member/join}">회원가입</a>
+            <a th:href="@{/member/login}" class="btn">로그인</a>
+        </th:block>
+
+        <th:block sec:authorize="isAuthenticated()">
+            <img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
+            <a th:href="@{/project/view}">프로젝트 관리</a>
+            <a th:href="@{/member/myPage}">마이페이지</a>
+            <a th:href="@{/member/logout}" class="btn">로그아웃</a>
+        </th:block>
+    </div>
+</header>
+
+<div class="container">
+    <div class="content">
+        <div class="sidebar">
+            <ul id="step-list">
+                <li class="active" data-target="section1">1. 프로젝트 제목</li>
+                <li data-target="section2">2. 업무범위</li>
+                <li data-target="section3">3. 카테고리</li>
+                <li data-target="section4">4. 이미지 업로드</li>
+                <li data-target="section5">5. 관련 기술</li>
+                <li data-target="section6">6. 상세업무 내용</li>
+                <li data-target="section7">7. 예산 및 일정</li>
+                <li data-target="section8">8. 모집 정보</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <form method="POST" action="/board/update" enctype="multipart/form-data">
+                <div id="section1" class="section">
+                    <h2>프로젝트 제목</h2>
+                    <div class="project-title-container">
+                        <input type="text" id="project-title" name="projectTitle" maxlength="30" placeholder="프로젝트 제목을 입력하세요" th:value="${board.projectBudget}">
+                    </div>
+                </div>
+
+                <div id="section2" class="section">
+                    <h2>범위</h2>
+                    <div class="scope-of-work">
+                        <div class="scope-option" onclick="toggleSelect(this)" data-scope="개발"
+                             th:classappend="${#lists.contains(board.selectedWorkScopes, '개발') ? 'selected' : ''}">
+                            <input type="checkbox" value="개발" th:checked="${#lists.contains(board.selectedWorkScopes, '개발')}">
+                            <img src="https://via.placeholder.com/50" alt="개발">
+                            <p>개발</p>
+                        </div>
+
+                        <div class="scope-option" onclick="toggleSelect(this)" data-scope="디자인"
+                             th:classappend="${#lists.contains(board.selectedWorkScopes, '디자인') ? 'selected' : ''}">
+                            <input type="checkbox" value="디자인" th:checked="${#lists.contains(board.selectedWorkScopes, '디자인')}">
+                            <img src="https://via.placeholder.com/50" alt="디자인">
+                            <p>디자인</p>
+                        </div>
+
+                        <div class="scope-option" onclick="toggleSelect(this)" data-scope="기획"
+                             th:classappend="${#lists.contains(board.selectedWorkScopes, '기획') ? 'selected' : ''}">
+                            <input type="checkbox" value="기획" th:checked="${#lists.contains(board.selectedWorkScopes, '기획')}">
+                            <img src="https://via.placeholder.com/50" alt="기획">
+                            <p>기획</p>
+                        </div>
+
+                        <div class="scope-option" onclick="toggleSelect(this)" data-scope="기타"
+                             th:classappend="${#lists.contains(board.selectedWorkScopes, '기타') ? 'selected' : ''}">
+                            <input type="checkbox" value="기타" th:checked="${#lists.contains(board.selectedWorkScopes, '기타')}">
+                            <img src="https://via.placeholder.com/50" alt="기타">
+                            <p>기타</p>
+                        </div>
+                        <input type="hidden" id="selectedWorkScopes" name="selectedWorkScopes" value="">
+                    </div>
+                </div>
+
+                <div id="section3" class="section">
+                    <!-- 카테고리 -->
+                    <h2>카테고리</h2>
+                    <div class="category-container">
+                        <div class="category-section">
+                            <p>해당하는 카테고리를 모두 선택해주세요.</p>
+                            <div class="category-buttons">
+                                <div class="category-btn" onclick="toggleCategory(this)" data-category="웹"
+                                     th:classappend="${#lists.contains(board.selectedCategories, '웹') ? 'selected' : ''}">웹</div>
+
+                                <div class="category-btn" onclick="toggleCategory(this)" data-category="안드로이드"
+                                     th:classappend="${#lists.contains(board.selectedCategories, '안드로이드') ? 'selected' : ''}">안드로이드</div>
+
+                                <div class="category-btn" onclick="toggleCategory(this)" data-category="iOS"
+                                     th:classappend="${#lists.contains(board.selectedCategories, 'iOS') ? 'selected' : ''}">iOS</div>
+
+                                <div class="category-btn" onclick="toggleCategory(this)" data-category="PC 프로그램"
+                                     th:classappend="${#lists.contains(board.selectedCategories, 'PC 프로그램') ? 'selected' : ''}">PC 프로그램</div>
+
+                                <div class="category-btn" onclick="toggleCategory(this)" data-category="임베디드"
+                                     th:classappend="${#lists.contains(board.selectedCategories, '임베디드') ? 'selected' : ''}">임베디드</div>
+
+                                <div class="category-btn" onclick="toggleCategory(this)" data-category="기타"
+                                     th:classappend="${#lists.contains(board.selectedCategories, '기타') ? 'selected' : ''}">기타</div>
+                            </div>
+                            <input type="hidden" id="selectedCategories" name="selectedCategories">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="section4" class="section">
+                    <!-- 이미지 업로드 -->
+                    <h2>프로젝트 이미지</h2>
+                    <div class="image-upload-section">
+                        <p>프로젝트 찾기 창에서 보일 프로젝트 대표 이미지를 넣어주세요. (최대 1개)</p>
+                        <br>
+                        <input type="file" name="projectImageFile" accept="image/png, image/jpeg">
+                    </div>
+                </div>
+                <script th:inline="javascript">
+                    var initialSelectedScopes = /*[[${board.selectedWorkScopes}]]*/ [];
+                    var initialSelectedCategories = /*[[${board.selectedCategories}]]*/ [];
+                    var initialSelectedTechs = /*[[${board.selectedSkills}]]*/ [];
+                </script>
+                <div id="section5" class="section">
+                    <input type="hidden" id="selectedSkills" name="selectedSkills">
+
+                    <!-- 관련 기술 선택 섹션 -->
+                    <div class="tech-section">
+                        <h2>관련 기술</h2>
+                        <p>프로젝트에서 활용될 기술에 대해 모두 선택해주세요.</p>
+                        <!-- 선택된 기술 표시 박스 -->
+                        <br>
+                        <div class="selected-techs" id="selected-techs">
+                            <!-- 선택한 기술들이 여기에 표시됩니다. -->
+                        </div>
+                        <div class="tech-buttons">
+                            <div class="tech-button" data-tech="Python" onclick="toggleTech(this)"
+                                 th:classappend="${#lists.contains(board.selectedSkills, 'Python') ? 'selected' : ''}">Python</div>
+
+                            <div class="tech-button" data-tech="Javascript" onclick="toggleTech(this)"
+                                 th:classappend="${#lists.contains(board.selectedSkills, 'Javascript') ? 'selected' : ''}">Javascript</div>
+
+                            <div class="tech-button" data-tech="JAVA" onclick="toggleTech(this)"
+                                 th:classappend="${#lists.contains(board.selectedSkills, 'JAVA') ? 'selected' : ''}">JAVA</div>
+
+                            <div class="tech-button" data-tech="C++" onclick="toggleTech(this)"
+                                 th:classappend="${#lists.contains(board.selectedSkills, 'C++') ? 'selected' : ''}">C++</div>
+
+                            <div class="tech-button" data-tech="iOS" onclick="toggleTech(this)"
+                                 th:classappend="${#lists.contains(board.selectedSkills, 'iOS') ? 'selected' : ''}">iOS</div>
+
+                            <div class="tech-button" data-tech="안드로이드" onclick="toggleTech(this)"
+                                 th:classappend="${#lists.contains(board.selectedSkills, '안드로이드') ? 'selected' : ''}">안드로이드</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="section6" class="section">
+                    <!-- 상세 업무 내용 섹션 -->
+                    <h2>상세업무 내용</h2>
+                    <div class="detail-section">
+                        <p>프로젝트와 관련된 상세한 내용들을 기입해주세요.</p>
+                        <br>
+                        <textarea id="detail-text" name="projectDescription" rows="5" maxlength="5000" placeholder="5000자 이내로 작성해주세요." th:text="${board.projectDescription}"></textarea>
+                        <p class="char-count" id="char-count">0 / 5000</p>
+                    </div>
+                </div>
+                <div id="section7" class="section">
+                    <h2>예산 및 일정</h2>
+                    <div class="budget-container">
+                        <!-- 지출 가능 예산 -->
+                        <div class="budget-item">
+                            <label for="budget">지출 가능 예산</label>
+                            <input type="text" id="budget" name="projectBudget" placeholder="300,000 ￦" th:value="${board.projectBudget}">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="flexible">
+                                <label for="flexible">입력한 예산에서 조율이 가능합니다.</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <!-- 프로젝트 시작일 -->
+                    <div class="budget-item">
+                        <label for="start-date">프로젝트 시작일</label>
+                        <input type="date" id="start-date" name="projectStartDate" th:value="${board.projectStartDate}">
+                    </div>
+                    <br>
+                    <!-- 프로젝트 종료일 -->
+                    <div class="budget-item">
+                        <label for="end-date">프로젝트 종료일</label>
+                        <input type="date" id="end-date" name="projectEndDate" th:value="${board.projectEndDate}">
+                    </div>
+                </div>
+
+                <div id="section8" class="section">
+                    <h2>모집 정보</h2>
+                    <div class="recruit-container">
+                        <!-- 모집 마감일 -->
+                        <div class="recruit-section">
+                            <label for="recruit_deadline">모집 마감일</label>
+                            <input type="datetime-local" id="recruit_deadline" name="recruitDeadline" th:value="${board.recruitDeadline}">
+                        </div>
+
+                        <!-- 모집 인원 -->
+                        <div class="recruit-section">
+                            <label>모집 인원</label>
+                            <div class="recruit-team-section">
+                                <select name="role"></select>
+                                <select name="category"></select>
+                                <input type="number" min="1" value="3" placeholder="명" name="teamSize[]">
+                                <span class="recruit-add-button" onclick="addTeamMember()">추가 +</span>
+
+                            </div>
+                            <div id="recruit-team-members"></div>
+                        </div>
+
+                        <!-- 사전 검증 질문 -->
+                        <div class="recruit-section">
+                            <label>사전 검증 질문</label>
+                            <div class="recruit-question-section">
+                                <input type="text" class="recruit-question-input" placeholder="사전 질문을 입력해주세요." name="question[]">
+                                <span class="recruit-add-button" onclick="addQuestion()">추가 +</span>
+                            </div>
+                            <!-- 추가되는 질문 필드가 여기에 표시됨 -->
+                            <div id="recruit-questions"></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button type="submit">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/board/updateForm.js}"></script>
+</body>
+</html>
