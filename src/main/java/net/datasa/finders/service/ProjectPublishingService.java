@@ -256,16 +256,146 @@ public class ProjectPublishingService {
                 .build();
     }
 
-    public void updateBoard(ProjectPublishingDTO projectPublishingDTO) {
-        // 수정된 데이터를 DB에 저장
-        ProjectPublishingEntity projectPublishingEntity = projectPublishingRepository.findById(projectPublishingDTO.getProjectNum()).orElseThrow();
+    public void updateBoard(ProjectPublishingDTO projectPublishingDTO,
+                            MultipartFile projectImageFile,
+                            String selectedSkills,
+                            String projectDescription,
+                            BigDecimal projectBudget,
+                            LocalDate projectStartDate,
+                            LocalDate projectEndDate,
+                            LocalDateTime recruitDeadline,
+                            List<String> roles,
+                            List<String> categories,
+                            List<Integer> teamSizes,
+                            List<String> questions) {
+        // 기존 프로젝트 엔티티 가져오기
+        ProjectPublishingEntity projectPublishingEntity = projectPublishingRepository.findById(projectPublishingDTO.getProjectNum())
+                .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다."));
+
+
+        // 선택한 기술 리스트 업데이트
+        projectPublishingDTO.setSelectedSkills(Arrays.asList(selectedSkills.split(",")));
+
+        // 이미지 Base64 인코딩 처리
+        String imageBase64 = null;
+        if (projectImageFile != null && !projectImageFile.isEmpty()) {
+            imageBase64 = convertToBase64(projectImageFile);  // Base64로 변환된 이미지
+            projectPublishingEntity.setProjectImage(imageBase64); // 이미지 업데이트
+        }
+
+        // 기존 프로젝트 엔티티 업데이트
         projectPublishingEntity.setProjectTitle(projectPublishingDTO.getProjectTitle());
-        projectPublishingEntity.setProjectDescription(projectPublishingDTO.getProjectDescription());
-        projectPublishingEntity.setProjectBudget(projectPublishingDTO.getProjectBudget());
-        // 필요하다면 더 많은 필드 추가
+        projectPublishingEntity.setRecruitDeadline(recruitDeadline);
+        projectPublishingEntity.setProjectStartDate(projectStartDate);
+        projectPublishingEntity.setProjectEndDate(projectEndDate);
+        projectPublishingEntity.setProjectBudget(projectBudget);
+        projectPublishingEntity.setProjectDescription(projectDescription);
+
+        // 프로젝트 엔티티 저장 (변경된 내용 반영)
         projectPublishingRepository.save(projectPublishingEntity);
+
+        // 관련 기술 업데이트 로직 (기존 기술 수정)
+        List<ProjectRequiredSkillEntity> existingSkills = skillRepository.findByProjectPublishingEntity(projectPublishingEntity);
+        updateOrSaveSkills(existingSkills, projectPublishingDTO.getSelectedSkills(), projectPublishingEntity);
+
+        // 모집 인원 업데이트 로직 (roles, categories, teamSizes 수정)
+        List<WorkScopeEntity> existingWorkScopes = workScopeRepository.findByProjectPublishingEntity(projectPublishingEntity);
+        updateOrSaveWorkScopes(existingWorkScopes, roles, teamSizes, projectPublishingEntity);
+
+        List<ProjectCategoryEntity> existingCategories = categoryRepository.findByProjectPublishingEntity(projectPublishingEntity);
+        updateOrSaveCategories(existingCategories, categories, teamSizes, projectPublishingEntity);
+
+        // 사전 질문 업데이트 로직 (기존 질문 수정)
+        List<PrequalificationQuestionEntity> existingQuestions = prequalificationQuestionRepository.findByProjectPublishingEntity(projectPublishingEntity);
+        updateOrSaveQuestions(existingQuestions, questions, projectPublishingEntity);
     }
 
+    private void updateOrSaveSkills(List<ProjectRequiredSkillEntity> existingSkills, List<String> newSkills, ProjectPublishingEntity projectPublishingEntity) {
+        for (int i = 0; i < newSkills.size(); i++) {
+            if (i < existingSkills.size()) {
+                existingSkills.get(i).setSkillText(newSkills.get(i)); // 기존 기술 수정
+            } else {
+                // 새로운 기술 추가
+                ProjectRequiredSkillEntity skillEntity = ProjectRequiredSkillEntity.builder()
+                        .projectPublishingEntity(projectPublishingEntity)
+                        .skillText(newSkills.get(i))
+                        .build();
+                skillRepository.save(skillEntity);
+            }
+        }
+        // 기존 리스트가 더 길면 남은 기존 항목 삭제
+        if (existingSkills.size() > newSkills.size()) {
+            for (int i = newSkills.size(); i < existingSkills.size(); i++) {
+                skillRepository.delete(existingSkills.get(i));
+            }
+        }
+    }
+
+    private void updateOrSaveWorkScopes(List<WorkScopeEntity> existingWorkScopes, List<String> roles, List<Integer> teamSizes, ProjectPublishingEntity projectPublishingEntity) {
+        for (int i = 0; i < roles.size(); i++) {
+            if (i < existingWorkScopes.size()) {
+                existingWorkScopes.get(i).setWorkType(roles.get(i));
+                existingWorkScopes.get(i).setRequiredNum(teamSizes.get(i));
+            } else {
+                WorkScopeEntity workScopeEntity = WorkScopeEntity.builder()
+                        .projectPublishingEntity(projectPublishingEntity)
+                        .workType(roles.get(i))
+                        .requiredNum(teamSizes.get(i))
+                        .build();
+                workScopeRepository.save(workScopeEntity);
+            }
+        }
+        // 기존 리스트가 더 길면 남은 기존 항목 삭제
+        if (existingWorkScopes.size() > roles.size()) {
+            for (int i = roles.size(); i < existingWorkScopes.size(); i++) {
+                workScopeRepository.delete(existingWorkScopes.get(i));
+            }
+        }
+    }
+
+    private void updateOrSaveCategories(List<ProjectCategoryEntity> existingCategories, List<String> categories, List<Integer> teamSizes, ProjectPublishingEntity projectPublishingEntity) {
+        for (int i = 0; i < categories.size(); i++) {
+            if (i < existingCategories.size()) {
+                existingCategories.get(i).setCategory(categories.get(i)); // 기존 카테고리 수정
+                existingCategories.get(i).setRequiredNum(teamSizes.get(i)); // 팀 사이즈 수정
+            } else {
+                // 새로운 카테고리 추가
+                ProjectCategoryEntity categoryEntity = ProjectCategoryEntity.builder()
+                        .projectPublishingEntity(projectPublishingEntity)
+                        .category(categories.get(i))
+                        .requiredNum(teamSizes.get(i))
+                        .build();
+                categoryRepository.save(categoryEntity);
+            }
+        }
+        // 기존 리스트가 더 길면 남은 기존 항목 삭제
+        if (existingCategories.size() > categories.size()) {
+            for (int i = categories.size(); i < existingCategories.size(); i++) {
+                categoryRepository.delete(existingCategories.get(i));
+            }
+        }
+    }
+
+    private void updateOrSaveQuestions(List<PrequalificationQuestionEntity> existingQuestions, List<String> newQuestions, ProjectPublishingEntity projectPublishingEntity) {
+        for (int i = 0; i < newQuestions.size(); i++) {
+            if (i < existingQuestions.size()) {
+                existingQuestions.get(i).setQuestionText(newQuestions.get(i)); // 기존 질문 수정
+            } else {
+                // 새로운 질문 추가
+                PrequalificationQuestionEntity questionEntity = PrequalificationQuestionEntity.builder()
+                        .projectPublishingEntity(projectPublishingEntity)
+                        .questionText(newQuestions.get(i))
+                        .build();
+                prequalificationQuestionRepository.save(questionEntity);
+            }
+        }
+        // 기존 리스트가 더 길면 남은 기존 항목 삭제
+        if (existingQuestions.size() > newQuestions.size()) {
+            for (int i = newQuestions.size(); i < existingQuestions.size(); i++) {
+                prequalificationQuestionRepository.delete(existingQuestions.get(i));
+            }
+        }
+    }
 
 //    public List<ClientReviewsEntity> getClientReviews(String clientId) {
 //        return clientReviewsRepository.findByClientId(clientId);

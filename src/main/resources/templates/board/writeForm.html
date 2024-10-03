@@ -17,6 +17,33 @@
 <body>
      <!-- Header Section -->
     <header>
+            <div class="logo">
+	        	<a href="/">
+					<img th:src="@{/images/wordmark-logo.png}" alt="Finders Logo">
+				</a>
+	        </div>
+            <nav>
+                <a th:href="@{/board/write}">프로젝트 등록</a>
+                <a th:href="@{/board/view}">프로젝트 찾기</a>
+                <a th:href="@{/find/view}">프리랜서 찾기</a>
+                <a th:href="@{/support/guide}">서비스 안내</a>
+                <a th:href="@{/myProject/view}">내 프로젝트 목록</a>
+                <a th:href="@{/webrtc}">미팅룸</a>
+            </nav>
+            
+            <div class="login-actions">
+	            <th:block sec:authorize="not isAuthenticated()">
+		           	<a th:href="@{/member/join}">회원가입</a>
+		       		<a th:href="@{/member/login}" class="btn">로그인</a>
+		   		</th:block>
+		
+		   		<th:block sec:authorize="isAuthenticated()">
+		   			<img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;"/>
+		   		    <a th:href="@{/project/view}">프로젝트 관리</a>
+		   		    <a th:href="@{/member/myPage}">마이페이지</a>
+		   			<a th:href="@{/member/logout}" class="btn">로그아웃</a>
+		   		</th:block>
+	        </div>
     </header>
 
     <!-- Navigation Menu -->
