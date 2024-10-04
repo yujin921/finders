@@ -89,20 +89,65 @@
     margin-bottom: 15px;
 }
 
+/* 체크박스 스타일 */
 .filters label {
-    display: block;
-    margin-bottom: 10px;
-    color: #666;
-    transition: color 0.3s ease;
-}
-
-.filters label:hover {
-    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    position: relative;
+    padding-left: 35px; /* 체크박스와 텍스트 사이의 간격 */
+    user-select: none;
+    color: #333;
+    transition: all 0.3s ease;
 }
 
 .filters input[type="checkbox"] {
-    margin-right: 10px;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
 }
+
+.filters .checkmark {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%); /* 체크박스가 수직 중앙에 위치하도록 조정 */
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid #999;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.filters input:checked + .checkmark {
+    background-color: #1ABC9C;
+    border-color: #1ABC9C;
+}
+
+.filters .checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 4px;
+    top: 1px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.filters input:checked + .checkmark::after {
+    display: block;
+}
+
+.filters label:hover .checkmark {
+    border-color: #1ABC9C;
+}
+
 
 /* Results Styles */
 #results {
@@ -110,28 +155,19 @@
 }
 
 #sort {
-    background-color: var(--card-bg);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 40px;
+    margin-bottom: 20px;
+    margin-right: 0;
+    margin-left: auto;
 }
 
-#sort button {
-    background-color: transparent;
-    border: 2px solid var(--primary-color);
-    color: var(--primary-color);
-    padding: 10px 20px;
-    margin-right: 15px;
+#sort select {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
     border-radius: 25px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
-}
-
-#sort button.active,
-#sort button:hover {
-    background-color: var(--primary-color);
-    color: white;
 }
 
 #partners {

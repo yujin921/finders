@@ -10,7 +10,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
 @Data
@@ -56,6 +55,4 @@ public class ProjectPublishingEntity {
 
     @Column(name = "project_create_date", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime projectCreateDate;
-
-
 }

@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.CalendarEventDTO;
 import net.datasa.finders.domain.dto.FunctionDTO;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
+import net.datasa.finders.domain.dto.FunctionTitleWithTaskIdDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
@@ -125,7 +126,7 @@ public class ProjectManagementController {
             String functionTitleName = taskDTO.getFunctionTitleName();
 
             // 서비스 계층에서 기능 제목과 업무 데이터 저장 처리
-            FunctionTitleDTO savedFunction = projectManagementService.saveFunctionAndTask(projectNum, functionTitleName, taskDTO);
+            FunctionTitleWithTaskIdDTO savedFunction = projectManagementService.saveFunctionAndTask(projectNum, functionTitleName, taskDTO);
 
             return ResponseEntity.ok(savedFunction);
         } catch (IllegalArgumentException e) {
@@ -252,14 +253,20 @@ public class ProjectManagementController {
     
     @ResponseBody
     @PostMapping("changeTaskStatus")
-    public ResponseEntity<String> changeTaskStatus(@RequestParam("taskId") Integer taskId, @RequestParam("taskStatus") TaskStatus status) {
+    public ResponseEntity<String> changeTaskStatus(
+            @RequestParam("taskId") Integer taskId, 
+            @RequestParam("taskStatus") TaskStatus status
+    ) {
         try {
-            projectManagementService.updateTaskStatus(taskId, status);
+            projectManagementService.updateTaskStatus(taskId, status); // 상태 변경 호출
             return ResponseEntity.ok("업무 상태가 성공적으로 변경되었습니다.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(404).body("업무를 찾을 수 없습니다: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("업무 상태 변경 실패: " + e.getMessage());
         }
     }
+
     
     @ResponseBody
     @GetMapping("getGanttChartData")
@@ -404,8 +411,8 @@ public class ProjectManagementController {
     
     @ResponseBody
     @GetMapping("notifications")
-    public Map<String, List<TaskNotificationsDTO>> getNotifications(@RequestParam("recipientId") String recipientId) {
-        return projectManagementService.getNotifications(recipientId);
+    public Map<String, List<TaskNotificationsDTO>> getNotifications(@RequestParam("recipientId") String recipientId, @RequestParam("projectNum") Integer projectNum) {
+        return projectManagementService.getNotifications(recipientId, projectNum);
     }
     
     @GetMapping("notification-subscribe")
@@ -418,6 +425,52 @@ public class ProjectManagementController {
     public void markNotificationAsRead(@RequestParam("notificationId") int notificationId) {
         projectManagementService.markNotificationAsRead(notificationId);
     }
+    
+    @ResponseBody
+    @PostMapping("sendNotificationToClient")
+    public ResponseEntity<String> sendNotification(
+            @RequestParam("message") String message,
+            @RequestParam("taskId") int taskId,
+            @AuthenticationPrincipal AuthenticatedUser user) {  // @AuthenticatedUser를 사용하여 ID를 가져옴
+
+    	// 로그 추가
+        log.debug("Received message!! :" + message);
+        log.debug("Received taskId!! :" + taskId);
+        log.debug("Received user!! :" + user);
+    	
+    	projectManagementService.sendNotificationToClient(message, taskId, user.getUsername());
+        return ResponseEntity.ok("알림 전송 완료");
+    }
+    
+    @GetMapping("getTaskTitle")
+    public ResponseEntity<String> getTaskTitle(@RequestParam("taskId") int taskId) {
+        String taskTitle = projectManagementService.getTaskTitle(taskId);
+        return ResponseEntity.ok(taskTitle);
+    }
+    
+    // 피드백 알림 전송
+    @ResponseBody
+    @PostMapping("sendNotificationToFreelancer")
+    public ResponseEntity<String> sendNotificationToFreelancer(
+            @RequestParam("message") String message,
+            @RequestParam("taskId") int taskId,
+            @AuthenticationPrincipal AuthenticatedUser user) {
+
+        // 로그 추가
+        log.debug("Received message!! :" + message);
+        log.debug("Received taskId!! :" + taskId);
+        log.debug("Received user!! :" + user);
+        
+        projectManagementService.sendNotificationToFreelancer(message, taskId, user.getUsername());
+        return ResponseEntity.ok("피드백 알림 전송 완료");
+    }
+    
+    @GetMapping("getTaskStatus")
+    public ResponseEntity<String> getTaskStatus(@RequestParam("taskId") int taskId) {
+        String taskStatus = projectManagementService.getTaskStatus(taskId);
+        return ResponseEntity.ok(taskStatus);
+    }
+    
     
     
 //    @GetMapping("/project/application-list")

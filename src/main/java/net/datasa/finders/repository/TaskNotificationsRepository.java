@@ -12,6 +12,6 @@ import net.datasa.finders.domain.entity.TaskNotificationsEntity;
 public interface TaskNotificationsRepository extends JpaRepository<TaskNotificationsEntity, Integer> {
 
 	// recipientId로 알림 목록을 찾는 메서드
-    List<TaskNotificationsEntity> findByRecipientId(MemberEntity recipient);
+    List<TaskNotificationsEntity> findByRecipient(MemberEntity recipient);
 
 }

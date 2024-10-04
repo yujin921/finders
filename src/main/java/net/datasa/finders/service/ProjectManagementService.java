@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.CalendarEventDTO;
 import net.datasa.finders.domain.dto.FunctionDTO;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
+import net.datasa.finders.domain.dto.FunctionTitleWithTaskIdDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
@@ -303,11 +304,14 @@ public class ProjectManagementService {
 
         taskManagementRepository.save(taskManagementEntity);
 
+        // taskId를 DTO에 설정
+        taskDTO.setTaskId(taskManagementEntity.getTaskId());
+        
         return taskDTO;
     }
 
     @Transactional
-    public FunctionTitleDTO saveFunctionAndTask(int projectNum, String functionTitleName, TaskManagementDTO taskDTO) {
+    public FunctionTitleWithTaskIdDTO saveFunctionAndTask(int projectNum, String functionTitleName, TaskManagementDTO taskDTO) {
         // 기능 제목이 새로 추가된 경우
         FunctionTitleDTO savedFunction;
         if (taskDTO.getFunctionTitleId() == null || taskDTO.getFunctionTitleId() <= 0) {
@@ -318,11 +322,12 @@ public class ProjectManagementService {
             // 기존 기능 선택
             savedFunction = new FunctionTitleDTO(taskDTO.getFunctionTitleId(), functionTitleName, "0%");
         }
-        
-        // 업무 저장
-        saveTask(projectNum, taskDTO);
 
-        return savedFunction;
+        // 업무 저장
+        TaskManagementDTO savedTask = saveTask(projectNum, taskDTO);
+
+        // 새로운 DTO 생성하여 반환
+        return new FunctionTitleWithTaskIdDTO(savedFunction, savedTask.getTaskId());
     }
     
     public List<FunctionTitleDTO> getAllFunctionTitles(int projectNum) {
@@ -431,9 +436,13 @@ public class ProjectManagementService {
     // 업무 상태 변경
     public void updateTaskStatus(Integer taskId, TaskStatus status) {
         TaskManagementEntity task = taskManagementRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("업무를 찾을 수 없습니다."));
-        
+                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+
+        // 상태 변경
         task.setTaskStatus(status);
+        
+        log.debug("업무 ID!! : " + taskId + ", 변경된 상태!! : " + status); // 로그 추가);
+        
         taskManagementRepository.save(task); // 상태 변경 후 저장
     }
 	
@@ -884,20 +893,38 @@ public class ProjectManagementService {
     }
 
     public TaskNotificationsDTO sendMessage(TaskNotificationsDTO notificationDTO) {
+    	log.debug("전송할 DTO!! : {}", notificationDTO);
+    	
+    	// 입력값 검증
+        if (notificationDTO.getSender() == null) {
+            throw new IllegalArgumentException("보낸 회원의 아이디가 null입니다.");
+        }
+        if (notificationDTO.getRecipient() == null) {
+            throw new IllegalArgumentException("받는 회원의 아이디가 null입니다.");
+        }
+        if (notificationDTO.getTask() == null) {
+            throw new IllegalArgumentException("업무 ID가 null입니다.");
+        }
+    	
         // 프리랜서 회원의 MemberEntity를 가져옴
-        MemberEntity sender = memberRepository.findById(notificationDTO.getSenderId())
+        MemberEntity sender = memberRepository.findById(notificationDTO.getSender())
                 .orElseThrow(() -> new EntityNotFoundException("보낸 회원의 아이디가 없습니다."));
 
         // 수신 회원의 MemberEntity를 가져옴
-        MemberEntity recipient = memberRepository.findById(notificationDTO.getRecipientId())
+        MemberEntity recipient = memberRepository.findById(notificationDTO.getRecipient())
                 .orElseThrow(() -> new EntityNotFoundException("받는 회원의 아이디가 없습니다."));
 
+        // 업무 ID를 가져오고 엔티티를 설정
+        TaskManagementEntity task = taskManagementRepository.findById(notificationDTO.getTask())
+                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+        
         // DTO를 엔티티로 변환하여 저장
         TaskNotificationsEntity notification = TaskNotificationsEntity.builder()
                 .notificationMessage(notificationDTO.getNotificationMessage())
                 .readStatus(false) // 기본값 설정
-                .senderId(sender) // 가져온 MemberEntity 설정
-                .recipientId(recipient) // 가져온 MemberEntity 설정
+                .sender(sender) // 가져온 MemberEntity 설정
+                .recipient(recipient) // 가져온 MemberEntity 설정
+                .task(task)
                 .createDate(LocalDateTime.now()) // 현재 시간 설정
                 .build();
 
@@ -908,7 +935,7 @@ public class ProjectManagementService {
         log.debug("저장된 알림 ID: {}", savedNotification.getNotificationId());
         
         // SseEmitter 전송
-        SseEmitter emitter = emitterMap.get(notificationDTO.getRecipientId());
+        SseEmitter emitter = emitterMap.get(notificationDTO.getRecipient());
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event().name("message").data(
@@ -919,41 +946,48 @@ public class ProjectManagementService {
                 log.error("메시지 전송 중 오류 발생: ", e);
             }
         } else {
-            log.warn("프리랜서 {}에 대한 SseEmitter가 등록되어 있지 않습니다.", notificationDTO.getRecipientId());
+            log.warn("프리랜서 {}에 대한 SseEmitter가 등록되어 있지 않습니다.", notificationDTO.getRecipient());
         }
 
         return TaskNotificationsDTO.fromEntity(savedNotification); // 알림 DTO 반환
     }
 
-    public Map<String, List<TaskNotificationsDTO>> getNotifications(String recipientId) {
+    public Map<String, List<TaskNotificationsDTO>> getNotifications(String recipientId, Integer projectNum) {
         MemberEntity recipient = memberRepository.findById(recipientId)
                 .orElseThrow(() -> new EntityNotFoundException("받는 회원의 아이디가 없습니다."));
 
-        List<TaskNotificationsEntity> notifications = taskNotificationsRepository.findByRecipientId(recipient);
-        
+        List<TaskNotificationsEntity> notifications = taskNotificationsRepository.findByRecipient(recipient);
+
+        // projectNum에 해당하는 알림만 필터링
+        List<TaskNotificationsEntity> filteredNotifications = notifications.stream()
+                .filter(notification -> notification.getTask().getProjectPublishingEntity().getProjectNum().equals(projectNum))
+                .collect(Collectors.toList());
+
         // 읽음과 안 읽음 알림을 구분
-        List<TaskNotificationsDTO> unreadNotifications = notifications.stream()
+        List<TaskNotificationsDTO> unreadNotifications = filteredNotifications.stream()
                 .filter(notification -> !notification.isReadStatus())
                 .map(notification -> {
                     TaskNotificationsDTO dto = new TaskNotificationsDTO();
                     dto.setNotificationId(notification.getNotificationId());
                     dto.setNotificationMessage(notification.getNotificationMessage());
                     dto.setReadStatus(notification.isReadStatus());
-                    dto.setSenderId(notification.getSenderId().getMemberId());
-                    dto.setRecipientId(recipient.getMemberId());
+                    dto.setSender(notification.getSender().getMemberId());
+                    dto.setRecipient(recipient.getMemberId());
+                    dto.setTask(notification.getTask().getTaskId());
                     dto.setCreateDate(notification.getCreateDate());
                     return dto;
                 }).collect(Collectors.toList());
 
-        List<TaskNotificationsDTO> readNotifications = notifications.stream()
+        List<TaskNotificationsDTO> readNotifications = filteredNotifications.stream()
                 .filter(TaskNotificationsEntity::isReadStatus)
                 .map(notification -> {
                     TaskNotificationsDTO dto = new TaskNotificationsDTO();
                     dto.setNotificationId(notification.getNotificationId());
                     dto.setNotificationMessage(notification.getNotificationMessage());
                     dto.setReadStatus(notification.isReadStatus());
-                    dto.setSenderId(notification.getSenderId().getMemberId());
-                    dto.setRecipientId(recipient.getMemberId());
+                    dto.setSender(notification.getSender().getMemberId());
+                    dto.setRecipient(recipient.getMemberId());
+                    dto.setTask(notification.getTask().getTaskId());
                     dto.setCreateDate(notification.getCreateDate());
                     return dto;
                 }).collect(Collectors.toList());
@@ -973,6 +1007,84 @@ public class ProjectManagementService {
         notification.setReadStatus(true); // 읽음으로 설정
         taskNotificationsRepository.save(notification);
     }
+    
+    // 기업 회원에게 알림 전송
+    public void sendNotificationToClient(String message, int taskId, String userId) {
+        // 기존 로직과 동일하게 알림 전송
+        TaskNotificationsEntity notification = new TaskNotificationsEntity();
+        notification.setNotificationMessage(message);
+        notification.setReadStatus(false);
+
+        // 알림을 보내는 회원 정보 (프리랜서 회원 ID 사용)
+        MemberEntity sender = memberRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+        notification.setSender(sender);
+
+        // 수신자 정보 가져오기 (업무 ID로 수신자 찾기)
+        TaskManagementEntity task = taskManagementRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+        
+        // 업무 ID 설정
+        notification.setTask(task);
+
+        // 프로젝트 정보를 통해 클라이언트 ID 가져오기
+        String clientId = task.getProjectPublishingEntity().getClientId().getMemberId();
+        MemberEntity recipient = memberRepository.findById(clientId)
+                .orElseThrow(() -> new EntityNotFoundException("클라이언트를 찾을 수 없습니다."));
+        notification.setRecipient(recipient);
+        
+        log.debug("notification 저장 체크용~!! : " + notification);
+        
+        log.debug("Sending notification to client Message: " + message + ", Task ID: " + taskId + ", Sender ID: " + userId);
+        log.debug("Recipient ID: " + clientId);
+        
+        // 알림 저장
+        taskNotificationsRepository.save(notification);
+    }
+
+	public String getTaskTitle(int taskId) {
+		TaskManagementEntity task = taskManagementRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+		
+        return task.getTaskTitle();
+	}
+
+	// 프리랜서에게 피드백 알림 전송
+    public void sendNotificationToFreelancer(String message, int taskId, String userId) {
+        // 알림 생성 로직
+        TaskNotificationsEntity notification = new TaskNotificationsEntity();
+        notification.setNotificationMessage(message);
+        notification.setReadStatus(false);
+
+        // 알림을 보내는 회원 정보 (프리랜서 ID 사용)
+        MemberEntity sender = memberRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("프리랜서를 찾을 수 없습니다."));
+        notification.setSender(sender);
+
+        // 수신자 정보 가져오기 (업무 ID로 수신자 찾기)
+        TaskManagementEntity task = taskManagementRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+
+        // 프로젝트 정보를 통해 프리랜서 ID 가져오기
+        String freelancerId = task.getMemberEntity().getMemberId(); // 프리랜서 ID를 직접 가져오는 로직이 필요합니다.
+        MemberEntity recipient = memberRepository.findById(freelancerId)
+                .orElseThrow(() -> new EntityNotFoundException("프리랜서를 찾을 수 없습니다."));
+        notification.setRecipient(recipient);
+
+        // 업무 ID 설정
+        notification.setTask(task);
+
+        // 알림 저장
+        taskNotificationsRepository.save(notification);
+    }
+
+	public String getTaskStatus(int taskId) {
+		// 업무 ID에 해당하는 업무를 조회
+		TaskManagementEntity task = taskManagementRepository.findById(taskId)
+            .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+        return task.getTaskStatus().toString(); // 업무 상태 반환
+	}
+
     
     
     // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Service 코드

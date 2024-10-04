@@ -1284,3 +1284,77 @@ h1 {
 .read {
     color: gray;
 }
+
+/* 피드백 모달 배경 스타일 */
+#unique-feedback-modal {
+    position: fixed; /* 고정 위치 */
+    top: 0;
+    left: 0;
+    width: 100%; /* 전체 화면 너비 */
+    height: 100%; /* 전체 화면 높이 */
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    display: none; /* 기본 상태를 숨김으로 설정 */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 다른 요소 위에 표시 */
+}
+
+/* 모달이 열릴 때 */
+#unique-feedback-modal.active {
+    display: flex; /* 모달이 열릴 때는 flex로 표시 */
+}
+
+/* 피드백 모달 내용 스타일 */
+#unique-feedback-modal .modal-content {
+    background-color: white; /* 흰색 배경 */
+    border-radius: 8px; /* 모서리 둥글게 */
+    padding: 20px; /* 내부 여백 */
+    width: 400px; /* 모달 너비 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+}
+
+/* 버튼 스타일 */
+#unique-feedback-modal .modal-buttons {
+    display: flex;
+    justify-content: space-between; /* 버튼 간격 조절 */
+    margin-top: 15px; /* 위쪽 여백 */
+}
+
+#unique-feedback-modal .btn-close, 
+#unique-feedback-modal .btn-save {
+    padding: 10px 15px; /* 버튼 패딩 */
+    border: none; /* 기본 테두리 제거 */
+    border-radius: 5px; /* 버튼 모서리 둥글게 */
+    cursor: pointer; /* 커서 모양 변경 */
+    width: 48%; /* 버튼 너비 조절 */
+}
+
+/* 취소 버튼 스타일 */
+#unique-feedback-modal .btn-close {
+    background-color: #e57373; /* 취소 버튼 색상 */
+    color: white; /* 텍스트 색상 */
+}
+
+/* 저장 버튼 스타일 */
+#unique-feedback-modal .btn-save {
+    background-color: #81c784; /* 저장 버튼 색상 */
+    color: white; /* 텍스트 색상 */
+}
+
+/* 버튼 hover 효과 */
+#unique-feedback-modal .btn-close:hover {
+    background-color: #c62828; /* 다크 레드 */
+}
+
+#unique-feedback-modal .btn-save:hover {
+    background-color: #388e3c; /* 다크 그린 */
+}
+
+/* 텍스트 영역 스타일 */
+#unique-feedback-modal textarea {
+    width: 100%; /* 전체 너비 */
+    border: 1px solid #ccc; /* 테두리 */
+    border-radius: 4px; /* 모서리 둥글게 */
+    resize: none; /* 크기 조절 비활성화 */
+    padding: 10px; /* 내부 여백 */
+}

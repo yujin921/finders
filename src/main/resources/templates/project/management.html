@@ -302,11 +302,25 @@
 	            <option value="INPROGRESS">진행</option>
 	            <option value="FEEDBACK">피드백</option>
 	            <option value="COMPLETED">완료</option>
+	            <option value="APPROVAL">승인</option>
 	            <option value="HOLD">보류</option>
 	        </select>
 	        <div class="modal-buttons">
 	            <button id="cancel-button" class="btn-cancel">취소</button>
 	            <button id="change-button" class="btn-change">변경</button>
+	        </div>
+	    </div>
+	</div>
+	
+	<!-- 피드백 Modal 창 -->
+	<div id="unique-feedback-modal" class="modal hidden">
+	    <div class="modal-content">
+	        <h3>피드백 작성</h3>
+	        <label for="unique-feedback-message">피드백 메시지:</label>
+	        <textarea id="unique-feedback-message" rows="4" required></textarea>
+	        <div class="modal-buttons">
+	            <button type="button" class="btn-close" id="close-feedback-modal">취소</button>
+	            <button type="button" class="btn-save" id="unique-feedback-submit-button">전송</button>
 	        </div>
 	    </div>
 	</div>
