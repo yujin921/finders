@@ -22,54 +22,83 @@
     <nav>
     </nav>
 
-    <!-- 새로 추가된 파트너스 찾기 섹션 -->
+    <!-- 새로 추가된 프리랜서 찾기 섹션 -->
     <main>
         <div class="container">
             <section class="main-search-section">
-            	<h1>파트너스 찾기</h1>
+            	<h1>프리랜서 찾기</h1>
 	            <div class="container">
 	                <div class="search-bar">
 	                    <input type="text" id="freelancerSearch" placeholder="프리랜서명을 입력하세요">
 	                    <button id="freelancerSearchBtn">검색</button>
 	                </div>
-	                <p class="partner-count"><span th:text="${countFreelancer}">130,049</span>명의 파트너스가 있습니다.</p>
+	                <p class="partner-count"><span th:text="${countFreelancer}">130,049</span>명의 프리랜서가 있습니다.</p>
 	            </div>
 	        </section>
             
             <div class="content-wrapper">
                 <aside class="filters">
-                    <h2>파트너스 필터</h2>
                     <section>
                         <h3>업무 범위</h3>
-                        <label><input type="checkbox" name="field" value="개발"> 개발</label>
-                        <label><input type="checkbox" name="field" value="디자인"> 디자인</label>
-                        <label><input type="checkbox" name="field" value="기획"> 기획</label>
-                        <label><input type="checkbox" name="field" value="기타"> 기타</label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="field" value="개발">
+                            <span class="checkmark"></span> 개발
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="field" value="디자인">
+                            <span class="checkmark"></span> 디자인
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="field" value="기획">
+                            <span class="checkmark"></span> 기획
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="field" value="기타">
+                            <span class="checkmark"></span> 기타
+                        </label>
                     </section>
                     <section>
                         <h3>업무 영역</h3>
-                        <label><input type="checkbox" name="area" value="웹"> 웹</label>
-                        <label><input type="checkbox" name="area" value="안드로이드"> 안드로이드</label>
-                        <label><input type="checkbox" name="area" value="iOS"> iOS</label>
-                        <label><input type="checkbox" name="area" value="PC프로그램"> PC프로그램</label>
-                        <label><input type="checkbox" name="area" value="임베디드"> 임베디드</label>
-                        <label><input type="checkbox" name="area" value="기타"> 기타</label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="area" value="웹">
+                            <span class="checkmark"></span> 웹
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="area" value="안드로이드">
+                            <span class="checkmark"></span> 안드로이드
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="area" value="iOS">
+                            <span class="checkmark"></span> iOS
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="area" value="PC프로그램">
+                            <span class="checkmark"></span> PC프로그램
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="area" value="임베디드">
+                            <span class="checkmark"></span> 임베디드
+                        </label>
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="area" value="기타">
+                            <span class="checkmark"></span> 기타
+                        </label>
                     </section>
                     <!-- 다른 필터 섹션들 추가 -->
                 </aside>
                 
                 <section id="results">
                     <div id="sort">
-                        <button class="active">기본 정렬순</button>
-                        <button>평점 높은순</button>
-                        <button>포트폴리오 많은순</button>
-                        <button>최근 업데이트순</button>
+                        <select onchange="sortFreelancers(this.value)">
+                            <option value="default">기본 정렬순</option>
+                            <option value="rating">평점 높은순</option>
+                            <option value="portfolio">포트폴리오 많은순</option>
+                        </select>
                     </div>
                     
                     <div id="partners">
-                        <!-- 파트너 카드들이 여기에 동적으로 추가됩니다 -->
+                        <!-- 프리랜서 카드들이 여기에 동적으로 추가됩니다 -->
                     </div>
-                    
                 </section>
             </div>
         </div>
