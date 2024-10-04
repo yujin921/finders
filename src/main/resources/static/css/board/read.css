@@ -321,7 +321,6 @@ button:hover {
 
 .skill-item {
     background-color: var(--icon-color);
-    color: white;
     padding: 10px 20px;
     border-radius: 20px;
     font-size: 0.9em;

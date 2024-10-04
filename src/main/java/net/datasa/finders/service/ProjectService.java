@@ -169,5 +169,11 @@ public class ProjectService {
 		
 		return projectDTOList;
 	}
+
+	public void applicationDeadline(int projectNum) {
+		ProjectPublishingEntity projectPublishingEntity = projectPublishingRepository.findByProjectNum(projectNum);
+		projectPublishingEntity.setProjectStatus(true);
+		projectPublishingRepository.save(projectPublishingEntity);
+	}
     
 }

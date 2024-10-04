@@ -2,8 +2,8 @@
  * 
  */
 
-
 $(document).ready(function() {
+	console.log($('.main-content').data('rolename'));
 	function showTab(tabName) {
 	        // 탭 활성화 상태 변경
 	        $('.tab').removeClass('active');
@@ -32,9 +32,9 @@ $(document).ready(function() {
 	                    `;
 	                    if(tabName === "완료된") {
 	                        projectListHtml += `<a href="/unifiedreview/writereview?projectNum=${project.projectNum}" class="btn btn-secondary">후기 작성</a>`;
-	                    }
+	                    } else if(tabName === "모집중" && $('.main-content').data('rolename') === "ROLE_CLIENT")
+							projectListHtml += `<a href="/project/applicationDeadline?projectNum=${project.projectNum}" class="btn btn-secondary" sec:authorize="hasRole('ROLE_CLIENT')">모집 마감</a>`
 	                    projectListHtml += `
-	                            
 	                        </li>
 	                    `;
 	                });
