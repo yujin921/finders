@@ -554,14 +554,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	        url: `notifications?recipientId=${recipientId}&projectNum=${projectNum}`, // projectNum 추가
 	        type: 'get',
 	        success: function(response) {
+	            // 알림 목록 비우기
 	            $('#notification-list').empty();
 
-				// 알림이 없는 경우 메시지 표시
+	            // 알림이 없는 경우 메시지 표시
 	            if (response.unread.length === 0 && response.read.length === 0) {
 	                $('#notification-list').append('<li>알림이 없습니다.</li>');
 	                return;
 	            }
-				
+	            
 	            // 읽음/안 읽음 알림 처리
 	            response.unread.forEach(function(notification) {
 	                const notificationItem = `<li>${notification.notificationMessage} (받은 시간: ${new Date(notification.createDate).toLocaleString()}) <button class="mark-as-read" data-id="${notification.notificationId}">안 읽음</button></li>`;
@@ -658,6 +659,19 @@ document.addEventListener('DOMContentLoaded', function() {
 	                            const formattedStartDate = formatDateTime(task.taskStartDate);
 	                            const formattedEndDate = formatDateTime(task.taskEndDate);
 
+								// 변경 버튼 활성화 조건
+								const changeButtonDisabled = 
+								    (userData.role === 'ROLE_CLIENT' && 
+								        (task.taskStatus === 'REQUEST' || 
+								         task.taskStatus === 'INPROGRESS' || 
+								         task.taskStatus === 'HOLD' || 
+								         task.taskStatus === 'APPROVAL')) || // 기업 회원 비활성화 조건
+								    (userData.role === 'ROLE_FREELANCER' && 
+								        (task.taskStatus === 'COMPLETED' || 
+								         task.taskStatus === 'APPROVAL' || 
+										 task.freelancerId !== userData.id)) // 프리랜서 회원 비활성화 조건
+								    ? 'disabled' : '';
+								
 	                            tbody.append(`
 	                                <tr class="task-row" data-task-id="${task.taskId}" data-task-status="${task.taskStatus}">
 	                                    <td style="text-align: center;">${task.taskTitle}</td>
@@ -668,7 +682,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                                    <td style="text-align: center;">${formattedEndDate}</td>
 	                                    <td style="text-align: center;">${task.freelancerId}</td>
 	                                    <td style="width: 100px; text-align: center;">
-	                                        <button class="btn-change-status" data-task-id="${task.taskId}" data-task-status="${task.taskStatus}" ${task.freelancerId === userData.id ? '' : 'disabled'}>변경</button>
+	                                        <button class="btn-change-status" data-task-id="${task.taskId}" data-task-status="${task.taskStatus}" ${changeButtonDisabled}>변경</button>
 	                                    </td>
 	                                </tr>
 	                            `);
@@ -719,7 +733,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	        options.push('COMPLETED', 'HOLD'); // 진행 중인 경우 완료 및 보류 선택
 	    } else if (currentStatus === 'HOLD') {
 	        options.push('INPROGRESS'); // 보류인 경우 진행 선택
-	    } else {
+	    } else if (currentStatus === 'COMPLETED') {
+			options.push('FEEDBACK', 'APPROVAL'); // 완료인 경우 피드백 및 승인 선택
+		} else if (currentStatus === 'FEEDBACK') {
+		    options.push('COMPLETED'); // 피드백인 경우 완료 선택
+		} else {
 	        options.push('INPROGRESS', 'HOLD'); // 그 외의 경우 진행 및 보류 선택
 	    }
 
@@ -737,9 +755,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	        modal.classList.add('hidden'); // 모달 숨김
 	    };
 
-	    // 변경 버튼 클릭 이벤트
+		// 변경 버튼 클릭 이벤트
 	    document.getElementById('change-button').onclick = () => {
-	        changeTaskStatus(taskId, statusSelect.value, modal); // 상태 변경 함수 호출
+	        const selectedStatus = statusSelect.value;
+	        if (selectedStatus === 'APPROVAL') {
+	            // 승인 선택 시 approveTask 호출
+	            approveTask(taskId, modal);
+	        } else {
+	            // 다른 상태 변경 시 changeTaskStatus 호출
+	            changeTaskStatus(taskId, selectedStatus, modal);
+	        }
 	    };
 
 	    modal.classList.remove('hidden'); // 모달 보이기
@@ -748,21 +773,27 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 업무 상태 변경 AJAX 요청 처리
 	function changeTaskStatus(taskId, newStatus, modal) {
 	    $.ajax({
-	        url: `changeTaskStatus?taskId=${taskId}&taskStatus=${newStatus}`, // 상태 변경 API 호출
+	        url: `changeTaskStatus?taskId=${taskId}&taskStatus=${newStatus}`,
 	        type: 'POST',
 	        contentType: 'application/json',
 	        success: function(response) {
 	            console.log('업무 상태 변경 성공:', response);
-	            alert('업무 상태가 변경되었습니다.');
 
-	            // UI에서 해당 업무 항목 업데이트 (상태 변경)
-	            $(`tr[data-task-id="${taskId}"] td:nth-child(3)`).text(newStatus); // 상태 열 업데이트
-
-	            // 캘린더 새로 고침
+	            // UI 업데이트
+	            updateTaskUI(taskId, newStatus);
 	            loadCalendar();
-	            
-	            // 알림 메시지 전송
-	            sendNotificationToClient(taskId, newStatus);
+
+	            // 알림 전송
+	            if (userData.role === 'ROLE_FREELANCER') {
+	                sendNotificationToClient(taskId, newStatus);
+	            } else if (userData.role === 'ROLE_CLIENT') {
+	                if (newStatus === 'FEEDBACK') {
+	                    openFeedbackModal(taskId);
+	                }
+	            }
+
+	            alert('업무 상태가 변경되었습니다.');
+	            loadNotifications(projectNum);
 
 	            // 모달 닫기
 	            if (modal) {
@@ -770,12 +801,17 @@ document.addEventListener('DOMContentLoaded', function() {
 	            }
 	        },
 	        error: function(xhr) {
-	            alert('업무 상태 변경에 실패했습니다: ' + xhr.responseText);
+	            alert('업무 상태 변경에 실패했습니다. 다시 시도해 주세요.');
 	            if (modal) {
-	                document.body.removeChild(modal); // 모달 닫기
+	                document.body.removeChild(modal);
 	            }
 	        }
 	    });
+	}
+
+	// UI 업데이트 함수
+	function updateTaskUI(taskId, newStatus) {
+	    $(`tr[data-task-id="${taskId}"] td:nth-child(3)`).text(newStatus); // 상태 열 업데이트
 	}
 
 	// 알림 메시지(프리랜서 진행, 보류, 완료로 업무 상태 선택 시에 해당) 전송 함수
@@ -796,7 +832,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                message = `${freelancerId}가 ${taskTitle} 업무를 보류하였습니다.`;
 	            } else if (newStatus === 'COMPLETED') {
 	                message = `${freelancerId}가 ${taskTitle} 업무를 완료하였습니다.`;
-	            }
+				}
 
 	            console.log("taskTitle 체크용!! : ", taskTitle);
 	                
@@ -818,6 +854,136 @@ document.addEventListener('DOMContentLoaded', function() {
 	        },
 	        error: function(xhr) {
 	            console.error('업무 제목을 가져오는 데 실패했습니다:', xhr.responseText);
+	        }
+	    });
+	}
+	
+	// 피드백 모달창 열기
+	function openFeedbackModal(taskId) {
+	    const feedbackModal = document.getElementById('unique-feedback-modal');
+	    
+	    // 업무 제목을 가져오기 위한 AJAX 요청
+	    $.ajax({
+	        url: `getTaskTitle?taskId=${taskId}`,
+	        type: 'GET',
+	        success: function(taskTitle) {
+	            feedbackModal.classList.add('active'); // 모달 열기
+
+	            const feedbackSubmitButton = document.getElementById('unique-feedback-submit-button');
+	            feedbackSubmitButton.onclick = function() {
+	                const feedbackMessage = document.getElementById('unique-feedback-message').value;
+	                if (feedbackMessage) {
+	                    $.ajax({
+	                        url: 'sendNotificationToFreelancer',
+	                        type: 'POST',
+	                        data: {
+	                            message: `업무(${taskTitle})에 대한 피드백이 도착했습니다.\n\n피드백 내용: ${feedbackMessage}`,
+	                            taskId: taskId
+	                        },
+	                        success: function() {
+	                            closeUniqueFeedbackModal();
+	                        },
+	                        error: function(xhr) {
+	                            console.error('피드백 알림 메시지 전송 실패:', xhr.responseText);
+	                        }
+	                    });
+	                } else {
+	                    closeUniqueFeedbackModal();
+	                }
+	            };
+	        },
+	        error: function(xhr) {
+	            console.error('업무 제목 가져오기 실패:', xhr.responseText);
+	            alert('업무 제목을 가져오는 데 실패했습니다.');
+	        }
+	    });
+	}
+
+	// 모달 닫기 함수
+	function closeUniqueFeedbackModal() {
+	    const feedbackModal = document.getElementById('unique-feedback-modal');
+	    feedbackModal.classList.remove('active'); // 모달 닫기
+	}
+	
+	// 취소 버튼 클릭 시 피드백 모달 닫기
+    $('#close-feedback-modal').on('click', function() {
+		closeUniqueFeedbackModal();
+    });
+	
+	// 모달 바깥 영역 클릭 시 모달 닫기
+    $('#unique-feedback-modal').on('click', function(event) {
+       if (event.target === this) { // 모달 바깥 영역(오버레이)을 클릭했을 때만 닫기
+          $(this).addClass('hidden').hide();
+       }
+    });
+
+	/*
+	// 피드백 확인 후 업무 완료
+	function completeTaskAfterFeedback(taskId) {
+	    // 업무 제목을 가져오기 위한 AJAX 요청
+	    $.ajax({
+	        url: `getTaskTitle?taskId=${taskId}`, // 업무 제목을 가져오는 API
+	        type: 'GET',
+	        success: function(taskTitle) {
+	            changeTaskStatus(taskId, 'FEEDBACK', null); // 상태 변경
+
+	            // 기업 회원에게 알림 전송
+	            $.ajax({
+	                url: 'sendNotificationToClient', // 알림 전송 API 경로
+	                type: 'POST',
+	                data: {
+	                    message: `피드백이 확인되었습니다. 업무(${taskTitle})를 보완 완료하였습니다.`,
+	                    taskId: taskId // 업무 ID도 함께 전송
+	                },
+	                success: function(response) {
+	                    console.log('업무 완료 알림 메시지 전송 성공:', response);
+	                },
+	                error: function(xhr) {
+	                    console.error('업무 완료 알림 메시지 전송 실패:', xhr.responseText);
+	                }
+	            });
+	        },
+	        error: function(xhr) {
+	            console.error('업무 제목 가져오기 실패:', xhr.responseText);
+	        }
+	    });
+	}
+	*/
+
+	let isNotificationSent = false; // 알림이 이미 전송되었는지 확인하는 플래그
+
+	function approveTask(taskId, modal) {
+	    // 상태 변경 요청 (항상 진행)
+	    changeTaskStatus(taskId, 'APPROVAL', modal);
+
+	    // 업무 제목을 가져오기 위한 AJAX 요청
+	    $.ajax({
+	        url: `getTaskTitle?taskId=${taskId}`,
+	        type: 'GET',
+	        success: function(taskTitle) {
+	            // 상태 변경 후에 알림을 한 번만 보냄
+	            if (!isNotificationSent) {
+	                isNotificationSent = true; // 알림 전송 플래그 설정
+
+	                // 승인 알림 전송
+	                $.ajax({
+	                    url: 'sendNotificationToFreelancer',
+	                    type: 'POST',
+	                    data: {
+	                        message: `업무(${taskTitle})가 최종 승인되었습니다.`,
+	                        taskId: taskId
+	                    },
+	                    success: function(response) {
+	                        console.log('업무 승인 알림 메시지 전송 성공:', response);
+	                    },
+	                    error: function(xhr) {
+	                        console.error('업무 승인 알림 메시지 전송 실패:', xhr.responseText);
+	                    }
+	                });
+	            }
+	        },
+	        error: function(xhr) {
+	            console.error('업무 제목 가져오기 실패:', xhr.responseText);
 	        }
 	    });
 	}

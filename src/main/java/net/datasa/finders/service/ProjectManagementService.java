@@ -440,6 +440,9 @@ public class ProjectManagementService {
 
         // 상태 변경
         task.setTaskStatus(status);
+        
+        log.debug("업무 ID!! : " + taskId + ", 변경된 상태!! : " + status); // 로그 추가);
+        
         taskManagementRepository.save(task); // 상태 변경 후 저장
     }
 	
@@ -1005,7 +1008,49 @@ public class ProjectManagementService {
         taskNotificationsRepository.save(notification);
     }
     
+    // 기업 회원에게 알림 전송
     public void sendNotificationToClient(String message, int taskId, String userId) {
+        // 기존 로직과 동일하게 알림 전송
+        TaskNotificationsEntity notification = new TaskNotificationsEntity();
+        notification.setNotificationMessage(message);
+        notification.setReadStatus(false);
+
+        // 알림을 보내는 회원 정보 (프리랜서 회원 ID 사용)
+        MemberEntity sender = memberRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+        notification.setSender(sender);
+
+        // 수신자 정보 가져오기 (업무 ID로 수신자 찾기)
+        TaskManagementEntity task = taskManagementRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+        
+        // 업무 ID 설정
+        notification.setTask(task);
+
+        // 프로젝트 정보를 통해 클라이언트 ID 가져오기
+        String clientId = task.getProjectPublishingEntity().getClientId().getMemberId();
+        MemberEntity recipient = memberRepository.findById(clientId)
+                .orElseThrow(() -> new EntityNotFoundException("클라이언트를 찾을 수 없습니다."));
+        notification.setRecipient(recipient);
+        
+        log.debug("notification 저장 체크용~!! : " + notification);
+        
+        log.debug("Sending notification to client Message: " + message + ", Task ID: " + taskId + ", Sender ID: " + userId);
+        log.debug("Recipient ID: " + clientId);
+        
+        // 알림 저장
+        taskNotificationsRepository.save(notification);
+    }
+
+	public String getTaskTitle(int taskId) {
+		TaskManagementEntity task = taskManagementRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+		
+        return task.getTaskTitle();
+	}
+
+	// 프리랜서에게 피드백 알림 전송
+    public void sendNotificationToFreelancer(String message, int taskId, String userId) {
         // 알림 생성 로직
         TaskNotificationsEntity notification = new TaskNotificationsEntity();
         notification.setNotificationMessage(message);
@@ -1020,10 +1065,10 @@ public class ProjectManagementService {
         TaskManagementEntity task = taskManagementRepository.findById(taskId)
                 .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
 
-        // 프로젝트 정보를 통해 클라이언트 ID 가져오기
-        String clientId = task.getProjectPublishingEntity().getClientId().getMemberId();
-        MemberEntity recipient = memberRepository.findById(clientId)
-                .orElseThrow(() -> new EntityNotFoundException("클라이언트를 찾을 수 없습니다."));
+        // 프로젝트 정보를 통해 프리랜서 ID 가져오기
+        String freelancerId = task.getMemberEntity().getMemberId(); // 프리랜서 ID를 직접 가져오는 로직이 필요합니다.
+        MemberEntity recipient = memberRepository.findById(freelancerId)
+                .orElseThrow(() -> new EntityNotFoundException("프리랜서를 찾을 수 없습니다."));
         notification.setRecipient(recipient);
 
         // 업무 ID 설정
@@ -1033,12 +1078,13 @@ public class ProjectManagementService {
         taskNotificationsRepository.save(notification);
     }
 
-	public String getTaskTitle(int taskId) {
+	public String getTaskStatus(int taskId) {
+		// 업무 ID에 해당하는 업무를 조회
 		TaskManagementEntity task = taskManagementRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
-		
-        return task.getTaskTitle();
+            .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+        return task.getTaskStatus().toString(); // 업무 상태 반환
 	}
+
     
     
     // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Service 코드

@@ -448,6 +448,29 @@ public class ProjectManagementController {
         return ResponseEntity.ok(taskTitle);
     }
     
+    // 피드백 알림 전송
+    @ResponseBody
+    @PostMapping("sendNotificationToFreelancer")
+    public ResponseEntity<String> sendNotificationToFreelancer(
+            @RequestParam("message") String message,
+            @RequestParam("taskId") int taskId,
+            @AuthenticationPrincipal AuthenticatedUser user) {
+
+        // 로그 추가
+        log.debug("Received message!! :" + message);
+        log.debug("Received taskId!! :" + taskId);
+        log.debug("Received user!! :" + user);
+        
+        projectManagementService.sendNotificationToFreelancer(message, taskId, user.getUsername());
+        return ResponseEntity.ok("피드백 알림 전송 완료");
+    }
+    
+    @GetMapping("getTaskStatus")
+    public ResponseEntity<String> getTaskStatus(@RequestParam("taskId") int taskId) {
+        String taskStatus = projectManagementService.getTaskStatus(taskId);
+        return ResponseEntity.ok(taskStatus);
+    }
+    
     
     
 //    @GetMapping("/project/application-list")
