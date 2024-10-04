@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>사용자 확인</title>
+    <link rel="stylesheet" th:href="@{/css/resetPw.css}">
 </head>
 <body>
     <div class="container">
-        <h1>비밀번호 재설정 - 사용자 확인</h1>
+        <h1>사용자 확인</h1>
         <form th:action="@{/member/verifyUser}" method="post">
             <div>
                 <label for="memberId">아이디:</label>

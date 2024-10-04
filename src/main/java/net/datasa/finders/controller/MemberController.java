@@ -246,7 +246,7 @@ public class MemberController {
         }
 
         if (memberService.resetPassword(memberId, newPassword)) {
-            return "redirect:/";
+            return "/member/loginForm";
         } else {
             model.addAttribute("error", "비밀번호 재설정에 실패했습니다.");
             return "/member/resetPassword";

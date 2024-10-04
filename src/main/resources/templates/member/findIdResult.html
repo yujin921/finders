@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>아이디 찾기 결과</title>
+    <link rel="stylesheet" th:href="@{/css/findId.css}">
 </head>
 <body>
     <div class="container">
         <h1>아이디 찾기 결과</h1>
-
-        <div th:if="${message}">
+        
+        <div th:if="${message}" class="message">
             <p th:text="${message}"></p>
         </div>
 
-        <div th:if="${error}">
-            <p th:text="${error}" class="error-message"></p>
+        <div th:if="${error}" class="errorMsg">
+            <p th:text="${error}"></p>
         </div>
-
-        <a th:href="@{/member/findId}">다시 시도하기</a>
+        <br>
+        <button th:onclick="'location.href=\'' + @{/member/findId} + '\''">다시 시도하기</button><br><br>
+        <button th:onclick="'location.href=\'' + @{/member/resetPw} + '\''">비밀번호 재설정</button><br><br>
+        <button th:onclick="'location.href=\'' + @{/member/loginForm} + '\''">로그인</button>
     </div>
 </body>
 </html>
