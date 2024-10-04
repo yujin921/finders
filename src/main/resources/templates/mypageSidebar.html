@@ -32,8 +32,8 @@
 		            <a href="/portfolio/create" class="add-page-link">+</a>
 		            </button></h2>
 		    <div class="sidebar-section">
-		        <ul th:each="portfolio : ${portfoliosList}">
-		            <li><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
+		        <ul>
+		            <li th:each="portfolio : ${portfoliosList}"><a th:href="@{/portfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a></li>
 		        </ul>
 		    </div>
 	    </div>

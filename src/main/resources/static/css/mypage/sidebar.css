@@ -71,7 +71,7 @@ a.add-page-link {
     background-color: #f4f5f7;
     color: #333;
     padding: 20px;
-    position: absolute;
+    margin: 20px;
     top: 160px;
     left: 20px;
     border-radius: 12px;
@@ -142,12 +142,4 @@ a.add-page-link {
     padding: 10px;
     font-size: 0.9rem;
     color: #666;
-}
-
-/* 메인 콘텐츠 여백 */
-main {
-    margin-left: 280px;
-    padding: 30px;
-    background-color: var(--background-color);
-    transition: margin-left 0.3s ease;
 }
