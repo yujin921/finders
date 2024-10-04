@@ -57,12 +57,5 @@ public class ProjectPublishingEntity {
     @Column(name = "project_create_date", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime projectCreateDate;
 
-    @OneToMany(mappedBy = "projectPublishingEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WorkScopeEntity> workScopes;
 
-    @OneToMany(mappedBy = "projectPublishingEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectRequiredSkillEntity> requiredSkills;
-
-    @OneToMany(mappedBy = "projectPublishingEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectCategoryEntity> categories;
 }

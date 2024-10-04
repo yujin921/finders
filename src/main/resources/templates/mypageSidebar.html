@@ -22,9 +22,9 @@
 	    <h2>프로젝트관리</h2>
 		<div class="sidebar-section">
 	        <ul>
-	            <li>VR 게임 프로젝트 활동</li>
-	            <li>2D 방탈출 게임</li>
-	            <li>강화학습 프로젝트</li>
+	            <li><a th:href="@{/project/myproject?status=모집중}">모집중 프로젝트</a></li>
+	            <li><a th:href="@{/project/myproject?status=진행중}">진행중 프로젝트</a></li>
+	            <li><a th:href="@{/project/myproject?status=완료된}">완료된 프로젝트</a></li>
 	        </ul>
 	    </div>
 	    <div sec:authorize="hasRole('ROLE_FREELANCER')">

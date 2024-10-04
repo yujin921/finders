@@ -42,5 +42,19 @@ public class ProjectController {
 	    model.addAttribute("projects", projects);
 	    return "/project/list";
 	}	
+	
+	@GetMapping("myproject")
+	public String myproject(@RequestParam("status") String status
+			,@AuthenticationPrincipal UserDetails userDetails, Model model) {
+		String memberId = userDetails.getUsername();
+		System.out.println("Authenticated Member ID: " + memberId); // 로그 추가
+		log.debug(status);
+		List<ProjectEntity> projects = projectService.getProjectsByMemberId(memberId);
+		System.out.println("Projects retrieved: " + projects.size()); // 조회된 프로젝트 수 확인
+		log.debug(status);
+		model.addAttribute("projects", projects);
+		model.addAttribute("status", status);
+		return "/project/myprojectList";
+	}	
 
 }

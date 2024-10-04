@@ -75,22 +75,22 @@
     <!-- 프로젝트 리스트 테이블 -->
     <table>
         <thead>
-        <tr>
-            <th>프로젝트 번호</th>
-            <th>프로젝트 이름</th>
-            <th>후기 작성</th>
-        </tr>
+	        <tr>
+	            <th>프로젝트 번호</th>
+	            <th>프로젝트 이름</th>
+	            <th>후기 작성</th>
+	        </tr>
         </thead>
         <tbody>
-    <tr th:each="project : ${projects}">
-        <td th:text="${project.projectNum}">1</td>
-        <td th:text="${project.projectName}">프로젝트 A</td>
-        <td>
-            <!-- 통합된 리뷰 작성/수정 버튼 -->
-            <a th:href="@{/unifiedreview/writereview(projectNum=${project.projectNum})}" class="button">후기 작성</a>
-        </td>
-    </tr>
-</tbody>
+		    <tr th:each="project : ${projects}">
+		        <td th:text="${project.projectNum}">1</td>
+		        <td th:text="${project.projectName}">프로젝트 A</td>
+		        <td>
+		            <!-- 통합된 리뷰 작성/수정 버튼 -->
+		            <a th:href="@{/unifiedreview/writereview(projectNum=${project.projectNum})}" class="button">후기 작성</a>
+		        </td>
+		    </tr>
+		</tbody>
     </table>
 </div>
 </body>
