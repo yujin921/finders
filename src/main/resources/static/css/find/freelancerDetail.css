@@ -14,7 +14,6 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
 }
 header {
     background-color: #3f51b5;
@@ -72,5 +71,168 @@ h1, h2, h3 {
     }
     .partner-stats span {
         margin-bottom: 10px;
+    }
+}
+
+/* 전체 레이아웃 */
+.container2 {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.main-content {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    width: 900px;
+}
+
+/* 프리랜서 헤더 스타일 */
+.freelancer-header {
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.header-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.freelancer-title {
+    font-size: 1.8em;
+    color: #2d3748;
+    margin: 0;
+}
+
+/* 프리랜서 메타 스타일 */
+.freelancer-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    color: #4a5568;
+}
+
+.meta-item i {
+    margin-right: 8px;
+    color: var(--secondary-color);
+}
+
+/* 스킬 섹션 스타일 */
+.skills-section {
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.skills-list {
+    display: flex;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skill-item {
+    background-color: var(--icon-color);
+    color: black;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.skill-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 포트폴리오 섹션 스타일 */
+.portfolio-section {
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.portfolio-item {
+    background-color: #f7fafc;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* 리뷰 섹션 스타일 */
+.review-section {
+    padding-bottom: 20px;
+}
+
+.review-item {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.review-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.rating i {
+    color: #d1d5db;
+}
+
+.rating .filled {
+    color: #f6ad55;
+}
+
+.review-body {
+    font-size: 1rem;
+    color: #4a5568;
+}
+
+/* 반응형 디자인 */
+@media screen and (max-width: 768px) {
+    .container2 {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .main {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .skills-list {
+        flex-direction: column;
+        align-items: center;
     }
 }

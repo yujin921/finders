@@ -3,27 +3,26 @@
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>아이디 찾기</title>
+<link rel="stylesheet" th:href="@{/css/findId.css}">
 </head>
 <body>
 	<div class="container">
 		<h1>아이디 찾기</h1>
 		<form th:action="@{/member/findId}" method="post">
-			<div>
-				<label for="name">이름:</label> <input type="text" id="memberName"
-					name="memberName" required>
-			</div>
-			<div>
-				<label for="email">이메일:</label> <input type="email" id="email"
-					name="email" required>
-			</div>
+			<label for="memberName">이름:</label>
+			<input type="text" id="memberName" name="memberName" required>
+			
+			<label for="email">이메일:</label>
+			<input type="email" id="email" name="email" required>
+			
 			<button type="submit">아이디 찾기</button>
 		</form>
-		<div th:if="${message}">
+		<div th:if="${message}" class="message">
 			<p th:text="${message}"></p>
 		</div>
-		<div th:if="${error}">
-			<p class="error-message" th:text="${error}"></p>
+		<div th:if="${error}" class="errorMsg">
+			<p th:text="${error}"></p>
 		</div>
 	</div>
 </body>

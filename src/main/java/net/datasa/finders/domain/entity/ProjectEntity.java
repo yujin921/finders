@@ -23,6 +23,9 @@ public class ProjectEntity {
 
     @Column(name = "project_title", nullable = false, length = 100)
     private String projectName;
+    
+    @Column(name = "project_status", columnDefinition = "tinyint(1) default 0")
+    private boolean projectStatus;
 
     // MemberEntity와의 다대다 관계 설정
     @ManyToMany
