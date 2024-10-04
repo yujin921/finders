@@ -523,6 +523,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	                success: function() {
 	                    alert('업무와 알림이 성공적으로 등록되었습니다.');
 
+						// 알림 목록 새로 로드
+						loadNotifications(projectNum);
+						
 	                    $('#task-modal').addClass('hidden').hide();
 	                    
 	                    // 알림을 ul에 추가
@@ -550,6 +553,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	function loadNotifications(projectNum) {
 	    const recipientId = userData.id;
 
+		// 기존 알림 목록 비우기
+		$('#notification-list').empty();
+		
 	    $.ajax({
 	        url: `notifications?recipientId=${recipientId}&projectNum=${projectNum}`, // projectNum 추가
 	        type: 'get',
@@ -708,7 +714,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                });
 	                
 	                // 상태 변경 버튼 클릭 이벤트
-	                $('.btn-change-status').on('click', function(event) {
+	                $('.btn-change-status').off('click').on('click', function(event) {
 	                    event.stopPropagation(); // 드롭다운이 열리는 것을 방지하기 위해 이벤트 전파 중지
 	                    const taskId = $(this).data('task-id');
 	                    const currentStatus = $(this).data('task-status');
@@ -723,51 +729,65 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	// 업무 상태 변경 모달 창 열기
-	function openStatusChangeModal(taskId, currentStatus) {
+	function openStatusChangeModal(taskId) {
 	    const modal = document.getElementById('status-change-modal');
 	    const statusSelect = document.getElementById('new-status');
 
-	    // 상태 선택 초기화
-	    const options = [];
-	    if (currentStatus === 'INPROGRESS') {
-	        options.push('COMPLETED', 'HOLD'); // 진행 중인 경우 완료 및 보류 선택
-	    } else if (currentStatus === 'HOLD') {
-	        options.push('INPROGRESS'); // 보류인 경우 진행 선택
-	    } else if (currentStatus === 'COMPLETED') {
-			options.push('FEEDBACK', 'APPROVAL'); // 완료인 경우 피드백 및 승인 선택
-		} else if (currentStatus === 'FEEDBACK') {
-		    options.push('COMPLETED'); // 피드백인 경우 완료 선택
-		} else {
-	        options.push('INPROGRESS', 'HOLD'); // 그 외의 경우 진행 및 보류 선택
-	    }
+	    // 현재 상태를 가져오기 위한 AJAX 요청
+	    $.ajax({
+	        url: 'getTaskStatus',
+	        type: 'GET',
+	        data: { taskId: taskId },
+	        success: function(currentStatus) {
+	            // 상태 선택 초기화
+	            statusSelect.innerHTML = ''; // 기존 옵션 제거
+	            
+	            // 상태 선택 초기화
+	            const options = [];
+	            if (currentStatus === 'INPROGRESS') {
+	                options.push('COMPLETED', 'HOLD'); // 진행 중인 경우 완료 및 보류 선택
+	            } else if (currentStatus === 'HOLD') {
+	                options.push('INPROGRESS'); // 보류인 경우 진행 선택
+	            } else if (currentStatus === 'COMPLETED') {
+	                options.push('FEEDBACK', 'APPROVAL'); // 완료인 경우 피드백 및 승인 선택
+	            } else if (currentStatus === 'FEEDBACK') {
+	                options.push('COMPLETED'); // 피드백인 경우 완료 선택
+	            } else {
+	                options.push('INPROGRESS', 'HOLD'); // 그 외의 경우 진행 및 보류 선택
+	            }
 
-	    // 옵션 설정
-	    statusSelect.innerHTML = ''; // 기존 옵션 제거
-	    options.forEach(option => {
-	        const opt = document.createElement('option');
-	        opt.value = option;
-	        opt.text = option;
-	        statusSelect.appendChild(opt);
-	    });
+	            // 옵션 설정
+	            options.forEach(option => {
+	                const opt = document.createElement('option');
+	                opt.value = option;
+	                opt.text = option;
+	                statusSelect.appendChild(opt);
+	            });
 
-	    // 취소 버튼 클릭 이벤트
-	    document.getElementById('cancel-button').onclick = () => {
-	        modal.classList.add('hidden'); // 모달 숨김
-	    };
+	            // 취소 버튼 클릭 이벤트
+	            document.getElementById('cancel-button').onclick = () => {
+	                modal.classList.add('hidden'); // 모달 숨김
+	            };
 
-		// 변경 버튼 클릭 이벤트
-	    document.getElementById('change-button').onclick = () => {
-	        const selectedStatus = statusSelect.value;
-	        if (selectedStatus === 'APPROVAL') {
-	            // 승인 선택 시 approveTask 호출
-	            approveTask(taskId, modal);
-	        } else {
-	            // 다른 상태 변경 시 changeTaskStatus 호출
-	            changeTaskStatus(taskId, selectedStatus, modal);
+	            // 변경 버튼 클릭 이벤트
+	            document.getElementById('change-button').onclick = () => {
+	                const selectedStatus = statusSelect.value;
+	                if (selectedStatus === 'APPROVAL') {
+	                    // 승인 선택 시 approveTask 호출
+	                    approveTask(taskId, modal);
+	                } else {
+	                    // 다른 상태 변경 시 changeTaskStatus 호출
+	                    changeTaskStatus(taskId, selectedStatus, modal);
+	                }
+	            };
+
+	            modal.classList.remove('hidden'); // 모달 보이기
+	        },
+	        error: function() {
+	            alert('업무 상태를 가져오는 데 실패했습니다.');
+	            modal.classList.add('hidden'); // 모달 숨김
 	        }
-	    };
-
-	    modal.classList.remove('hidden'); // 모달 보이기
+	    });
 	}
 
 	// 업무 상태 변경 AJAX 요청 처리
@@ -797,13 +817,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	            // 모달 닫기
 	            if (modal) {
-	                document.body.removeChild(modal);
+	                modal.classList.add('hidden'); // 모달 숨김
 	            }
 	        },
 	        error: function(xhr) {
 	            alert('업무 상태 변경에 실패했습니다. 다시 시도해 주세요.');
 	            if (modal) {
-	                document.body.removeChild(modal);
+	                modal.classList.add('hidden'); // 모달 숨김
 	            }
 	        }
 	    });
@@ -811,7 +831,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// UI 업데이트 함수
 	function updateTaskUI(taskId, newStatus) {
-	    $(`tr[data-task-id="${taskId}"] td:nth-child(3)`).text(newStatus); // 상태 열 업데이트
+	    const $taskRow = $(`tr[data-task-id="${taskId}"]`);
+	    $taskRow.find('td:nth-child(3)').text(newStatus); // 상태 열 업데이트
+
+	    // 상태에 따라 버튼 비활성화 처리
+	    const changeButton = $taskRow.find('.btn-change-status');
+	    const currentStatus = newStatus;
+
+	    const isFreelancer = userData.role === 'ROLE_FREELANCER';
+	    const isClient = userData.role === 'ROLE_CLIENT';
+
+	    // 변경 버튼 활성화 조건
+	    let changeButtonDisabled = false;
+
+	    if (isFreelancer) {
+	        // 프리랜서 조건
+	        if (currentStatus === 'INPROGRESS') {
+	            // INPROGRESS 상태일 경우 COMPLTED나 HOLD로 변경 가능
+	            changeButtonDisabled = false; // 활성화
+	        } else if (currentStatus === 'COMPLETED' || currentStatus === 'APPROVAL') {
+	            changeButtonDisabled = true; // 비활성화
+	        } else {
+	            changeButtonDisabled = 
+	                (currentStatus === 'REQUEST' || 
+	                 currentStatus === 'HOLD') ? true : false;
+	        }
+	    } else if (isClient) {
+	        // 기업 회원 조건
+	        if (currentStatus === 'FEEDBACK') {
+	            changeButtonDisabled = true; // 비활성화
+	        } else {
+	            changeButtonDisabled = 
+	                (currentStatus === 'REQUEST' || 
+	                 currentStatus === 'INPROGRESS' || 
+	                 currentStatus === 'HOLD' || 
+	                 currentStatus === 'APPROVAL') ? true : false;
+	        }
+	    }
+
+	    changeButton.prop('disabled', changeButtonDisabled); // 버튼 비활성화 설정
 	}
 
 	// 알림 메시지(프리랜서 진행, 보류, 완료로 업무 상태 선택 시에 해당) 전송 함수
