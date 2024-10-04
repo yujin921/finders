@@ -2,6 +2,8 @@
  * 
  */
 
+let freelancers = [];
+
 $(document).ready(function() {
 	loadPartners();	
 	$('input[type="checkbox"]').on("click", function() {
@@ -57,11 +59,11 @@ function loadPartners() {
         },
         dataType: 'json',
         success: function(response) {
-            console.log(response);
-            updatePartnerList(response);
+            freelancers = response;  // 프리랜서 목록을 전역 변수에 저장
+            updatePartnerList(freelancers);  // 기본 목록 업데이트
 			$('.partner-card').on('click', function() {
-					window.location.href="/find/freelancerDetail?memberId="+ $(this).attr('data');
-				});
+                window.location.href="/find/freelancerDetail?memberId="+ $(this).attr('data');
+            });
         },
         error: function(xhr, status, error) {
             console.error("파트너 데이터를 불러오는 데 실패했습니다:", error);
@@ -109,4 +111,22 @@ function createPartnerCard(partner) {
             </div>
         </div>
     `;
+}
+
+function sortFreelancers(sortType) {
+    let sortedFreelancers = [...freelancers];  // 원본 배열 복사
+
+    if (sortType === "rating") {
+        // 평점 높은 순으로 정렬
+        sortedFreelancers.sort((a, b) => b.totalRating - a.totalRating);
+    } else if (sortType === "portfolio") {
+        // 포트폴리오 많은 순으로 정렬
+        sortedFreelancers.sort((a, b) => b.totalPortfolios - a.totalPortfolios);
+    } else if (sortType === "default") {
+        // 기본 정렬: 불러온 데이터를 그대로 사용
+        sortedFreelancers = freelancers;  // 원본 데이터를 그대로 사용
+    }
+
+    // 정렬된 리스트 다시 표시
+    updatePartnerList(sortedFreelancers);
 }

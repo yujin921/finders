@@ -22,23 +22,23 @@
     <nav>
     </nav>
 
-    <!-- 새로 추가된 파트너스 찾기 섹션 -->
+    <!-- 새로 추가된 프리랜서 찾기 섹션 -->
     <main>
         <div class="container">
             <section class="main-search-section">
-            	<h1>파트너스 찾기</h1>
+            	<h1>프리랜서 찾기</h1>
 	            <div class="container">
 	                <div class="search-bar">
 	                    <input type="text" id="freelancerSearch" placeholder="프리랜서명을 입력하세요">
 	                    <button id="freelancerSearchBtn">검색</button>
 	                </div>
-	                <p class="partner-count"><span th:text="${countFreelancer}">130,049</span>명의 파트너스가 있습니다.</p>
+	                <p class="partner-count"><span th:text="${countFreelancer}">130,049</span>명의 프리랜서가 있습니다.</p>
 	            </div>
 	        </section>
             
             <div class="content-wrapper">
                 <aside class="filters">
-                    <h2>파트너스 필터</h2>
+                    <h2>프리랜서 필터</h2>
                     <section>
                         <h3>업무 범위</h3>
                         <label><input type="checkbox" name="field" value="개발"> 개발</label>
@@ -60,16 +60,16 @@
                 
                 <section id="results">
                     <div id="sort">
-                        <button class="active">기본 정렬순</button>
-                        <button>평점 높은순</button>
-                        <button>포트폴리오 많은순</button>
-                        <button>최근 업데이트순</button>
+                        <select onchange="sortFreelancers(this.value)">
+                            <option value="default">기본 정렬순</option>
+                            <option value="rating">평점 높은순</option>
+                            <option value="portfolio">포트폴리오 많은순</option>
+                        </select>
                     </div>
                     
                     <div id="partners">
-                        <!-- 파트너 카드들이 여기에 동적으로 추가됩니다 -->
+                        <!-- 프리랜서 카드들이 여기에 동적으로 추가됩니다 -->
                     </div>
-                    
                 </section>
             </div>
         </div>
