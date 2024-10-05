@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FindFreelancerDTO;
 import net.datasa.finders.domain.dto.FreelancerPortfoliosDTO;
-import net.datasa.finders.domain.dto.FreelancerReviewDTO;
+import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.FindService;
@@ -73,16 +73,14 @@ public class FindController {
   		
   	    FindFreelancerDTO findFreelancerDTO = findService.findFreelancerDetail(memberId);
   	    List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(memberId);
-  	    List<FreelancerReviewDTO> freelancerReviewDTOList = freelancerReviewService.findFreelancerReviewList(memberId);
+  	    List<FreelancerReviewsEntity> freelancerReviews = freelancerReviewService.getFreelancerReviewsByFreelanccerId(memberId);
   	    
   	    log.debug("프리랜서 DTO : {}",findFreelancerDTO);
   	    log.debug("포트폴리오 DTO : {}",freelancerPortfoliosDTOList);
-  	    log.debug("리뷰 DTO : {}",freelancerReviewDTOList);
-  	    
-  	    
+  	    log.debug("리뷰 DTO : {}",freelancerReviews);    
   	    model.addAttribute("findFreelancer", findFreelancerDTO);
   	    model.addAttribute("freelancerPortfoliosList", freelancerPortfoliosDTOList);
-  	    model.addAttribute("freelancerReviewList", freelancerReviewDTOList);
+  	    model.addAttribute("freelancerReviews", freelancerReviews);
   	    
   	    return "find/freelancerDetail"; // home.html 템플릿으로 이동
   	}

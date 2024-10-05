@@ -1,7 +1,6 @@
 package net.datasa.finders.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,23 +62,9 @@ public class FreelancerReviewService {
         freelancerReviewItemRepository.saveAll(reviewItems);
     }
 
-	public List<FreelancerReviewDTO> findFreelancerReviewList(String memberId) {
-		List<FreelancerReviewsEntity> freelancerReviewEntityList = freelancerReviewsRepository.findByreceivedId(memberId);
-		log.debug("{}",freelancerReviewEntityList);
-		
-		ArrayList<FreelancerReviewDTO> freelancerReviewDTOList = new ArrayList<>();
-		
-		for (FreelancerReviewsEntity freelancerReviewEntity : freelancerReviewEntityList) {
-			FreelancerReviewDTO freelancerReviewDTO = FreelancerReviewDTO.builder()
-					.rating(freelancerReviewEntity.getRating())
-					.sendId(freelancerReviewEntity.getSendId())
-					.comment(freelancerReviewEntity.getComment())
-//					.reviewItems(freelancerReviewEntity.getReviewItems())
-					.build();
-			freelancerReviewDTOList.add(freelancerReviewDTO);
-		}
-		
-		return freelancerReviewDTOList;
+	public List<FreelancerReviewsEntity> getFreelancerReviewsByFreelanccerId(String freelancerId) {
+        return freelancerReviewsRepository.findByreceivedId(freelancerId);
+
 	}
 	
     @Autowired

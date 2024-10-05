@@ -1,6 +1,6 @@
 
 .main-search-section {
-    padding: 50px 0;
+    padding: 20px 0;
     text-align: center;
 }
 
@@ -12,7 +12,7 @@
 
 
 .main-search-section .search-bar {
-    margin: 40px auto;
+    margin: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
