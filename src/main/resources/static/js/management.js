@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     console.log("projectNum 체크용: ", projectNum);
-
+	
 	// 페이지 로드 시 기본적으로 업무 목록 로드
 	loadTasks();
 
@@ -194,6 +194,57 @@ document.addEventListener('DOMContentLoaded', function() {
         taskTableBody.appendChild(newRow);
     }
 	*/
+	
+	let assignees = []; // AJAX로 불러온 데이터 저장할 배열
+
+	// "담당자" 입력란에 ID 입력 시 해당 프로젝트에 참여하는 프리랜서 ID 자동완성
+	function initializeAssigneeAutocomplete() {
+	    console.log('Initializing assignee autocomplete'); // 로그 추가
+
+	    console.log("User Data 체크용:", userData); // 확인용 로그
+	    console.log("User Role 체크용:", userData.role);
+	    console.log("User ID 체크용:", userData.id);
+
+	    // 담당자 입력란 초기화
+	    if (userData.role === 'ROLE_FREELANCER' && userData.id) {
+	        $('#task-assignee').val(userData.id); // 자신의 ID 설정
+	        $('#task-assignee').prop('readonly', true); // 읽기 전용으로 설정
+	        $('#task-assignee').css('background-color', '#f0f0f0'); // 배경색 변경
+	    } else {
+	        $('#task-assignee').prop('readonly', false); // 일반 사용자 경우 수정 가능
+	    }
+		
+		// 입력 필드 이벤트 핸들링
+		$('#task-assignee').on('input', function() {
+		    let value = $(this).val().toLowerCase();
+		    $('#autocomplete-list').empty(); // 이전 목록 비우기
+
+		    if (value) {
+		        let filteredAssignees = assignees.filter(assignee => assignee.id.toLowerCase().includes(value));
+		        console.log('Filtered Assignees:', filteredAssignees); // 필터링된 결과 로그
+
+		        filteredAssignees.forEach(assignee => {
+		            $('#autocomplete-list').append(`<div class="autocomplete-item">${assignee.id}</div>`);
+		        });
+		        $('#autocomplete-list').removeClass('hidden'); // 목록 보이기
+		    } else {
+		        $('#autocomplete-list').addClass('hidden'); // 입력이 없으면 목록 숨기기
+		    }
+		});
+
+		// 클릭 시 입력 필드에 값 설정
+		$(document).on('click', '.autocomplete-item', function() {
+		    $('#task-assignee').val($(this).text());
+		    $('#autocomplete-list').addClass('hidden'); // 목록 숨기기
+		});
+
+		// 입력 필드 밖 클릭 시 목록 숨기기
+		$(document).on('click', function(e) {
+		    if (!$(e.target).closest('#task-assignee').length) {
+		        $('#autocomplete-list').addClass('hidden');
+		    }
+		});
+	}
 
     // 업무 등록 버튼 클릭 시 모달 창 열기
     $('.add-task-buttons').on('click', function() {
@@ -216,8 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 		
 		// 자동완성 초기화 호출
-		initializeAssigneeAutocomplete();
-		
+		initializeAssigneeAutocomplete(); // 이 부분을 호출하여 자동완성 초기화
     });
 
     // 모달 닫기 버튼 클릭 시
@@ -231,8 +281,50 @@ document.addEventListener('DOMContentLoaded', function() {
 			$(this).addClass('hidden').hide();
 		}
 	});
+	
+	// 프리랜서 데이터를 불러오는 함수
+	function loadFreelancers() {
+	    $.ajax({
+	        url: 'freelancersInput?projectNum=' + projectNum,
+	        type: 'GET',
+	        dataType: 'json',
+	        success: function(data) {
+	            console.log("AJAX success, data:", data);
+	            // 프리랜서만 필터링
+	            assignees = data.filter(freelancer => freelancer.roleName === 'ROLE_FREELANCER')
+	                             .map(freelancer => ({
+	                id: freelancer.memberId,
+	                role: freelancer.roleName
+	            }));
+				
+				// 기존에 autocomplete가 초기화되어 있으면 파기
+	            if ($('#task-assignee').data('ui-autocomplete')) {
+	                $('#task-assignee').autocomplete('destroy'); // 이미 초기화된 경우 삭제
+	            }
+	            
+	            // 자동완성 설정
+	            $('#task-assignee').autocomplete({
+	                source: assignees.map(f => f.id), // 초기 데이터로 자동완성 목록 제공
+	                minLength: 1,
+	                select: function(event, ui) {
+	                    console.log("Selected value:", ui.item.value);
+	                    $('#task-assignee').val(ui.item.value); // 선택된 값 설정
+	                }
+	            });
 
-    console.log("projectNum 체크용: ", projectNum);
+	            console.log("Autocomplete initialized"); // 초기화 로그
+	        },
+	        error: function() {
+	            console.error("AJAX error");
+	        }
+	    });
+	}
+	
+	// "담당자" 입력란 클릭 시 프리랜서 데이터 로드
+	$('#task-assignee').on('focus', function() {
+	    console.log('Loading freelancers for autocomplete'); // 로그 추가
+		loadFreelancers(); // 프리랜서 데이터 로드
+	});
 
     // 기능 분류 목록 로드 함수
     function loadFunctionTitles(projectNum, isFirstTask) {
@@ -281,6 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
         funcTitleId = $(this).val();
     });
 	
+	/*
 	let assignees = []; // AJAX로 불러온 데이터 저장할 배열
 
 	// "담당자" 입력란에 ID 입력 시 해당 프로젝트에 참여하는 프리랜서 ID 자동완성
@@ -367,6 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        }
 	    });
 	}
+	*/
 
 	/*
 	// 폼 제출 이벤트 핸들러
@@ -1693,8 +1787,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	                console.log("data 체크용:", data);
 	                
-	                // 간트차트 생성 함수 호출
-	                createGanttChart(data);
+					if (data.length === 0) {
+	                    // 데이터가 없을 경우 메시지 표시
+	                    $('#gantt-chart').html('<p>업무 미등록으로 인한 간트차트 미생성(먼저 업무를 등록해주세요.)</p>');
+	                } else {
+	                    // 간트차트 생성 함수 호출
+	                    createGanttChart(data);
+	                }
 	            } else {
 	                alert('간트 차트 데이터를 로드하는 데 필요한 정보가 부족합니다.');
 	                console.error('잘못된 데이터:', response);
