@@ -3,6 +3,7 @@ package net.datasa.finders.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,12 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ClientDataDTO;
 import net.datasa.finders.domain.dto.ClientReviewDTO;
 import net.datasa.finders.domain.dto.FreelancerReviewDTO;
+import net.datasa.finders.domain.dto.UnifiedReviewDTO;
 import net.datasa.finders.domain.entity.MemberEntity;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.repository.MemberRepository;
 import net.datasa.finders.repository.ProjectPublishingRepository;
 import net.datasa.finders.service.ClientReviewService;
 import net.datasa.finders.service.FreelancerReviewService;
+import net.datasa.finders.service.MemberService;
 import net.datasa.finders.service.ReviewService;
 
 @Slf4j
@@ -41,7 +44,9 @@ public class UnifiedReviewController {
     private final ClientReviewService clientReviewService;
     private final ProjectPublishingRepository projectRepository;
     private final MemberRepository memberRepository;
-    
+    private final MemberService memberService;
+
+ 
     @GetMapping("/writereview")
     public String getWriteReviewPage(
             @RequestParam("projectNum") int projectNum,
@@ -130,18 +135,52 @@ public class UnifiedReviewController {
 
     @GetMapping("/latest")
     @ResponseBody
-    public List<Object> getLatestReviews() {
-        List<Object> combinedReviews = new ArrayList<>();
+    public List<UnifiedReviewDTO> getLatestReviews() {
+        List<UnifiedReviewDTO> combinedReviews = new ArrayList<>();
         
         // 클라이언트 리뷰 추가
         List<ClientReviewDTO> clientReviews = clientReviewService.getLatest20ClientReviews();
-        combinedReviews.addAll(clientReviews);
-        
+        for (ClientReviewDTO clientReview : clientReviews) {
+            // 로그로 작성자와 수신자 정보를 출력
+            System.out.println("Client Review - SendId: " + clientReview.getSendId() + ", ReceivedId: " + clientReview.getParticipantId());
+            
+            UnifiedReviewDTO reviewDTO = new UnifiedReviewDTO();
+            reviewDTO.setComment(clientReview.getComment());
+            reviewDTO.setRating(clientReview.getRating());
+            reviewDTO.setReviewerId(clientReview.getSendId()); // 작성자 ID
+            reviewDTO.setReviewDate(clientReview.getReviewDate()); // 날짜만 추출
+            reviewDTO.setRole("클라이언트");
+            reviewDTO.setReceivedId(clientReview.getParticipantId()); // 수신자 ID
+            
+            // 수신자의 프로필 이미지 조회
+            String recipientProfileImage = memberService.getProfileImageById(clientReview.getParticipantId());
+            reviewDTO.setProfileImg(recipientProfileImage);
+
+            combinedReviews.add(reviewDTO);
+        }
+
         // 프리랜서 리뷰 추가
         List<FreelancerReviewDTO> freelancerReviews = freelancerReviewService.getLatest20FreelancerReviews();
-        combinedReviews.addAll(freelancerReviews);
+        for (FreelancerReviewDTO freelancerReview : freelancerReviews) {
+            // 로그로 작성자와 수신자 정보를 출력
+            System.out.println("Freelancer Review - SendId: " + freelancerReview.getSendId() + ", ReceivedId: " + freelancerReview.getParticipantId());
 
-        
+            UnifiedReviewDTO reviewDTO = new UnifiedReviewDTO();
+            reviewDTO.setComment(freelancerReview.getComment());
+            reviewDTO.setRating(freelancerReview.getRating());
+            reviewDTO.setReviewerId(freelancerReview.getSendId()); // 작성자 ID
+            reviewDTO.setReviewDate(freelancerReview.getReviewDate()); // 날짜만 추출
+            reviewDTO.setRole("프리랜서");
+            reviewDTO.setReceivedId(freelancerReview.getParticipantId()); // 수신자 ID
+            
+            // 수신자의 프로필 이미지 조회
+            String recipientProfileImage = memberService.getProfileImageById(freelancerReview.getParticipantId());
+            reviewDTO.setProfileImg(recipientProfileImage);
+
+            combinedReviews.add(reviewDTO);
+        }
+
         return combinedReviews;
     }
+
 }
