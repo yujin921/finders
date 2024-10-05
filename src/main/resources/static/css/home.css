@@ -116,62 +116,66 @@ main .cta-btn:hover {
 
 .project-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 30px; /* 간격 증가 */
-    padding: 0 30px; /* 좌우 패딩 증가 */
-    max-width: 1400px; /* 최대 너비 증가 */
-    margin: 0 auto;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
 }
 
 .project-card {
     background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    padding: 25px; /* 패딩 증가 */
-    text-align: left;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 100%; /* 높이를 100%로 설정 */
+    height: 200px; /* 카드의 높이를 약간 줄임 */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
 }
 
 .project-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .project-card h3 {
-    color: var(--primary-color);
-    margin-bottom: 15px;
-    font-size: 1.4em; /* 글자 크기 증가 */
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.project-info-wrapper {
+    margin-top: auto;
+}
+
+.project-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.project-rating, .project-author {
+    color: #666;
     font-weight: bold;
 }
 
-.project-card p {
-    color: var(--text-color);
-    margin-bottom: 20px;
-    font-size: 1em; /* 글자 크기 증가 */
-    line-height: 1.5;
-    flex-grow: 1; /* 내용이 카드의 남은 공간을 채우도록 설정 */
+.project-budget, .project-deadline {
+    color: #4a4a4a;
+    text-align: right;
 }
 
-.project-card .btn {
-    background-color: var(--accent-color);
-    text-decoration: none;
-    color: #fff;
-    padding: 10px 20px; /* 버튼 크기 증가 */
-    border-radius: 25px;
-    font-size: 1em;
-    transition: background-color 0.3s ease, transform 0.2s;
-    align-self: flex-start;
-    display: inline-block;
+.project-rating {
+    color: #ffd700;
 }
 
-.project-card .btn:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-3px);
+.project-author, .project-deadline {
+    font-size: 0.9em;
 }
 
 /* 특징 섹션 스타일 */
@@ -220,7 +224,7 @@ main .cta-btn:hover {
 .project-card h3 {
     color: var(--primary-color);
     margin-bottom: 10px;
-    font-size : 1.4em;
+    font-size: 1.4em;
 }
 
 .project-card p {
