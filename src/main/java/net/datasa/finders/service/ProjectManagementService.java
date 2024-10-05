@@ -35,6 +35,7 @@ import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.dto.TaskNotificationsDTO;
+import net.datasa.finders.domain.dto.TaskResponseDTO;
 import net.datasa.finders.domain.dto.TeamDTO;
 import net.datasa.finders.domain.entity.CalendarEventEntity;
 import net.datasa.finders.domain.entity.FunctionTitleEntity;
@@ -960,37 +961,21 @@ public class ProjectManagementService {
 
         // projectNum에 해당하는 알림만 필터링
         List<TaskNotificationsEntity> filteredNotifications = notifications.stream()
-                .filter(notification -> notification.getTask().getProjectPublishingEntity().getProjectNum().equals(projectNum))
+                .filter(notification -> notification.getTask() != null && 
+                                       notification.getTask().getProjectPublishingEntity().getProjectNum().equals(projectNum) ||
+                                       notification.getTask() == null) // taskId가 null인 경우도 포함
                 .collect(Collectors.toList());
 
         // 읽음과 안 읽음 알림을 구분
         List<TaskNotificationsDTO> unreadNotifications = filteredNotifications.stream()
                 .filter(notification -> !notification.isReadStatus())
-                .map(notification -> {
-                    TaskNotificationsDTO dto = new TaskNotificationsDTO();
-                    dto.setNotificationId(notification.getNotificationId());
-                    dto.setNotificationMessage(notification.getNotificationMessage());
-                    dto.setReadStatus(notification.isReadStatus());
-                    dto.setSender(notification.getSender().getMemberId());
-                    dto.setRecipient(recipient.getMemberId());
-                    dto.setTask(notification.getTask().getTaskId());
-                    dto.setCreateDate(notification.getCreateDate());
-                    return dto;
-                }).collect(Collectors.toList());
+                .map(notification -> mapToDTO(notification, recipient))
+                .collect(Collectors.toList());
 
         List<TaskNotificationsDTO> readNotifications = filteredNotifications.stream()
                 .filter(TaskNotificationsEntity::isReadStatus)
-                .map(notification -> {
-                    TaskNotificationsDTO dto = new TaskNotificationsDTO();
-                    dto.setNotificationId(notification.getNotificationId());
-                    dto.setNotificationMessage(notification.getNotificationMessage());
-                    dto.setReadStatus(notification.isReadStatus());
-                    dto.setSender(notification.getSender().getMemberId());
-                    dto.setRecipient(recipient.getMemberId());
-                    dto.setTask(notification.getTask().getTaskId());
-                    dto.setCreateDate(notification.getCreateDate());
-                    return dto;
-                }).collect(Collectors.toList());
+                .map(notification -> mapToDTO(notification, recipient))
+                .collect(Collectors.toList());
 
         // 결과를 Map으로 반환
         Map<String, List<TaskNotificationsDTO>> result = new HashMap<>();
@@ -998,6 +983,19 @@ public class ProjectManagementService {
         result.put("read", readNotifications);
         
         return result;
+    }
+
+    // DTO 매핑을 위한 메서드 추가
+    private TaskNotificationsDTO mapToDTO(TaskNotificationsEntity notification, MemberEntity recipient) {
+        TaskNotificationsDTO dto = new TaskNotificationsDTO();
+        dto.setNotificationId(notification.getNotificationId());
+        dto.setNotificationMessage(notification.getNotificationMessage());
+        dto.setReadStatus(notification.isReadStatus());
+        dto.setSender(notification.getSender().getMemberId());
+        dto.setRecipient(recipient.getMemberId());
+        dto.setTask(notification.getTask() != null ? notification.getTask().getTaskId() : null); // taskId가 null인 경우 처리
+        dto.setCreateDate(notification.getCreateDate());
+        return dto;
     }
     
     public void markNotificationAsRead(int notificationId) {
@@ -1084,7 +1082,100 @@ public class ProjectManagementService {
             .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
         return task.getTaskStatus().toString(); // 업무 상태 반환
 	}
+	
+	// 업무 삭제 요청
+	public TaskResponseDTO requestDeleteTask(Integer taskId, String reason) {
+		TaskManagementEntity task = taskManagementRepository.findById(taskId)
+	            .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
 
+        // 업무 상태를 "DELETED_REQUEST"로 변경
+        task.setTaskStatus(TaskStatus.DELETED_REQUEST);
+        taskManagementRepository.save(task); // 상태 업데이트
+
+        // 알림 메시지 생성 및 저장
+        String notificationMessage = task.getMemberEntity().getMemberId() + "(이)가" + task.getTaskTitle() + " 업무 삭제를 요청하였습니다. \n\n사유: " + reason;
+
+        TaskNotificationsEntity notification = new TaskNotificationsEntity();
+        notification.setNotificationMessage(notificationMessage);
+        notification.setSender(task.getMemberEntity()); // 요청한 프리랜서 ID
+
+        // ProjectPublishingEntity에서 clientId 가져오기
+        MemberEntity client = task.getProjectPublishingEntity().getClientId();
+        notification.setRecipient(client); // 기업 회원 ID 설정
+
+        notification.setTask(task);
+        taskNotificationsRepository.save(notification);
+
+        // 응답 객체 생성
+        return TaskResponseDTO.builder()
+                .taskId(taskId)
+                .taskTitle(task.getTaskTitle())
+                .build();
+    }
+	
+	// 업무 삭제 승인 처리
+    public TaskResponseDTO approveDeleteTask(Integer taskId) {
+        TaskManagementEntity task = taskManagementRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+
+        // 알림 메시지 생성 및 저장
+        String notificationMessage = task.getTaskTitle() + " 업무의 삭제 요청이 승인되어 최종 삭제되었습니다.";
+
+        TaskNotificationsEntity notification = new TaskNotificationsEntity();
+        notification.setNotificationMessage(notificationMessage);
+        
+        // ProjectPublishingEntity에서 clientId 가져오기
+        MemberEntity client = task.getProjectPublishingEntity().getClientId();
+        notification.setSender(client); // 알림을 보내는 client ID
+        notification.setRecipient(task.getMemberEntity()); // 알림을 받는 프리랜서 ID
+
+        notification.setTask(task);
+        taskNotificationsRepository.save(notification);
+        
+        // 응답 객체 생성
+        TaskResponseDTO taskResponse = new TaskResponseDTO();
+        taskResponse.setTaskId(taskId);
+        taskResponse.setTaskTitle(task.getTaskTitle());
+        
+        // functionTitleId 저장
+        taskResponse.setFunctionTitleId(task.getFunctionTitleEntity().getFunctionTitleId()); // DTO에 functionTitleId 설정
+        
+        // 상태를 DELETED_APPROVED로 변경
+        task.setTaskStatus(TaskStatus.DELETED_APPROVED);
+        taskManagementRepository.delete(task); // 업무 삭제
+        
+        return taskResponse;
+    }
+
+    // 업무 삭제 거부 처리
+    public TaskResponseDTO denyDeleteTask(Integer taskId, String reason) {
+        TaskManagementEntity task = taskManagementRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("업무를 찾을 수 없습니다."));
+        
+        // 상태를 DELETED_DENIED로 변경
+        task.setTaskStatus(TaskStatus.DELETED_DENIED);
+        taskManagementRepository.save(task); // 상태 업데이트
+
+        // 알림 메시지 생성 및 저장
+        String notificationMessage = task.getMemberEntity().getMemberId() + "(이)가 " + task.getTaskTitle() + " 업무 삭제 요청이 거절되었습니다. \n\n사유: " + reason;
+
+        TaskNotificationsEntity notification = new TaskNotificationsEntity();
+        notification.setNotificationMessage(notificationMessage);
+        
+        // ProjectPublishingEntity에서 clientId 가져오기
+        MemberEntity client = task.getProjectPublishingEntity().getClientId();
+        notification.setSender(client); // 알림을 보내는 client ID
+        notification.setRecipient(task.getMemberEntity()); // 알림을 받는 프리랜서 ID
+
+        notification.setTask(task);
+        taskNotificationsRepository.save(notification);
+
+        // 응답 객체 생성
+        return TaskResponseDTO.builder()
+                .taskId(taskId)
+                .taskTitle(task.getTaskTitle())
+                .build();
+    }
     
     
     // 임시 리스트 화면 구현 시 기존 프로젝트 생성 페이지 Service 코드
