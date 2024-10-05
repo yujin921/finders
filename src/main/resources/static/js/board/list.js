@@ -1,12 +1,26 @@
 $(document).ready(function() {
    list();
+   $('#projectSearchBtn').on('click', function() {
+	list();
+   });
+
+   $('#projectSearch').on('keypress', function(e) {
+       if (e.which === 13) {  // Enter 키 누를 때
+       	list();
+       }
+   });
 });
 
 function list(sortValue = 'projectCreateDate,asc') {
+	
+	const searchTerm = $('#projectSearch').val().trim();
+	
     $.ajax({
         url: 'list',
         type: 'get',
-      data: { sort: sortValue },
+      data: { sort: sortValue
+		, word: searchTerm
+	   },
         success: function(list) {
          sortList(list, sortValue);
             $('#output').empty();

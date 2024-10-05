@@ -23,5 +23,7 @@ public interface ProjectPublishingRepository extends JpaRepository<ProjectPublis
 
 	List<ProjectPublishingEntity> findByClientIdAndProjectStatus(MemberEntity memberEntity, boolean b);
 
+	List<ProjectPublishingEntity> findByProjectTitleContainingOrProjectDescriptionContaining(String word, String word2);
+
 
 }

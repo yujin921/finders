@@ -9,6 +9,7 @@ import net.datasa.finders.domain.entity.*;
 import net.datasa.finders.repository.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -119,10 +120,10 @@ public class ProjectPublishingService {
         }
     }
    
-    public List<ProjectPublishingDTO> getList() {
+    public List<ProjectPublishingDTO> getList(String word) {
         
        Sort sort = Sort.by(Sort.Direction.DESC, "projectNum");
-       List<ProjectPublishingEntity> entityList = projectPublishingRepository.findAll(sort);
+       List<ProjectPublishingEntity> entityList = projectPublishingRepository.findByProjectTitleContainingOrProjectDescriptionContaining(word, word);
        List<ProjectPublishingDTO> dtoList = new ArrayList<>();
 
         for (ProjectPublishingEntity entity : entityList) {
