@@ -55,23 +55,24 @@ public class FindController {
   	    return "/find/view"; // home.html 템플릿으로 이동
   	}
   	
-  	
   	@GetMapping("freelancerDetail")
   	public String freelancerDetail(@RequestParam("memberId") String memberId, Model model, @AuthenticationPrincipal AuthenticatedUser user) {
   	    if (user != null) {
   	        // 현재 로그인한 사용자의 정보 가져오기
   	        String userId = user.getId();
+  	        
+  	        // MemberService를 통해 사용자의 정보 가져오기
   	        MemberEntity member = memberService.findByMemberId(userId);
   	        log.debug(member.getProfileImg());
   	        model.addAttribute("profileImgUrl", member.getProfileImg());
   	    }
-  	    
+
   	    // 프리랜서 세부 정보 및 포트폴리오, 리뷰 가져오기
   	    FindFreelancerDTO findFreelancerDTO = findService.findFreelancerDetail(memberId);
   	    List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(memberId);
   	    List<FreelancerReviewsEntity> freelancerReviews = freelancerReviewService.getFreelancerReviewsByFreelancerId(memberId);
 
-  	    
+
 
   	    // 모델에 데이터 추가
   	    model.addAttribute("findFreelancer", findFreelancerDTO);
@@ -80,5 +81,4 @@ public class FindController {
   	    
   	    return "find/freelancerDetail"; // 프리랜서 상세 페이지 템플릿으로 이동
   	}
-
 }

@@ -12,7 +12,10 @@
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 </head>
 <body>
-    <header></header>
+    <header>
+    </header>
+
+    <!-- Navigation Menu -->
     <nav class="top-nav"></nav>
 
     <div class="container2">
@@ -56,49 +59,26 @@
                         </h4>
                     </div>
                     <p th:if="${#lists.isEmpty(freelancerPortfoliosList)}">등록된 포트폴리오가 없습니다.</p>
-                </div> 
+                </div>
+
+                <div class="review-section">
+                    <h3>리뷰</h3>
+                    <div th:each="review : ${freelancerReviewList}" class="review-item">
+                        <div class="review-header">
+                            <div class="rating">
+                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                    <i th:class="${i <= review.rating ? 'fas fa-star filled' : 'fas fa-star'}"></i>
+                                </span>
+                                <span th:text="${review.rating}"></span>
+                            </div>
+                        </div>
+                        <div class="review-body">
+                            <p th:text="${review.comment}"></p>
+                        </div>
+                    </div>
+                    <p th:if="${#lists.isEmpty(freelancerReviewList)}">아직 리뷰가 없습니다.</p>
+                </div>
             </div>
-            
-            <div class = "main-content">
-				<div class="review-section">
-				    <h3>후기</h3>
-				    <div th:if="${not #lists.isEmpty(freelancerReviews)}">
-				        <div th:each="review : ${freelancerReviews}" class="review-item">
-				            <div class="review-header">
-				                <div class="review-info">
-				                    <div class="review-author">
-				                        <i class="fas fa-user"></i>
-				                        <span th:text="${review.sendId}"></span> <!-- 리뷰 작성자의 ID -->
-				                    </div>
-				                    <div class="review-date">
-				                        <i class="fas fa-calendar-alt"></i>
-				                        <span th:text="${#temporals.format(review.reviewDate, 'yyyy-MM-dd HH:mm')}"></span> <!-- 리뷰 날짜 -->
-				                    </div>
-				                </div>
-				                <div class="rating">
-				                    <span th:each="i : ${#numbers.sequence(1, 5)}">
-				                        <i th:class="${i <= review.rating ? 'fas fa-star filled' : 'fas fa-star'}"></i> <!-- 별점 -->
-				                    </span>
-				                    <span th:text="${review.rating}"></span> <!-- 평점 -->
-				                </div>
-				            </div>
-				            <div class="review-body">
-				                <p th:text="${review.comment}"></p> <!-- 리뷰 내용 -->
-				            </div>
-				            <div class="review-details">
-				                <h4>세부 평가</h4>
-				                <ul class="detail-list">
-				                    <li th:each="item : ${review.reviewItems}">
-				                        <i class="fas fa-check-circle"></i>
-				                        <span th:text="${item.itemName}"></span> <!-- 세부 평가 항목 이름 -->
-				                    </li>
-				                </ul>
-				            </div>
-				        </div>
-				    </div>
-				    <p th:if="${#lists.isEmpty(freelancerReviews)}">아직 이 프리랜서에 대한 후기가 없습니다.</p>
-				</div>
-			</div>
         </div>
     </div>
 
