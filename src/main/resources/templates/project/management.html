@@ -84,7 +84,7 @@
                     <li><span class="tab-link task-tab" data-tab="task-content">전체 업무</span></li>
                     <li><span class="tab-link gantt-tab" data-tab="gantt-content">간트차트</span></li>
                     <li><span class="tab-link calendar-tab" data-tab="calendar-content">캘린더</span></li>
-                    <li><span class="tab-link application-tab" data-tab="application-content">신청목록</span></li>
+                    <li><span sec:authorize="hasRole('ROLE_CLIENT')" class="tab-link application-tab" data-tab="application-content">신청목록</span></li>
                     <li><span class="tab-link team-tab" data-tab="team-content">팀원목록</span></li>
                     <li><span>임시저장</span></li>
                 </ul>
@@ -92,7 +92,7 @@
             <br>
             <br>
             <br>
-            <button class="btn-project" id="project-completion-button">프로젝트 완료</button>
+            <button sec:authorize="hasRole('ROLE_CLIENT')" class="btn-project" id="project-completion-button">프로젝트 완료</button>
             <button class="btn-project" id="project-review-button" style="display: none;">리뷰 작성</button>
             
         </aside>
