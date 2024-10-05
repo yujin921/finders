@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FreelancerReviewDTO;
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
 import net.datasa.finders.domain.entity.FreelancerReviewItemEntity;
 import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.repository.FreelancerReviewItemRepository;
@@ -63,24 +64,10 @@ public class FreelancerReviewService {
         freelancerReviewItemRepository.saveAll(reviewItems);
     }
 
-	public List<FreelancerReviewDTO> findFreelancerReviewList(String memberId) {
-		List<FreelancerReviewsEntity> freelancerReviewEntityList = freelancerReviewsRepository.findByreceivedId(memberId);
-		log.debug("{}",freelancerReviewEntityList);
-		
-		ArrayList<FreelancerReviewDTO> freelancerReviewDTOList = new ArrayList<>();
-		
-		for (FreelancerReviewsEntity freelancerReviewEntity : freelancerReviewEntityList) {
-			FreelancerReviewDTO freelancerReviewDTO = FreelancerReviewDTO.builder()
-					.rating(freelancerReviewEntity.getRating())
-					.sendId(freelancerReviewEntity.getSendId())
-					.comment(freelancerReviewEntity.getComment())
-//					.reviewItems(freelancerReviewEntity.getReviewItems())
-					.build();
-			freelancerReviewDTOList.add(freelancerReviewDTO);
-		}
-		
-		return freelancerReviewDTOList;
-	}
+    public List<FreelancerReviewsEntity> getFreelancerReviewsByFreelancerId(String freelancerId) {
+        // 클라이언트 ID를 기준으로 해당 클라이언트에 대한 모든 프로젝트 리뷰를 조회
+        return freelancerReviewsRepository.findByreceivedId(freelancerId);
+        }
 	
     @Autowired
     private FreelancerReviewsRepository freelancerReviewRepository;

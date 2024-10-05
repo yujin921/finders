@@ -283,6 +283,9 @@
 }
 
 
+.question-list{
+	margin-left : 20px;
+}
 /* 버튼 스타일 */
 button {
     background-color: #3182ce;

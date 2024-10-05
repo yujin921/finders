@@ -48,4 +48,7 @@ public class FreelancerReviewsEntity {
 	    @Column(name = "review_date", nullable = false)
 	    private LocalDateTime reviewDate;
 
-	    }
+	    
+	    @OneToMany(mappedBy = "freelancerReview", cascade = CascadeType.ALL, orphanRemoval = true)
+	    private List<FreelancerReviewItemEntity> reviewItems;  // 연결된 평가 항목들
+}

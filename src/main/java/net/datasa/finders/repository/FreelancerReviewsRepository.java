@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
 import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 
 public interface FreelancerReviewsRepository extends JpaRepository<FreelancerReviewsEntity,Integer>{
@@ -19,4 +20,5 @@ public interface FreelancerReviewsRepository extends JpaRepository<FreelancerRev
 
     List<FreelancerReviewsEntity> findTop20ByOrderByReviewDateDesc(); // 최신순 20개 조회
 
+    
 }
