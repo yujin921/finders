@@ -78,6 +78,16 @@ public class FindService {
 		return findFreelancerDTOList;
 	}
 	
+	public List<FindFreelancerDTO> allFindFreelancerList(String search) {
+		
+		List<MemberEntity> memberEntityList = memberRepository.findByRoleNameAndMemberIdContaining(RoleName.ROLE_FREELANCER, search);
+		log.debug("{}", memberEntityList);
+		List<FindFreelancerDTO> findFreelancerDTOList = new ArrayList<>();
+		memberEntityList.stream()
+		.map(memberEntity -> findFreelancerDetail(memberEntity.getMemberId()))
+		.forEach(findFreelancerDTOList::add);
+		return findFreelancerDTOList;
+	}
 
 
 	public FindFreelancerDTO findFreelancerDetail(String memberId) {

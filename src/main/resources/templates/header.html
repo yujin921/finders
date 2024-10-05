@@ -17,8 +17,8 @@
                 </a>
             </div>
             <div class="search-bar">
-                <input type="text" placeholder="프로젝트 또는 프리랜서 검색">
-                <button type="submit"><i class="fas fa-search"></i></button>
+                <input type="text" id="totalSearch" placeholder="프로젝트 또는 프리랜서 검색">
+                <button type="submit" id="totalSearchBtn"><i class="fas fa-search"></i></button>
             </div>
             <div class="login-actions">
                 <th:block sec:authorize="not isAuthenticated()">
@@ -36,4 +36,48 @@
     </div>
     
 </body>
+<script>
+$(document).ready(function() {
+	$('#totalSearchBtn').on('click', function() {
+		load();
+    });
+
+    $('#totalSearch').on('keypress', function(e) {
+        if (e.which === 13) {  // Enter 키 누를 때
+        	load();
+        }
+    });
+});
+
+function load() {
+	    const searchInput = $('#totalSearch').val().trim();
+	    
+	    if (validateSearchInput(searchInput)) {
+	        // 검색 실행
+	        console.log('검색 실행:', searchInput);
+	        var keyword = $('#totalSearch').val().trim();
+	    	
+	    	window.location.href="/totalSearch?keyword=" + keyword;
+	    } else {
+	        // 오류 메시지 표시
+	        alert('검색어에 허용되지 않는 문자가 포함되어 있습니다. 한글, 영문, 숫자만 사용해 주세요.');
+	    }
+	
+	
+	
+}
+
+function validateSearchInput(input) {
+    // 허용된 문자: 한글, 영문, 숫자, 공백
+    const allowedPattern = /^[가-힣a-zA-Z0-9\s]+$/;
+
+    if (allowedPattern.test(input)) {
+        return true; // 유효한 입력
+    } else {
+        return false; // 유효하지 않은 입력
+    }
+}
+
+
+</script>
 </html>
