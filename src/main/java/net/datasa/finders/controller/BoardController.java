@@ -45,8 +45,8 @@ public class BoardController {
 	
     @ResponseBody
     @GetMapping("list")
-    public List<ProjectPublishingDTO> list() {
-        List<ProjectPublishingDTO> list = projectPublishingService.getList();
+    public List<ProjectPublishingDTO> list(@RequestParam("word") String word) {
+        List<ProjectPublishingDTO> list = projectPublishingService.getList(word);
 
         for (ProjectPublishingDTO project : list) {
             // 프로젝트를 등록한 클라이언트의 평균 평점 구하기

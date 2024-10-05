@@ -45,7 +45,7 @@ function loadPartners() {
             return this.value;
         }).get();
     }
-    var searchTerm = $('#freelancerSearch').val().trim();
+    const searchTerm = $('#freelancerSearch').val().trim();
         
 
     // AJAX 요청
