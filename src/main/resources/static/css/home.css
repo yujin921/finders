@@ -160,12 +160,13 @@ main .cta-btn:hover {
     margin-bottom: 10px;
 }
 
-.project-rating, .project-author {
-    color: #666;
-    font-weight: bold;
+.project-budget {
+    color: #4a4a4a;
+    text-align: right;
+    margin-left: auto; /* 우측 정렬을 위해 추가 */
 }
 
-.project-budget, .project-deadline {
+.project-deadline {
     color: #4a4a4a;
     text-align: right;
 }
