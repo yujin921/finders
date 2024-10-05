@@ -30,13 +30,11 @@
             <form id="freelancer-update-form" th:action="@{/member/update/freelancer}" method="post" enctype="multipart/form-data">
 				<!-- 프로필 이미지 업로드 -->
 				<div class="profile-section">
-				    <label for="freelancer-profile-img">프로필 이미지</label>
+				    <label for="profile-img">프로필 이미지</label>
 				    <div class="profile-img-container">
-				        <input type="file" id="freelancer-profile-img" name="profileImg" 
-				        accept="image/*" onchange="previewImage(this, 'freelancer-preview')">
-				        
-				        <!-- 현재 프로필 이미지 미리보기 -->
-				        <img id="freelancer-preview" th:src="${profileImgUrl}" alt="프로필 이미지 미리보기" class="profile-preview">
+				        <img id="preview" th:src="${profileImgUrl}" alt="프로필 이미지 미리보기" class="profile-preview">
+				        <input type="file" id="profile-img" name="profileImg" 
+				               accept="image/*" onchange="previewImage(this, 'preview')">
 				    </div>
 				</div>
 				                <!-- 프리랜서 회원 기본 정보 -->
@@ -58,15 +56,15 @@
                 <input type="text" id="freelancer-phone" name="freelancerPhone" th:value="${member.freelancer.freelancerPhone}"><br>
                  
                 <!-- 카카오 확인 -->
+                <label for="freelancer-address">우편번호</label>
                 <input type="text" id="sample6_postcode" name="postalCode" placeholder="우편번호" readonly="readonly" th:value="${member.freelancer.postalCode}">
     			<input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
+
+                <label for="client-address">주소</label>
     			<input type="text" id="sample6_address" name="address" placeholder="주소" readonly="readonly" th:value="${member.freelancer.address}">
    				<input type="text" id="sample6_detailAddress" name="detailAddress" placeholder="상세주소" th:value="${member.freelancer.detailAddress}">
     			<input type="text" id="sample6_extraAddress" name="extraAddress" placeholder="참고항목" th:value="${member.freelancer.extraAddress}">
                 <!-- 카카오 확인 끝-->
-                
-                <label for="freelancer-country">체류 중인 국가</label>
-                <input type="text" id="freelancer-country" name="country" th:value="${member.freelancer.country}"><br>
                 
                 <div id="section5" class="section">
 				        <input type="hidden" id="selectedSkills" name="skills">
@@ -132,10 +130,15 @@
         <!-- client 수정 폼 -->
         <div sec:authorize="hasRole('ROLE_CLIENT')" id="client-update">
             <form id="client-update-form" th:action="@{/member/update/client}" method="post" enctype="multipart/form-data">
-                <label for="client-profile-img">프로필 이미지</label>
-                <input type="file" id="client-profile-img" name="profileImg"
-                accept="image/*" onchange="previewImage(this, 'client-preview')"><br>
-				<img id="client-preview" src="#" alt="프로필 이미지 미리보기" style="display:none; width:100px; height:100px; border-radius:50%;">
+                <div class="profile-section">
+                    <label for="profile-img">프로필 이미지</label>
+                        <div class="profile-img-container">
+                            <img id="preview" th:src="${profileImgUrl}" alt="프로필 이미지 미리보기" class="profile-preview">
+                            <input type="file" id="profile-img" name="profileImg"
+                                accept="image/*" onchange="previewImage(this, 'preview')">
+                        </div>
+                </div>
+
 
                 <h1>기본 정보</h1>
                 <!-- client 회원 기본 정보 -->
@@ -156,9 +159,12 @@
                 <label for="client-phone">연락처</label>
                 <input type="text" id="client-phone" name="clientPhone" th:value="${member.client.clientPhone}"><br>
                 <!-- 카카오 확인 -->
+                <label for="client-address">우편번호</label>
                 <input type="text" id="sample6_postcode_client" name="postalCode" placeholder="우편번호" readonly="readonly" th:value="${member.client.postalCode}">
     			<input type="button" onclick="sample6_execDaumPostcode_client()" value="우편번호 찾기"><br>
-    			<input type="text" id="sample6_address_client" name="address" placeholder="주소" readonly="readonly" th:value="${member.client.address}"><br>
+
+                <label for="client-address">주소</label>
+    			<input type="text" id="sample6_address_client" name="address" placeholder="주소" readonly="readonly" th:value="${member.client.address}">
    				<input type="text" id="sample6_detailAddress_client" name="detailAddress" placeholder="상세주소" th:value="${member.client.detailAddress}">
     			<input type="text" id="sample6_extraAddress_client" name="extraAddress" placeholder="참고항목" th:value="${member.client.extraAddress}">
                 <!-- 카카오 확인 끝-->

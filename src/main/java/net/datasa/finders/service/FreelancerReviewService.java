@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,4 +81,15 @@ public class FreelancerReviewService {
 		
 		return freelancerReviewDTOList;
 	}
+	
+    @Autowired
+    private FreelancerReviewsRepository freelancerReviewRepository;
+
+    public List<FreelancerReviewDTO> getLatest20FreelancerReviews() {
+        // Repository를 통해 최신 20개의 프리랜서 리뷰를 가져오는 로직
+        List<FreelancerReviewsEntity> freelancerReviews = freelancerReviewRepository.findTop20ByOrderByReviewDateDesc();
+        return freelancerReviews.stream()
+                .map(review -> new FreelancerReviewDTO(review))
+                .collect(Collectors.toList());
+    }
 }
