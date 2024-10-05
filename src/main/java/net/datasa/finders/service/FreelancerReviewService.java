@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FreelancerReviewDTO;
+import net.datasa.finders.domain.entity.ClientReviewsEntity;
 import net.datasa.finders.domain.entity.FreelancerReviewItemEntity;
 import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.repository.FreelancerReviewItemRepository;
@@ -62,10 +63,10 @@ public class FreelancerReviewService {
         freelancerReviewItemRepository.saveAll(reviewItems);
     }
 
-	public List<FreelancerReviewsEntity> getFreelancerReviewsByFreelanccerId(String freelancerId) {
+    public List<FreelancerReviewsEntity> getFreelancerReviewsByFreelancerId(String freelancerId) {
+        // 클라이언트 ID를 기준으로 해당 클라이언트에 대한 모든 프로젝트 리뷰를 조회
         return freelancerReviewsRepository.findByreceivedId(freelancerId);
-
-	}
+        }
 	
     @Autowired
     private FreelancerReviewsRepository freelancerReviewRepository;

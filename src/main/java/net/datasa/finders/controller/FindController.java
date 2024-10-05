@@ -1,16 +1,5 @@
 package net.datasa.finders.controller;
 
-import java.security.Principal;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FindFreelancerDTO;
@@ -22,6 +11,16 @@ import net.datasa.finders.service.FindService;
 import net.datasa.finders.service.FreelancerPortfoliosService;
 import net.datasa.finders.service.FreelancerReviewService;
 import net.datasa.finders.service.MemberService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.security.Principal;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -56,13 +55,10 @@ public class FindController {
   	    return "/find/view"; // home.html 템플릿으로 이동
   	}
   	
-  	
   	@GetMapping("freelancerDetail")
-  	public String freelancerDetail(@RequestParam("memberId") String memberId
-  			, Model model
-  			, @AuthenticationPrincipal AuthenticatedUser user) {
-  		if (user != null) {
-  	        // principal.getName()은 현재 로그인한 사용자의 username을 가져옴
+  	public String freelancerDetail(@RequestParam("memberId") String memberId, Model model, @AuthenticationPrincipal AuthenticatedUser user) {
+  	    if (user != null) {
+  	        // 현재 로그인한 사용자의 정보 가져오기
   	        String userId = user.getId();
   	        
   	        // MemberService를 통해 사용자의 정보 가져오기
@@ -70,18 +66,19 @@ public class FindController {
   	        log.debug(member.getProfileImg());
   	        model.addAttribute("profileImgUrl", member.getProfileImg());
   	    }
-  		
+
+  	    // 프리랜서 세부 정보 및 포트폴리오, 리뷰 가져오기
   	    FindFreelancerDTO findFreelancerDTO = findService.findFreelancerDetail(memberId);
   	    List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(memberId);
-  	    List<FreelancerReviewsEntity> freelancerReviews = freelancerReviewService.getFreelancerReviewsByFreelanccerId(memberId);
-  	    
-  	    log.debug("프리랜서 DTO : {}",findFreelancerDTO);
-  	    log.debug("포트폴리오 DTO : {}",freelancerPortfoliosDTOList);
-  	    log.debug("리뷰 DTO : {}",freelancerReviews);    
+  	    List<FreelancerReviewsEntity> freelancerReviews = freelancerReviewService.getFreelancerReviewsByFreelancerId(memberId);
+
+
+
+  	    // 모델에 데이터 추가
   	    model.addAttribute("findFreelancer", findFreelancerDTO);
   	    model.addAttribute("freelancerPortfoliosList", freelancerPortfoliosDTOList);
   	    model.addAttribute("freelancerReviews", freelancerReviews);
   	    
-  	    return "find/freelancerDetail"; // home.html 템플릿으로 이동
+  	    return "find/freelancerDetail"; // 프리랜서 상세 페이지 템플릿으로 이동
   	}
 }
