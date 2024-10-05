@@ -150,13 +150,22 @@ public class MemberController {
     @PostMapping("/update/freelancer")
     public String updateFreelancer(@ModelAttribute FreelancerDTO freelancerDTO,
     								@RequestParam("profileImg") MultipartFile profileImg,
+    								@RequestParam(value = "selectedField", required = false) String selectedFieldString,
+    								@RequestParam(value = "selectedCategory", required = false) String selectedCategoryString,
     								Model model) {
         try {
         	log.debug("{}",freelancerDTO);
+            if (selectedFieldString != null && !selectedFieldString.isEmpty()) {
+                freelancerDTO.setFields(Arrays.asList(selectedFieldString.split(",")));
+            }
+            if (selectedCategoryString != null && !selectedCategoryString.isEmpty()) {
+                freelancerDTO.setCategorys(Arrays.asList(selectedCategoryString.split(",")));
+            }
             memberService.updateFreelancer(freelancerDTO, profileImg, uploadPath);
             
             return "redirect:/";
         } catch (Exception e) {
+            log.debug("{}", freelancerDTO);
             model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
             return "redirect:/member/myPage";
         }

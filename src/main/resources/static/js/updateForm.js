@@ -40,9 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 선택한 기술들을 저장할 배열
     let selectedTechs = [];
-
-	let selectedField = [];
-	let selectedCategory = [];
+    let selectedField = [];
+    let selectedCategory = [];
+    let selectedFieldFreelancer = [];
+    let selectedCategoryFreelancer = [];
 
     // 기술 버튼 클릭 시 호출되는 함수
     window.toggleTech = function(element) {
@@ -81,6 +82,34 @@ document.addEventListener('DOMContentLoaded', function() {
       }
    }
 
+    // 프리랜서용 필드 토글 함수
+    window.toggleFieldFreelancer = function(element) {
+        const field = element.getAttribute('data-field');
+        element.classList.toggle('selected');
+      
+        const index = selectedFieldFreelancer.indexOf(field);
+        if (index === -1) {
+            selectedFieldFreelancer.push(field);
+        } else {
+            selectedFieldFreelancer.splice(index, 1);
+        }
+        document.getElementById('selectedFieldFreelancer').value = selectedFieldFreelancer.join(',');
+    }
+
+    // 프리랜서용 카테고리 토글 함수
+    window.toggleCategoryFreelancer = function(element) {
+        const category = element.getAttribute('data-category');
+        element.classList.toggle('selected');   
+      
+        const index = selectedCategoryFreelancer.indexOf(category);
+        if (index === -1) {
+            selectedCategoryFreelancer.push(category);
+        } else {
+            selectedCategoryFreelancer.splice(index, 1);
+        }
+        document.getElementById('selectedCategoryFreelancer').value = selectedCategoryFreelancer.join(',');
+    }
+
     // 회원가입 폼 제출 시 유효성 검사 수정
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function(event) {
@@ -95,20 +124,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('selectedSkills').value = selectedTechs.join(',');
             }
          
-         const isClientForm = this.id === 'client-update-form';
-         if (isClientForm && selectedField.length === 0) {
-            alert('최소 하나 이상의 관심 분야를 선택해야 합니다.');
-            event.preventDefault();
-         } else if (isClientForm) {
-            document.getElementById('selectedField').value = selectedField.join(',');
-         }
+            if (isFreelancerForm && selectedFieldFreelancer.length === 0) {
+                alert('최소 하나 이상의 관심 분야를 선택해야 합니다.');
+                event.preventDefault();
+            }
          
-         if (isClientForm && selectedCategory.length === 0) {
-            alert('최소 하나 이상의 관심 카테고리를 선택해야 합니다.');
-            event.preventDefault();
-         } else if (isClientForm) {
-            document.getElementById('selectedCategory').value = selectedCategory.join(',');
-         }
+            if (isFreelancerForm && selectedCategoryFreelancer.length === 0) {
+                alert('최소 하나 이상의 관심 카테고리를 선택해야 합니다.');
+                event.preventDefault();
+            }
+
+            const isClientForm = this.id === 'client-update-form';
+            // ... 기존 클라이언트 폼 검증 코드 ...
+        });
+    });
+
+    function toggleFieldFreelancer(button) {
+        button.classList.toggle('selected');
+        updateSelectedFieldsFreelancer();
+    }
+
+    function updateSelectedFieldsFreelancer() {
+        const selectedFields = Array.from(document.querySelectorAll('#section6-freelancer .field-button.selected'))
+            .map(button => button.getAttribute('data-field'));
+        document.getElementById('selectedFieldFreelancer').value = selectedFields.join(',');
+    }
+
+    function toggleCategoryFreelancer(button) {
+        button.classList.toggle('selected');
+        updateSelectedCategoriesFreelancer();
+    }
+
+    function updateSelectedCategoriesFreelancer() {
+        const selectedCategories = Array.from(document.querySelectorAll('#section7-freelancer .category-button.selected'))
+            .map(button => button.getAttribute('data-category'));
+        document.getElementById('selectedCategoryFreelancer').value = selectedCategories.join(',');
+    }
+
+    // 페이지 로드 시 이벤트 리스너 추가
+    document.addEventListener('DOMContentLoaded', function() {
+        // 기존 클라이언트용 이벤트 리스너
+        // ...
+
+        // 프리랜서용 이벤트 리스너
+        const freelancerFieldButtons = document.querySelectorAll('#section6-freelancer .field-button');
+        freelancerFieldButtons.forEach(button => {
+            button.addEventListener('click', () => toggleFieldFreelancer(button));
+        });
+
+        const freelancerCategoryButtons = document.querySelectorAll('#section7-freelancer .category-button');
+        freelancerCategoryButtons.forEach(button => {
+            button.addEventListener('click', () => toggleCategoryFreelancer(button));
         });
     });
 });

@@ -311,6 +311,14 @@ public class MemberService {
           
           updateFreelancerSkills(dto.getMemberId(), dto.getSkills());
 
+          // 추가: Field와 Category 업데이트
+          if (dto.getFields() != null && !dto.getFields().isEmpty()) {
+              updateClientField(dto.getMemberId(), dto.getFields());
+          }
+          if (dto.getCategorys() != null && !dto.getCategorys().isEmpty()) {
+              updateClientCategory(dto.getMemberId(), dto.getCategorys());
+          }
+
           freelancerRepository.save(freelancer);
           memberRepository.save(member);
       }
