@@ -27,4 +27,7 @@ public class FreelancerDTO {
 	String detailAddress;
 	String extraAddress;
 	List<String> skills;
+	
+	private List<String> fields;
+	private List<String> categorys;
 }

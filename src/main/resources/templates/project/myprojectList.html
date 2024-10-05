@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Finders</title>
+    <link rel="stylesheet" th:href="@{/css/primary.css}">
+    <link rel="stylesheet" th:href="@{/css/myproject/myprojectList.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script th:src="@{/js/myproject/myprojectList.js}"></script>
+</head>
+<body>
+	<header></header>
+	<nav></nav>
+	<div class="main-container">
+		<aside class="sidebar"></aside>
+	    <main>
+	        <div class="main-content" th:data-status="${status}" th:data-rolename="${userRoleName}">
+	            <div class="tabs">
+	                <div class="tab" data-tab="모집중">모집중 프로젝트</div>
+	                <div class="tab" data-tab="진행중">진행중 프로젝트</div>
+	                <div class="tab" data-tab="완료된">완료된 프로젝트</div>
+	            </div>
+	            <div class="content">
+	                <h2 id="tabTitle">모집중 프로젝트</h2>
+	                <ul class="project-list" id="projectList">
+	                    <!-- 프로젝트 목록이 여기에 동적으로 추가됩니다 -->
+	                </ul>
+	            </div>
+	        </div>
+    	</main>
+	</div>
+	<footer></footer>
+	<div id="chat-container"></div>
+</body>
+<script>
+$(document).ready(function () {
+    $("#chat-container").load("/chat/view", function () {
+        // 외부 스타일시트 처리
+        $("#chat-container link[rel='stylesheet']").each(function() {
+            var href = $(this).attr('href');
+            $.get(href, function(css) {
+                var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+                $('<style>').text(modifiedCss).appendTo('head');
+            });
+            $(this).remove(); // 원래의 link 태그 제거
+        });
+
+        // 인라인 스타일 처리
+        $("#chat-container style").each(function() {
+            var css = $(this).text();
+            var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+            $(this).text(modifiedCss);
+        });
+    });
+    
+    $('header').load("/header", function () {
+    	});
+    $('nav').load("/nav", function () {
+	});
+    $('footer').load("/footer", function () {
+	});
+    $('aside').load("/aside", function () {
+	});    
+});
+
+</script>
+</html>

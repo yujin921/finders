@@ -91,8 +91,39 @@
 				        </div>
 					</div>
                 
+                <!-- 프리랜서용 관심 분야 선택 섹션 추가 -->
+                <div id="section6-freelancer" class="section">
+                    <input type="hidden" id="selectedFieldFreelancer" name="selectedField">
+                    <div class="field-section">
+                        <h2>관심 분야</h2>
+                        <p>관심 있는 업무 분야를 선택할 수 있습니다.(최소 1개 이상)</p>
+                        <div class="field-buttons">
+                            <div class="field-button" data-field="개발" onclick="toggleFieldFreelancer(this)">개발</div>
+                            <div class="field-button" data-field="디자인" onclick="toggleFieldFreelancer(this)">디자인</div>
+                            <div class="field-button" data-field="기획" onclick="toggleFieldFreelancer(this)">기획</div>
+                            <div class="field-button" data-field="기타" onclick="toggleFieldFreelancer(this)">기타</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 프리랜서용 관심 카테고리 선택 섹션 추가 -->
+                <div id="section7-freelancer" class="section">
+                    <input type="hidden" id="selectedCategoryFreelancer" name="selectedCategory">
+                    <div class="category-section">
+                        <h2>관심 카테고리</h2>
+                        <p>관심 있는 카테고리를 선택할 수 있습니다.(최소 1개 이상)</p>
+                        <div class="category-buttons">
+                            <div class="category-button" data-category="Web" onclick="toggleCategoryFreelancer(this)">Web</div>
+                            <div class="category-button" data-category="안드로이드" onclick="toggleCategoryFreelancer(this)">안드로이드</div>
+                            <div class="category-button" data-category="iOS" onclick="toggleCategoryFreelancer(this)">iOS</div>
+                            <div class="category-button" data-category="PC프로그램" onclick="toggleCategoryFreelancer(this)">PC프로그램</div>
+                            <div class="category-button" data-category="임베디드" onclick="toggleCategoryFreelancer(this)">임베디드</div>
+                            <div class="category-button" data-category="기타" onclick="toggleCategoryFreelancer(this)">기타</div>
+                        </div>
+                    </div>
+                </div>
                 
-                <button type="submit">회원 정보 수정</button>
+                    <button class="submit-button" type="submit" >회원 정보 수정</button>
                 <div class="errorMsg" th:if="${param.error}"><script>alert('회원가입에 실패했습니다.')</script></div>
             </form>
             
@@ -140,8 +171,8 @@
                 <label for="client-website">사이트 URL</label>
                 <input type="text" id="client-website" name="website" th:value="${member.client.website}"><br>
                 
-                            <div id="section6" class="section">
-               <input type="hidden" id="selectedField" name="selectedField">
+            <div id="section6" class="section">
+            <input type="hidden" id="selectedField" name="selectedField">
                <!-- 관련 기술 선택 섹션 -->
                <div class="field-section">
                   <h2>관심 분야</h2>
