@@ -50,10 +50,34 @@ $(document).ready(function() {
 });
 
 function load() {
-	var keyword = $('#totalSearch').val().trim();
+	    const searchInput = $('#totalSearch').val().trim();
+	    
+	    if (validateSearchInput(searchInput)) {
+	        // 검색 실행
+	        console.log('검색 실행:', searchInput);
+	        var keyword = $('#totalSearch').val().trim();
+	    	
+	    	window.location.href="/totalSearch?keyword=" + keyword;
+	    } else {
+	        // 오류 메시지 표시
+	        alert('검색어에 허용되지 않는 문자가 포함되어 있습니다. 한글, 영문, 숫자만 사용해 주세요.');
+	    }
 	
-	window.location.href="/totalSearch?keyword=" + keyword;
+	
 	
 }
+
+function validateSearchInput(input) {
+    // 허용된 문자: 한글, 영문, 숫자, 공백
+    const allowedPattern = /^[가-힣a-zA-Z0-9\s]+$/;
+
+    if (allowedPattern.test(input)) {
+        return true; // 유효한 입력
+    } else {
+        return false; // 유효하지 않은 입력
+    }
+}
+
+
 </script>
 </html>
