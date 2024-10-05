@@ -520,7 +520,7 @@ function openCreateChatRoomModal() {
             projectList.innerHTML = '';
             projects.forEach(project => {
                 const projectElement = document.createElement('li');
-                projectElement.textContent = `프로젝트 번호: ${project.projectNum}, 프로젝트 이름: ${project.projectName}`;
+                projectElement.textContent = project.projectName; // 프로젝트 이름만 표시
                 projectElement.onclick = () => selectProject(project.projectNum, projectElement);
                 projectList.appendChild(projectElement);
             });
