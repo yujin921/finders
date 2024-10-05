@@ -90,31 +90,50 @@ function updatePartnerList(response) {
 }
 
 function createPartnerCard(partner) {
-	function getStarRating(rating) {
-	        const fullStars = Math.floor(rating);
-	        const halfStar = rating % 1 >= 0.5 ? 1 : 0;
-	        const emptyStars = 5 - fullStars - halfStar;
-	        
-	        return '★'.repeat(fullStars) + (halfStar ? '½' : '') + '☆'.repeat(emptyStars);
-	    }
-	
+    function getStarRating(rating) {
+        const fullStars = Math.floor(rating);
+        const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+        const emptyStars = 5 - fullStars - halfStar;
+        
+        return (
+            '<i class="fas fa-star"></i>'.repeat(fullStars) +
+            (halfStar ? '<i class="fas fa-star-half-alt"></i>' : '') +
+            '<i class="far fa-star"></i>'.repeat(emptyStars)
+        );
+    }
+
     return `
         <div class="partner-card" data="${partner.memberId}">
-            <img src="${partner.profileImg}" alt="${partner.name}" class="partner-image" width="300px" height="300px">
+            <div class="image-container">
+                <img src="${partner.profileImg}" alt="${partner.name}" class="partner-image">
+            </div>
             <div class="partner-info">
                 <h3 class="partner-id">${partner.memberId || '아이디 없음'}</h3>
-                <div class="rating">${getStarRating(partner.totalRating)} ${partner.totalRating} / 평가 ${partner.totalReviews || 0}개</div>
+                <div class="rating">
+                    ${getStarRating(partner.totalRating)} 
+                    <span class="rating-number">${partner.totalRating.toFixed(2)} / 평가 ${partner.totalReviews || 0}개</span>
+                </div>
                 <div class="partner-stats">
-                    <span>계약한 프로젝트: ${partner.totalProjects || 0}건</span>
-                    <span>포트폴리오: ${partner.totalPortfolios || 0}개</span>
+                    <div class="stat-item">
+                        <i class="fas fa-briefcase"></i>
+                        <span>계약한 프로젝트: ${partner.totalProjects || 0}건</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>포트폴리오: ${partner.totalPortfolios || 0}개</span>
+                    </div>
                 </div>
                 <div class="skills">
-                    ${partner.skills ? partner.skills.join(', ') : '스킬 정보 없음'}
+                    ${partner.skills ? partner.skills.map(skill => `<span class="skill">${skill}</span>`).join('') : '<span class="no-skills">스킬 정보 없음</span>'}
                 </div>
             </div>
         </div>
     `;
 }
+
+
+
+
 
 function sortFreelancers(sortType) {
     let sortedFreelancers = [...freelancers];  // 원본 배열 복사

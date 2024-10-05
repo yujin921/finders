@@ -103,7 +103,7 @@
                 <h3>사전 질문</h3>
                 <div class="question-detail">
                     <ol>
-                        <li th:each="question : ${board.prequalificationQuestions}">
+                        <li class="question-list" th:each="question : ${board.prequalificationQuestions}">
                             <span th:text="${question}"></span> <!-- 질문 내용 출력 -->
                         </li>
                     </ol>
@@ -114,7 +114,7 @@
 		<div class="main-content">
    			 <!-- 클라이언트 후기 -->
             <div class="review-section">
-                <h3>클라이언트 후기</h3>
+                <h3>후기</h3>
                 <div th:if="${not #lists.isEmpty(clientReviews)}">
                     <div th:each="review : ${clientReviews}" class="review-item">
                         <div class="review-header">

@@ -39,16 +39,6 @@ management-container .sidebar .logo img {
     overflow-y: auto; /* 콘텐츠가 많아질 경우 스크롤 가능하게 */
 }
 
-footer {
-    background-color: black; /* 배경색을 검은색으로 설정 */
-    color: white; /* 텍스트 색상을 흰색으로 설정 */
-    display: flex; /* flexbox로 설정 */
-    justify-content: center; /* 수평 중앙 정렬 */
-    align-items: center; /* 수직 중앙 정렬 */
-    padding: 10px 20px; /* 상하 및 좌우 패딩 추가 */
-    text-align: center; /* 가운데 정렬 */
-}
-
 /* 프로젝트 생성 버튼 */
 .btn-create-project {
     display: block;
