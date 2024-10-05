@@ -39,7 +39,7 @@
 	    </section>
 
         <section class="featured-projects container">
-	        <h2>주목받는 프로젝트</h2>
+	        <h2>최신 프로젝트</h2>
 	        <div class="project-grid" id="latest-projects">
 	            <!-- 여기에 최신 프로젝트가 동적으로 추가될 것입니다 -->
 	        </div>
@@ -107,10 +107,9 @@
             var projectGrid = $('#latest-projects');
             projects.forEach(function(project) {
                 var projectCard = `
-                    <div class="project-card">
+                    <div class="project-card" onclick="location.href='/board/read?projectNum=${project.projectNum}'">
                         <h3>${project.projectTitle}</h3>
                         <p>${project.projectDescription.substring(0, 100)}...</p>
-                        <a href="/board/read?projectNum=${project.projectNum}" class="btn">상세보기</a>
                     </div>
                 `;
                 projectGrid.append(projectCard);
