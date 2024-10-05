@@ -1,13 +1,24 @@
 package net.datasa.finders.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.ClientDTO;
-import net.datasa.finders.domain.dto.FindFreelancerDTO;
 import net.datasa.finders.domain.dto.FreelancerDTO;
-import net.datasa.finders.domain.dto.FreelancerSkillDTO;
 import net.datasa.finders.domain.dto.MemberDTO;
 import net.datasa.finders.domain.entity.ClientCategoryEntity;
 import net.datasa.finders.domain.entity.ClientEntity;
@@ -22,19 +33,6 @@ import net.datasa.finders.repository.ClientRepository;
 import net.datasa.finders.repository.FreelancerRepository;
 import net.datasa.finders.repository.FreelancerSkillRepository;
 import net.datasa.finders.repository.MemberRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -446,4 +444,13 @@ public class MemberService {
 		}
 		return i;
 	}
+	
+
+    // 프로필 이미지를 조회하는 메서드
+    public String getProfileImageById(String memberId) {
+        MemberEntity member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Member not found with ID: " + memberId));
+        
+        return member.getProfileImg(); // 멤버의 프로필 이미지 경로 반환
+    }
 }

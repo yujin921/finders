@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,5 +28,7 @@ public class UnifiedReviewDTO {
     private int projectNum;    // 프로젝트 번호
     private List<ReviewItemDTO> reviewItems; // 리뷰 항목 리스트 추가
     
+    private String role;
+    private String profileImg;
     
 }

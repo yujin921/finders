@@ -99,44 +99,46 @@ $(document).ready(function(){
 
     // 슬라이더 요소가 있는지 확인
     if (reviewSlider.length > 0) {
-        // 리뷰 데이터를 서버에서 가져옴
+        // AJAX로 서버에서 리뷰 데이터를 가져옴
         $.ajax({
-            url: '/unifiedreview/latest',  // 클라이언트와 프리랜서 최신 리뷰를 반환하는 API
+            url: '/unifiedreview/latest',
             method: 'GET',
             success: function(response) {
                 response.forEach(function(review) {
-                    // 리뷰 데이터를 동적으로 추가
-                    let reviewText = review.comment || '리뷰 내용이 없습니다.';
-                    let reviewAuthor = review.sendId || '익명';
-                    let reviewProject = review.projectName || '프로젝트명 미상';
-                    let reviewRating = review.rating || '평점 미상';
-                    let reviewDate = review.reviewDate || '날짜 미상';
-
                     let reviewHtml = `
                         <div class="review-item">
-                            <h3 class="project-name">${reviewProject}</h3>
-                            <div class="rating">평점: ${reviewRating}</div>
-                            <p class="review-text">${reviewText}</p>
+                            <p class="review-text">${review.comment || '리뷰 내용이 없습니다.'}</p>
+                            <div class="rating-and-author">
+                                <div class="rating">${'★'.repeat(Math.floor(review.rating))}</div>
+                                <div class="author-id">${review.reviewerId || '익명'}</div>
+                            </div>
                             <div class="review-footer">
-                                <p class="review-author">- ${reviewAuthor}</p>
-                                <p class="review-date">${reviewDate}</p>
+                                <div class="recipient-info">
+                                    <img src="${review.profileImg || '/images/default-profile.png'}" alt="${review.receivedId || '수신자 미상'}의 프로필 이미지">
+                                    <span class="recipient-role">${review.role || '역할 미상'}</span>
+                                    <span class="recipient-id">${review.receivedId || '수신자 미상'}</span>
+                                </div>
+                                <div class="review-date">${review.reviewDate.split('T')[0] || '날짜 미상'}</div>
                             </div>
                         </div>`;
+                    
                     reviewSlider.append(reviewHtml);
                 });
 
                 // 슬라이더 초기화
                 if (!reviewSlider.hasClass('slick-initialized')) {
-                    reviewSlider.slick({
-                        infinite: true,   // 무한 슬라이드 활성화
-                        slidesToShow: 3,  // 기본적으로 보여줄 슬라이드 개수
-                        slidesToScroll: 1,
-                        autoplay: true,   // 자동 슬라이드 활성화
-                        autoplaySpeed: 3000,
-                        dots: true,       // 하단 네비게이션 점 추가
-                        variableWidth: true,  // 슬라이드 개수에 따라 너비 자동 조정
-                        centerMode: true  // 슬라이드가 화면 가운데 오도록 설정
-                    });
+					reviewSlider.slick({
+					    infinite: true,   // 무한 슬라이드 활성화
+					    slidesToShow: 3,  // 한 번에 표시할 슬라이드 수
+					    slidesToScroll: 1,
+					    autoplay: true,   // 자동 슬라이드 활성화
+					    autoplaySpeed: 0, // 자동 슬라이드 딜레이 없이 부드럽게 이동
+					    speed: 6000,      // 슬라이드가 전환되는 시간 (6초 동안 전환)
+					    cssEase: 'linear', // 부드러운 전환을 위해 'linear' easing 사용
+					    dots: true,       // 하단 네비게이션 점 표시
+					    variableWidth: true,  // 슬라이드 너비가 유동적으로 조정
+					    centerMode: true  // 슬라이드가 화면 가운데로
+					});
                 }
             },
             error: function() {
@@ -147,6 +149,8 @@ $(document).ready(function(){
         console.error('리뷰 슬라이더 요소를 찾을 수 없습니다.');
     }
 });
+
+
 
 
 

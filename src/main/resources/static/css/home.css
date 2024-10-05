@@ -177,19 +177,7 @@ main .cta-btn:hover {
     overflow: hidden;
 }
 
-/*리뷰 슬라이드*/
-.slidereview {
-    text-align: center;
-    padding: 50px 0;
-    background-color: #f7f9fc;
-}
-
-.slidereview h2 {
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-    color: #333;
-}
-
+/* 리뷰 슬라이드 */
 .review-slider {
     display: flex;
     justify-content: center;
@@ -199,46 +187,58 @@ main .cta-btn:hover {
 
 .review-item {
     background-color: #ffffff;
-    border-radius: 12px;
+    border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    width: 300px; /* 고정된 슬라이드 카드 크기 */
-    height: 320px; /* 카드의 고정된 높이 */
-    flex-shrink: 0;
+    padding: 25px;
+    width: 500px; /* 카드의 고정 너비 */
+    height: 250px !important; /* 카드의 고정 높이 */
     text-align: left;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start; /* 위쪽부터 채우기 시작 */
     overflow: hidden;
     transition: transform 0.3s ease;
+    position: relative; /* 필요한 경우 카드 내에서 위치 고정 */
 }
 
-.review-item:hover {
-    transform: translateY(-10px);
+.slick-slide {
+    margin: 20px; /* 슬라이드 좌우에 간격 추가 */
 }
 
-.project-name {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #227B94; /* 메인 색상 */
-}
-
-.rating {
-    font-size: 1.1rem;
-    color: #ffb400;
-    margin-bottom: 15px;
+.slick-dots {
+    display: none !important;
 }
 
 .review-text {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #555;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    flex-grow: 1; /* 텍스트 영역이 가변적으로 확장 */
     display: -webkit-box;
     -webkit-line-clamp: 4; /* 최대 4줄까지만 표시 */
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.rating-and-author {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    font-size: 1.4rem;
+    color: #ffb400;
+}
+
+.author-id {
+    font-size: 1rem;
+    color: #777;
+    font-weight: bold;
 }
 
 .review-footer {
@@ -247,15 +247,44 @@ main .cta-btn:hover {
     align-items: center;
     font-size: 0.9rem;
     color: #777;
+    margin-top: auto; /* 상단에 여유 공간을 채우고 하단에 고정 */
+    padding-top: 10px; /* 상단과의 여백 */
+    position: absolute; /* 카드의 하단에 고정 */
+    bottom: 15px; /* 카드의 하단에서 떨어진 거리 */
+    left: 25px;
+    right: 25px;
 }
 
-.review-author {
+.recipient-info {
+    display: flex;
+    align-items: center;
+}
+
+.recipient-info img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.recipient-role {
+    margin-right: 5px;
+    font-size: 0.9rem;
     font-weight: bold;
+    color: #555;
+}
+
+.recipient-id {
+    font-size: 0.9rem;
+    font-weight : bold;
+    color: var(--hilight-color);
 }
 
 .review-date {
     font-style: italic;
     color: #999;
+    text-align: right;
 }
+
 
 
