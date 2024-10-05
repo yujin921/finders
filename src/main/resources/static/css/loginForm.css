@@ -27,7 +27,7 @@ html, body {
 .container {
     text-align: center;
     width: 100%;
-    max-width: 400px;
+    max-width: 450px; /* 컨테이너의 최대 너비를 400px에서 450px로 증가 */
     margin: 0 auto;
     padding: 20px;
     background-color: white;
@@ -140,22 +140,25 @@ button[type="submit"]:hover {
 .find-links {
     margin-top: 20px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between; /* 버튼 사이의 간격을 최대화 */
     gap: 10px;
 }
 
 .find-links button {
-    background-color: var(--primary-color);
+    background-color: var(--secondary-color);
     color: white;
-    padding: 12px 0;
+    padding: 10px 5px; /* 좌우 패딩을 줄임 */
     border: none;
     border-radius: 5px;
-    font-size: 1.1rem;
+    font-size: 0.9rem; /* 폰트 크기를 약간 줄임 */
     cursor: pointer;
-    width: 100%;
+    width: 48%; /* 버튼의 너비를 전체의 48%로 설정 */
     transition: background-color 0.3s ease;
+    white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 설정 */
+    overflow: hidden; /* 넘치는 텍스트를 숨김 */
+    text-overflow: ellipsis; /* 넘치는 텍스트를 ...으로 표시 */
 }
 
 .find-links button:hover {
-    background-color: var(--button-hover);
+    background-color: var(--highlight-color);
 }
