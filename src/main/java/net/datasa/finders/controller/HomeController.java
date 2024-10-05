@@ -1,22 +1,23 @@
 package net.datasa.finders.controller;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.domain.dto.FreelancerPortfoliosDTO;
-import net.datasa.finders.domain.entity.MemberEntity;
-import net.datasa.finders.security.AuthenticatedUser;
-import net.datasa.finders.service.FreelancerPortfoliosService;
-import net.datasa.finders.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.security.Principal;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.ClientReviewDTO;
+import net.datasa.finders.domain.dto.FreelancerPortfoliosDTO;
+import net.datasa.finders.domain.dto.FreelancerReviewDTO;
+import net.datasa.finders.security.AuthenticatedUser;
+import net.datasa.finders.service.ClientReviewService;
+import net.datasa.finders.service.FreelancerPortfoliosService;
+import net.datasa.finders.service.FreelancerReviewService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,7 +25,8 @@ import java.util.List;
 public class HomeController {
 	
 	private final FreelancerPortfoliosService freelancerPortfoliosService;
-	
+	private final ClientReviewService clientReviewService;
+	private final FreelancerReviewService freelancerReviewService;
     //application.properties 파일 관련 설정값
   	@Value("${member.uploadPath}")
   	String uploadPath;
@@ -63,4 +65,7 @@ public class HomeController {
   	public String base() {
   		return "baseHTML";
   	}
+  	
+  	
+
 }

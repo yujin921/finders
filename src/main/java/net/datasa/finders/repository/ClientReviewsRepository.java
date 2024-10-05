@@ -22,4 +22,6 @@ public interface ClientReviewsRepository extends JpaRepository<ClientReviewsEnti
     @Query("SELECT AVG(c.rating) FROM ClientReviewsEntity c WHERE c.receivedId = :clientId")
     Optional<Float> findAverageRatingByReceivedId(@Param("clientId") String clientId);
     
+    List<ClientReviewsEntity> findTop20ByOrderByReviewDateDesc(); // 최신순 20개 조회
+
 }
