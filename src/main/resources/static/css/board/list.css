@@ -60,6 +60,7 @@
     grid-auto-rows: auto;
     gap: 20px;
     width: 100%;
+    min-height: 420px;
     max-width: 1200px;
     margin: 0 auto;
 }

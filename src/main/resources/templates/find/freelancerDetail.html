@@ -54,7 +54,9 @@
                 </div>
                 <div class="portfolio-section">
                     <div th:each="portfolio : ${freelancerPortfoliosList}" class="portfolio-item">
-                        <h4 th:text="${portfolio.portfolioTitle}">프로젝트 제목</h4>
+                        <h4>
+                            <a th:href="@{/guestportfolio/content(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}">프로젝트 제목</a>
+                        </h4>
                     </div>
                     <p th:if="${#lists.isEmpty(freelancerPortfoliosList)}">등록된 포트폴리오가 없습니다.</p>
                 </div> 
