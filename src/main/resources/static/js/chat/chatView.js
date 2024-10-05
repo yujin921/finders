@@ -228,8 +228,8 @@ function connectWebSocket(chatroomId) {
     });
 }
 
-// 메시지 전송
-document.getElementById('sendMessageButton').onclick = function () {
+// 메시지 전송 함수
+function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const messageContent = messageInput.value;
     const memberId = document.getElementById('chatroom-data').getAttribute('data-member-id');
@@ -245,7 +245,18 @@ document.getElementById('sendMessageButton').onclick = function () {
         stompClients[chatroomId].send('/app/send', {}, JSON.stringify(messageData));
         messageInput.value = '';
     }
-};
+}
+
+// 전송 버튼 클릭 이벤트
+document.getElementById('sendMessageButton').onclick = sendMessage;
+
+// Enter 키 입력 이벤트
+document.getElementById('messageInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // 기본 동작 방지 (새 줄 추가 방지)
+        sendMessage();
+    }
+});
 
 //메시지 표시
 function displayMessage(message, chatroomId) {

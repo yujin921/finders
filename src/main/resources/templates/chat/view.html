@@ -6,6 +6,8 @@
     <meta charset="UTF-8">
     <title>프로젝트 관리</title>
     <link rel="stylesheet" th:href="@{/css/chat/chat.css}">
+    <!-- Font Awesome 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     
 </head>
@@ -37,9 +39,15 @@
        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
            <h3 id="chatroomTitle" style="margin: 0;">채팅방 이름</h3>
                <div class="button-container" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 10px;">
-                   <button class="button" onclick="openParticipantsModal()">멤버 보기</button>
-                   <button class="button" onclick="downloadChat()">채팅 다운</button>
-                   <button class="button-close" onclick="closeChatModal()">닫기</button>
+                   <button class="icon-button" onclick="openParticipantsModal()" title="멤버 보기">
+                       <i class="fas fa-users"></i>
+                   </button>
+                   <button class="icon-button" onclick="downloadChat()" title="채팅 다운로드">
+                       <i class="fas fa-download"></i>
+                   </button>
+                   <button class="icon-button" onclick="closeChatModal()" title="닫기">
+                       <i class="fas fa-times"></i>
+                   </button>
                </div>
 
           </div>
@@ -59,8 +67,12 @@
        <div class="modal-header">
            <h3>참가자 목록</h3>
            <div class="button-container">
-               <button class="button" onclick="openInviteModal()">채팅방 초대</button>
-               <button class="deletebutton" onclick="closeParticipantsModal()">닫기</button>
+               <button class="icon-button" onclick="openInviteModal()" title="채팅방 초대">
+                   <i class="fas fa-user-plus"></i>
+               </button>
+               <button class="icon-button" onclick="closeParticipantsModal()" title="닫기">
+                   <i class="fas fa-times"></i>
+               </button>
            </div>
        </div>
        <div class="modal-content">
@@ -74,8 +86,12 @@
        <div class="modal-header">
            <h3>참가자 목록</h3>
            <div class="button-container">
-               <button class="button" onclick="openInviteModal()">채팅방 초대</button>
-               <button class="deletebutton" onclick="closeInviteModal()">닫기</button> <!-- Use correct function for closing -->
+               <button class="icon-button" onclick="openInviteModal()" title="채팅방 초대">
+                   <i class="fas fa-user-plus"></i>
+               </button>
+               <button class="icon-button" onclick="closeInviteModal()" title="닫기">
+                   <i class="fas fa-times"></i>
+               </button>
            </div>
        </div>
        <div class="modal-content">
