@@ -111,7 +111,7 @@ function createPartnerCard(partner) {
                 <h3 class="partner-id">${partner.memberId || '아이디 없음'}</h3>
                 <div class="rating">
                     ${getStarRating(partner.totalRating)} 
-                    <span class="rating-number">${partner.totalRating.toFixed(2)} / 5.0</span>
+                    <span class="rating-number">${partner.totalRating.toFixed(2)} / 평가 ${partner.totalReviews || 0}개</span>
                 </div>
                 <div class="partner-stats">
                     <div class="stat-item">
@@ -130,6 +130,7 @@ function createPartnerCard(partner) {
         </div>
     `;
 }
+
 
 
 
