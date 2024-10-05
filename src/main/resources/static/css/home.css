@@ -95,7 +95,7 @@ main .cta-btn {
 }
 
 main .cta-btn:hover {
-    background-color: var(--secondary-color);
+    background-color: var(--button-hover);
     transform: translateY(-3px);
 }
 
