@@ -1,4 +1,3 @@
-
 html, body {
    margin: 0;
    padding: 0;
@@ -9,7 +8,7 @@ html, body {
 
 .management-container {
     display: flex;
-    height: 100vh;
+    height: calc(100vh - 50px); /* footer 높이만큼 빼줍니다 (예: 50px) */
 }
 
 /* 사이드바 */
@@ -32,6 +31,22 @@ management-container .sidebar:hover {
 management-container .sidebar .logo img {
     width: 80%;
     margin-bottom: 40px;
+}
+
+.main-content {
+    flex: 1; /* 메인 콘텐츠가 남은 공간을 차지하도록 설정 */
+    padding: 20px; /* 메인 콘텐츠에 패딩 추가 */
+    overflow-y: auto; /* 콘텐츠가 많아질 경우 스크롤 가능하게 */
+}
+
+footer {
+    background-color: black; /* 배경색을 검은색으로 설정 */
+    color: white; /* 텍스트 색상을 흰색으로 설정 */
+    display: flex; /* flexbox로 설정 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+    padding: 10px 20px; /* 상하 및 좌우 패딩 추가 */
+    text-align: center; /* 가운데 정렬 */
 }
 
 /* 프로젝트 생성 버튼 */
