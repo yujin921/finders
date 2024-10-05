@@ -23,6 +23,7 @@ public class WebSecurityConfig {
     		, "/header"
     		, "/nav"
     		, "/footer"
+            , "/guestaside"
     		, "/find/**"
             , "/images/**"          //이미지 경로
             , "/css/**"             //CSS파일들
@@ -38,6 +39,8 @@ public class WebSecurityConfig {
             , "/member/verifyUser"
             , "/member/resetPassword"
             , "/support/guide"
+            , "/unifiedreview/**"
+            , "/guestportfolio/**"
     };
     
     // 프리랜서 회원 접근 가능

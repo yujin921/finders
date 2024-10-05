@@ -39,28 +39,9 @@
 	    </section>
 
         <section class="featured-projects container">
-	        <h2>주목받는 프로젝트</h2>
-	        <div class="project-grid">
-	            <div class="project-card">
-	                <h3>웹사이트 리디자인</h3>
-	                <p>현대적이고 반응형 웹사이트로 업그레이드가 필요합니다.</p>
-	                <a href="#" class="btn">상세보기</a>
-	            </div>
-	            <div class="project-card">
-	                <h3>모바일 앱 개발</h3>
-	                <p>혁신적인 건강관리 앱 개발 파트너를 찾습니다.</p>
-	                <a href="#" class="btn">상세보기</a>
-	            </div>
-	            <div class="project-card">
-	                <h3>로고 디자인</h3>
-	                <p>신선하고 현대적인 브랜드 로고가 필요합니다.</p>
-	                <a href="#" class="btn">상세보기</a>
-	            </div>
-	            <div class="project-card">
-	                <h3>콘텐츠 마케팅</h3>
-	                <p>블로그 포스팅 및 SNS 콘텐츠 제작을 도와주실 분을 찾습니다.</p>
-	                <a href="#" class="btn">상세보기</a>
-	            </div>
+	        <h2>최신 프로젝트</h2>
+	        <div class="project-grid" id="latest-projects">
+	            <!-- 여기에 최신 프로젝트가 동적으로 추가될 것입니다 -->
 	        </div>
         </section>
         
@@ -117,6 +98,35 @@
             	});
                 
             });
+
+    // 최신 프로젝트 로드
+    $.ajax({
+        url: '/board/latestProjects',
+        method: 'GET',
+        success: function(projects) {
+            var projectGrid = $('#latest-projects');
+            projects.forEach(function(project) {
+                var projectCard = `
+                    <div class="project-card" onclick="location.href='/board/read?projectNum=${project.projectNum}'">
+                        <h3>${project.projectTitle}</h3>
+                        <div class="project-info-wrapper">
+                            <div class="project-info">
+                                <span class="project-budget">${project.projectBudget.toLocaleString()}원</span>
+                            </div>
+                            <div class="project-info">
+                                <span class="project-author">${project.clientId}</span>
+                                <span class="project-deadline">마감일: ${new Date(project.recruitDeadline).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                projectGrid.append(projectCard);
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error("프로젝트를 불러오는 데 실패했습니다:", error);
+        }
+    });
 
 </script>
 
