@@ -80,6 +80,9 @@ function updatePartnerList(response) {
     if (Array.isArray(response)) {
         response.forEach(function(partner) {
             $('#partners').append(createPartnerCard(partner));
+			$('.partner-card').on('click', function() {
+			                window.location.href="/find/freelancerDetail?memberId="+ $(this).attr('data');
+			            });
         });
     } else {
         console.error("예상치 못한 응답 형식:", response);
