@@ -1,4 +1,3 @@
-
 /* 전체 스타일 설정 */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -115,14 +114,17 @@ img:hover {
 }
 
 /* 공통 버튼 스타일 */
-.button, .button-close {
+.button, .button-close, .deletebutton {
     padding: 10px 15px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
-    font-size: 1rem; /* 버튼 크기 동일하게 설정 */
-    min-width: 80px; /* 버튼의 최소 너비 설정 */
+    font-size: 1rem;
+    min-width: 100px; /* 버튼의 최소 너비를 동일하게 설정 */
+    text-align: center;
+    display: inline-block;
+    margin: 5px;
 }
 
 /* 멤버 보기 버튼 스타일 */
@@ -136,13 +138,13 @@ img:hover {
 }
 
 /* 닫기 버튼 스타일 */
-.button-close {
-    background-color: #dc3545; /* 붉은색 */
+.button-close, .deletebutton {
+    background-color: #dc3545;
     color: white;
 }
 
-.button-close:hover {
-    background-color: #c82333; /* hover 시 더 진한 붉은색 */
+.button-close:hover, .deletebutton:hover {
+    background-color: #c82333;
 }
 
 /* 메시지 입력창 스타일 */
@@ -203,74 +205,72 @@ img:hover {
     margin: 0;
 }
 
-/* 메시지 스타일 */
+/* 메시지 컨테이너 스타일 */
 .message-container {
     display: flex;
     flex-direction: column;
     max-width: 70%;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
-/* 내 메시지 스타일 (오른쪽 정렬, 노란 배경) */
+/* 내 메시지 스타일 (오른쪽 정렬) */
 .message-container.sent {
-    align-self: flex-end; /* 전체 컨테이너를 오른쪽 끝으로 정렬 */
+    align-self: flex-end;
+    align-items: flex-end;
 }
 
+/* 상대방 메시지 스타일 (왼쪽 정렬) */
+.message-container.received {
+    align-self: flex-start;
+    align-items: flex-start;
+}
+
+/* 메시지 스타일 */
 .message {
     padding: 10px;
     border-radius: 10px;
     word-wrap: break-word;
     font-size: 1rem;
+    max-width: 100%;
 }
 
-#messages .message-container.sent .message {
-    background-color: #ffeb3b !important; /* 내 메시지의 배경색 (노란색) */
-    border-top-right-radius: 0 !important;
-    margin-left: auto !important;
-    color: #000 !important;
-    text-align: right !important;
-    max-width: 100% !important;
-    width: fit-content !important;
+/* 내 메시지 스타일 */
+.message-container.sent .message {
+    background-color: #ffeb3b;
+    color: #000;
+    border-top-right-radius: 0;
 }
 
-#messages .message-container.received .message {
-    background-color: #e9ecef !important; /* 상대방 메시지의 배경색 (회색) */
-    border-top-left-radius: 0 !important;
-    margin-right: auto !important;
-    color: #333 !important;
+/* 상대방 메시지 스타일 */
+.message-container.received .message {
+    background-color: #e9ecef;
+    color: #333;
+    border-top-left-radius: 0;
 }
 
-/* 보낸 사람 이름 및 시간 표시 스타일 */
+/* 보낸 사람 이름 스타일 */
 .sender {
     font-weight: bold;
     font-size: 0.9rem;
     color: #555;
-    display: block;
-}
-
-/* 내 메시지에서 보낸 사람 이름 오른쪽에 표시 */
-.message-container.sent .sender {
-    text-align: right;
-}
-
-/* 상대방 메시지에서 보낸 사람 이름 왼쪽에 표시 */
-.message-container.received .sender {
-    text-align: left;
+    margin-bottom: 2px;
 }
 
 /* 시간 표시 스타일 */
 .timestamp {
     font-size: 0.8rem;
     color: #888;
-    display: block;
+    margin-top: 2px;
 }
 
-/* 내 메시지에서 시간 오른쪽에 표시 */
+/* 내 메시지의 보낸 사람 이름과 시간 정렬 */
+.message-container.sent .sender,
 .message-container.sent .timestamp {
     text-align: right;
 }
 
-/* 상대방 메시지에서 시간 왼쪽에 표시 */
+/* 상대방 메시지의 보낸 사람 이름과 시간 정렬 */
+.message-container.received .sender,
 .message-container.received .timestamp {
     text-align: left;
 }
@@ -314,6 +314,11 @@ img:hover {
     border-bottom: 1px solid #ddd;
     padding: 10px 20px;
     margin-bottom: 10px;
+}
+
+.modal-header .button-container {
+    display: flex;
+    gap: 10px;
 }
 
 .modal ul {
@@ -383,4 +388,3 @@ img:hover {
 .context-menu-item:hover {
     background-color: #f1f1f1;
 }
-
