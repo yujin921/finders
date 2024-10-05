@@ -408,4 +408,18 @@ public class ProjectPublishingService {
         log.debug("Found {} reviews for client {}", reviews.size(), clientId);
         return reviews;
     }*/
+
+    public List<ProjectPublishingDTO> getLatestProjects(int limit) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "projectCreateDate");
+        List<ProjectPublishingEntity> entityList = projectPublishingRepository.findAll(sort);
+        List<ProjectPublishingDTO> dtoList = new ArrayList<>();
+
+        for (int i = 0; i < Math.min(limit, entityList.size()); i++) {
+            ProjectPublishingEntity entity = entityList.get(i);
+            ProjectPublishingDTO dto = convertToDTO(entity);
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
 }

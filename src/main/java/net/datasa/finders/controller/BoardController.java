@@ -172,4 +172,10 @@ public class BoardController {
 
         return "redirect:/board/view?projectNum=" + projectPublishingDTO.getProjectNum(); // 수정 후 해당 게시글로 리다이렉트
     }
+
+    @ResponseBody
+    @GetMapping("latestProjects")
+    public List<ProjectPublishingDTO> latestProjects() {
+        return projectPublishingService.getLatestProjects(4);  // 최신 4개 프로젝트 가져오기
+    }
 }
