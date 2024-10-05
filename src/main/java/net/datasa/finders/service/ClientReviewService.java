@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,5 +70,17 @@ public class ClientReviewService {
     @Transactional(readOnly = true)
     public Optional<Float> getAverageRatingForClient(String clientId) {
         return clientReviewsRepository.findAverageRatingByReceivedId(clientId);
+    }
+    
+    
+    @Autowired
+    private ClientReviewsRepository clientReviewRepository;
+
+    public List<ClientReviewDTO> getLatest20ClientReviews() {
+        // Repository를 통해 최신 20개의 클라이언트 리뷰를 가져오는 로직
+        List<ClientReviewsEntity> clientReviews = clientReviewRepository.findTop20ByOrderByReviewDateDesc();
+        return clientReviews.stream()
+                .map(review -> new ClientReviewDTO(review))
+                .collect(Collectors.toList());
     }
 }
