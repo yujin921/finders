@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>finders</title>
+    <link rel="stylesheet" th:href="@{/css/primary.css}">
+    <link rel="stylesheet" th:href="@{/css/totalSearch.css}">
+    <!-- Font Awesome 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+
+</head>
+<body>
+    <!-- Header Section -->
+    <header></header>
+
+    <!-- Navigation Menu -->
+    <nav class="top-nav"></nav>
+	
+	<div class="main-container">
+
+    <h3 class="section-title" th:text="'프로젝트 (' + ${#lists.size(objs)} + ')'"></h3>
+    <div class="post" th:each="obj : ${objs}" th:onclick="'location.href=\'/board/read?projectNum=' + ${obj.projectNum} + '\''">
+        <img th:src="@{'data:image/jpeg;base64,' + ${obj.projectImage}}" alt="Project Image" class="thumbnail">
+        <div class="post-info">
+            <span class="title" th:text="${obj.projectTitle}"></span>
+            <span class="rating" th:text="'평점: ' + ${obj.averageRating} + '점'"></span><br>
+            <span class="startdate" th:text="'시작일 : ' + ${obj.projectStartDate}"></span><br>
+            <span class="budget" th:text="'금액 : ' + ${#numbers.formatInteger(obj.projectBudget, 1, 'COMMA')} + '원'"></span>
+            <span class="author" th:text="'작성자 : ' + ${obj.clientId}"></span>
+			<span class="date" th:attr="data-start-date=${#temporals.format(obj.projectStartDate, 'yyyy-MM-dd')}, data-end-date=${#temporals.format(obj.projectEndDate, 'yyyy-MM-dd')}"></span>
+            <span class="status" th:text="${status}"></span>
+        </div>
+    </div>
+
+    <h3 class="section-title" th:text="'프리랜서 (' + ${#lists.size(partners)} + ')'"></h3>
+    <div class="partner-card" th:each="partner : ${partners}" th:attr="onclick=|location.href='/find/freelancerDetail?memberId=${partner.memberId}'|">
+        <img th:src="${partner.profileImg}" class="partner-image" width="300px" height="300px">
+        <div class="partner-info">
+            <h3 class="partner-id" th:text="${partner.memberId ?: '아이디 없음'}"></h3>
+            <div class="rating">
+                <span th:utext="${#strings.replace(#strings.repeat('★', partner.totalRating), '★★★★★', '★★★★★')}"></span>
+                <span th:text="${partner.totalRating} + ' / 평가 ' + ${partner.totalReviews ?: 0} + '개'"></span>
+            </div>
+            <div class="partner-stats">
+                <span th:text="'계약한 프로젝트: ' + ${partner.totalProjects ?: 0} + '건'"></span>
+                <span th:text="'포트폴리오: ' + ${partner.totalPortfolios ?: 0} + '개'"></span>
+            </div>
+            <div class="skills" th:text="${partner.skills != null and partner.skills.length > 0} ? ${#strings.arrayJoin(partner.skills, ', ')} : '스킬 정보 없음'"></div>
+        </div>
+    </div>
+</div>
+	
+    <!-- Footer Section -->
+    <footer></footer>
+    
+</body>
+<script>
+$(document).ready(function () {
+    $('header').load("/header", function () {
+   		});
+    $('nav').load("/nav", function () {
+		});
+    $('footer').load("/footer", function () {
+		});
+});
+
+function calculateRemainingDays(startDateStr, endDateStr) {
+    // 날짜 문자열을 Date 객체로 변환 (YYYY-MM-DD 형식 가정)
+    const start = new Date(startDateStr + 'T00:00:00+09:00');
+    const end = new Date(endDateStr + 'T00:00:00+09:00');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);  // 오늘 날짜의 시간을 00:00:00으로 설정
+
+    // 시작일이 미래인 경우 시작일부터, 아니면 오늘부터 계산
+    const fromDate = start > today ? start : today;
+
+    // 밀리초 단위로 차이를 계산하고 일 단위로 변환
+    const remaining = Math.ceil((end - fromDate) / (1000 * 60 * 60 * 24));
+    return remaining > 0 ? remaining : 0;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.date').forEach(function(element) {
+        const startDate = element.getAttribute('data-start-date');
+        const endDate = element.getAttribute('data-end-date');
+        const remainingDays = calculateRemainingDays(startDate, endDate);
+        element.textContent = '예상 기간 : ' + remainingDays + '일';
+    });
+});
+</script>
+</html>
