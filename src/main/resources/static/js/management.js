@@ -2985,7 +2985,9 @@ function loadApplicationList() {
 
 				contentHtml += `
                 <tr>
-                    <td>${application.freelancerId}</td>
+                    <td>
+                    	<a href="/find/freelancerDetail?memberId=${application.freelancerId}">${application.freelancerId}</a>
+					</td>
                     <td>${application.projectTitle}</td>
                     <td>${statusText}</td> <!-- 상태란에 지원 신청 중 표시 -->
                     <td>${actionHtml}</td> <!-- 동작란에 찬성/반대 버튼 표시 -->

@@ -9,7 +9,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <style>
-        
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
 
         /* 입력창과 버튼들을 상단에 배치 */
         .control-panel {
@@ -21,26 +27,28 @@
 
         /* 캠 화면을 담는 컨테이너 */
         .video-container {
-            display: flex;
-            margin: 0 auto;
-            justify-content: space-between; /* 캠 화면을 좌우로 나눔 */
-            width: 1300px; /* 두 개의 640px 영상과 여유 공간을 맞춤 */
-            margin-top: 50px;
+            display: flex; /* flex 사용 */
+            justify-content: space-between;
+            width: 100%; /* 컨테이너 너비를 100%로 설정 */
+            max-width: 1300px; /* 최대 너비 설정 */
+            margin: 50px auto; /* 중앙 정렬 */
         }
 
         /* 캠 고정 크기 설정 */
-        #localStream, #remoteStreamDiv video {
-            width: 640px;
-            height: 480px;
-            object-fit: cover;
-            background-color: black; /* 상대방 캠이 없을 때 빈 화면 처리 */
+        #localStream, #remoteStreamDiv {
+            margin: 0 30px;
+            width: 50%; /* 각 비디오 요소의 너비를 50%로 설정 */
+            height: 480px; /* 높이 설정 */
+            object-fit: cover; /* 비디오 크기 조정 */
         }
 
-        /* 상대 캠이 없을 때 공간 확보를 위해 기본적으로 비디오 공간을 유지 */
-        #remoteStreamDiv {
-            width: 640px;
-            height: 480px;
-            background-color: black; /* 상대방 캠이 없을 때 빈 화면 처리 */
+        /* Footer */
+        footer {
+            margin-top: auto; /* 공간을 차지하여 하단에 고정 */
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
         }
 
         #chat-container {
