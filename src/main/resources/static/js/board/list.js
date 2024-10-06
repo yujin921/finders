@@ -67,7 +67,7 @@ function formatBudget(budget) {
 function sortList(list, sortValue) {
    let [sortField, sortDirection] = sortValue.split(',');
 
-   if (sortField === "recommend") {
+   if (sortField === "recommended") {
       // 추천순 기능이 추가되면 여기에 로직 구현
       return;
    }

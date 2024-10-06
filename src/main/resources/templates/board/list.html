@@ -3,13 +3,14 @@
      xmlns:th="http://www.thymeleaf.org"
      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-   <meta charset="UTF-8">
-   <title>프로젝트 게시판</title>
-   <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-   <link rel="stylesheet" th:href="@{/css/primary.css}">
-   <link rel="stylesheet" th:href="@{/css/board/list.css}">
+    <meta charset="UTF-8">
+    <title>프로젝트 게시판</title>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/primary.css}">
+    <link rel="stylesheet" th:href="@{/css/board/list.css}">
     
     <script th:src="@{/js/board/list.js}"></script>
+    <script th:src="@{/js/recommendation.js}"></script>
 </head>
 <body>
 	<header></header>
@@ -30,6 +31,8 @@
         <select id="sortSelect" onchange="list(this.value)">
             <option value="projectCreateDate,desc">최신순</option>
             <option value="projectBudget,asc">가격순</option>
+            <!-- 프리랜서 회원일 때만 보여줌 -->
+        	<option sec:authorize="hasRole('ROLE_FREELANCER')" value="recommended">추천순</option>
         </select>
     </div>
     <div class="table-container" id="output">

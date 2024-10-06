@@ -4,13 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.FindFreelancerDTO;
 import net.datasa.finders.domain.dto.FreelancerPortfoliosDTO;
+import net.datasa.finders.domain.dto.MemberDTO;
 import net.datasa.finders.domain.entity.FreelancerReviewsEntity;
 import net.datasa.finders.domain.entity.MemberEntity;
+import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.FindService;
 import net.datasa.finders.service.FreelancerPortfoliosService;
 import net.datasa.finders.service.FreelancerReviewService;
 import net.datasa.finders.service.MemberService;
+import net.datasa.finders.service.RecommendationService;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -18,15 +22,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("find")
-
 public class FindController {
 
     //application.properties 파일 관련 설정값
@@ -37,6 +43,7 @@ public class FindController {
 	private final FindService findService;
 	private final FreelancerPortfoliosService freelancerPortfoliosService;
 	private final FreelancerReviewService freelancerReviewService;
+	private final RecommendationService recommendationService;
 
   	@GetMapping("view")
   	public String view(Model model, Principal principal) {
@@ -81,4 +88,30 @@ public class FindController {
   	    
   	    return "find/freelancerDetail"; // 프리랜서 상세 페이지 템플릿으로 이동
   	}
+  	
+  	@ResponseBody
+    @GetMapping("currentUser")
+	public Map<String, Object> getCurrentUser(@AuthenticationPrincipal AuthenticatedUser user) {
+	    MemberDTO memberDTO = recommendationService.getCurrentUser(user.getUsername());
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("roleName", memberDTO.getRoleName());
+	    
+	    // 클라이언트와 프리랜서 ID를 추가
+	    if (memberDTO.getRoleName() == RoleName.ROLE_CLIENT) {
+	        response.put("clientId", memberDTO.getMemberId()); // 클라이언트 ID
+	    } else if (memberDTO.getRoleName() == RoleName.ROLE_FREELANCER) {
+	        response.put("freelancerId", memberDTO.getMemberId()); // 프리랜서 ID
+	    }
+	    
+	    return response; // JSON 형식으로 응답
+	}
+  	
+  	// 클라이언트가 프리랜서를 추천받기 위한 API 엔드포인트
+  	@ResponseBody
+    @GetMapping("recommendations/freelancers")
+    public List<FindFreelancerDTO> recommendFreelancers(@RequestParam("clientId") String clientId) {
+        // 클라이언트 ID를 이용해 추천 프리랜서를 가져옴
+        return recommendationService.recommendFreelancers(clientId);
+    }
 }

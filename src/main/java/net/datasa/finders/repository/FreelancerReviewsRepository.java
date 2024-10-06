@@ -20,5 +20,9 @@ public interface FreelancerReviewsRepository extends JpaRepository<FreelancerRev
 
     List<FreelancerReviewsEntity> findTop20ByOrderByReviewDateDesc(); // 최신순 20개 조회
 
+	List<FreelancerReviewsEntity> findBySendId(String clientId);
+
+	List<FreelancerReviewsEntity> findByReceivedId(String freelancerId);
+
     
 }

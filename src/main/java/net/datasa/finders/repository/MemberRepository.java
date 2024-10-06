@@ -14,6 +14,9 @@ import net.datasa.finders.domain.entity.RoleName;
 @Repository
 public interface MemberRepository extends JpaRepository<MemberEntity, String> {
 
+	// 특정 역할을 가진 모든 회원을 조회하는 메소드
+    List<MemberEntity> findAllByRoleName(RoleName roleClient); // 역할 이름으로 변경
+	
     MemberEntity findByMemberIdAndRoleName(String memberId, RoleName roleName);
 
     // 특정 프로젝트에 참여한 멤버를 찾는 메서드

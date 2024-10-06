@@ -2,6 +2,7 @@ package net.datasa.finders.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.MemberDTO;
 import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.entity.ClientReviewsEntity;
 import net.datasa.finders.domain.entity.RoleName;
@@ -9,6 +10,8 @@ import net.datasa.finders.security.AuthenticatedUser;
 import net.datasa.finders.service.ClientReviewService;
 import net.datasa.finders.service.ProjectApplicationService;
 import net.datasa.finders.service.ProjectPublishingService;
+import net.datasa.finders.service.RecommendationService;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +22,9 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -31,6 +36,7 @@ public class BoardController {
 	private final ProjectPublishingService projectPublishingService;
     private final ProjectApplicationService projectApplicationService;
     private final ClientReviewService clientReviewService;
+    private final RecommendationService recommendationService;
 	
 	@GetMapping("view")
 	public String view() {
@@ -177,5 +183,31 @@ public class BoardController {
     @GetMapping("latestProjects")
     public List<ProjectPublishingDTO> latestProjects() {
         return projectPublishingService.getLatestProjects(4);  // 최신 4개 프로젝트 가져오기
+    }
+    
+    @ResponseBody
+    @GetMapping("currentUser")
+	public Map<String, Object> getCurrentUser(@AuthenticationPrincipal AuthenticatedUser user) {
+	    MemberDTO memberDTO = recommendationService.getCurrentUser(user.getUsername());
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("roleName", memberDTO.getRoleName());
+	    
+	    // 클라이언트와 프리랜서 ID를 추가
+	    if (memberDTO.getRoleName() == RoleName.ROLE_CLIENT) {
+	        response.put("clientId", memberDTO.getMemberId()); // 클라이언트 ID
+	    } else if (memberDTO.getRoleName() == RoleName.ROLE_FREELANCER) {
+	        response.put("freelancerId", memberDTO.getMemberId()); // 프리랜서 ID
+	    }
+	    
+	    return response; // JSON 형식으로 응답
+	}
+    
+    // 프리랜서가 프로젝트를 추천받기 위한 API 엔드포인트
+    @ResponseBody
+    @GetMapping("recommendations/projects")
+    public List<ProjectPublishingDTO> recommendProjects(@RequestParam("freelancerId") String freelancerId) {
+        // 프리랜서 ID를 이용해 추천 프로젝트를 가져옴
+        return recommendationService.recommendProjects(freelancerId);
     }
 }

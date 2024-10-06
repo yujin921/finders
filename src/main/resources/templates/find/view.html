@@ -9,7 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/find/view.css}">
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <script th:src="@{/js/findFreelancer/view.js}"></script>
-
+	<script th:src="@{/js/recommendation.js}"></script>
 </head>
 <body>
     <!-- Header Section -->
@@ -88,6 +88,8 @@
                             <option value="default">기본 정렬순</option>
                             <option value="rating">평점 높은순</option>
                             <option value="portfolio">포트폴리오 많은순</option>
+                            <!-- 기업 회원일 때만 보여줌 -->
+        					<option sec:authorize="hasRole('ROLE_CLIENT')" value="recommended">추천순</option>
                         </select>
                     </div>
                     
