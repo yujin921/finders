@@ -108,12 +108,13 @@
             projects.forEach(function(project) {
                 var projectCard = `
                     <div class="project-card" onclick="location.href='/board/read?projectNum=${project.projectNum}'">
-                        <h3>${project.projectTitle}</h3>
-                        <div class="project-info-wrapper">
-                            <div class="project-info">
+                        <div class="project-image">
+                            <img src="data:image/jpeg;base64,${project.projectImage}" alt="${project.projectTitle}">
+                        </div>
+                        <div class="project-info">
+                            <h3>${project.projectTitle}</h3>
+                            <div class="project-details">
                                 <span class="project-budget">${project.projectBudget.toLocaleString()}원</span>
-                            </div>
-                            <div class="project-info">
                                 <span class="project-author">${project.clientId}</span>
                                 <span class="project-deadline">마감일: ${new Date(project.recruitDeadline).toLocaleDateString()}</span>
                             </div>

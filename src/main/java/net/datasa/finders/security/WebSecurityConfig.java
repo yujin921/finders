@@ -32,6 +32,7 @@ public class WebSecurityConfig {
             , "/member/idCheck"		//중복체크
             , "/board/view"
             , "/board/list"
+            , "/board/latestProjects"  // 이 줄을 추가
             , "/member/findId"
             , "/member/findPw"
             , "/member/findIdResult"
