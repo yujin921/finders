@@ -32,7 +32,8 @@
 			<div class="find-links">
 				<button th:onclick="'location.href=\'' + @{/member/findId} + '\''">아이디 찾기</button>
 				<button th:onclick="'location.href=\'' + @{/member/resetPw} + '\''">비밀번호 재설정</button>
-			</div>
+			</div>			
+			<button class="join" th:onclick="'location.href=\'' + @{/member/join} + '\''">회원가입</button>
 		</div>
 
 		<!-- 기업 로그인 폼 -->
@@ -52,6 +53,7 @@
 				<button th:onclick="'location.href=\'' + @{/member/findId} + '\''">아이디 찾기</button>
 				<button th:onclick="'location.href=\'' + @{/member/resetPw} + '\''">비밀번호 재설정</button>
 			</div>
+			<button class="join" th:onclick="'location.href=\'' + @{/member/join} + '\''">회원가입</button>
 		</div>
 	</div>
 </body>
