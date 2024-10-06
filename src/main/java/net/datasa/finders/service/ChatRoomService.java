@@ -349,5 +349,5 @@ public class ChatRoomService {
             chatParticipantRepository.save(newParticipant);
         }
     }
-
+    
 }
