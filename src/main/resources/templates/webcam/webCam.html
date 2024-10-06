@@ -4,20 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>1:1 화상 회의</title>
+    <link rel="stylesheet" th:href="@{/css/primary.css}">
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <style>
-        /* 전체 레이아웃 스타일 */
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
+        
 
         /* 입력창과 버튼들을 상단에 배치 */
         .control-panel {
@@ -30,6 +22,7 @@
         /* 캠 화면을 담는 컨테이너 */
         .video-container {
             display: flex;
+            margin: 0 auto;
             justify-content: space-between; /* 캠 화면을 좌우로 나눔 */
             width: 1300px; /* 두 개의 640px 영상과 여유 공간을 맞춤 */
             margin-top: 50px;
@@ -49,24 +42,68 @@
             height: 480px;
             background-color: black; /* 상대방 캠이 없을 때 빈 화면 처리 */
         }
+
+        #chat-container {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 1000;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
-<div class="control-panel">
-    <input type="number" id="roomIdInput" />
-    <button type="button" id="enterRoomBtn">enter Room</button>
-    <button type="button" id="startSteamBtn" style="display: none;">start Streams</button>
-</div>
-<!-- 좌우로 캠을 배치하는 컨테이너 -->
-<div class="video-container">
-    <!-- 왼쪽 내 캠 화면 -->
-    <video id="localStream" autoplay playsinline controls></video>
-
-    <!-- 오른쪽 상대방 캠 화면 -->
-    <div id="remoteStreamDiv">
-        <!-- 상대방 캠이 들어오면 여기에 추가됨 -->
+    <header></header>
+    <!-- Navigation Menu -->
+    <nav class="top-nav"></nav>
+    <div class="control-panel">
+        <input type="number" id="roomIdInput" />
+        <button type="button" id="enterRoomBtn">enter Room</button>
+        <button type="button" id="startSteamBtn" style="display: none;">start Streams</button>
     </div>
-</div>
+    <!-- 좌우로 캠을 배치하는 컨테이너 -->
+    <div class="video-container">
+        <!-- 왼쪽 내 캠 화면 -->
+        <video id="localStream" autoplay playsinline controls></video>
+
+        <!-- 오른쪽 상대방 캠 화면 -->
+        <div id="remoteStreamDiv">
+            <!-- 상대방 캠이 들어오면 여기에 추가됨 -->
+        </div>
+    </div>
+    <footer></footer>
+    <div id="chat-container"></div>
 <script src="/js/webCam/webCam.js"></script>
 </body>
+<script>
+    $(document).ready(function () {
+        $("#chat-container").load("/chat/view", function () {
+            // 외부 스타일시트 처리
+            $("#chat-container link[rel='stylesheet']").each(function() {
+                var href = $(this).attr('href');
+                $.get(href, function(css) {
+                    var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+                    $('<style>').text(modifiedCss).appendTo('head');
+                });
+                $(this).remove(); // 원래의 link 태그 제거
+            });
+
+            // 인라인 스타일 처리
+            $("#chat-container style").each(function() {
+                var css = $(this).text();
+                var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+                $(this).text(modifiedCss);
+            });
+        });
+
+        $('header').load("/header", function () {
+        });
+        $('nav').load("/nav", function () {
+        });
+        $('footer').load("/footer", function () {
+        });
+
+    });
+</script>
+
 </html>
