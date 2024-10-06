@@ -108,15 +108,14 @@
             projects.forEach(function(project) {
                 var projectCard = `
                     <div class="project-card" onclick="location.href='/board/read?projectNum=${project.projectNum}'">
-                        <div class="project-image">
-                            <img src="data:image/jpeg;base64,${project.projectImage}" alt="${project.projectTitle}">
-                        </div>
                         <div class="project-info">
                             <h3>${project.projectTitle}</h3>
+                            <span class="project-author">${project.clientId}</span>
                             <div class="project-details">
                                 <span class="project-budget">${project.projectBudget.toLocaleString()}원</span>
-                                <span class="project-author">${project.clientId}</span>
                                 <span class="project-deadline">마감일: ${new Date(project.recruitDeadline).toLocaleDateString()}</span>
+                                <br>
+                                <span class="project-duration">예상 기간: ${Math.ceil((new Date(project.projectEndDate) - new Date(project.projectStartDate)) / (1000 * 60 * 60 * 24))}일</span>
                             </div>
                         </div>
                     </div>
