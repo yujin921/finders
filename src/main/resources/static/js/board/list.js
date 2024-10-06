@@ -11,7 +11,7 @@ $(document).ready(function() {
    });
 });
 
-function list(sortValue = 'projectCreateDate,asc') {
+function list(sortValue = 'projectCreateDate,desc') {
 	
 	const searchTerm = $('#projectSearch').val().trim();
 	

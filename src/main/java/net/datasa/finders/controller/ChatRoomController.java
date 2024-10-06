@@ -233,6 +233,7 @@ public class ChatRoomController {
     public ResponseEntity<String> leaveChatRoom(@RequestParam("chatroomId") int chatroomId) {
         // 현재 로그인한 사용자 ID 가져오기
         String currentUserId = getCurrentUserId();
+        System.out.println("Current User ID: " + currentUserId);  // 로그로 출력
 
         // chatroomId와 currentUserId에 해당하는 참여 기록을 삭제
         int deletedCount = chatParticipantRepository.deleteByChatroomIdAndParticipantId(chatroomId, currentUserId);

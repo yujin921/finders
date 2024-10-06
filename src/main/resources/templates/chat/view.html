@@ -18,15 +18,16 @@
 
 
     <!-- 사이드바 -->
-    <div id="chatSidebar" class="sidebar">
-        <span class="closebtn" onclick="closeSidebar()">&times;</span>
-        <div class="sidebar-content">
-            <button class="button" onclick="openCreateChatRoomModal()">채팅방 만들기</button>
-            <div id="chatRoomsContent" class="chat-room-list">
-                <!-- 채팅방 목록이 여기에 로드됩니다. -->
-            </div>
+<div id="chatSidebar" class="sidebar">
+    <span class="closebtn" onclick="closeSidebar()">&times;</span>
+    <div class="sidebar-content">
+        <button class="button" onclick="openCreateChatRoomModal()">채팅방 만들기</button>
+        <div id="chatRoomsContent" class="chat-room-list">
+            <!-- 채팅방 목록이 여기에 로드됩니다. -->
         </div>
     </div>
+</div>
+
 
    <!-- HTML: 컨텍스트 메뉴 추가 -->
    <div id="contextMenu" class="context-menu" style="display: none;">
@@ -36,21 +37,24 @@
    <div class="overlay" id="chatOverlay" onclick="closeChatModal()"></div>
    <div id="chatModal" class="modal">
        <!-- 제목과 버튼들을 같은 행에 배치 -->
-       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-           <h3 id="chatroomTitle" style="margin: 0;">채팅방 이름</h3>
-               <div class="button-container" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 10px;">
-                   <button class="icon-button" onclick="openParticipantsModal()" title="멤버 보기">
-                       <i class="fas fa-users"></i>
-                   </button>
-                   <button class="icon-button" onclick="downloadChat()" title="채팅 다운로드">
-                       <i class="fas fa-download"></i>
-                   </button>
-                   <button class="icon-button" onclick="closeChatModal()" title="닫기">
-                       <i class="fas fa-times"></i>
-                   </button>
-               </div>
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+    <h3 id="chatroomTitle" style="margin: 0;">채팅방 이름</h3>
+    <div class="button-container" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 10px;">
+        <button class="icon-button" onclick="leaveCurrentChatRoom()" title="나가기">
+            <i class="fas fa-sign-out-alt"></i>    
+        </button>
+        <button class="icon-button" onclick="openParticipantsModal()" title="멤버 보기">
+            <i class="fas fa-users"></i>
+        </button>
+        <button class="icon-button" onclick="downloadChat()" title="채팅 다운로드">
+            <i class="fas fa-download"></i>
+        </button>
+        <button class="icon-button" onclick="closeChatModal()" title="닫기">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
 
-          </div>
        <div id="chatroom-data" data-chatroom-id="" data-member-id="" data-project-num=""></div>
        <div class="chat-container">
            <div id="messages" class="messages"></div>
