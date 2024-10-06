@@ -26,8 +26,7 @@ html, body {
 /* 컨테이너 중앙 정렬 */
 .container {
     text-align: center;
-    width: 100%;
-    max-width: 400px;
+    width: 450px;
     margin: 0 auto;
     padding: 20px;
     background-color: white;
