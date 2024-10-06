@@ -1,14 +1,18 @@
 package net.datasa.finders.service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import net.datasa.finders.domain.dto.ChatMessageDTO;
 import net.datasa.finders.domain.dto.ChatRoomDTO;
 import net.datasa.finders.domain.dto.CreateChatRoomRequestDTO;
@@ -33,6 +37,8 @@ public class ChatRoomService {
     private final ProjectRepository projectRepository;
     private final ChatMessageRepository chatMessageRepository;
 
+    @Autowired
+    private EntityManager entityManager;
     
     @Autowired
     public ChatRoomService(ChatRoomRepository chatRoomRepository, 
@@ -60,7 +66,7 @@ public class ChatRoomService {
         return chatRoomRepository.findAllById(chatroomIds);
     }
 
-    // 새로운 채팅방 생성 메서드
+ // 새로운 채팅방 생성 메서드
     @Transactional
     public void createChatRoom(CreateChatRoomRequestDTO request, String loggedInUserId) {
         // 채팅방 이름 설정
@@ -76,26 +82,29 @@ public class ChatRoomService {
                 .build();
         ChatRoomEntity savedChatRoom = chatRoomRepository.save(chatRoom);
 
-        // 로그인한 사용자 채팅방 참가자로 추가
+        // 로그인한 사용자 채팅방 참가자로 추가 (LAST_READ_TIME을 현재 시간으로 설정)
         ChatParticipantEntity creatorParticipant = ChatParticipantEntity.builder()
                 .chatroomId(savedChatRoom.getChatroomId())
                 .participantId(loggedInUserId)
                 .joinedTime(LocalDateTime.now())
+                .lastReadTime(Timestamp.valueOf(LocalDateTime.now())) // LAST_READ_TIME을 현재 시간으로 설정
                 .build();
         chatParticipantRepository.save(creatorParticipant);
 
-        // 선택된 멤버들을 추가
+        // 선택된 멤버들을 추가 (LAST_READ_TIME을 현재 시간으로 설정)
         for (String memberId : request.getSelectedMemberIds()) {
             if (!memberId.equals(loggedInUserId)) { // 로그인한 사용자가 중복 추가되지 않도록 체크
                 ChatParticipantEntity participant = ChatParticipantEntity.builder()
                         .chatroomId(savedChatRoom.getChatroomId())
                         .participantId(memberId)
                         .joinedTime(LocalDateTime.now())
+                        .lastReadTime(Timestamp.valueOf(LocalDateTime.now())) // LAST_READ_TIME을 현재 시간으로 설정
                         .build();
                 chatParticipantRepository.save(participant);
             }
         }
     }
+
 
     @Transactional
     public void createChatRoomsForAllMemberProjects(String memberId) {
@@ -281,7 +290,64 @@ public class ChatRoomService {
     }
 
 
+ // 마지막 읽은 시간 업데이트
+    @Transactional
+    public void updateLastReadTime(int chatroomId, String participantId) {
+        ChatParticipantEntity participant = chatParticipantRepository.findByChatroomIdAndParticipantId(chatroomId, participantId)
+                .orElseThrow(() -> new EntityNotFoundException("참여자를 찾을 수 없습니다."));
+
+        // 현재 시간을 명시적으로 설정
+        participant.setLastReadTime(new Timestamp(System.currentTimeMillis()));
+       
+
+        chatParticipantRepository.save(participant);
+        entityManager.flush(); // 엔티티 매니저 플러시
+    }
 
 
-    
+
+
+    public boolean hasNewMessages(int chatroomId, String userId) {
+    	Timestamp lastReadTime = chatParticipantRepository.findLastReadTimeByChatroomIdAndParticipantId(chatroomId, userId)
+                .orElse(Timestamp.from(Instant.now())); // 없을 경우 현재 시간으로 설정
+
+        if (lastReadTime == null) {
+            // 만약 lastReadTime이 null이면 첫 진입으로 간주하고 알림이 뜨지 않도록 설정
+            return false;
+        }
+        
+        long newMessagesCount = chatMessageRepository.countNewMessagesAfter(chatroomId, lastReadTime);
+        return newMessagesCount > 0;
+    }
+
+
+    public int countNewMessages(int chatroomId, String participantId) {
+        // 사용자의 마지막 읽은 시간 조회
+        Timestamp lastReadTime = chatParticipantRepository.findLastReadTimeByChatroomIdAndParticipantId(chatroomId, participantId)
+            .orElse(Timestamp.valueOf(LocalDateTime.MIN)); // 만약 마지막 읽은 시간이 없으면 매우 옛날 시간으로 설정
+        
+        // 해당 채팅방에서 마지막 읽은 시간 이후의 메시지 갯수를 카운트
+        return chatMessageRepository.countNewMessagesAfter(chatroomId, lastReadTime);
+    }
+
+    public void enterChatRoom(int chatroomId, String userId) {
+        // 사용자가 해당 채팅방에 이미 참여하고 있는지 확인
+        Optional<ChatParticipantEntity> participantOpt = chatParticipantRepository.findByChatroomIdAndParticipantId(chatroomId, userId);
+        
+        if (participantOpt.isPresent()) {
+            // 이미 참가자가 존재하는 경우: LastReadTime 업데이트
+            ChatParticipantEntity participant = participantOpt.get();
+            participant.setLastReadTime(new Timestamp(System.currentTimeMillis()));
+            chatParticipantRepository.save(participant);
+        } else {
+            // 처음 참여하는 경우: 새로운 참여자 생성 및 LastReadTime을 현재 시간으로 설정
+            ChatParticipantEntity newParticipant = ChatParticipantEntity.builder()
+                .chatroomId(chatroomId)
+                .participantId(userId)
+                .lastReadTime(new Timestamp(System.currentTimeMillis()))  // 현재 시간을 설정
+                .build();
+            chatParticipantRepository.save(newParticipant);
+        }
+    }
+
 }

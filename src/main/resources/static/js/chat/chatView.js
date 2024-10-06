@@ -28,9 +28,6 @@ function updateChatRoomList() {
             chatRoomsContent.innerHTML = '';
 
             chatrooms.forEach(room => {
-                // 참가자 수를 확인하고 필요시 메시지를 삭제하는 부분 추가
-                
-
                 // 채팅방을 UI에 추가
                 const roomContainer = document.createElement('div');
                 roomContainer.classList.add('chat-room-container');
@@ -45,6 +42,21 @@ function updateChatRoomList() {
                     openChatRoom(room.chatroomId, room.chatroomName);
                 };
 
+                // 새로운 메시지 갯수를 확인하여 배지 표시
+				fetch(`/chat/check-new-messages?chatroomId=${room.chatroomId}`)
+				    .then(response => response.json())
+				    .then(data => {
+				        if (data.newMessageCount > 0) {
+				            const badge = document.createElement('span');
+				            badge.className = 'badge';
+				            badge.textContent = data.newMessageCount;
+				            roomLink.appendChild(badge);
+				        }
+				    })
+				    .catch(error => {
+				        console.error('Error checking new messages:', error);
+				    });
+
                 roomContainer.appendChild(roomLink);
                 chatRoomsContent.appendChild(roomContainer);
             });
@@ -54,6 +66,7 @@ function updateChatRoomList() {
             alert('채팅방 목록을 불러오는 중 오류가 발생했습니다.');
         });
 }
+
 
 //채팅방 삭제 API 호출 예시
 function deleteEmptyChatRooms(chatRoomId) {
@@ -137,9 +150,9 @@ function openChatRoom(chatroomId, chatroomName) {
     fetch(`/chat/getProjectNum?chatroomId=${chatroomId}`)
         .then(response => response.json())
         .then(data => {
-            const projectNum = data.projectNum; // 서버에서 받아온 projectNum 설정
+            const projectNum = data.projectNum;
             if (projectNum) {
-                selectedProjectNum = projectNum; // 받아온 projectNum을 selectedProjectNum에 설정
+                selectedProjectNum = projectNum;
                 document.getElementById('chatroom-data').setAttribute('data-project-num', selectedProjectNum);
                 console.log('Selected projectNum set in chatroom-data:', selectedProjectNum);
             } else {
@@ -150,14 +163,17 @@ function openChatRoom(chatroomId, chatroomName) {
             console.error('Error fetching projectNum:', error);
         });
 
-    // memberId를 서버에서 받아오는 로직 추가 (로그인한 사용자 정보)
-    fetch('/member/getMemberId') // 서버에서 현재 로그인한 사용자의 memberId를 가져오는 API 엔드포인트
+    // memberId를 서버에서 받아오는 로직 추가
+    fetch('/member/getMemberId')
         .then(response => response.json())
         .then(data => {
-            const memberId = data.memberId; // 서버에서 받아온 memberId 설정
+            const memberId = data.memberId;
             if (memberId) {
                 document.getElementById('chatroom-data').setAttribute('data-member-id', memberId);
                 console.log('Member ID set in chatroom-data:', memberId);
+
+                // Last Read Time 업데이트 (채팅방 입장 시)
+                updateLastReadTime(chatroomId, memberId);
             } else {
                 console.error('Could not fetch memberId');
             }
@@ -175,6 +191,27 @@ function openChatRoom(chatroomId, chatroomName) {
     loadPreviousMessages(chatroomId);
     connectWebSocket(chatroomId);
 }
+
+// Last Read Time 업데이트 함수
+function updateLastReadTime(chatroomId, memberId) {
+    fetch(`/chat/updateLastReadTime`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `chatroomId=${chatroomId}&memberId=${memberId}`
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Last read time updated successfully');
+        } else {
+            console.error('Failed to update last read time');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating last read time:', error);
+    });
+}
+
+
 
 // 채팅방 모달 닫기
 function closeChatModal() {
@@ -236,10 +273,18 @@ function sendMessage() {
             messageContents: messageContent,
             sendTime: new Date().toISOString()
         };
+
+        // 메시지 전송
         stompClients[chatroomId].send('/app/send', {}, JSON.stringify(messageData));
+
+        // 메시지 전송 성공 후 Last Read Time 업데이트 호출
+        updateLastReadTime(chatroomId, memberId);
+
+        // 메시지 입력란 초기화
         messageInput.value = '';
     }
 }
+
 
 // 전송 버튼 클릭 이벤트
 document.getElementById('sendMessageButton').onclick = sendMessage;
@@ -503,7 +548,7 @@ window.closeModal = function () {
 };
 
 // 자동으로 채팅방 목록 업데이트 (5초마다)
-setInterval(updateChatRoomList, 5000);
+setInterval(updateChatRoomList, 3000);
 
 function openCreateChatRoomModal() {
     fetch('/chat/getProjects')
@@ -590,3 +635,52 @@ function downloadChat() {
 
     window.location.href = `/chat/downloadChat?chatroomId=${chatroomId}`;
 }
+
+// 새로운 메시지가 있는지 서버에서 확인하는 함수 (메시지 갯수 포함)
+// 새로운 메시지가 있는지 서버에서 확인하는 함수 (메시지 갯수 포함)
+function checkForNewMessages(chatroomId) {
+    fetch(`/chat/check-new-messages?chatroomId=${chatroomId}`)
+        .then(response => response.json())
+        .then(data => {
+            const chatRoomElement = document.querySelector(`[data-chatroom-id="${chatroomId}"]`);
+            
+            if (data.newMessageCount > 0) {
+                chatRoomElement.classList.add('newMessageBadge');
+                
+                // 알림 배지에 메시지 갯수를 표시
+                let badge = chatRoomElement.querySelector('.badge');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'badge';
+                    chatRoomElement.appendChild(badge);
+                }
+                badge.textContent = data.newMessageCount;
+            } else {
+                chatRoomElement.classList.remove('newMessageBadge');
+                const badge = chatRoomElement.querySelector('.badge');
+                if (badge) {
+                    badge.remove();
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error checking new messages:', error);
+        });
+}
+
+// 채팅방 목록을 초기화하고 새로운 메시지를 확인하는 함수
+function initializeChatRooms() {
+    const chatRooms = document.querySelectorAll('.chat-room-item');
+    chatRooms.forEach(chatRoom => {
+        const chatroomId = chatRoom.getAttribute('data-chatroom-id');
+        checkForNewMessages(chatroomId);  // 각 채팅방에 대해 새로운 메시지를 확인
+    });
+}
+
+// DOM 로드 후 채팅방 알림 확인
+document.addEventListener('DOMContentLoaded', function () {
+    initializeChatRooms();  // 페이지 로드 시 모든 채팅방에 대해 알림 확인
+});
+
+
+
