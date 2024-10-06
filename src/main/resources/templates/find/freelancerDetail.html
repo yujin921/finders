@@ -53,7 +53,8 @@
                 </div>
                 <div class="portfolio-section">
                     <div th:each="portfolio : ${freelancerPortfoliosList}" class="portfolio-item"
-                         th:onclick="'location.href=\'/guestportfolio/content?portfolioId=' + ${portfolio.portfolioId} + '\''">
+                         th:onclick="'window.open(\'/guestportfolio/content?portfolioId=' + ${portfolio.portfolioId} + '\', \'_blank\', \'width=1200,height=800\'); return false;'"
+                         style="cursor: pointer;">
                         <h4>
                             <a th:text="${portfolio.portfolioTitle}"></a>
                         </h4>
