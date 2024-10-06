@@ -252,4 +252,35 @@ public class ChatRoomController {
         chatRoomService.deleteChatRoomIfNoParticipants(chatRoomId);
         return ResponseEntity.ok().build();
     }
+    
+    @PostMapping("/updateLastReadTime")
+    public ResponseEntity<Void> updateLastReadTime(
+            @RequestParam("chatroomId") int chatroomId,
+            @RequestParam("memberId") String memberId) {
+        try {
+            // last_read_time 업데이트 로직
+            chatRoomService.updateLastReadTime(chatroomId, memberId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+  
+
+    @GetMapping("/check-new-messages")
+    public ResponseEntity<Map<String, Integer>> checkNewMessages(@RequestParam("chatroomId") int chatroomId, @AuthenticationPrincipal AuthenticatedUser user) {
+        String userId = user.getId();
+        
+        // 새로운 메시지의 갯수를 조회
+        int newMessageCount = chatRoomService.countNewMessages(chatroomId, userId);
+        
+        // 결과를 Map에 담아 반환
+        Map<String, Integer> response = new HashMap<>();
+        response.put("newMessageCount", newMessageCount);
+        
+        return ResponseEntity.ok(response);
+    }
+    
 }

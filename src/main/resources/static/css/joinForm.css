@@ -1,12 +1,11 @@
 :root {
   --primary-color: #1A202C;   /* 다크 네이비 */
-  --secondary-color: #4FD1C5; /* 청록색 */
-  --accent-color: #F6AD55;    /* 오렌지 */
-  --background-color: #f8f9fa; /* 밝은 회색 배경 */
+  --background-color: #EDF2F7; /* 밝은 회색 배경 */
   --text-color: #333;         /* 기본 텍스트 색상 */
   --error-color: #e74c3c;     /* 오류 색상 */
   --border-radius: 8px;       /* 전체적인 둥근 모서리 */
   --button-radius: 5px;       /* 버튼 둥근 모서리 */
+  --border-color: #E2E8F0; 
 }
 
 body {
@@ -21,7 +20,7 @@ body {
   min-height: 100vh;
 }
 
-.container {
+body > div {
   width: 100%;
   max-width: 600px;
   background-color: #fff;
@@ -45,7 +44,7 @@ h1 {
 }
 
 .tabs button {
-  width: 250px; /* 버튼의 고정 넓이를 동일하게 설정 */
+  width: 250px;
   padding: 10px 20px;
   font-size: 1rem;
   background-color: transparent;
@@ -64,7 +63,7 @@ h1 {
 
 .tab-content {
   display: none;
-  max-width: 100%; /* 폼 컨텐츠의 최대 너비 통일 */
+  max-width: 100%;
 }
 
 .tab-content.active {
@@ -90,7 +89,7 @@ input[type="number"],
 input[type="date"],
 input[type="file"] {
   width: 100%;
-  max-width: 500px; /* 입력 필드의 고정 넓이 */
+  max-width: 500px;
   padding: 12px;
   margin-top: 5px;
   border: 1px solid #ddd;
@@ -113,7 +112,7 @@ input[type="file"]:focus {
 input[type="button"],
 button[type="submit"] {
   width: 100%;
-  max-width: 500px; /* 버튼의 고정 넓이 */
+  max-width: 500px;
   background-color: var(--primary-color);
   color: white;
   padding: 12px;
@@ -138,53 +137,14 @@ button[type="submit"]:hover {
   font-size: 0.9rem;
 }
 
-/* 기술 분야 카테고리 섹션 */
-
 .tech-section, .field-section, .category-section {
   margin-top: 25px;
-  background-color: var(--background-color);
   padding: 15px;
   border-radius: var(--border-radius);
+  border: 1px solid #ddd;
 }
 
-.tech-buttons, .selected-techs, .field-buttons, .category-buttons, .selected-field, .selected-category {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.tech-button, .selected-tech, .field-button, .category-button, .selected-field, .selected-category {
-  padding: 8px 12px;
-  border-radius: var(--button-radius);
-  font-size: 13px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: all 0.3s ease;
-}
-
-.tech-button, .field-button, .category-button {
-  background-color: #e9ecef;
-  cursor: pointer;
-}
-
-.tech-button:hover, .field-button:hover, .category-button:hover {
-  background-color: #dee2e6;
-}
-
-.tech-button.selected, .selected-tech, .category-button.selected, .selected-category, .field-button.selected, .selected-field {
-  background-color: var(--primary-color);
-  color: #fff;
-}.tech-section, .field-section, .category-section {
-  margin-top: 25px;
-  background-color: var(--background-color);
-  padding: 15px;
-  border-radius: var(--border-radius);
-}
-
-.tech-buttons, .selected-techs, .field-buttons, .category-buttons, .selected-field, .selected-category {
+.tech-buttons, .field-buttons, .category-buttons, .selected-field, .selected-category {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 10px;
@@ -224,7 +184,7 @@ input[type="button"] {
 }
 
 @media (max-width: 768px) {
-  .container {
+  body > div {
     width: 100%;
     margin: 0 10px;
   }
@@ -235,12 +195,6 @@ input[type="button"] {
 
   .tabs button {
     padding: 8px;
-    font-size: 0.9rem;
-  }
-
-  input[type="text"],
-  input[type="password"],
-  input[type="email"] {
     font-size: 0.9rem;
   }
 }

@@ -161,3 +161,21 @@ button[type="submit"]:hover {
 .find-links button:hover {
     background-color: var(--highlight-color);
 }
+
+/* 회원가입 버튼 스타일 */
+.join {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    margin-top: 20px; /* 상단 여백 추가 */
+}
+
+.join:hover {
+    background-color: var(--button-hover);
+}
