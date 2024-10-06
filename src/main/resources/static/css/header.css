@@ -88,7 +88,7 @@ header .search-bar button {
     transition: background-color 0.3s ease;
 }
 header .search-bar button:hover {
-    background-color: var(--button-hover); /* 버튼 색상만 변경 */
+    background-color: var(--secondary-color); /* 버튼 색상만 변경 */
 }
 
 
@@ -115,7 +115,7 @@ header .login-actions a.btn {
 }
 
 header .login-actions a.btn:hover {
-    background-color: var(--secondary-color);
+    background-color: var(--button-hover);
     transform: translateY(-3px);
     color : white;
 }

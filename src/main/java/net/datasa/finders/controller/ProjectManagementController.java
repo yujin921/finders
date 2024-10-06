@@ -24,6 +24,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.CalendarEventDTO;
+import net.datasa.finders.domain.dto.DeleteRequestDTO;
 import net.datasa.finders.domain.dto.FunctionDTO;
 import net.datasa.finders.domain.dto.FunctionTitleDTO;
 import net.datasa.finders.domain.dto.FunctionTitleWithTaskIdDTO;
@@ -31,6 +32,7 @@ import net.datasa.finders.domain.dto.ProjectPublishingDTO;
 import net.datasa.finders.domain.dto.TaskDTO;
 import net.datasa.finders.domain.dto.TaskManagementDTO;
 import net.datasa.finders.domain.dto.TaskNotificationsDTO;
+import net.datasa.finders.domain.dto.TaskResponseDTO;
 import net.datasa.finders.domain.dto.TeamDTO;
 import net.datasa.finders.domain.entity.RoleName;
 import net.datasa.finders.domain.entity.TaskStatus;
@@ -465,10 +467,59 @@ public class ProjectManagementController {
         return ResponseEntity.ok("피드백 알림 전송 완료");
     }
     
+    @ResponseBody
     @GetMapping("getTaskStatus")
     public ResponseEntity<String> getTaskStatus(@RequestParam("taskId") int taskId) {
         String taskStatus = projectManagementService.getTaskStatus(taskId);
         return ResponseEntity.ok(taskStatus);
+    }
+    
+    // 업무 삭제 요청
+    @ResponseBody
+    @PostMapping("requestDeleteTask")
+    public ResponseEntity<TaskResponseDTO> requestDeleteTask(@RequestBody DeleteRequestDTO deleteRequestDTO) {
+        Integer taskId = deleteRequestDTO.getTaskId();
+        String reason = deleteRequestDTO.getReason();
+
+        // 업무 삭제 요청 처리
+        TaskResponseDTO response = projectManagementService.requestDeleteTask(taskId, reason);
+
+        // 삭제 요청 후 응답 생성
+        if (response != null) {
+            return ResponseEntity.ok(response); // 성공적으로 삭제 요청이 처리된 경우
+        } else {
+            return ResponseEntity.badRequest().build(); // 실패한 경우
+        }
+    }
+    
+    // 업무 삭제 요청 승인 처리
+    @ResponseBody
+    @PostMapping("approveDeleteTask")
+    public ResponseEntity<TaskResponseDTO> approveDeleteTask(@RequestParam("taskId") Integer taskId) {
+        try {
+            TaskResponseDTO response = projectManagementService.approveDeleteTask(taskId);
+            return ResponseEntity.ok(response); // 성공적으로 삭제 요청이 승인된 경우
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build(); // 업무를 찾을 수 없는 경우
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build(); // 기타 에러 발생
+        }
+    }
+
+    // 업무 삭제 요청 거부 처리
+    @ResponseBody
+    @PostMapping("denyDeleteTask")
+    public ResponseEntity<TaskResponseDTO> denyDeleteTask(@RequestParam("taskId") Integer taskId, @RequestBody Map<String, String> payload) {
+        String reason = payload.get("reason");
+        
+        try {
+            TaskResponseDTO response = projectManagementService.denyDeleteTask(taskId, reason);
+            return ResponseEntity.ok(response); // 성공적으로 삭제 요청이 거부된 경우
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build(); // 업무를 찾을 수 없는 경우
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build(); // 기타 에러 발생
+        }
     }
     
     

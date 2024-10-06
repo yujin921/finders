@@ -1,10 +1,5 @@
 package net.datasa.finders.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +11,10 @@ import net.datasa.finders.repository.FreelancerPortfoliosRepository;
 import net.datasa.finders.repository.FreelancerRepository;
 import net.datasa.finders.repository.MemberRepository;
 import net.datasa.finders.security.AuthenticatedUser;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -79,17 +78,24 @@ public class FreelancerPortfoliosService {
 		return;
 	}
 
+	public FreelancerPortfoliosDTO getPortfolioToGuest(int portfolioId) throws Exception {
+		FreelancerPortfoliosEntity portfolio = freelancerPortfoliosRepository.findById(portfolioId)
+				.orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
+
+		return convertToDTO(portfolio);
+	}
+
 	public FreelancerPortfoliosDTO getPortfolioById(int portfolioId, String userId) throws Exception {
 		FreelancerPortfoliosEntity portfolio = freelancerPortfoliosRepository.findById(portfolioId)
 		        .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
-		    
+
 		    if (!portfolio.getMember().getMemberId().equals(userId)) {
 		    	throw new Exception("You don't have permission to update this portfolio");
 		    }
-		    
+
 		    return convertToDTO(portfolio);
 	}
-	
+
 	public FreelancerPortfoliosDTO convertToDTO(FreelancerPortfoliosEntity freelancerPortfoliosEntity) {
 	
 		return FreelancerPortfoliosDTO.builder()

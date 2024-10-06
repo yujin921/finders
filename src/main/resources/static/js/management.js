@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     console.log("projectNum 체크용: ", projectNum);
-
+	
 	// 페이지 로드 시 기본적으로 업무 목록 로드
 	loadTasks();
 
@@ -194,6 +194,57 @@ document.addEventListener('DOMContentLoaded', function() {
         taskTableBody.appendChild(newRow);
     }
 	*/
+	
+	let assignees = []; // AJAX로 불러온 데이터 저장할 배열
+
+	// "담당자" 입력란에 ID 입력 시 해당 프로젝트에 참여하는 프리랜서 ID 자동완성
+	function initializeAssigneeAutocomplete() {
+	    console.log('Initializing assignee autocomplete'); // 로그 추가
+
+	    console.log("User Data 체크용:", userData); // 확인용 로그
+	    console.log("User Role 체크용:", userData.role);
+	    console.log("User ID 체크용:", userData.id);
+
+	    // 담당자 입력란 초기화
+	    if (userData.role === 'ROLE_FREELANCER' && userData.id) {
+	        $('#task-assignee').val(userData.id); // 자신의 ID 설정
+	        $('#task-assignee').prop('readonly', true); // 읽기 전용으로 설정
+	        $('#task-assignee').css('background-color', '#f0f0f0'); // 배경색 변경
+	    } else {
+	        $('#task-assignee').prop('readonly', false); // 일반 사용자 경우 수정 가능
+	    }
+		
+		// 입력 필드 이벤트 핸들링
+		$('#task-assignee').on('input', function() {
+		    let value = $(this).val().toLowerCase();
+		    $('#autocomplete-list').empty(); // 이전 목록 비우기
+
+		    if (value) {
+		        let filteredAssignees = assignees.filter(assignee => assignee.id.toLowerCase().includes(value));
+		        console.log('Filtered Assignees:', filteredAssignees); // 필터링된 결과 로그
+
+		        filteredAssignees.forEach(assignee => {
+		            $('#autocomplete-list').append(`<div class="autocomplete-item">${assignee.id}</div>`);
+		        });
+		        $('#autocomplete-list').removeClass('hidden'); // 목록 보이기
+		    } else {
+		        $('#autocomplete-list').addClass('hidden'); // 입력이 없으면 목록 숨기기
+		    }
+		});
+
+		// 클릭 시 입력 필드에 값 설정
+		$(document).on('click', '.autocomplete-item', function() {
+		    $('#task-assignee').val($(this).text());
+		    $('#autocomplete-list').addClass('hidden'); // 목록 숨기기
+		});
+
+		// 입력 필드 밖 클릭 시 목록 숨기기
+		$(document).on('click', function(e) {
+		    if (!$(e.target).closest('#task-assignee').length) {
+		        $('#autocomplete-list').addClass('hidden');
+		    }
+		});
+	}
 
     // 업무 등록 버튼 클릭 시 모달 창 열기
     $('.add-task-buttons').on('click', function() {
@@ -216,8 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 		
 		// 자동완성 초기화 호출
-		initializeAssigneeAutocomplete();
-		
+		initializeAssigneeAutocomplete(); // 이 부분을 호출하여 자동완성 초기화
     });
 
     // 모달 닫기 버튼 클릭 시
@@ -231,8 +281,50 @@ document.addEventListener('DOMContentLoaded', function() {
 			$(this).addClass('hidden').hide();
 		}
 	});
+	
+	// 프리랜서 데이터를 불러오는 함수
+	function loadFreelancers() {
+	    $.ajax({
+	        url: 'freelancersInput?projectNum=' + projectNum,
+	        type: 'GET',
+	        dataType: 'json',
+	        success: function(data) {
+	            console.log("AJAX success, data:", data);
+	            // 프리랜서만 필터링
+	            assignees = data.filter(freelancer => freelancer.roleName === 'ROLE_FREELANCER')
+	                             .map(freelancer => ({
+	                id: freelancer.memberId,
+	                role: freelancer.roleName
+	            }));
+				
+				// 기존에 autocomplete가 초기화되어 있으면 파기
+	            if ($('#task-assignee').data('ui-autocomplete')) {
+	                $('#task-assignee').autocomplete('destroy'); // 이미 초기화된 경우 삭제
+	            }
+	            
+	            // 자동완성 설정
+	            $('#task-assignee').autocomplete({
+	                source: assignees.map(f => f.id), // 초기 데이터로 자동완성 목록 제공
+	                minLength: 1,
+	                select: function(event, ui) {
+	                    console.log("Selected value:", ui.item.value);
+	                    $('#task-assignee').val(ui.item.value); // 선택된 값 설정
+	                }
+	            });
 
-    console.log("projectNum 체크용: ", projectNum);
+	            console.log("Autocomplete initialized"); // 초기화 로그
+	        },
+	        error: function() {
+	            console.error("AJAX error");
+	        }
+	    });
+	}
+	
+	// "담당자" 입력란 클릭 시 프리랜서 데이터 로드
+	$('#task-assignee').on('focus', function() {
+	    console.log('Loading freelancers for autocomplete'); // 로그 추가
+		loadFreelancers(); // 프리랜서 데이터 로드
+	});
 
     // 기능 분류 목록 로드 함수
     function loadFunctionTitles(projectNum, isFirstTask) {
@@ -280,163 +372,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // 선택한 기능 분류 ID를 전역 변수에 저장
         funcTitleId = $(this).val();
     });
-	
-	let assignees = []; // AJAX로 불러온 데이터 저장할 배열
-
-	// "담당자" 입력란에 ID 입력 시 해당 프로젝트에 참여하는 프리랜서 ID 자동완성
-	function initializeAssigneeAutocomplete() {
-	    console.log('Initializing assignee autocomplete'); // 로그 추가
-
-	    console.log("User Data 체크용:", userData); // 확인용 로그
-	    console.log("User Role 체크용:", userData.role);
-	    console.log("User ID 체크용:", userData.id);
-
-	    // 담당자 입력란 초기화
-	    if (userData.role === 'ROLE_FREELANCER' && userData.id) {
-	        $('#task-assignee').val(userData.id); // 자신의 ID 설정
-	        $('#task-assignee').prop('readonly', true); // 읽기 전용으로 설정
-	        $('#task-assignee').css('background-color', '#f0f0f0'); // 배경색 변경
-	    } else {
-	        $('#task-assignee').prop('readonly', false); // 일반 사용자 경우 수정 가능
-	    }
-
-	    // 프리랜서 데이터 불러오기
-	    loadFreelancers();
-
-	    // 자동완성 설정
-	    $('#task-assignee').autocomplete({
-	        source: assignees.map(f => f.id), // 초기 데이터로 자동완성 목록 제공
-	        minLength: 1,
-	        select: function(event, ui) {
-	            console.log("Selected value:", ui.item.value);
-	            $('#task-assignee').val(ui.item.value); // 선택된 값 설정
-	        }
-	    });
-
-	    // 입력 필드 이벤트 핸들링
-	    $('#task-assignee').on('input', function() {
-	        let value = $(this).val().toLowerCase();
-	        $('#autocomplete-list').empty(); // 이전 목록 비우기
-
-	        if (value) {
-	            let filteredAssignees = assignees.filter(assignee => assignee.id.toLowerCase().includes(value));
-	            console.log('Filtered Assignees:', filteredAssignees); // 필터링된 결과 로그
-
-	            filteredAssignees.forEach(assignee => {
-	                $('#autocomplete-list').append(`<div class="autocomplete-item">${assignee.id}</div>`);
-	            });
-	            $('#autocomplete-list').removeClass('hidden'); // 목록 보이기
-	        } else {
-	            $('#autocomplete-list').addClass('hidden'); // 입력이 없으면 목록 숨기기
-	        }
-	    });
-
-	    // 클릭 시 입력 필드에 값 설정
-	    $(document).on('click', '.autocomplete-item', function() {
-	        $('#task-assignee').val($(this).text());
-	        $('#autocomplete-list').addClass('hidden'); // 목록 숨기기
-	    });
-
-	    // 입력 필드 밖 클릭 시 목록 숨기기
-	    $(document).on('click', function(e) {
-	        if (!$(e.target).closest('#task-assignee').length) {
-	            $('#autocomplete-list').addClass('hidden');
-	        }
-	    });
-
-	    console.log("Autocomplete initialized");
-	}
-
-	// 프리랜서 데이터를 불러오는 함수
-	function loadFreelancers() {
-	    $.ajax({
-	        url: 'freelancersInput?projectNum=' + projectNum,
-	        type: 'GET',
-	        dataType: 'json',
-	        success: function(data) {
-	            console.log("AJAX success, data:", data);
-	            // 프리랜서만 필터링
-	            assignees = data.filter(freelancer => freelancer.roleName === 'ROLE_FREELANCER')
-	                             .map(freelancer => ({
-	                id: freelancer.memberId,
-	                role: freelancer.roleName
-	            }));
-	        },
-	        error: function() {
-	            console.error("AJAX error");
-	        }
-	    });
-	}
-
-	/*
-	// 폼 제출 이벤트 핸들러
-	$('#save-function-and-task-btn').on('click', function() {
-	    const newFunctionName = $('#new-function-name').val();
-	    const projectNum = $('#project-num').val(); // 프로젝트 번호 값 읽기
-	    const selectedFunctionId = $('#function-select').val(); // 선택된 기능 ID
-
-	    if (newFunctionName.trim() === '' && selectedFunctionId === '') {
-	        alert('기능 이름을 입력해 주세요 또는 기능을 선택해 주세요.');
-	        return;
-	    }
-	    
-	    // functionTitleName을 새 기능 입력값이나 선택된 기능 이름으로 설정
-	    const functionTitleName = newFunctionName.trim() !== '' ? newFunctionName : $('#function-select option:selected').text();
-
-	    // 시작 및 종료 날짜를 UTC로 변환
-	    const taskStartDate = new Date($('#task-start-date').val());
-	    const taskEndDate = new Date($('#task-end-date').val());
-
-	    const formattedStartDate = new Date(taskStartDate.getTime() - (taskStartDate.getTimezoneOffset() * 60000)).toISOString().split('.')[0] + 'Z';
-	    const formattedEndDate = new Date(taskEndDate.getTime() - (taskEndDate.getTimezoneOffset() * 60000)).toISOString().split('.')[0] + 'Z';
-
-	    const taskData = {
-	        functionTitleId: selectedFunctionId || null, // 선택된 기능 ID, 새 기능의 경우 null 처리
-	        functionTitleName: functionTitleName, // 기능 제목 추가
-	        taskTitle: $('#task-title').val(),
-	        taskDescription: $('#task-description').val(),
-	        taskStatus: "REQUEST", // 신규 업무 등록 시 업무 상태 default 값은 "REQUEST(요청)"로 설정함
-	        taskPriority: $('#task-priority').val().toUpperCase(), // Enum을 위해 대문자로 변환
-	        taskStartDate: formattedStartDate, // 변환된 시작 날짜
-	        taskEndDate: formattedEndDate, // 변환된 종료 날짜
-	        freelancerId: $('#task-assignee').val()
-	    };
-
-	    console.log('taskData 체크용: ', taskData);
-
-	    $.ajax({
-	        url: 'saveFunctionAndTask?projectNum=' + projectNum,
-	        type: 'post',
-	        data: JSON.stringify(taskData),
-	        contentType: 'application/json',
-	        dataType: 'json',
-	        success: function(response) {
-	            console.log('서버 응답:', response);
-
-	            // 새 기능 추가 후 기능 분류 목록 갱신
-	            if (newFunctionName.trim() !== '') {
-	                $('#function-select').append(`<option value="${response.functionTitleId}">${newFunctionName}</option>`);
-	                $('#function-select').val(response.functionTitleId);
-	                $('#new-function-name').hide();
-	                $('#add-new-function-btn').hide();
-	            }
-
-	            alert('업무가 성공적으로 등록되었습니다.');
-	            $('#task-modal').addClass('hidden').hide();
-
-	            // 업무 목록 업데이트
-	            loadTasks();
-				
-				// 캘린더 새로 고침(새로 등록한 업무 일정을 캘린더 화면에 반영하기 위해 호출함)
-				loadCalendar(); // 캘린더 새로 고침 호출
-
-	        },
-	        error: function(xhr) {
-	            alert('업무 등록에 실패했습니다: ' + xhr.responseText);
-	        }
-	    });
-	});
-	*/
 	
 	// 폼 제출 이벤트 핸들러
 	$('#save-function-and-task-btn').on('click', function() {
@@ -553,9 +488,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	function loadNotifications(projectNum) {
 	    const recipientId = userData.id;
 
-		// 기존 알림 목록 비우기
-		$('#notification-list').empty();
-		
+	    // 기존 알림 목록 비우기
+	    $('#notification-list').empty();
+	    
 	    $.ajax({
 	        url: `notifications?recipientId=${recipientId}&projectNum=${projectNum}`, // projectNum 추가
 	        type: 'get',
@@ -571,11 +506,19 @@ document.addEventListener('DOMContentLoaded', function() {
 	            
 	            // 읽음/안 읽음 알림 처리
 	            response.unread.forEach(function(notification) {
+	                if (notification.taskId === null && notification.recipient !== recipientId) {
+	                    return; // 일치하지 않으면 건너뜀
+	                }
+
 	                const notificationItem = `<li>${notification.notificationMessage} (받은 시간: ${new Date(notification.createDate).toLocaleString()}) <button class="mark-as-read" data-id="${notification.notificationId}">안 읽음</button></li>`;
 	                $('#notification-list').append(notificationItem);
 	            });
 
 	            response.read.forEach(function(notification) {
+	                if (notification.taskId === null && notification.recipient !== recipientId) {
+	                    return; // 일치하지 않으면 건너뜀
+	                }
+
 	                const notificationItem = `<li style="text-decoration: line-through;">${notification.notificationMessage} (받은 시간: ${new Date(notification.createDate).toLocaleString()}) <button class="mark-as-read" data-id="${notification.notificationId}" disabled>읽음</button></li>`;
 	                $('#notification-list').append(notificationItem);
 	            });
@@ -649,9 +592,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	                        const thead = $(`<thead>
 	                            <tr>
 	                                <th style="width: 180px; text-align: center;">업무 제목</th>
-	                                <th style="text-align: center;">설명</th>
-	                                <th style="text-align: center;">상태</th>
-	                                <th style="text-align: center;">우선순위</th>
+	                                <th style="width: 280px; text-align: center;">설명</th>
+	                                <th style="width: 160px; text-align: center;">상태</th>
+	                                <th style="width: 100px; text-align: center;">우선순위</th>
 	                                <th style="width: 150px; text-align: center;">시작 날짜</th>
 	                                <th style="width: 150px; text-align: center;">종료 날짜</th>
 	                                <th style="text-align: center;">프리랜서 ID</th>
@@ -665,20 +608,22 @@ document.addEventListener('DOMContentLoaded', function() {
 	                            const formattedStartDate = formatDateTime(task.taskStartDate);
 	                            const formattedEndDate = formatDateTime(task.taskEndDate);
 
-								// 변경 버튼 활성화 조건
-								const changeButtonDisabled = 
-								    (userData.role === 'ROLE_CLIENT' && 
-								        (task.taskStatus === 'REQUEST' || 
-								         task.taskStatus === 'INPROGRESS' || 
-								         task.taskStatus === 'HOLD' || 
-								         task.taskStatus === 'APPROVAL')) || // 기업 회원 비활성화 조건
-								    (userData.role === 'ROLE_FREELANCER' && 
-								        (task.taskStatus === 'COMPLETED' || 
-								         task.taskStatus === 'APPROVAL' || 
-										 task.freelancerId !== userData.id)) // 프리랜서 회원 비활성화 조건
-								    ? 'disabled' : '';
-								
-	                            tbody.append(`
+	                            // 변경 버튼 활성화 조건
+	                            const changeButtonDisabled = 
+	                                (userData.role === 'ROLE_CLIENT' && 
+	                                    (task.taskStatus === 'REQUEST' || 
+	                                     task.taskStatus === 'INPROGRESS' || 
+	                                     task.taskStatus === 'HOLD' || 
+	                                     task.taskStatus === 'APPROVAL' ||
+									     task.taskStatus === 'DELETED_DENIED')) || // 기업 회원 비활성화 조건
+	                                (userData.role === 'ROLE_FREELANCER' && 
+	                                    (task.taskStatus === 'COMPLETED' || 
+	                                     task.taskStatus === 'APPROVAL' || 
+	                                     task.freelancerId !== userData.id)) || // 프리랜서 회원 비활성화 조건
+									(task.taskStatus === 'DELETED_REQUEST') // 삭제 요청 상태 시 비활성화
+									? 'disabled' : '';
+	                            
+	                            const row = $(`
 	                                <tr class="task-row" data-task-id="${task.taskId}" data-task-status="${task.taskStatus}">
 	                                    <td style="text-align: center;">${task.taskTitle}</td>
 	                                    <td style="width: 120px; text-align: center;">${task.taskDescription}</td>
@@ -692,6 +637,18 @@ document.addEventListener('DOMContentLoaded', function() {
 	                                    </td>
 	                                </tr>
 	                            `);
+	                            
+	                            // DELETED_REQUEST 상태인 경우 취소선 표시
+	                            if (task.taskStatus === 'DELETED_REQUEST') {
+	                                row.css('text-decoration', 'line-through'); // 취소선 표시
+	                            }
+								
+								// DELETED_DENIED 상태인 경우 배경색 변경
+	                            if (task.taskStatus === 'DELETED_DENIED') {
+	                                row.css('background-color', '#f8d7da'); // 붉은 색 배경
+	                            }
+
+	                            tbody.append(row);
 	                        });
 
 	                        table.append(thead).append(tbody);
@@ -707,10 +664,43 @@ document.addEventListener('DOMContentLoaded', function() {
 	                    $container.toggleClass('open');  // 클래스 추가로 드롭다운 토글
 	                });
 
-	                // 업무 삭제 클릭 이벤트
+					// 업무 삭제 클릭 이벤트
 	                $('tbody .task-row').on('click', function() {
 	                    const taskId = $(this).data('task-id');
-	                    openDeleteModal(taskId);
+	                    const taskStatus = $(this).data('task-status');
+						
+						// 프리랜서일 때만 삭제 요청 방지 조건 추가
+					    if (userData.role === 'ROLE_FREELANCER' && 
+					        ['APPROVAL', 'DELETED_REQUEST'].includes(taskStatus)) {
+					        alert('이 업무는 삭제할 수 없습니다.');
+					        return; // 삭제 요청을 막음
+					    }
+
+	                    if (userData.role === 'ROLE_FREELANCER') {
+	                        if (taskStatus === 'DELETED_REQUEST') {
+	                            alert('이 업무는 이미 삭제 요청이 되었습니다.');
+	                        } else {
+	                            requestDeleteTask(taskId); // 프리랜서가 삭제 요청
+	                        }
+	                    } else if (userData.role === 'ROLE_CLIENT') {
+	                        if (taskStatus === 'DELETED_REQUEST') {
+	                            // 모달 열기
+	                            $('#delete-approval-modal').removeClass('hidden');
+
+	                            // 승인 및 거부 버튼 클릭 이벤트
+	                            $('#approve-delete-button').off('click').on('click', function() {
+	                                approveDeleteTask(taskId);
+	                                closeDeleteApprovalModal(); // 모달 닫기
+	                            });
+
+	                            $('#deny-delete-button').off('click').on('click', function() {
+	                                denyDeleteTask(taskId);
+	                                closeDeleteApprovalModal(); // 모달 닫기
+	                            });
+	                        } else {
+	                            alert('해당 업무는 삭제 요청 상태가 아닙니다.');
+	                        }
+	                    }
 	                });
 	                
 	                // 상태 변경 버튼 클릭 이벤트
@@ -753,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	            } else if (currentStatus === 'FEEDBACK') {
 	                options.push('COMPLETED'); // 피드백인 경우 완료 선택
 	            } else {
-	                options.push('INPROGRESS', 'HOLD'); // 그 외의 경우 진행 및 보류 선택
+	                options.push('INPROGRESS', 'HOLD'); // 그 외의 경우(삭제 요청 거부 포함) 진행 및 보류 선택
 	            }
 
 	            // 옵션 설정
@@ -841,10 +831,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	    const isFreelancer = userData.role === 'ROLE_FREELANCER';
 	    const isClient = userData.role === 'ROLE_CLIENT';
 
+		if (currentStatus === 'INPROGRESS' || currentStatus === 'HOLD') {
+	        $taskRow.css('background-color', ''); // 원래 배경색으로 복원
+	    }
+		
 	    // 변경 버튼 활성화 조건
 	    let changeButtonDisabled = false;
 
-	    if (isFreelancer) {
+		if (currentStatus === 'DELETED_REQUEST') {
+		        changeButtonDisabled = true; // 삭제 요청 상태일 경우 버튼 비활성화
+		} else if (isFreelancer) {
 	        // 프리랜서 조건
 	        if (currentStatus === 'INPROGRESS') {
 	            // INPROGRESS 상태일 경우 COMPLTED나 HOLD로 변경 가능
@@ -872,7 +868,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    changeButton.prop('disabled', changeButtonDisabled); // 버튼 비활성화 설정
 	}
 
-	// 알림 메시지(프리랜서 진행, 보류, 완료로 업무 상태 선택 시에 해당) 전송 함수
+	// 알림 메시지(프리랜서 진행, 보류, 완료로 업무 상태 변경 시 해당) 전송 함수
 	function sendNotificationToClient(taskId, newStatus) {
 	    const freelancerId = userData.id; // 현재 로그인한 프리랜서 ID
 
@@ -1045,7 +1041,183 @@ document.addEventListener('DOMContentLoaded', function() {
 	        }
 	    });
 	}
+	
+	// 업무 삭제 요청 처리
+	function requestDeleteTask(taskId) {
+	    const deleteModal = document.getElementById('unique-delete-modal');
 
+	    // 모달 열기
+	    deleteModal.classList.remove('hidden');
+	    
+	    // 업무 제목을 가져오기 위한 AJAX 요청
+	    $.ajax({
+	        url: `getTaskTitle?taskId=${taskId}`,
+	        type: 'GET',
+	        success: function() {
+	            const deleteSubmitButton = document.getElementById('unique-delete-submit-button');
+	            const deleteReasonTextarea = document.getElementById('unique-delete-reason');
+
+	            // 삭제 요청 버튼 클릭 시 처리
+	            deleteSubmitButton.onclick = function() {
+	                const reason = deleteReasonTextarea.value;
+
+	                if (reason) {
+	                    // 삭제 요청 전송
+	                    $.ajax({
+	                        url: 'requestDeleteTask',
+	                        type: 'POST',
+	                        contentType: 'application/json',
+	                        data: JSON.stringify({ taskId: taskId, reason: reason }),
+	                        success: function(response) {
+	                            console.log('업무 삭제 요청 성공:', response);
+	                            $(`tr[data-task-id="${taskId}"]`).css('text-decoration', 'line-through'); // 취소선 표시
+								updateTaskUI(taskId, 'DELETED_REQUEST'); // UI 업데이트 호출
+								
+								loadTasks(); // 업무 상태 및 버튼, 클릭 이벤트 업데이트
+								
+								alert('업무 삭제 요청이 전송되었습니다.');
+	                            closeUniqueDeleteModal(); // 모달 닫기
+	                        },
+	                        error: function() {
+	                            alert('업무 삭제 요청에 실패했습니다.');
+	                        }
+	                    });
+	                } else {
+	                    alert('삭제 사유를 입력해 주세요.');
+	                }
+	            };
+	        },
+	        error: function(xhr) {
+	            console.error('업무 제목 가져오기 실패:', xhr.responseText);
+	            alert('업무 제목을 가져오는 데 실패했습니다.');
+	        }
+	    });
+	}
+
+	// 모달 닫기 함수
+	function closeUniqueDeleteModal() {
+	    const deleteModal = document.getElementById('unique-delete-modal');
+	    deleteModal.classList.add('hidden'); // 모달 닫기
+	}
+
+	// 취소 버튼 클릭 시 피드백 모달 닫기
+	$('#close-delete-modal').on('click', function() {
+	    closeUniqueDeleteModal();
+	});
+
+	// 모달 바깥 영역 클릭 시 모달 닫기
+	$('#unique-delete-modal').on('click', function(event) {
+	    if (event.target === this) { // 모달 바깥 영역(오버레이)을 클릭했을 때만 닫기
+	        closeUniqueDeleteModal();
+	    }
+	});
+	
+	// 업무 삭제 승인 처리
+	function approveDeleteTask(taskId) {
+	    $.ajax({
+	        url: `approveDeleteTask?taskId=${taskId}`,
+	        type: 'POST',
+	        success: function(response) {
+	            console.log('업무 삭제 승인 성공:', response);
+				// 기능의 업무 개수 확인
+				checkIfFunctionCanBeDeleted(response.functionTitleId);
+				
+				alert('업무 삭제가 승인되었습니다.');
+	        },
+	        error: function() {
+	            alert('업무 삭제 승인에 실패했습니다.');
+	        }
+	    });
+	}
+
+	// 업무 삭제 거부 처리
+	function denyDeleteTask(taskId) {
+	    const denialReason = $('#deny-reason').val(); // 거부 사유 입력 필드에서 값 가져오기
+
+	    if (!denialReason) {
+	        alert('거부 사유를 입력해 주세요.'); // 사유가 없을 경우 알림
+	        return;
+	    }
+
+	    $.ajax({
+	        url: `denyDeleteTask?taskId=${taskId}`,
+	        type: 'POST',
+	        contentType: 'application/json',
+	        data: JSON.stringify({ reason: denialReason }), // 사유를 JSON 형태로 전송
+	        success: function(response) {
+	            console.log('업무 삭제 거부 성공:', response);
+				
+				loadTasks(); // 변경된 업무 상태를 UI에 즉시 반영하기 위해 loadTasks 호출
+				
+	            alert('업무 삭제가 거절되었습니다.');
+	        },
+	        error: function() {
+	            alert('업무 삭제 거부에 실패했습니다.');
+	        }
+	    });
+	}
+	
+	// 거부 버튼 클릭 시 거부 사유 입력 필드 보이기
+	$('#deny-delete-button').on('click', function() {
+	    $('#deny-reason-container').removeClass('hidden'); // 필드 보이기
+	});
+	
+	// 모달 닫기 함수
+	function closeDeleteApprovalModal() {
+	    $('#delete-approval-modal').addClass('hidden'); // 모달 닫기
+	}
+
+	// 닫기 버튼 클릭 시 모달 닫기
+	$('#close-delete-approval-modal').on('click', function() {
+	    closeDeleteApprovalModal();
+	});
+
+	// 모달 바깥 영역 클릭 시 모달 닫기
+	$('#delete-approval-modal').on('click', function(event) {
+	    if (event.target === this) { // 모달 바깥 영역(오버레이)을 클릭했을 때만 닫기
+	        closeDeleteApprovalModal();
+	    }
+	});
+
+	// 기능의 업무 개수를 확인하고 필요 시 기능 삭제
+	function checkIfFunctionCanBeDeleted(functionTitleId) {
+	    $.ajax({
+	        url: 'getTasksByFunction?functionTitleId=' + functionTitleId,
+	        type: 'GET',
+	        success: function(tasks) {
+	            console.log('해당 기능의 업무:', tasks);
+	            if (tasks.length === 0) {
+	                console.log('업무가 없으므로 기능 삭제 요청');
+	                deleteFunction(functionTitleId);
+	            } else {
+	                loadTasks(); // 업무 목록 새로 고침
+	            }
+	        },
+	        error: function() {
+	            alert('기능의 업무를 확인하는 데 실패했습니다.');
+	            loadTasks(); // 업무 목록 새로 고침
+	        }
+	    });
+	}
+
+	// 기능 삭제 AJAX 요청 처리
+	function deleteFunction(functionTitleId) {
+	    $.ajax({
+	        url: 'deleteFunction?functionTitleId=' + functionTitleId,
+	        type: 'POST',
+	        success: function() {
+	            alert('해당 기능이 삭제되었습니다.');
+	            loadTasks(); // 업무 목록 새로 고침
+	        },
+	        error: function(xhr) {
+	            console.error('기능 삭제 실패:', xhr.responseText);
+	            alert('기능 삭제에 실패했습니다.');
+	        }
+	    });
+	}
+
+
+	/*
 	// 업무 삭제 모달 창 열기
 	function openDeleteModal(taskId) {
 	    const modal = document.createElement('div');
@@ -1165,6 +1337,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	        }
 	    });
 	}
+	*/
 
 	function formatDateTime(dateString) {
 	    const date = new Date(dateString);
@@ -1693,8 +1866,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	                console.log("data 체크용:", data);
 	                
-	                // 간트차트 생성 함수 호출
-	                createGanttChart(data);
+					if (data.length === 0) {
+	                    // 데이터가 없을 경우 메시지 표시
+	                    $('#gantt-chart').html('<p>업무 미등록으로 인한 간트차트 미생성(먼저 업무를 등록해주세요.)</p>');
+	                } else {
+	                    // 간트차트 생성 함수 호출
+	                    createGanttChart(data);
+	                }
 	            } else {
 	                alert('간트 차트 데이터를 로드하는 데 필요한 정보가 부족합니다.');
 	                console.error('잘못된 데이터:', response);

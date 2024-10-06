@@ -1,45 +1,53 @@
-/* 전체 배경색 설정 */
+/* 전체 페이지 스타일 */
 body {
     background-color: #f7f9fc;
 }
 
-.container{
-	padding: 0px !important;
+.container {
+    padding: 0px !important;
 }
 
-/* 슬라이더 */
+/* 헤더 스타일 */
+/* (헤더 관련 스타일이 없으므로 생략) */
+
+/* 네비게이션 스타일 */
+/* (네비게이션 관련 스타일이 없으므로 생략) */
+
+/* 메인 컨텐츠 스타일 */
+
+/* 이미지 슬라이더 */
 .slider {
-	max-width:80%;
-	height:400px;
-	margin:40px auto; /* 상하 여백 증가 */
-	overflow:hidden;
+    max-width: 80%;
+    height: 400px;
+    margin: 40px auto;
+    overflow: hidden;
     position: relative;
-    z-index: 1; /* 슬라이더는 nav 아래에 위치 */
-    background-color: #ffffff; /* 배경색 추가 */
-    border-radius: 15px; /* 모서리 둥글게 */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+    z-index: 1;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.slides{
-	display:flex;
-	transition: trasform 1s ease-in-out;
-	width:500%;
+.slides {
+    display: flex;
+    transition: transform 1s ease-in-out;
+    width: 500%;
 }
 
-/* 개별 슬라이드 스타일 */
 .slide {
     min-width: 20%;
     box-sizing: border-box;
 }
+
 .slider .slide img {
     width: 100%;
     height: 400px;
     object-fit: cover;
     object-position: center;
-    display : block;
+    display: block;
 }
 
-/* 슬라이더 이전/다음 버튼 공통 스타일 */
+/* 슬라이더 버튼 */
 button.prev, button.next {
     position: absolute;
     top: 50%;
@@ -52,54 +60,15 @@ button.prev, button.next {
     z-index: 10;
 }
 
-/* 이전 버튼 위치 */
 button.prev {
     left: 10px;
 }
 
-/* 다음 버튼 위치 */
 button.next {
     right: 10px;
 }
 
-
-/* Hero Section */
-/* 히어로 섹션 */
-.hero {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    text-align: center;
-    padding: 70px 0;
-    margin: 40px 0; /* 상하 여백 추가 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.hero h1 {
-    font-size: 3em;
-    margin-bottom: 20px;
-}
-
-.hero p {
-    font-size: 1.4em;
-    margin-bottom: 40px;
-}
-
-main .cta-btn {
-    background-color: var(--accent-color);
-    text-decoration : none;
-    color: white;
-    padding: 15px 40px;
-    border-radius: 30px;
-    font-size: 1.2rem;
-    transition: background-color 0.3s ease, transform 0.2s;
-}
-
-main .cta-btn:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-3px);
-}
-
-/* Featured Projects */
+/* 최신 프로젝트 섹션 */
 .featured-projects {
     padding: 70px 0;
     margin: 40px 0;
@@ -118,31 +87,59 @@ main .cta-btn:hover {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
-    padding: 20px;
+    padding: 0 50px;
 }
 
 .project-card {
-    background-color: #fff;
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 200px; /* 카드의 높이를 약간 줄임 */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
 }
 
 .project-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-.project-card h3 {
+.project-front {
+    width: 100%;
+    height: 100%;
+}
+
+.project-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.project-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.project-card:hover .project-back {
+    opacity: 1;
+}
+
+.project-info h3 {
+    margin: 0 0 10px;
     font-size: 1.2em;
-    margin-bottom: 10px;
-    color: #333;
+    line-height: 1.3;
+    max-height: 2.6em;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -150,112 +147,64 @@ main .cta-btn:hover {
     -webkit-box-orient: vertical;
 }
 
-.project-info-wrapper {
-    margin-top: auto;
+.project-author {
+    font-size: 0.9em;
+    margin-bottom: 10px;
 }
 
-.project-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
+.project-details {
+    font-size: 0.8em;
 }
 
 .project-budget {
-    color: #4a4a4a;
-    text-align: right;
-    margin-left: auto; /* 우측 정렬을 위해 추가 */
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #FFD700;
+    display: block;
+    margin-bottom: 5px;
 }
 
-.project-deadline {
-    color: #4a4a4a;
-    text-align: right;
+.project-deadline, .project-duration {
+    display: block;
+    margin-top: 5px;
 }
 
-.project-rating {
-    color: #ffd700;
-}
-
-.project-author, .project-deadline {
-    font-size: 0.9em;
-}
-
-/* 특징 섹션 스타일 */
-.featured {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    padding: 20px;
-    background: #f9f9f9;
-}
-
-/* 개별 특징 아이템 스타일 */
-.feature {
-    flex: 1 1 22%;
-    margin: 10px;
+/* 히어로 섹션 */
+.hero {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
     text-align: center;
+    padding: 70px 0;
+    margin: 40px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 특징 이미지 스타일 */
-.feature img {
-    max-width: 100%;
-    height: auto;
+.hero h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
 }
 
-.project-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 0 50px;
-}
-
-.project-card {
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.project-card h3 {
-    color: var(--primary-color);
-    margin-bottom: 10px;
+.hero p {
     font-size: 1.4em;
+    margin-bottom: 40px;
 }
 
-.project-card p {
-    color: var(--text-color);
-    margin-bottom:20px;
-}
-
-.project-card a {
+main .cta-btn {
     background-color: var(--accent-color);
-    text-decoration : none;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 25px;
+    text-decoration: none;
+    color: white;
+    padding: 15px 40px;
+    border-radius: 30px;
+    font-size: 1.2rem;
     transition: background-color 0.3s ease, transform 0.2s;
 }
 
-.project-card a:hover {
+main .cta-btn:hover {
     background-color: var(--button-hover);
     transform: translateY(-3px);
 }
 
-#chat-container {
-    position: fixed;
-    bottom: 40px;
-    right: 40px;
-    z-index: 1000;
-    overflow: hidden;
-}
-
-/* 리뷰 슬라이드 */
+/* 리뷰 슬라이더 */
 .review-slider {
     display: flex;
     justify-content: center;
@@ -268,33 +217,32 @@ main .cta-btn:hover {
     border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 25px;
-    width: 500px; /* 카드의 고정 너비 */
-    height: 250px !important; /* 카드의 고정 높이 */
+    width: 500px;
+    height: 250px !important;
     text-align: left;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* 위쪽부터 채우기 시작 */
+    justify-content: flex-start;
     overflow: hidden;
     transition: transform 0.3s ease;
-    position: relative; /* 필요한 경우 카드 내에서 위치 고정 */
+    position: relative;
 }
 
 .slick-slide {
-    margin: 20px; /* 슬라이드 좌우에 간격 추가 */
+    margin: 20px;
 }
 
 .slick-dots, .slick-next:before, .slick-prev:before {
     display: none !important;
 }
 
-
 .review-text {
     font-size: 1.1rem;
     color: #555;
     margin-bottom: 15px;
-    flex-grow: 1; /* 텍스트 영역이 가변적으로 확장 */
+    flex-grow: 1;
     display: -webkit-box;
-    -webkit-line-clamp: 4; /* 최대 4줄까지만 표시 */
+    -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -326,10 +274,10 @@ main .cta-btn:hover {
     align-items: center;
     font-size: 0.9rem;
     color: #777;
-    margin-top: auto; /* 상단에 여유 공간을 채우고 하단에 고정 */
-    padding-top: 10px; /* 상단과의 여백 */
-    position: absolute; /* 카드의 하단에 고정 */
-    bottom: 15px; /* 카드의 하단에서 떨어진 거리 */
+    margin-top: auto;
+    padding-top: 10px;
+    position: absolute;
+    bottom: 15px;
     left: 25px;
     right: 25px;
 }
@@ -355,7 +303,7 @@ main .cta-btn:hover {
 
 .recipient-id {
     font-size: 0.9rem;
-    font-weight : bold;
+    font-weight: bold;
     color: var(--hilight-color);
 }
 
@@ -365,27 +313,35 @@ main .cta-btn:hover {
     text-align: right;
 }
 
+/* 채팅 컨테이너 */
+#chat-container {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 1000;
+    overflow: hidden;
+}
+
 /* 섹션 공통 스타일 */
 .slider, .featured-projects, .slidereview {
-    max-width: 1200px; /* 최대 너비 설정 */
-    margin-left: auto;
-    margin-right: auto;
-}
-.hero{
-	max-width: 100%; /* 최대 너비 설정 */
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
 }
 
-/* 반응형 디자인을 위한 미디어 쿼리 */
+.hero {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 반응형 디자인 */
 @media (max-width: 1200px) {
     .slider, .hero, .featured-projects, .slidereview {
         margin-left: 20px;
         margin-right: 20px;
     }
-}
 
-@media (max-width: 1200px) {
     .project-grid {
         grid-template-columns: repeat(3, 1fr);
     }

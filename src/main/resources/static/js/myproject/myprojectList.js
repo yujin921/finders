@@ -31,9 +31,9 @@ $(document).ready(function() {
 	                            </a>
 	                    `;
 	                    if(tabName === "완료된") {
-	                        projectListHtml += `<a href="/unifiedreview/writereview?projectNum=${project.projectNum}" class="btn btn-secondary">후기 작성</a>`;
+	                        projectListHtml += `<a href="/unifiedreview/writereview?projectNum=${project.projectNum}" class="btn btn-primary">후기 작성</a>`;
 	                    } else if(tabName === "모집중" && $('.main-content').data('rolename') === "ROLE_CLIENT")
-							projectListHtml += `<a href="/project/applicationDeadline?projectNum=${project.projectNum}" class="btn btn-secondary" sec:authorize="hasRole('ROLE_CLIENT')">모집 마감</a>`
+							projectListHtml += `<a href="/project/applicationDeadline?projectNum=${project.projectNum}" class="btn btn-primary" sec:authorize="hasRole('ROLE_CLIENT')">모집 마감</a>`
 	                    projectListHtml += `
 	                        </li>
 	                    `;

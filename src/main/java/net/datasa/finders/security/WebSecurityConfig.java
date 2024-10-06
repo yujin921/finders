@@ -8,8 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 /**
  * 시큐리티 환경설정
@@ -23,7 +23,6 @@ public class WebSecurityConfig {
     		, "/header"
     		, "/nav"
     		, "/footer"
-            , "/guestaside"
     		, "/find/**"
             , "/images/**"          //이미지 경로
             , "/css/**"             //CSS파일들
@@ -32,6 +31,7 @@ public class WebSecurityConfig {
             , "/member/idCheck"		//중복체크
             , "/board/view"
             , "/board/list"
+            , "/board/latestProjects"  // 이 줄을 추가
             , "/member/findId"
             , "/member/findPw"
             , "/member/findIdResult"
@@ -40,7 +40,8 @@ public class WebSecurityConfig {
             , "/member/resetPassword"
             , "/support/guide"
             , "/unifiedreview/**"
-            , "/guestportfolio/**"
+            , "/guestportfolio/content"
+            , "/portfolio/content"
     };
     
     // 프리랜서 회원 접근 가능

@@ -11,20 +11,64 @@
     <!-- AnyChart 스타일 시트 -->
     <link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css">
     <link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css"/>
+    
     <!-- Custom 스타일 시트 -->
     <link rel="stylesheet" th:href="@{/css/management.css}">
     <link rel="stylesheet" th:href="@{/css/primary.css}">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
     
+	<!-- jQuery UI CSS -->
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
 </head>
 <body>
 
-    <header></header>
+    <header>
+    	<div class="container">
+	        <div class="header-content">
+	            <div class="logo">
+	                <a href="/">
+	                    <img th:src="@{/images/wordmark-logo.png}" alt="Finders Logo" class="logo-img">
+	                </a>
+	            </div>
+	            <div class="search-bar">
+	                <input type="text" placeholder="프로젝트 또는 프리랜서 검색">
+	                <button type="submit"><i class="fas fa-search"></i></button>
+	            </div>
+	            <div class="login-actions">
+	                <th:block sec:authorize="not isAuthenticated()">
+	                    <a th:href="@{/member/join}">회원가입</a>
+	                    <a th:href="@{/member/login}" class="btn">로그인</a>
+	                </th:block>
+	                <th:block sec:authorize="isAuthenticated()">
+	                    <img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;">
+	                    <a th:href="@{/project/view}">프로젝트 관리</a>
+	                    <a th:href="@{/member/myPage}">마이페이지</a>
+	                    <a th:href="@{/member/logout}" class="btn">로그아웃</a>
+	                </th:block>
+	            </div>
+	        </div>
+	    </div>
+    </header>
 
     <!-- Navigation Menu -->
-    <nav class="top-nav"></nav>
+    <nav class="top-nav">
+    	<ul>
+            <li sec:authorize="hasRole('ROLE_CLIENT') or hasRole('ROLE_ADMIN')">
+                <a th:href="@{/board/write}">프로젝트 등록</a></li>
+            <li><a th:href="@{/board/view}">프로젝트 찾기</a></li>
+            <li><a th:href="@{/find/view}">프리랜서 찾기</a></li>
+            <li><a th:href="@{/support/guide}">서비스 안내</a></li>
+            <!--  <li><a href="#">커뮤니티</a></li> -->
+            <span style="color:white;">│</span>
+            <li><a th:href="@{/project/myproject?status=모집중}">내 프로젝트 목록</a></li>
+            <li><a th:href="@{/webrtc}">미팅룸</a></li>
+        </ul>
+    </nav>
     
     
     <div class="management-container">
@@ -40,7 +84,7 @@
                     <li><span class="tab-link task-tab" data-tab="task-content">전체 업무</span></li>
                     <li><span class="tab-link gantt-tab" data-tab="gantt-content">간트차트</span></li>
                     <li><span class="tab-link calendar-tab" data-tab="calendar-content">캘린더</span></li>
-                    <li><span class="tab-link application-tab" data-tab="application-content">신청목록</span></li>
+                    <li><span sec:authorize="hasRole('ROLE_CLIENT')" class="tab-link application-tab" data-tab="application-content">신청목록</span></li>
                     <li><span class="tab-link team-tab" data-tab="team-content">팀원목록</span></li>
                     <li><span>임시저장</span></li>
                 </ul>
@@ -48,7 +92,7 @@
             <br>
             <br>
             <br>
-            <button class="btn-project" id="project-completion-button">프로젝트 완료</button>
+            <button sec:authorize="hasRole('ROLE_CLIENT')" class="btn-project" id="project-completion-button">프로젝트 완료</button>
             <button class="btn-project" id="project-review-button" style="display: none;">리뷰 작성</button>
             
         </aside>
@@ -184,6 +228,10 @@
     <!-- footer 영역 -->
     <footer>
     	<!-- footer 콘텐츠 -->
+    	<div class="container">
+        	<p>&copy; 2024 프리랜서 마켓플레이스. All rights reserved.</p>
+        	<p><a href="#">개인정보 처리방침</a> | <a href="#">이용 약관</a> | <a href="#">연락처</a></p>
+    	</div>
     </footer>
     
     <!-- 업무 등록 Modal 창 -->
@@ -291,6 +339,35 @@
 	        </div>
 	    </div>
 	</div>
+	
+	<!-- 업무 삭제 요청 시 사유 입력 Modal 창 -->
+	<div id="unique-delete-modal" class="modal hidden">
+	    <div class="unique-delete-modal-content">
+	        <span class="unique-close-button" id="close-delete-modal">&times;</span>
+	        <h2>삭제 사유 입력</h2>
+	        <textarea id="unique-delete-reason" placeholder="삭제 사유를 입력하세요"></textarea>
+	        <button id="unique-delete-submit-button">삭제 요청 전송</button>
+	    </div>
+	</div>
+	
+	<!-- 업무 삭제 요청에 대한 승인 or 거부 선택 Modal 창 -->
+	<div id="delete-approval-modal" class="modal hidden">
+	    <div class="delete-approval-modal-content">
+	        <span class="delete-approval-close-button" id="close-delete-approval-modal">&times;</span>
+	        <h3>삭제 요청을 승인하거나 거부해 주세요.</h3>
+	        
+	        <!-- 거부 사유 입력 필드 추가 -->
+	        <div id="deny-reason-container">
+	            <label for="deny-reason">거부 사유를 입력해 주세요:</label>
+	            <textarea id="deny-reason" rows="3" placeholder="거부 사유를 입력하세요..." required></textarea>
+	        </div>
+	        
+	        <div class="delete-approval-modal-buttons">
+	            <button id="approve-delete-button">삭제 요청 승인</button>
+	            <button id="deny-delete-button">삭제 요청 거부</button>
+	        </div>
+	    </div>
+	</div>
     
     <!-- 캘린더 일정 추가 Modal 창 -->
     <div id="event-modal" class="modal hidden">
@@ -347,37 +424,31 @@
 	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 	<!-- jQuery UI JavaScript -->
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+	
     <!-- Custom 스크립트 파일 -->
     <script src="/js/management.js" defer></script>
 </body>
 <script>
-	$(document).ready(function () {
-	    $("#chat-container").load("/chat/view", function () {
-	        // 외부 스타일시트 처리
-	        $("#chat-container link[rel='stylesheet']").each(function() {
-	            var href = $(this).attr('href');
-	            $.get(href, function(css) {
-	                var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
-	                $('<style>').text(modifiedCss).appendTo('head');
-	            });
-	            $(this).remove(); // 원래의 link 태그 제거
-	        });
-	
-	        // 인라인 스타일 처리
-	        $("#chat-container style").each(function() {
-	            var css = $(this).text();
-	            var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
-	            $(this).text(modifiedCss);
-	        });
-	    });
-	    
-	    $('header').load("/header", function () {
-	    	});
-	    $('.top-nav').load("/nav", function () {
-		});
-	    $('footer').load("/footer", function () {
-		});
-	    
-	});
+$(document).ready(function () {
+    $("#chat-container").load("/chat/view", function () {
+        // 외부 스타일시트 처리
+        $("#chat-container link[rel='stylesheet']").each(function() {
+            var href = $(this).attr('href');
+            $.get(href, function(css) {
+                var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+                $('<style>').text(modifiedCss).appendTo('head');
+            });
+            $(this).remove(); // 원래의 link 태그 제거
+        });
+
+        // 인라인 스타일 처리
+        $("#chat-container style").each(function() {
+            var css = $(this).text();
+            var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+            $(this).text(modifiedCss);
+        });
+    });
+    
+});
 </script>
 </html>

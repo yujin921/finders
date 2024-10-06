@@ -10,8 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RequiredArgsConstructor
 @Controller
@@ -28,15 +26,10 @@ public class GuestPortfolioController {
 	}
 
 	@GetMapping("content")
-    public String content(@RequestParam("portfolioId") int portfolioId
-    		,@AuthenticationPrincipal AuthenticatedUser user
-    		,Model model) throws Exception {
-		FreelancerPortfoliosDTO freelancerPortfoliosDTO = freelancerPortfoliosService.getPortfolioById(portfolioId, user.getId());
-		List<FreelancerPortfoliosDTO> freelancerPortfoliosDTOList = freelancerPortfoliosService.findPortfolioList(user.getId());
-
-		model.addAttribute("portfoliosList", freelancerPortfoliosDTOList);
-		log.debug("여긴옴?");
+    public String content(@RequestParam("portfolioId") int portfolioId, Model model) throws Exception {
+		FreelancerPortfoliosDTO freelancerPortfoliosDTO = freelancerPortfoliosService.getPortfolioToGuest(portfolioId);
 		model.addAttribute("freelancerPortfolios", freelancerPortfoliosDTO);
-        return "guestportfolio/content";
+
+		return "guestportfolio/content"; // 모든 사용자에게 보여줄 페이지
     }
 }
