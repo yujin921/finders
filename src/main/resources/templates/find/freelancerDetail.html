@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${findFreelancer.memberId} + '의 상세 정보'">파트너 상세 정보</title>
     <link rel="stylesheet" th:href="@{/css/primary.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/find/freelancerDetail.css}">
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 </head>
@@ -53,9 +52,10 @@
                     <h3>포트폴리오</h3>
                 </div>
                 <div class="portfolio-section">
-                    <div th:each="portfolio : ${freelancerPortfoliosList}" class="portfolio-item">
+                    <div th:each="portfolio : ${freelancerPortfoliosList}" class="portfolio-item"
+                         th:onclick="'location.href=\'/guestportfolio/content?portfolioId=' + ${portfolio.portfolioId} + '\''">
                         <h4>
-                            <a th:href="@{/guestportfolio/content?portfolioId={portfolioId}(portfolioId=${portfolio.portfolioId})}" th:text="${portfolio.portfolioTitle}"></a>
+                            <a th:text="${portfolio.portfolioTitle}"></a>
                         </h4>
                     </div>
                     <p th:if="${#lists.isEmpty(freelancerPortfoliosList)}">등록된 포트폴리오가 없습니다.</p>
