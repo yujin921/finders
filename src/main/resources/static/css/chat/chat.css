@@ -552,3 +552,34 @@ img:hover {
     font-size: 0.8em;
     color: #bdc3c7;
 }
+
+.chat-room-item {
+    position: relative; /* 부모 요소에 relative 설정 */
+    display: flex;
+    align-items: left;
+    justify-content: space-between;
+    padding-right: 10px; /* 배지가 텍스트와 겹치지 않도록 여백 추가 */
+}
+
+.badge {
+    position: absolute; /* 배지에 absolute 설정 */
+    top: 10px; /* 상단에서 약간 떨어진 위치 */
+    right: 10px; /* 오른쪽에서 약간 떨어진 위치 */
+    background-color: red; /* 배지의 배경색 설정 */
+    color: white; /* 텍스트 색상 */
+    border-radius: 50%; /* 완벽한 원 모양을 위해 50% 설정 */
+    width: 30px; /* 원의 가로 크기 */
+    height: 30px; /* 원의 세로 크기 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px; /* 텍스트 크기 조정 */
+    font-weight: bold; /* 텍스트를 볼드로 설정 */
+    padding: 0; /* 패딩을 0으로 설정하여 원 크기를 유지 */
+}
+
+/* 새로운 메시지가 있는 경우 시각적으로 강조 */
+.newMessageBadge {
+    font-weight: bold;
+}
+
