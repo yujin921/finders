@@ -282,5 +282,5 @@ public class ChatRoomController {
         
         return ResponseEntity.ok(response);
     }
-
+    
 }

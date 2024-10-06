@@ -116,27 +116,35 @@ function leaveCurrentChatRoom() {
         return;
     }
 
-    console.log(`Leaving chat room with ID: ${chatroomId}`);
+    // 확인 메시지를 띄워서 사용자에게 나갈 건지 확인
+    const confirmLeave = confirm('정말로 이 채팅방을 나가시겠습니까?');
 
-    fetch(`/chat/leave?chatroomId=${chatroomId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => {
-        console.log(`Server response: ${response.status}`);
-        if (response.ok) {
-            alert('채팅방을 나갔습니다.');
-            // 채팅방 목록을 갱신하거나 모달을 닫는 등의 추가 로직 처리
-            closeChatModal();
-            updateChatRoomList(); // 필요시 채팅방 목록 갱신
-        } else {
-            alert('채팅방 나가기에 실패했습니다.');
-        }
-    })
-    .catch(error => {
-        console.error('Error leaving chat room:', error);
-        alert('채팅방 나가기 중 오류가 발생했습니다.');
-    });
+    if (confirmLeave) {
+        console.log(`Leaving chat room with ID: ${chatroomId}`);
+
+        fetch(`/chat/leave?chatroomId=${chatroomId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => {
+            console.log(`Server response: ${response.status}`);
+            if (response.ok) {
+                alert('채팅방을 나갔습니다.');
+                // 채팅방 목록을 갱신하거나 모달을 닫는 등의 추가 로직 처리
+                closeChatModal();
+                updateChatRoomList(); // 필요시 채팅방 목록 갱신
+            } else {
+                alert('채팅방 나가기에 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error leaving chat room:', error);
+            alert('채팅방 나가기 중 오류가 발생했습니다.');
+        });
+    } else {
+        // 사용자가 취소를 누르면 아무 작업도 하지 않음
+        console.log('User canceled leaving the chat room.');
+    }
 }
 
 
@@ -640,8 +648,8 @@ function downloadChat() {
 // 새로운 메시지가 있는지 서버에서 확인하는 함수 (메시지 갯수 포함)
 function checkForNewMessages(chatroomId) {
     fetch(`/chat/check-new-messages?chatroomId=${chatroomId}`)
-        .then(response => response.json())
-        .then(data => {
+	        .then(response => response.json())
+	        .then(data => {
             const chatRoomElement = document.querySelector(`[data-chatroom-id="${chatroomId}"]`);
             
             if (data.newMessageCount > 0) {
@@ -655,18 +663,18 @@ function checkForNewMessages(chatroomId) {
                     chatRoomElement.appendChild(badge);
                 }
                 badge.textContent = data.newMessageCount;
-            } else {
+	            } else {
                 chatRoomElement.classList.remove('newMessageBadge');
                 const badge = chatRoomElement.querySelector('.badge');
                 if (badge) {
                     badge.remove();
                 }
-            }
-        })
-        .catch(error => {
+	            }
+	        })
+	        .catch(error => {
             console.error('Error checking new messages:', error);
-        });
-}
+	        });
+	}
 
 // 채팅방 목록을 초기화하고 새로운 메시지를 확인하는 함수
 function initializeChatRooms() {
