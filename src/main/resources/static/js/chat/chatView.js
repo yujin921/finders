@@ -75,63 +75,57 @@ function deleteEmptyChatRooms(chatRoomId) {
 let selectedChatRoomId = null; // 선택된 채팅방 ID 저장 변수
 
 
-// DOMContentLoaded 시 이벤트 리스너 추가
 document.addEventListener('DOMContentLoaded', function () {
     const chatRoomsContent = document.getElementById('chatRoomsContent');
-    const leaveChatRoomButton = document.getElementById('leaveChatRoomButton');
 
-    // 우클릭 이벤트 추가
+    // chatRoomsContent 요소가 존재하는지 확인
+    if (!chatRoomsContent) {
+        console.log("chatRoomsContent 요소를 찾을 수 없습니다.");
+        return;
+    }
+    console.log("chatRoomsContent 요소가 존재합니다.");
+
+    // 우클릭 이벤트 확인
     chatRoomsContent.addEventListener('contextmenu', function (event) {
-        event.preventDefault();
-
-        const target = event.target.closest('.chat-room-item');
-        if (!target) return;
-
-        selectedChatRoomId = target.getAttribute('data-chatroom-id');
-
-        const contextMenu = document.getElementById('contextMenu');
-        contextMenu.style.top = `${event.clientY}px`;
-        contextMenu.style.left = `${event.clientX}px`;
-        contextMenu.style.display = 'block';
+        event.preventDefault();  // 기본 우클릭 메뉴 방지
+        console.log("우클릭이 감지되었습니다!");
     });
-
-    // 클릭 시 컨텍스트 메뉴 닫기
-    document.addEventListener('click', function () {
-        document.getElementById('contextMenu').style.display = 'none';
-    });
-
-    // "채팅방 나가기" 버튼에 클릭 이벤트 추가
-    leaveChatRoomButton.addEventListener('click', leaveChatRoom);
 });
 
-//채팅방 나가기 기능
-function leaveChatRoom() {
-    if (!selectedChatRoomId) {
-        alert('채팅방을 선택하지 않았습니다.');
+
+
+function leaveCurrentChatRoom() {
+    const chatroomData = document.getElementById('chatroom-data');
+    const chatroomId = chatroomData.getAttribute('data-chatroom-id'); // 현재 열려있는 채팅방의 ID를 가져옴
+
+    if (!chatroomId) {
+        alert('채팅방을 찾을 수 없습니다.');
         return;
     }
 
-    console.log(`Leaving chat room with ID: ${selectedChatRoomId}`);
+    console.log(`Leaving chat room with ID: ${chatroomId}`);
 
-    fetch(`/chat/leave?chatroomId=${selectedChatRoomId}`, {
+    fetch(`/chat/leave?chatroomId=${chatroomId}`, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'}
+        headers: { 'Content-Type': 'application/json' }
     })
-        .then(response => {
-            console.log(`Server response: ${response.status}`);
-            if (response.ok) {
-                alert('채팅방을 나갔습니다.');
-                // 채팅방 목록을 갱신하여 삭제 여부를 확인
-                updateChatRoomList();
-            } else {
-                alert('채팅방 나가기에 실패했습니다.');
-            }
-        })
-        .catch(error => {
-            console.error('Error leaving chat room:', error);
-            alert('채팅방 나가기 중 오류가 발생했습니다.');
-        });
+    .then(response => {
+        console.log(`Server response: ${response.status}`);
+        if (response.ok) {
+            alert('채팅방을 나갔습니다.');
+            // 채팅방 목록을 갱신하거나 모달을 닫는 등의 추가 로직 처리
+            closeChatModal();
+            updateChatRoomList(); // 필요시 채팅방 목록 갱신
+        } else {
+            alert('채팅방 나가기에 실패했습니다.');
+        }
+    })
+    .catch(error => {
+        console.error('Error leaving chat room:', error);
+        alert('채팅방 나가기 중 오류가 발생했습니다.');
+    });
 }
+
 
 function openChatRoom(chatroomId, chatroomName) {
     if (!chatroomId) {
