@@ -82,7 +82,7 @@ public class FreelancerPortfoliosService {
 		FreelancerPortfoliosEntity portfolio = freelancerPortfoliosRepository.findById(portfolioId)
 				.orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
 
-		return convertToDTO(portfolio);
+		return convertToDtoForFreelancer(portfolio);
 	}
 
 	public FreelancerPortfoliosDTO getPortfolioById(int portfolioId, String userId) throws Exception {
@@ -95,7 +95,17 @@ public class FreelancerPortfoliosService {
 
 		    return convertToDTO(portfolio);
 	}
-	
+
+	public FreelancerPortfoliosDTO convertToDtoForFreelancer(FreelancerPortfoliosEntity freelancerPortfoliosEntity) {
+
+		return FreelancerPortfoliosDTO.builder()
+				.portfolioId(freelancerPortfoliosEntity.getPortfolioId())
+				.portfolioTitle(freelancerPortfoliosEntity.getPortfolioTitle())
+				.portfolioDescription(freelancerPortfoliosEntity.getPortfolioDescription())
+				.freelancerId(freelancerPortfoliosEntity.getMember().getMemberId())
+				.build();
+	}
+
 	public FreelancerPortfoliosDTO convertToDTO(FreelancerPortfoliosEntity freelancerPortfoliosEntity) {
 	
 		return FreelancerPortfoliosDTO.builder()

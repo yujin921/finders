@@ -39,7 +39,7 @@ public class WebSecurityConfig {
             , "/member/resetPassword"
             , "/support/guide"
             , "/unifiedreview/**"
-            , "/guestportfolio/**"
+            , "/guestportfolio/content"
             , "/portfolio/content"
     };
     

@@ -26,10 +26,17 @@ public class GuestPortfolioController {
 	}
 
 	@GetMapping("content")
-    public String content(@RequestParam("portfolioId") int portfolioId, Model model) throws Exception {
-		FreelancerPortfoliosDTO freelancerPortfoliosDTO = freelancerPortfoliosService.getPortfolioToGuest(portfolioId);
+    public String content(@RequestParam("portfolioId") int portfolioId, Model model, @AuthenticationPrincipal AuthenticatedUser user) throws Exception {
 
+		FreelancerPortfoliosDTO freelancerPortfoliosDTO = freelancerPortfoliosService.getPortfolioToGuest(portfolioId);
 		model.addAttribute("freelancerPortfolios", freelancerPortfoliosDTO);
-        return "guestportfolio/content";
+		if (user != null) {
+			// 포트폴리오 소유자 ID와 로그인한 사용자 ID 비교
+			if (freelancerPortfoliosDTO.getFreelancerId().equals(user.getId())) {
+				return "redirect:/portfolio/content?portfolioId=" + freelancerPortfoliosDTO.getPortfolioId();
+			}
+		}
+
+		return "guestportfolio/content"; // 모든 사용자에게 보여줄 페이지
     }
 }
