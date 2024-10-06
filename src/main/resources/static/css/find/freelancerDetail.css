@@ -92,11 +92,48 @@
     border-bottom: 1px solid #e2e8f0;
 }
 
+/* 포트폴리오 아이템 스타일을 후기 스타일과 유사하게 변경 */
 .portfolio-item {
-    background-color: #f7fafc;
-    padding: 15px;
-    border-radius: 8px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.portfolio-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 포트폴리오 아이템 제목 */
+.portfolio-item-title {
+    font-size: 1.5em;
+    color: #2d3748;
     margin-bottom: 10px;
+}
+
+/* 포트폴리오 아이템 설명 */
+.portfolio-item-description {
+    font-size: 1rem;
+    color: #4a5568;
+}
+
+/* 포트폴리오 링크 버튼 */
+.portfolio-item-link {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 15px;
+    background-color: #3182ce;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.portfolio-item-link:hover {
+    background-color: #2b6cb0;
 }
 
 /* 후기 섹션 스타일 */
