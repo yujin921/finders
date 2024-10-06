@@ -162,3 +162,12 @@ main {
     position: relative;
     margin: 20px auto 0;
 }
+
+/* 채팅 컨테이너 */
+#chat-container {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 1000;
+    overflow: hidden;
+}
