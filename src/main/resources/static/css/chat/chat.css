@@ -403,6 +403,10 @@ img:hover {
     transition: color 0.3s;
 }
 
+.fas.fa-users {
+    color: #1b5edc;
+}
+
 /* 멤버 보기 버튼 스타일 */
 .icon-button[title="멤버 보기"] {
     color: #007bff; /* 파란색 */
