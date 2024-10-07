@@ -222,12 +222,7 @@ public class ProjectManagementController {
     @ResponseBody
     @GetMapping("checkProjectStatus")
     public Boolean checkProjectStatus(@RequestParam("projectNum") int projectNum) {
-log.debug("왔다감1");
-
-
-
             return projectManagementService.isProjectCompleted(projectNum);
-
     }
     
     @ResponseBody
