@@ -2998,11 +2998,11 @@ function loadApplicationList() {
 
 				contentHtml += `
                 <tr>
-					<td>
-                       <a href="/find/freelancerDetail?memberId=${application.freelancerId}" target="_blank">${application.freelancerId}</a>
+					<td onclick="location.href='/find/freelancerDetail?memberId=${application.freelancerId}'">
+                       ${application.freelancerId}
                		</td>
-                    <td>${application.projectTitle}</td>
-                    <td>${statusText}</td> <!-- 상태란에 지원 신청 중 표시 -->
+                    <td onclick="location.href='/find/freelancerDetail?memberId=${application.freelancerId}'">${application.projectTitle}</td>
+                    <td onclick="location.href='/find/freelancerDetail?memberId=${application.freelancerId}'">${statusText}</td> <!-- 상태란에 지원 신청 중 표시 -->
                     <td>${actionHtml}</td> <!-- 동작란에 찬성/반대 버튼 표시 -->
                 </tr>
                 `;

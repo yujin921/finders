@@ -22,7 +22,7 @@
 	<div class="main-container">
 
     <h3 class="section-title" th:text="'프로젝트 (' + ${#lists.size(objs)} + ')'"></h3>
-	<div class="post" th:each="obj : ${objs}" th:onclick="'location.href=\'/board/read?projectNum=' + ${obj.projectNum}">
+	<div class="post" th:each="obj : ${objs}" th:attr="onclick=|location.href='/board/read?projectNum=${obj.projectNum}'|">
 	    <img th:src="@{'data:image/jpeg;base64,' + ${obj.projectImage}}" alt="Project Image" class="thumbnail">
 	    <div class="post-info">
 	        <span class="title" th:text="${obj.projectTitle}"></span>

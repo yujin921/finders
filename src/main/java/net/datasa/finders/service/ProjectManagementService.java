@@ -396,6 +396,9 @@ public class ProjectManagementService {
     public boolean isProjectCompleted(int projectNum) {
         ProjectPublishingEntity e = projectPublishingRepository.findById(projectNum).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
         ProjectManagementEntity project = projectManagementRepository.findByProjectPublishing(e);
+        if (project == null) {
+        	return false;
+        }
         return project.getCompleteStatus(); // 완료 여부 반환
     }
     

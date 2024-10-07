@@ -353,7 +353,7 @@ button:hover {
 }
 
 .apply-button {
-    background-color: var(--secondary-color);
+    background-color: var(--highlight-color);
     color: white;
     padding: 15px 60px; /* 가로 길이 더 길게 조정 */
     border-radius: 8px;
@@ -365,7 +365,7 @@ button:hover {
 }
 
 .apply-button:hover {
-    background-color: var(--icon-color);
+    background-color: var(--secondary-color);
     transform: translateY(-3px);
 }
 
