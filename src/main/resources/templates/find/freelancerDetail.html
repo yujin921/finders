@@ -106,12 +106,42 @@
     </div>
 
     <footer></footer>
+    
+    <div id="chat-container"></div>
+    
 </body>
 <script>
 $(document).ready(function () {
-    $('header').load("/header", function () {});
-    $('nav').load("/nav", function () {});
-    $('footer').load("/footer", function () {});
+    $("#chat-container").load("/chat/view", function (response, status, xhr) {
+        if (status === "error") {
+            console.error("Chat container 로드 실패:", xhr.status, xhr.statusText);
+        } else {
+            console.log("Chat container 로드 성공");
+        }
+        
+        // 외부 스타일시트 처리
+        $("#chat-container link[rel='stylesheet']").each(function() {
+            var href = $(this).attr('href');
+            $.get(href, function(css) {
+                var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+                $('<style>').text(modifiedCss).appendTo('head');
+            });
+            $(this).remove(); // 원래의 link 태그 제거
+        });
+
+        // 인라인 스타일 처리
+        $("#chat-container style").each(function() {
+            var css = $(this).text();
+            var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+            $(this).text(modifiedCss);
+        });
+    });
+
+    // 헤더, 네비게이션, 푸터 로드
+    $('header').load("/header");
+    $('nav').load("/nav");
+    $('footer').load("/footer");
 });
+
 </script>
 </html>

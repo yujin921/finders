@@ -13,26 +13,26 @@
     <script th:src="@{/js/recommendation.js}"></script>
 </head>
 <body>
-	<header></header>
+    <header></header>
 
     <!-- Navigation Menu -->
     <nav class="top-nav"></nav>
     
     <section class="main-search-section">
-	    <div class="container">
-	        <div class="search-bar">
-	            <input type="text" id="projectSearch" placeholder="프로젝트명을 입력하세요">
-	            <button id="projectSearchBtn">검색</button>
-	        </div>
-	    </div>
-	</section>
+        <div class="container">
+            <div class="search-bar">
+                <input type="text" id="projectSearch" placeholder="프로젝트명을 입력하세요">
+                <button id="projectSearchBtn">검색</button>
+            </div>
+        </div>
+    </section>
 
     <div class="filter-bar">
         <select id="sortSelect" onchange="list(this.value)">
             <option value="projectCreateDate,desc">최신순</option>
             <option value="projectBudget,asc">가격순</option>
             <!-- 프리랜서 회원일 때만 보여줌 -->
-        	<option sec:authorize="hasRole('ROLE_FREELANCER')" value="recommended">추천순</option>
+            <option sec:authorize="hasRole('ROLE_FREELANCER')" value="recommended">추천순</option>
         </select>
     </div>
     <div class="table-container" id="output">
@@ -44,7 +44,7 @@
     <div id="chat-container"></div>
 </body>
 <script>
-	$(document).ready(function () {
+$(document).ready(function () {
 	    $("#chat-container").load("/chat/view", function () {
 	        // 외부 스타일시트 처리
 	        $("#chat-container link[rel='stylesheet']").each(function() {
@@ -52,18 +52,18 @@
 	            $.get(href, function(css) {
 	                var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
 	                $('<style>').text(modifiedCss).appendTo('head');
-	            });
+                });
 	            $(this).remove(); // 원래의 link 태그 제거
-	        });
-	
+    });
+
 	        // 인라인 스타일 처리
 	        $("#chat-container style").each(function() {
 	            var css = $(this).text();
 	            var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
 	            $(this).text(modifiedCss);
 	        });
-	    });
-	    
+});
+
 	    $('header').load("/header", function () {
 	    	});
 	    $('nav').load("/nav", function () {
