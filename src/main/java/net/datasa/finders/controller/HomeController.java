@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,6 +25,8 @@ public class HomeController {
 	private final FreelancerPortfoliosService freelancerPortfoliosService;
 	private final ProjectPublishingService projectPublshingService;
 	private final FindService findService;
+	private final ClientReviewService clientReviewService;
+	
     //application.properties 파일 관련 설정값
   	@Value("${member.uploadPath}")
   	String uploadPath;
@@ -68,6 +71,12 @@ public class HomeController {
   		
   		log.debug("지나감");
   		List<ProjectPublishingDTO> projectPubloshingDTOList = projectPublshingService.getList(totalSearch);
+  		
+  		 for (ProjectPublishingDTO project : projectPubloshingDTOList) {
+             // 프로젝트를 등록한 클라이언트의 평균 평점 구하기
+             Optional<Float> averageRating = clientReviewService.getAverageRatingForClient(project.getClientId());
+             project.setAverageRating(averageRating.orElse(0.0f));  // 평점이 없을 경우 0점 설정
+         }
   		List<FindFreelancerDTO> findFreelancerDTOList = findService.allFindFreelancerList(totalSearch);
 
   		log.debug("프로젝트: {}", projectPubloshingDTOList);
