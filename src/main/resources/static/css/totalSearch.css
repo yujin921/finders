@@ -41,25 +41,32 @@
 .post .post-info {
   padding: 15px;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .post .title {
   font-size: 18px;
   font-weight: bold;
   color: #333;
-  display: block;
   margin-bottom: 10px;
 }
 
-.post .rating,
-.post .startdate,
-.post .budget,
-.post .author,
-.post .date,
-.post .status {
+.post .details {
   font-size: 14px;
   color: #666;
-  display: inline-block;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.post .details i {
+  margin-right: 8px;
+  color: #007bff;
+}
+
+.post .details span {
   margin-right: 15px;
 }
 
@@ -68,7 +75,7 @@
   display: flex;
   background-color: #f8f9fa;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
   overflow: hidden;
   transition: transform 0.3s ease;
@@ -79,18 +86,23 @@
 }
 
 .partner-card .partner-image {
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 210px;
   object-fit: cover;
+  margin-right: 20px;
+  /* 이미지 스타일 변경 없이 유지 */
 }
 
 .partner-card .partner-info {
   padding: 15px;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .partner-card .partner-id {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   color: #333;
   margin-bottom: 10px;
@@ -100,17 +112,31 @@
   font-size: 16px;
   color: #ffc107;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.partner-card .rating i {
+  margin-right: 5px; /* 아이콘과 텍스트 간 간격 */
 }
 
 .partner-card .partner-stats {
   font-size: 14px;
   color: #666;
   margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 .partner-card .partner-stats span {
-  display: block;
+  display: flex;
+  align-items: center;
   margin-bottom: 5px;
+}
+
+.partner-card .partner-stats i {
+  margin-right: 8px;
+  color: #007bff;
 }
 
 .partner-card .skills {
@@ -120,4 +146,21 @@
   padding: 5px 10px;
   border-radius: 20px;
   display: inline-block;
+}
+
+.partner-card .details {
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.partner-card .details i {
+  margin-right: 8px;
+  color: #007bff;
+}
+
+.partner-card .details span {
+  margin-right: 15px;
 }
