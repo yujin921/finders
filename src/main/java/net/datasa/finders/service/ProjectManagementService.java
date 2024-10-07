@@ -1,5 +1,16 @@
 package net.datasa.finders.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.*;
+import net.datasa.finders.domain.entity.*;
+import net.datasa.finders.repository.*;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,62 +19,10 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.domain.dto.CalendarEventDTO;
-import net.datasa.finders.domain.dto.FunctionDTO;
-import net.datasa.finders.domain.dto.FunctionTitleDTO;
-import net.datasa.finders.domain.dto.FunctionTitleWithTaskIdDTO;
-import net.datasa.finders.domain.dto.ProjectPublishingDTO;
-import net.datasa.finders.domain.dto.TaskDTO;
-import net.datasa.finders.domain.dto.TaskManagementDTO;
-import net.datasa.finders.domain.dto.TaskNotificationsDTO;
-import net.datasa.finders.domain.dto.TaskResponseDTO;
-import net.datasa.finders.domain.dto.TeamDTO;
-import net.datasa.finders.domain.entity.CalendarEventEntity;
-import net.datasa.finders.domain.entity.FunctionTitleEntity;
-import net.datasa.finders.domain.entity.MemberEntity;
-import net.datasa.finders.domain.entity.PrequalificationQuestionEntity;
-import net.datasa.finders.domain.entity.ProjectCategoryEntity;
-import net.datasa.finders.domain.entity.ProjectManagementEntity;
-import net.datasa.finders.domain.entity.ProjectPublishingEntity;
-import net.datasa.finders.domain.entity.ProjectRequiredSkillEntity;
-import net.datasa.finders.domain.entity.RoleName;
-import net.datasa.finders.domain.entity.TaskManagementEntity;
-import net.datasa.finders.domain.entity.TaskNotificationsEntity;
-import net.datasa.finders.domain.entity.TaskPriority;
-import net.datasa.finders.domain.entity.TaskStatus;
-import net.datasa.finders.domain.entity.TeamEntity;
-import net.datasa.finders.domain.entity.WorkScopeEntity;
-import net.datasa.finders.repository.CalendarEventRepository;
-import net.datasa.finders.repository.FunctionTitleRepository;
-import net.datasa.finders.repository.MemberRepository;
-import net.datasa.finders.repository.PrequalificationQuestionRepository;
-import net.datasa.finders.repository.ProjectCategoryRepository;
-import net.datasa.finders.repository.ProjectManagementRepository;
-import net.datasa.finders.repository.ProjectPublishingRepository;
-import net.datasa.finders.repository.ProjectRequiredSkillRepository;
-import net.datasa.finders.repository.TaskManagementRepository;
-import net.datasa.finders.repository.TaskNotificationsRepository;
-import net.datasa.finders.repository.TeamRepository;
-import net.datasa.finders.repository.WorkScopeRepository;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -429,8 +388,9 @@ public class ProjectManagementService {
     
     // 프로젝트 상태 확인 메서드
     public boolean isProjectCompleted(int projectNum) {
-        ProjectManagementEntity project = projectManagementRepository.findById(projectNum)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
+        ProjectPublishingEntity e = projectPublishingRepository.findById(projectNum).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
+        ProjectManagementEntity project = projectManagementRepository.findByProjectPublishing(e);
+        log.debug("왔다감2");
         return project.getCompleteStatus(); // 완료 여부 반환
     }
     
