@@ -1,5 +1,29 @@
 package net.datasa.finders.controller;
 
+import java.math.BigDecimal;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datasa.finders.domain.dto.MemberDTO;
@@ -11,21 +35,6 @@ import net.datasa.finders.service.ClientReviewService;
 import net.datasa.finders.service.ProjectApplicationService;
 import net.datasa.finders.service.ProjectPublishingService;
 import net.datasa.finders.service.RecommendationService;
-
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.math.BigDecimal;
-import java.security.Principal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -51,9 +60,13 @@ public class BoardController {
 	
     @ResponseBody
     @GetMapping("list")
-    public List<ProjectPublishingDTO> list(@RequestParam("word") String word) {
-        List<ProjectPublishingDTO> list = projectPublishingService.getList(word);
-
+    public Page<ProjectPublishingDTO> list(@RequestParam(name="page", defaultValue = "0") int page,
+    	    @RequestParam(name="size", defaultValue = "10") int size,
+    	    @RequestParam(name="sort", defaultValue = "projectCreateDate,desc") String sort,
+    	    @RequestParam(name="word", required = false) String word) {
+    	Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "projectNum"));
+        Page<ProjectPublishingDTO> list = projectPublishingService.getList(pageable, word);
+        
         for (ProjectPublishingDTO project : list) {
             // 프로젝트를 등록한 클라이언트의 평균 평점 구하기
             Optional<Float> averageRating = clientReviewService.getAverageRatingForClient(project.getClientId());

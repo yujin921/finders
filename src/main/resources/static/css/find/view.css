@@ -340,6 +340,47 @@ aside.filters h3 {
     font-weight: 400;
 }
 
+        .pagination {
+            display: flex;
+            padding: 10px;
+            border-radius: 50px;
+            
+            justify-content: center;
+        }
+        .page-item {
+            margin: 0 5px;
+            list-style: none;
+        }
+        .page-link {
+        	text-decoration: none;
+            border: none;
+            color: #6c757d;
+            font-weight: 600;
+            padding: 10px 15px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        .page-link:hover, .page-link:focus {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+        .page-item.active .page-link {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+        .page-item:first-child .page-link,
+        .page-item:last-child .page-link {
+            background: linear-gradient(145deg, #f1f3f5, #e9ecef);
+            color: #495057;
+        }
+        .page-item:first-child .page-link:hover,
+        .page-item:last-child .page-link:hover {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: #ffffff;
+        }
+
 /* 채팅 컨테이너 */
 #chat-container {
     position: fixed;

@@ -1,24 +1,47 @@
 package net.datasa.finders.service;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.domain.dto.ProjectPublishingDTO;
-import net.datasa.finders.domain.entity.*;
-import net.datasa.finders.repository.*;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.ProjectPublishingDTO;
+import net.datasa.finders.domain.entity.MemberEntity;
+import net.datasa.finders.domain.entity.PrequalificationQuestionEntity;
+import net.datasa.finders.domain.entity.ProjectCategoryEntity;
+import net.datasa.finders.domain.entity.ProjectPublishingEntity;
+import net.datasa.finders.domain.entity.ProjectRequiredSkillEntity;
+import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.domain.entity.WorkScopeEntity;
+import net.datasa.finders.repository.ClientReviewItemRepository;
+import net.datasa.finders.repository.ClientReviewsRepository;
+import net.datasa.finders.repository.MemberRepository;
+import net.datasa.finders.repository.PrequalificationQuestionRepository;
+import net.datasa.finders.repository.ProjectCategoryRepository;
+import net.datasa.finders.repository.ProjectPublishingRepository;
+import net.datasa.finders.repository.ProjectRequiredSkillRepository;
+import net.datasa.finders.repository.WorkScopeRepository;
 
 /**
  * 게시판 서비스
@@ -144,6 +167,23 @@ public class ProjectPublishingService {
         }
 
         return dtoList;
+    }
+    
+public Page<ProjectPublishingDTO> getList(Pageable pageable, String word) {
+        
+    	if (word != null && !word.isEmpty()) {
+            // 검색어가 있는 경우
+    		Page<ProjectPublishingEntity> entityPage = projectPublishingRepository.findByProjectTitleContainingOrProjectDescriptionContaining(word, word, pageable);
+        	Page<ProjectPublishingDTO> dtoList = entityPage.map(this::convertToDTO);
+        	return dtoList;
+        } else {
+            // 검색어가 없는 경우
+        	Page<ProjectPublishingEntity> entityPage = projectPublishingRepository.findAll(pageable);
+        	Page<ProjectPublishingDTO> dtoList = entityPage.map(this::convertToDTO);
+            return dtoList;
+        }
+
+        
     }
 
     private ProjectPublishingDTO convertToDTO(ProjectPublishingEntity entity) {

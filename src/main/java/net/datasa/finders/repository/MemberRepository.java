@@ -3,6 +3,8 @@ package net.datasa.finders.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -53,4 +55,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
 	List<MemberEntity> findByRoleNameAndMemberIdContaining(RoleName roleFreelancer, String search);
     // member_id로 멤버를 찾는 메서드
     Optional<MemberEntity> findByMemberId(String memberId);
+
+	Page<MemberEntity> findByRoleNameAndMemberIdContaining(RoleName roleFreelancer, String search, Pageable pageable);
 }

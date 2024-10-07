@@ -1,22 +1,29 @@
 package net.datasa.finders.controller;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -119,22 +126,53 @@ public class PortfolioController {
 	 */
 	@ResponseBody
     @PostMapping("/upload-image")
-    public String uploadImage(@RequestParam("upload") MultipartFile file) throws IOException {
-		// 디렉토리 생성
-        Path uploadPath = Paths.get(UPLOAD_DIR);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
+	public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("upload") MultipartFile file) throws IOException {
+	    // 1. 파일 유효성 검사
+	    if (file.isEmpty()) {
+	        return ResponseEntity.badRequest().body(Map.of("error", "파일이 비어있습니다."));
+	    }
+
+	    // 2. 파일 이름 생성 (중복 방지를 위해 UUID 사용)
+	    String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+
+	    // 3. 저장 경로 설정
+	    Path uploadPath = Paths.get(UPLOAD_DIR);
+	    if (!Files.exists(uploadPath)) {
+	        Files.createDirectories(uploadPath);
+	    }
+
+	    // 4. 파일 저장
+	    try (InputStream inputStream = file.getInputStream()) {
+	        Path filePath = uploadPath.resolve(fileName);
+	        Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+	    } catch (IOException ioe) {
+	        throw new IOException("파일 저장 중 오류 발생: " + fileName, ioe);
+	    }
+
+	    // 5. 저장된 파일의 URL 생성
+	    String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+	            .path("/images/portfolio/")
+	            .path(fileName)
+	            .toUriString();
+
+	    // 6. 응답 반환
+	    return ResponseEntity.ok(Map.of("url", fileUrl));
+	}
+	
+	
+	@PostMapping("/delete-image")
+    public ResponseEntity<Void> deleteImage(@RequestBody Map<String, String> payload) {
+        String imageUrl = payload.get("url");
+        String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+        Path filePath = Paths.get(UPLOAD_DIR, fileName);
+
+        try {
+            Files.deleteIfExists(filePath);
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-		
-        // 파일을 저장할 경로 설정
-        String filePath = UPLOAD_DIR + file.getOriginalFilename();
-
-        // 파일을 로컬 경로에 저장
-        File dest = new File(filePath);
-        file.transferTo(dest);
-
-        // 저장된 파일의 경로를 반환
-        return "{\"url\":\"http://localhost:8888/images/portfolio/" + file.getOriginalFilename() + "\"}";
     }
 	
 	@GetMapping("content")

@@ -2,7 +2,11 @@ package net.datasa.finders.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -39,43 +43,35 @@ public class FindService {
 	private final ClientCategoryRepository clientCategoryRepository;
 	private final TeamRepository teamRepository;
 	
-	public List<FindFreelancerDTO> findFreelancerList(List<String> fields, List<String> areas, String search) {
+	public Page<FindFreelancerDTO> findFreelancerList(List<String> fields, List<String> areas, String search, Pageable pageable) {
 		
-		List<MemberEntity> memberEntityList = memberRepository.findByRoleNameAndMemberIdContaining(RoleName.ROLE_FREELANCER, search);
-		
-		List<FindFreelancerDTO> findFreelancerDTOList = new ArrayList<>();
-		
-		/*
-		 * for (MemberEntity memberEntity : memberEntityList) { for (String field :
-		 * fields) { for (String area : areas) {
-		 * 
-		 * if(clientFieldRepository.findByClientIdAndFieldText(memberEntity,
-		 * field).isPresent() &&
-		 * clientCategoryRepository.findByClientIdAndCategoryText(memberEntity,
-		 * area).isPresent()) {
-		 * 
-		 * FindFreelancerDTO findFreelancerDTO =
-		 * findFreelancerDetail(memberEntity.getMemberId());
-		 * 
-		 * if(!findFreelancerDTOList.contains(findFreelancerDTO)) {
-		 * findFreelancerDTOList.add(findFreelancerDTO); } // 프리랜서 정보가 이미 들어가 있을 시 중복
-		 * 제거를 위해 조건 추가
-		 * 
-		 * }; }; };
-		 * 
-		 * }
-		 */
-		memberEntityList.stream()
-	    .filter(memberEntity -> fields.stream()
-	        .anyMatch(field -> clientFieldRepository.findByClientIdAndFieldText(memberEntity, field).isPresent()) &&
-	        areas.stream()
-	        .anyMatch(area -> clientCategoryRepository.findByClientIdAndCategoryText(memberEntity, area).isPresent())
-	    )
-	    .map(memberEntity -> findFreelancerDetail(memberEntity.getMemberId()))  // FindFreelancerDTO로 변환
-	    .distinct()  // 중복 제거
-	    .forEach(findFreelancerDTOList::add);
-		
-		return findFreelancerDTOList;
+		// 전체 회원 목록을 가져옵니다.
+        List<MemberEntity> allMembers = memberRepository.findAll();
+
+        // 필터링 및 변환 로직
+        List<FindFreelancerDTO> filteredList = allMembers.stream()
+            .filter(memberEntity -> 
+                fields.stream().anyMatch(field -> clientFieldRepository.findByClientIdAndFieldText(memberEntity, field).isPresent()) &&
+                areas.stream().anyMatch(area -> clientCategoryRepository.findByClientIdAndCategoryText(memberEntity, area).isPresent())
+            )
+            .map(memberEntity -> findFreelancerDetail(memberEntity.getMemberId()))
+            .distinct()
+            .collect(Collectors.toList());
+
+        // 검색어로 추가 필터링 (만약 search 파라미터가 사용되고 있다면)
+        if (search != null && !search.isEmpty()) {
+            filteredList = filteredList.stream()
+                .filter(dto -> dto.getMemberId().toLowerCase().contains(search.toLowerCase()))
+                .collect(Collectors.toList());
+        }
+
+        // 페이지네이션 적용
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filteredList.size());
+        
+        List<FindFreelancerDTO> pageContent = filteredList.subList(start, end);
+
+        return new PageImpl<>(pageContent, pageable, filteredList.size());
 	}
 	
 	public List<FindFreelancerDTO> allFindFreelancerList(String search) {
