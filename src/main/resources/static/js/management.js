@@ -1439,25 +1439,28 @@ document.addEventListener('DOMContentLoaded', function() {
 	                    selectedDate = info.dateStr; // 선택한 날짜 저장
 	                },
 	                eventClick: function(info) {
-						// 업무 일정 삭제 시 task-content 탭 활성화
-			            const targetId = 'task-content'; // 활성화할 탭 ID
-			            document.getElementById(targetId).classList.add('active');
+						const event = info.event; // 클릭된 이벤트 객체
 
-			            // 추가적으로, 다른 탭의 'active' 클래스 제거 필요
-			            const tabs = document.querySelectorAll('.tab-content'); // 모든 탭 내용
-			            tabs.forEach(tab => {
-			                if (tab.id !== targetId) {
-			                    tab.classList.remove('active'); // 다른 탭 비활성화
-			                }
-			            });
-						
-			            // 필요에 따라 업무 목록 업데이트 함수를 호출할 수도 있음
-			            loadTasks(); // 업무 목록 새로 고침
-						
-						/*
-	                    // 클릭한 이벤트 정보를 모달로 전달하여 열기
-	                    openEventDetailModal(info.event); // FullCalendar 이벤트 객체 전달
-						*/
+					    // 클릭한 이벤트의 eventType에 따라 분기 처리
+					    if (event.extendedProps.eventType === 'task') {
+							// 업무 일정 삭제 시 task-content 탭 활성화
+						    const targetId = 'task-content'; // 활성화할 탭 ID
+						    document.getElementById(targetId).classList.add('active');
+
+						    // 추가적으로, 다른 탭의 'active' 클래스 제거 필요
+						    const tabs = document.querySelectorAll('.tab-content'); // 모든 탭 내용
+						    tabs.forEach(tab => {
+						        if (tab.id !== targetId) {
+						            tab.classList.remove('active'); // 다른 탭 비활성화
+						        }
+						    });
+
+						    // 필요에 따라 업무 목록 업데이트 함수를 호출할 수도 있음
+						    loadTasks(); // 업무 목록 새로 고침
+					    } else {
+							// 클릭한 이벤트 정보를 모달로 전달하여 열기
+							openEventDetailModal(info.event); // FullCalendar 이벤트 객체 전달
+					    }
 	                }
 	            });
 				
@@ -1724,6 +1727,71 @@ document.addEventListener('DOMContentLoaded', function() {
 	    }
 	});
 
+	// 일정 상세 모달 열기(업무 외 일정)
+	function openEventDetailModal(event) {
+	    const currentEventId = event.extendedProps.eventId; // FullCalendar 상 업무 외 일정의 eventId 가져오기
+
+	    console.log("eventId 확인용 : ", currentEventId);
+
+	    // 업무 외 일정일 경우에만 모달 열기
+	    if (event.extendedProps.eventType !== 'task') {
+	        const modal = document.createElement('div');
+	        modal.classList.add('modal', 'event-detail-modal');
+
+	        const modalContent = document.createElement('div');
+	        modalContent.classList.add('modal-content');
+
+	        const title = document.createElement('h3');
+	        title.textContent = event.title;
+
+	        const details = document.createElement('p');
+	        details.textContent = formatEventDetails(event);
+
+	        const closeButton = document.createElement('button');
+	        closeButton.textContent = 'Close';
+	        closeButton.classList.add('btn-close');
+	        closeButton.addEventListener('click', () => {
+	            document.body.removeChild(modal);
+	        });
+
+	        const deleteButton = document.createElement('button');
+	        deleteButton.textContent = 'Delete';
+	        deleteButton.classList.add('btn-delete');
+	        deleteButton.addEventListener('click', () => {
+	            const confirmDelete = confirm('이 일정을 정말 삭제하시겠습니까?');
+	            if (!confirmDelete) return; // 사용자가 삭제를 원하지 않을 경우 종료
+
+	            // 서버에 삭제 요청
+	            $.ajax({
+	                url: 'calendar/deleteEvent?eventId=' + currentEventId, // URL에 eventId 포함
+	                type: 'POST', // POST 방식
+	                success: function() {
+	                    alertAndCloseModal(modal, '업무 외 일정이 삭제되었습니다.'); // 메시지와 함께 모달 닫기
+	                },
+	                error: function(xhr) {
+	                    console.error('일정 삭제 실패:', xhr.responseText);
+	                    alert('일정을 삭제하는 데 실패했습니다.');
+	                }
+	            });
+	        });
+
+	        const buttonsContainer = document.createElement('div');
+	        buttonsContainer.classList.add('modal-buttons');
+	        buttonsContainer.appendChild(closeButton);
+	        buttonsContainer.appendChild(deleteButton);
+
+	        modalContent.appendChild(title);
+	        modalContent.appendChild(details);
+	        modalContent.appendChild(buttonsContainer);
+	        modal.appendChild(modalContent);
+
+	        document.body.appendChild(modal);
+	    } else {
+	        console.log('업무 일정은 삭제할 수 없습니다.'); // 업무 일정일 경우 로그 출력
+	    }
+	}
+	
+	/*
 	// 일정 상세 모달 열기
 	function openEventDetailModal(event) {
 	    const currentEventId = event.extendedProps.eventId; // FullCalendar 상 업무 외 일정의 eventId 가져오기
@@ -1817,6 +1885,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	    document.body.appendChild(modal);
 	}
+	*/
 
 	// 메시지를 보여주고 모달을 닫는 함수
 	function alertAndCloseModal(modal, message) {
