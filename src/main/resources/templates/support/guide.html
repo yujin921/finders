@@ -147,6 +147,25 @@ $(document).ready(function () {
             console.error("사용자 정보를 가져오는 데 실패했습니다. 상태 코드:", xhr.status);
         }
     });
+    
+    $("#chat-container").load("/chat/view", function () {
+        // 외부 스타일시트 처리
+        $("#chat-container link[rel='stylesheet']").each(function() {
+            var href = $(this).attr('href');
+            $.get(href, function(css) {
+                var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+                $('<style>').text(modifiedCss).appendTo('head');
+            });
+            $(this).remove(); // 원래의 link 태그 제거
+        });
+
+        // 인라인 스타일 처리
+        $("#chat-container style").each(function() {
+            var css = $(this).text();
+            var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
+            $(this).text(modifiedCss);
+        });
+    });
 
     // 헤더, 네비게이션, 푸터 로드
     $('header').load("/header", function () {});
