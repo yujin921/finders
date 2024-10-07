@@ -29,11 +29,12 @@
 				<div id="freelancer-error" class="errorMsg" th:if="${param.error}">ID
 					또는 비밀번호가 틀립니다.</div>
 			</form>
+			<button class="join" th:onclick="'location.href=\'' + @{/member/join} + '\''">회원가입</button>
 			<div class="find-links">
 				<button th:onclick="'location.href=\'' + @{/member/findId} + '\''">아이디 찾기</button>
 				<button th:onclick="'location.href=\'' + @{/member/resetPw} + '\''">비밀번호 재설정</button>
 			</div>			
-			<button class="join" th:onclick="'location.href=\'' + @{/member/join} + '\''">회원가입</button>
+			
 		</div>
 
 		<!-- 기업 로그인 폼 -->
@@ -49,11 +50,12 @@
 				<div id="company-error" class="errorMsg" th:if="${param.error}">ID
 					또는 비밀번호가 틀립니다.</div>
 			</form>
+			<button class="join" th:onclick="'location.href=\'' + @{/member/join} + '\''">회원가입</button>
 			<div class="find-links">
 				<button th:onclick="'location.href=\'' + @{/member/findId} + '\''">아이디 찾기</button>
 				<button th:onclick="'location.href=\'' + @{/member/resetPw} + '\''">비밀번호 재설정</button>
 			</div>
-			<button class="join" th:onclick="'location.href=\'' + @{/member/join} + '\''">회원가입</button>
+			
 		</div>
 	</div>
 </body>

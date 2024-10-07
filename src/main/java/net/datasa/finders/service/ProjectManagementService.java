@@ -396,6 +396,9 @@ public class ProjectManagementService {
     public boolean isProjectCompleted(int projectNum) {
         ProjectPublishingEntity e = projectPublishingRepository.findById(projectNum).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로젝트입니다."));
         ProjectManagementEntity project = projectManagementRepository.findByProjectPublishing(e);
+        if (project == null) {
+        	return false;
+        }
         return project.getCompleteStatus(); // 완료 여부 반환
     }
     
@@ -940,7 +943,9 @@ public class ProjectManagementService {
 
                     // task가 null인 경우, taskDelId를 통해 ProjectPublishingEntity 체크
                     if (taskDelId != null) {
+                    	log.debug("taskDelId : {}",taskDelId);
                         TaskManagementEntity delTask = taskManagementRepository.findById(taskDelId).orElse(null);
+                        log.debug("delTesk : {}",delTask);
                         if (delTask != null) {
                             ProjectPublishingEntity projectEntity = delTask.getProjectPublishingEntity();
                             return projectEntity != null &&
