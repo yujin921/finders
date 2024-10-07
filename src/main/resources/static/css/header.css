@@ -107,7 +107,7 @@ header .login-actions a {
 }
 
 header .login-actions a.btn {
-    background-color: var(--accent-color);
+    background-color: #555;
     color : white;
     padding: 10px 20px;
     border-radius: 30px;
@@ -115,7 +115,7 @@ header .login-actions a.btn {
 }
 
 header .login-actions a.btn:hover {
-    background-color: var(--button-hover);
+    background-color: #333;
     transform: translateY(-3px);
     color : white;
 }

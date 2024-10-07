@@ -2,7 +2,7 @@
 
 /* 네비게이션 */
 .top-nav {
-    background-color: var(--secondary-color);
+    background-color: var(--highlight-color);
     padding: 12px 0;
     border-bottom: 1px solid #ddd;
     z-index: 999;
