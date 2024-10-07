@@ -1,43 +1,26 @@
 package net.datasa.finders.controller;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.datasa.finders.domain.dto.*;
+import net.datasa.finders.domain.entity.RoleName;
+import net.datasa.finders.domain.entity.TaskStatus;
+import net.datasa.finders.security.AuthenticatedUser;
+import net.datasa.finders.service.ProjectManagementService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.datasa.finders.domain.dto.CalendarEventDTO;
-import net.datasa.finders.domain.dto.DeleteRequestDTO;
-import net.datasa.finders.domain.dto.FunctionDTO;
-import net.datasa.finders.domain.dto.FunctionTitleDTO;
-import net.datasa.finders.domain.dto.FunctionTitleWithTaskIdDTO;
-import net.datasa.finders.domain.dto.ProjectPublishingDTO;
-import net.datasa.finders.domain.dto.TaskDTO;
-import net.datasa.finders.domain.dto.TaskManagementDTO;
-import net.datasa.finders.domain.dto.TaskNotificationsDTO;
-import net.datasa.finders.domain.dto.TaskResponseDTO;
-import net.datasa.finders.domain.dto.TeamDTO;
-import net.datasa.finders.domain.entity.RoleName;
-import net.datasa.finders.domain.entity.TaskStatus;
-import net.datasa.finders.security.AuthenticatedUser;
-import net.datasa.finders.service.ProjectManagementService;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 거래 게시판 관련 콘트롤러
@@ -238,19 +221,8 @@ public class ProjectManagementController {
     
     @ResponseBody
     @GetMapping("checkProjectStatus")
-    public ResponseEntity<Map<String, Boolean>> checkProjectStatus(@RequestParam("projectNum") int projectNum) {
-        Map<String, Boolean> response = new HashMap<>();
-        try {
-            boolean completeStatus = projectManagementService.isProjectCompleted(projectNum);
-            response.put("completeStatus", completeStatus); // 완료 여부 추가
-
-            return ResponseEntity.ok(response);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public Boolean checkProjectStatus(@RequestParam("projectNum") int projectNum) {
+            return projectManagementService.isProjectCompleted(projectNum);
     }
     
     @ResponseBody

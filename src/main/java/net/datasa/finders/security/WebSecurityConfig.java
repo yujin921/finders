@@ -31,6 +31,7 @@ public class WebSecurityConfig {
             , "/member/idCheck"		//중복체크
             , "/board/view"
             , "/board/list"
+            , "/board/**"
             , "/board/latestProjects"  // 이 줄을 추가
             , "/member/findId"
             , "/member/findPw"
@@ -42,6 +43,7 @@ public class WebSecurityConfig {
             , "/unifiedreview/**"
             , "/guestportfolio/content"
             , "/portfolio/content"
+            , "/totalSearch/**"
     };
     
     // 프리랜서 회원 접근 가능
@@ -69,6 +71,7 @@ public class WebSecurityConfig {
                 .requestMatchers(CLIENT_URLS).hasAnyRole("CLIENT", "ADMIN") //관리자는 모두 접근 가능
                 .requestMatchers(ADMIN_URLS).hasAnyRole("ADMIN")
                 .requestMatchers("/board/write").hasRole("CLIENT") // 클라이언트만 접근 가능
+                .requestMatchers("/portfolio/create").hasRole("FREELANCER") // 이 줄을 추가
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exceptionHandling -> exceptionHandling

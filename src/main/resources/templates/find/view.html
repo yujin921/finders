@@ -114,9 +114,9 @@ $(document).ready(function () {
             $.get(href, function(css) {
                 var modifiedCss = css.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, "#chat-container $1$2");
                 $('<style>').text(modifiedCss).appendTo('head');
-            });
+                });
             $(this).remove(); // 원래의 link 태그 제거
-        });
+    });
 
         // 인라인 스타일 처리
         $("#chat-container style").each(function() {

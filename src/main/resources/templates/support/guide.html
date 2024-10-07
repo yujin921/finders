@@ -123,12 +123,32 @@
 	<!-- Footer -->
 	<footer>
 	</footer>
-	<div id="chat-container"></div>
+    <div id="chat-container"></div>
 	<script th:src="@{/js/support/guide.js}"></script>
 </body>
 <script>
 $(document).ready(function () {
-	$("#chat-container").load("/chat/view", function () {
+    // 로그인 여부를 확인하는 AJAX 요청
+    $.ajax({
+        url: '/currentUser',
+        method: 'GET',
+        success: function(isAuthenticated) {
+            console.log("인증 상태:", isAuthenticated);
+            if (isAuthenticated) {
+                // 로그인된 경우에만 chat-container를 로드
+                $("#chat-container").load("/chat/view", function(response, status, xhr) {
+                    if (status == "error") {
+                        console.error("Chat container 로드 실패: ", xhr.status, xhr.statusText);
+                    }
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("사용자 정보를 가져오는 데 실패했습니다. 상태 코드:", xhr.status);
+        }
+    });
+    
+    $("#chat-container").load("/chat/view", function () {
         // 외부 스타일시트 처리
         $("#chat-container link[rel='stylesheet']").each(function() {
             var href = $(this).attr('href');
@@ -146,12 +166,11 @@ $(document).ready(function () {
             $(this).text(modifiedCss);
         });
     });
-    $('header').load("/header", function () {
-   		});
-    $('nav').load("/nav", function () {
-		});
-    $('footer').load("/footer", function () {
-		});
+
+    // 헤더, 네비게이션, 푸터 로드
+    $('header').load("/header", function () {});
+    $('nav').load("/nav", function () {});
+    $('footer').load("/footer", function () {});
 });
 </script>
 </html>

@@ -1393,9 +1393,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	    $.ajax({
 	        url: 'checkProjectStatus?projectNum=' + projectNum,
 	        type: 'GET',
-	        dataType: 'json',
 	        success: function(response) {
-	            if (response && response.completeStatus) {
+	            if (response) {
 	                // "프로젝트 완료" 버튼 숨기기
 	                document.getElementById('project-completion-button').style.display = 'none';
 	            }

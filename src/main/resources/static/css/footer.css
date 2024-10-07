@@ -2,7 +2,7 @@
 
 /* 전체 높이 100vh로 설정하고, flexbox를 사용하여 내용과 footer를 배치합니다 */
 html, body {
-    height: 100%; /* 전체 높이 설정 */
+    min-height: 100%; /* 전체 높이 설정 */
     margin: 0; /* 기본 마진 제거 */
     /*display: flex; /* Flexbox 사용 */
     flex-direction: column; /* 세로 방향으로 정렬 */

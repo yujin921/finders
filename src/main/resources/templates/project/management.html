@@ -46,7 +46,6 @@
 	                </th:block>
 	                <th:block sec:authorize="isAuthenticated()">
 	                    <img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;">
-	                    <a th:href="@{/project/view}">프로젝트 관리</a>
 	                    <a th:href="@{/member/myPage}">마이페이지</a>
 	                    <a th:href="@{/member/logout}" class="btn">로그아웃</a>
 	                </th:block>
@@ -86,7 +85,6 @@
                     <li><span class="tab-link calendar-tab" data-tab="calendar-content">캘린더</span></li>
                     <li><span sec:authorize="hasRole('ROLE_CLIENT')" class="tab-link application-tab" data-tab="application-content">신청목록</span></li>
                     <li><span class="tab-link team-tab" data-tab="team-content">팀원목록</span></li>
-                    <li><span>임시저장</span></li>
                 </ul>
             </nav>
             <br>

@@ -55,7 +55,7 @@ management-container .sidebar .logo img {
 }
 
 .btn-create-project:hover {
-    background-color: var(--button-hover);
+    background-color: var(--secondary-color);
     transform: translateY(-3px);
 }
 
@@ -772,7 +772,7 @@ h1 {
 
 /* 테이블 헤더 스타일 */
 .application-table thead {
-    background-color: #4FD1C5; /* 청록색 */
+    background-color: #2C7A7B;
     color: white;
 }
 
