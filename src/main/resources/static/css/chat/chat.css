@@ -103,6 +103,7 @@ img:hover {
     max-height: 80vh;
     overflow-y: auto;
     z-index: 1001;
+    height:auto;
 }
 
 .overlay {
