@@ -858,7 +858,7 @@ h1 {
 
 /* 테이블 헤더 스타일 */
 .team-table thead {
-    background-color: #2C7A7B; /* 청록색 */
+    background-color: var(--secondary-color); /* 청록색 */
     color: white;
 }
 
