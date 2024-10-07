@@ -417,26 +417,27 @@ h1 {
 
 /* 모달 스타일 */
 .gantt-modal {
-    display: none; /* 기본적으로 숨김 */
+    display: none;
     position: fixed;
-    top: 0;
+    z-index: 1000;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
 }
 
 .gantt-modal-content {
-    background: #fff;
-    border-radius: 8px;
+    background-color: #fefefe;
     padding: 20px;
-    width: 90%;
+    border: 1px solid #888;
+    width: 80%;
     max-width: 500px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    position: relative;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .gantt-modal-content h2 {
@@ -447,9 +448,17 @@ h1 {
 }
 
 .close {
-    cursor: pointer;
+    color: #aaa;
     float: right;
-    font-size: 24px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .input-field {
@@ -849,7 +858,7 @@ h1 {
 
 /* 테이블 헤더 스타일 */
 .team-table thead {
-    background-color: #4FD1C5; /* 청록색 */
+    background-color: #2C7A7B; /* 청록색 */
     color: white;
 }
 
@@ -1284,4 +1293,47 @@ h1 {
 
 .delete-approval-close-button:hover {
     color: #333; /* 호버 시 색상 변경 */
+}
+
+#select-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#select-modal .modal-content .button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 20px;
+}
+
+#select-modal .modal-content button {
+    flex: 1;
+    padding: 10px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#select-modal .modal-content #add-task {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#select-modal .modal-content #add-event {
+    background-color: #2196F3;
+    color: white;
+}
+
+#select-modal .modal-content .btn-close {
+    background-color: #f44336;
+    color: white;
+}
+
+#select-modal .modal-content button:hover {
+    opacity: 0.8;
 }

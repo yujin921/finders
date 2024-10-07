@@ -614,6 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                                    (task.taskStatus === 'REQUEST' || 
 	                                     task.taskStatus === 'INPROGRESS' || 
 	                                     task.taskStatus === 'HOLD' || 
+										 task.taskStatus === 'FEEDBACK' ||
 	                                     task.taskStatus === 'APPROVAL' ||
 									     task.taskStatus === 'DELETED_DENIED')) || // 기업 회원 비활성화 조건
 	                                (userData.role === 'ROLE_FREELANCER' && 
@@ -916,6 +917,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	function openFeedbackModal(taskId) {
 	    const feedbackModal = document.getElementById('unique-feedback-modal');
 	    
+		// hidden 클래스를 제거하여 모달을 보이도록 설정
+		feedbackModal.classList.remove('hidden'); // 모달 열기
+		
 	    // 업무 제목을 가져오기 위한 AJAX 요청
 	    $.ajax({
 	        url: `getTaskTitle?taskId=${taskId}`,
