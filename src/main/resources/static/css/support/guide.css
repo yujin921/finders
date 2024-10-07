@@ -20,7 +20,7 @@ main {
 .main-tabs {
     display: flex;
     margin-bottom: 50px;
-    padding-top: 50px;
+    padding-top: 30px;
     border-bottom: 1px solid #ddd;
     width: 470px;
 }
@@ -170,4 +170,8 @@ main {
     right: 40px;
     z-index: 1000;
     overflow: hidden;
+}
+
+#main{
+	margin-top: 30px;
 }
