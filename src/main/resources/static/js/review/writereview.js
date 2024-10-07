@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	      .then(response => {
 	          if (response.ok) {
 	              alert('리뷰가 제출되었습니다.');
-	              window.location.href = '/project/list';
+	              window.location.href = '/project/myproject?status=%EB%AA%A8%EC%A7%91%EC%A4%91';
 	          } else {
 	              response.text().then(text => alert(`리뷰 제출에 실패했습니다: ${text}`));
 	          }
