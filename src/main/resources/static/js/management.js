@@ -2982,11 +2982,11 @@ function loadApplicationList() {
 
 				contentHtml += `
                 <tr>
-					<td onclick="location.href='/find/freelancerDetail?memberId=${application.freelancerId}'">
+					<td onclick="window.open('/find/applyFreelancerDetail?memberId=${application.freelancerId}', '_blank', 'width=900,height=800'); return false;">
                        ${application.freelancerId}
                		</td>
-                    <td onclick="location.href='/find/freelancerDetail?memberId=${application.freelancerId}'">${application.projectTitle}</td>
-                    <td onclick="location.href='/find/freelancerDetail?memberId=${application.freelancerId}'">${statusText}</td> <!-- 상태란에 지원 신청 중 표시 -->
+                    <td onclick="window.open('/find/applyFreelancerDetail?memberId=${application.freelancerId}', '_blank', 'width=900,height=800'); return false;">${application.projectTitle}</td>
+                    <td onclick="window.open('/find/applyFreelancerDetail?memberId=${application.freelancerId}', '_blank', 'width=900,height=800'); return false;">${statusText}</td> <!-- 상태란에 지원 신청 중 표시 -->
                     <td>${actionHtml}</td> <!-- 동작란에 찬성/반대 버튼 표시 -->
                 </tr>
                 `;
