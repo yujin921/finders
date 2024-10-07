@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -926,6 +927,7 @@ public class ProjectManagementService {
                 .sender(sender) // 가져온 MemberEntity 설정
                 .recipient(recipient) // 가져온 MemberEntity 설정
                 .task(task)
+                .taskDelId(task.getTaskId())
                 .createDate(LocalDateTime.now()) // 현재 시간 설정
                 .build();
 
@@ -954,16 +956,38 @@ public class ProjectManagementService {
     }
 
     public Map<String, List<TaskNotificationsDTO>> getNotifications(String recipientId, Integer projectNum) {
-        MemberEntity recipient = memberRepository.findById(recipientId)
+    	MemberEntity recipient = memberRepository.findById(recipientId)
                 .orElseThrow(() -> new EntityNotFoundException("받는 회원의 아이디가 없습니다."));
 
         List<TaskNotificationsEntity> notifications = taskNotificationsRepository.findByRecipient(recipient);
 
         // projectNum에 해당하는 알림만 필터링
         List<TaskNotificationsEntity> filteredNotifications = notifications.stream()
-                .filter(notification -> notification.getTask() != null && 
-                                       notification.getTask().getProjectPublishingEntity().getProjectNum().equals(projectNum) ||
-                                       notification.getTask() == null) // taskId가 null인 경우도 포함
+                .filter(notification -> {
+                    TaskManagementEntity task = notification.getTask();
+                    Integer taskDelId = notification.getTaskDelId();
+
+                    // task가 null이 아닐 때
+                    if (task != null) {
+                        return task.getProjectPublishingEntity() != null &&
+                               task.getProjectPublishingEntity().getProjectNum() != null &&
+                               task.getProjectPublishingEntity().getProjectNum().equals(projectNum);
+                    }
+
+                    // task가 null인 경우, taskDelId를 통해 ProjectPublishingEntity 체크
+                    if (taskDelId != null) {
+                        TaskManagementEntity delTask = taskManagementRepository.findById(taskDelId).orElse(null);
+                        if (delTask != null) {
+                            ProjectPublishingEntity projectEntity = delTask.getProjectPublishingEntity();
+                            return projectEntity != null &&
+                                   projectEntity.getProjectNum() != null &&
+                                   projectEntity.getProjectNum().equals(projectNum);
+                        }
+                    }
+
+                    // task가 null인 경우 projectNum과 일치하는 경우 true 반환
+                    return taskDelId != null; // taskDelId가 null이 아닐 경우에만 true
+                })
                 .collect(Collectors.toList());
 
         // 읽음과 안 읽음 알림을 구분
@@ -993,7 +1017,17 @@ public class ProjectManagementService {
         dto.setReadStatus(notification.isReadStatus());
         dto.setSender(notification.getSender().getMemberId());
         dto.setRecipient(recipient.getMemberId());
-        dto.setTask(notification.getTask() != null ? notification.getTask().getTaskId() : null); // taskId가 null인 경우 처리
+        
+        // task가 null일 경우 taskDelId를 설정하는 로직
+        TaskManagementEntity task = notification.getTask();
+        if (task != null) {
+            dto.setTask(task.getTaskId()); // task가 null이 아닐 경우 taskId 설정
+            dto.setTaskDelId(task.getTaskId()); // taskDelId도 taskId로 설정
+        } else {
+            dto.setTask(null); // task가 null인 경우
+            dto.setTaskDelId(notification.getTaskDelId()); // taskDelId는 notification에서 가져오기
+        }
+        
         dto.setCreateDate(notification.getCreateDate());
         return dto;
     }
@@ -1024,6 +1058,7 @@ public class ProjectManagementService {
         
         // 업무 ID 설정
         notification.setTask(task);
+        notification.setTaskDelId(task.getTaskId());
 
         // 프로젝트 정보를 통해 클라이언트 ID 가져오기
         String clientId = task.getProjectPublishingEntity().getClientId().getMemberId();
@@ -1071,7 +1106,8 @@ public class ProjectManagementService {
 
         // 업무 ID 설정
         notification.setTask(task);
-
+        notification.setTaskDelId(task.getTaskId());
+        
         // 알림 저장
         taskNotificationsRepository.save(notification);
     }
@@ -1104,6 +1140,7 @@ public class ProjectManagementService {
         notification.setRecipient(client); // 기업 회원 ID 설정
 
         notification.setTask(task);
+        notification.setTaskDelId(task.getTaskId());
         taskNotificationsRepository.save(notification);
 
         // 응답 객체 생성
@@ -1130,6 +1167,7 @@ public class ProjectManagementService {
         notification.setRecipient(task.getMemberEntity()); // 알림을 받는 프리랜서 ID
 
         notification.setTask(task);
+        notification.setTaskDelId(task.getTaskId());
         taskNotificationsRepository.save(notification);
         
         // 응답 객체 생성
@@ -1168,6 +1206,7 @@ public class ProjectManagementService {
         notification.setRecipient(task.getMemberEntity()); // 알림을 받는 프리랜서 ID
 
         notification.setTask(task);
+        notification.setTaskDelId(task.getTaskId());
         taskNotificationsRepository.save(notification);
 
         // 응답 객체 생성

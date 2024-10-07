@@ -49,6 +49,9 @@ public class TaskNotificationsEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id", referencedColumnName = "task_id", nullable = true) // nullable 추가
     private TaskManagementEntity task; // 업무와의 관계
+    
+    @Column(name = "task_del_id")
+    private Integer taskDelId;
 
     @CreatedDate
     @Column(name = "create_date", columnDefinition = "timestamp default current_timestamp", updatable = false)
