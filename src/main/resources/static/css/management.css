@@ -1335,3 +1335,98 @@ h1 {
 #select-modal .modal-content button:hover {
     opacity: 0.8;
 }
+
+/* 업무 알림 메시지 디자인 CSS */
+.notification-list {
+    max-height: calc(100vh - 150px); /* 사이드바를 고려한 최대 높이 */
+    overflow-y: auto; /* 세로 스크롤 활성화 */
+    background-color: #f9f9f9; /* 배경색 조정 (연한 회색) */
+    border-radius: 8px; /* 모서리 둥글게 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
+    padding: 10px; /* 내부 여백 */
+    margin-top: 10px; /* 상단 여백 */
+}
+
+.notification-item {
+    display: flex;
+    justify-content: space-between; /* 항목 내에서 요소 간의 공간 분배 */
+    align-items: center; /* 수직 정렬 */
+    padding: 12px 15px; /* 여백 조정 */
+    margin: 5px 0;
+    border-radius: 5px; /* 각 알림 항목의 모서리 둥글게 */
+    transition: background-color 0.3s; /* 배경색 전환 효과 */
+}
+
+.notification-item:nth-child(odd) {
+    background-color: #ffcc66; /* 홀수 항목 배경색 (진한 노란색) */
+}
+
+.notification-item:nth-child(even) {
+    background-color: #66b3ff; /* 짝수 항목 배경색 (선명한 하늘색) */
+}
+
+.notification-item:hover {
+    background-color: #eaeaea; /* 마우스 오버 시 배경색 변경 */
+}
+
+.notification-message {
+    color: #2c3e50; /* 알림 메시지 글자 색상 (진한 파란색) */
+    font-size: 1em; /* 글자 크기 조정 */
+    margin-bottom: 5px; /* 메시지와 시간 간격 */
+}
+
+.notification-time {
+    color: #7f8c8d; /* 일시 색상 (연한 회색) */
+    font-size: 0.85em; /* 시간 크기 조정 */
+}
+
+.notification-item.unread {
+    font-weight: bold; /* 안 읽음 상태 글자 두껍게 */
+}
+
+.notification-item.read .notification-message {
+    color: #888; /* 읽음 상태의 글자 색상 */
+    text-decoration: line-through; /* 읽음 상태의 메시지에 취소선 */
+}
+
+.mark-as-read {
+    padding: 6px 12px; /* 버튼 여백 조정 */
+    border: none;
+    border-radius: 5px;
+    background-color: #28a745; /* 읽음 버튼 색상 (선명한 녹색) */
+    color: white;
+    font-weight: bold; /* 버튼 글자 두껍게 */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; /* 효과 추가 */
+}
+
+.mark-as-read:hover:not(:disabled) {
+    background-color: #218838; /* 읽음 버튼 마우스 오버 색상 */
+    transform: translateY(-2px); /* 마우스 오버 시 위로 이동하는 효과 */
+}
+
+.mark-as-read:disabled {
+    background-color: #ccc; /* 비활성화된 버튼 색상 */
+    cursor: not-allowed; /* 비활성화된 커서 */
+}
+
+.mark-as-unread {
+    padding: 6px 12px; /* 버튼 여백 조정 */
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff; /* 안 읽음 버튼 색상 (선명한 파란색) */
+    color: white;
+    font-weight: bold; /* 버튼 글자 두껍게 */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; /* 효과 추가 */
+}
+
+.mark-as-unread:hover:not(:disabled) {
+    background-color: #0056b3; /* 안 읽음 버튼 마우스 오버 색상 */
+    transform: translateY(-2px); /* 마우스 오버 시 위로 이동하는 효과 */
+}
+
+.mark-as-unread:disabled {
+    background-color: #ccc; /* 비활성화된 버튼 색상 */
+    cursor: not-allowed; /* 비활성화된 커서 */
+}
