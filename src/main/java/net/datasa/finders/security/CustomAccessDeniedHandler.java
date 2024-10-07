@@ -16,12 +16,19 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_FREELANCER"))) {
-            if (request.getRequestURI().equals("/board/write")) {
-                response.setContentType("text/html;charset=UTF-8");
-                response.getWriter().println("<script>alert('프로젝트 등록은 클라이언트 계정만 가능합니다'); history.back();</script>");
-                return;
+        if (auth != null) {
+            if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_FREELANCER"))) {
+                if (request.getRequestURI().equals("/board/write")) {
+                    response.setContentType("text/html;charset=UTF-8");
+                    response.getWriter().println("<script>alert('프로젝트 등록은 클라이언트 계정만 가능합니다'); history.back();</script>");
+                    return;
+                }
+            } else if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CLIENT"))) {
+                if (request.getRequestURI().equals("/portfolio/create")) {
+                    response.setContentType("text/html;charset=UTF-8");
+                    response.getWriter().println("<script>alert('포트폴리오 작성은 프리랜서 계정만 가능합니다'); history.back();</script>");
+                    return;
+                }
             }
         }
         response.sendRedirect("/access-denied");
