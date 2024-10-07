@@ -31,6 +31,7 @@ public class WebSecurityConfig {
             , "/member/idCheck"		//중복체크
             , "/board/view"
             , "/board/list"
+            , "/board/**"
             , "/board/latestProjects"  // 이 줄을 추가
             , "/member/findId"
             , "/member/findPw"
@@ -42,6 +43,7 @@ public class WebSecurityConfig {
             , "/unifiedreview/**"
             , "/guestportfolio/content"
             , "/portfolio/content"
+            , "/totalSearch/**"
     };
     
     // 프리랜서 회원 접근 가능
