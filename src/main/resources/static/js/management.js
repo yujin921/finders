@@ -561,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
     
 	// 업무 목록 로드(조회)
-	function loadTasks() {
+	function loadTasks() {		
 	    $.ajax({
 	        url: 'getTasks',
 	        type: 'get',
@@ -1049,7 +1049,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 업무 삭제 요청 처리
 	function requestDeleteTask(taskId) {
 	    const deleteModal = document.getElementById('unique-delete-modal');
-
+		
 	    // 모달 열기
 	    deleteModal.classList.remove('hidden');
 	    
@@ -1439,8 +1439,25 @@ document.addEventListener('DOMContentLoaded', function() {
 	                    selectedDate = info.dateStr; // 선택한 날짜 저장
 	                },
 	                eventClick: function(info) {
+						// 업무 일정 삭제 시 task-content 탭 활성화
+			            const targetId = 'task-content'; // 활성화할 탭 ID
+			            document.getElementById(targetId).classList.add('active');
+
+			            // 추가적으로, 다른 탭의 'active' 클래스 제거 필요
+			            const tabs = document.querySelectorAll('.tab-content'); // 모든 탭 내용
+			            tabs.forEach(tab => {
+			                if (tab.id !== targetId) {
+			                    tab.classList.remove('active'); // 다른 탭 비활성화
+			                }
+			            });
+						
+			            // 필요에 따라 업무 목록 업데이트 함수를 호출할 수도 있음
+			            loadTasks(); // 업무 목록 새로 고침
+						
+						/*
 	                    // 클릭한 이벤트 정보를 모달로 전달하여 열기
 	                    openEventDetailModal(info.event); // FullCalendar 이벤트 객체 전달
+						*/
 	                }
 	            });
 				
@@ -1716,7 +1733,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		console.log("currentTaskId 확인용 : ", currentTaskId);
 
 	    const modal = document.createElement('div');
-	    modal.classList.add('modal');
+	    modal.classList.add('modal event-detail-modal');
 
 	    const modalContent = document.createElement('div');
 	    modalContent.classList.add('modal-content');
@@ -1774,8 +1791,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				    type: requestType,
 				    success: function(task) {
 				        if (event.extendedProps.eventType === 'task') {
-				            // 업무 일정 삭제 시 deleteTask 호출
-				            deleteTask(task.taskId, modal);
+							// 삭제 함수 구현 예정
 				        } else {
 				            const message = '업무 외 일정이 삭제되었습니다.';
 				            alertAndCloseModal(modal, message); // 메시지와 함께 모달 닫기

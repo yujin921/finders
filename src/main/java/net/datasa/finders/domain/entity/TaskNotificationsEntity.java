@@ -52,6 +52,9 @@ public class TaskNotificationsEntity {
     
     @Column(name = "task_del_id")
     private Integer taskDelId;
+    
+    @Column(name = "project_num")
+    private Integer projectNum;
 
     @CreatedDate
     @Column(name = "create_date", columnDefinition = "timestamp default current_timestamp", updatable = false)
