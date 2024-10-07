@@ -1087,7 +1087,7 @@ public class ProjectManagementService {
         taskManagementRepository.save(task); // 상태 업데이트
 
         // 알림 메시지 생성 및 저장
-        String notificationMessage = task.getMemberEntity().getMemberId() + "(이)가" + task.getTaskTitle() + " 업무 삭제를 요청하였습니다. \n\n사유: " + reason;
+        String notificationMessage = task.getMemberEntity().getMemberId() + "(이)가" + task.getTaskTitle() + " 업무 삭제를 요청하였습니다. <br>사유: " + reason;
 
         TaskNotificationsEntity notification = new TaskNotificationsEntity();
         notification.setNotificationMessage(notificationMessage);
@@ -1155,7 +1155,7 @@ public class ProjectManagementService {
         taskManagementRepository.save(task); // 상태 업데이트
 
         // 알림 메시지 생성 및 저장
-        String notificationMessage = task.getMemberEntity().getMemberId() + "(이)가 " + task.getTaskTitle() + " 업무 삭제 요청이 거절되었습니다. \n\n사유: " + reason;
+        String notificationMessage = task.getMemberEntity().getMemberId() + "(이)가 " + task.getTaskTitle() + " 업무 삭제 요청이 거절되었습니다. <br>사유: " + reason;
 
         TaskNotificationsEntity notification = new TaskNotificationsEntity();
         notification.setNotificationMessage(notificationMessage);

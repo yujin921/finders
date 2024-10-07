@@ -960,7 +960,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	                        url: 'sendNotificationToFreelancer',
 	                        type: 'POST',
 	                        data: {
-	                            message: `업무(${taskTitle})에 대한 피드백이 도착했습니다.\n\n피드백 내용: ${feedbackMessage}`,
+	                            message: `업무(${taskTitle})에 대한 피드백이 도착했습니다.<br>피드백 내용: ${feedbackMessage}`,
 	                            taskId: taskId
 	                        },
 	                        success: function() {
