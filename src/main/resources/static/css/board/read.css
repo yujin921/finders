@@ -338,7 +338,6 @@ button:hover {
 
 /* 사이드바 스타일 */
 .sidebar {
-    width: 300px;
     margin-left: 20px;
     position: sticky;
     top: 120px;
@@ -401,7 +400,6 @@ button:hover {
     }
 
     .sidebar {
-        width: 100%;
         position: static;
         margin-left: 0;
     }
