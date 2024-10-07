@@ -1,10 +1,24 @@
-/**
- * 
- */
-
 let freelancers = [];
+let clientId; // 클라이언트 ID 변수
 
 $(document).ready(function() {
+	// 로그인한 사용자의 ID를 가져오는 AJAX 요청
+    $.ajax({
+        url: 'currentUser', // 현재 로그인한 사용자 정보를 가져오는 API
+        method: 'GET',
+        success: function(data) {
+            // RoleName에 따라 ID 할당
+            if (data.roleName === 'ROLE_FREELANCER') {
+                freelancerId = data.freelancerId; // 프리랜서 ID 할당
+            } else if (data.roleName === 'ROLE_CLIENT') {
+                clientId = data.clientId; // 클라이언트 ID 할당
+            }
+        },
+        error: function() {
+            alert("사용자 정보를 가져오는 데 실패했습니다.");
+        }
+    });
+	
 	loadPartners();	
 	$('input[type="checkbox"]').on("click", function() {
 		loadPartners()
@@ -19,8 +33,6 @@ $(document).ready(function() {
         	loadPartners();
         }
     });
-	
-	
 });
 
 function loadPartners() {
@@ -131,24 +143,43 @@ function createPartnerCard(partner) {
     `;
 }
 
-
-
-
-
 function sortFreelancers(sortType) {
-    let sortedFreelancers = [...freelancers];  // 원본 배열 복사
+	if (sortType === "recommended") {
+        // 추천순을 선택했을 때 AJAX 요청 보내기
+        $.ajax({
+            url: 'recommendations/freelancers?clientId=' + clientId, // 클라이언트 ID를 쿼리 파라미터로 전송
+            method: 'GET',
+            success: function(data) {
+                $('#partners').empty(); // 기존 출력 내용 비우기
+                $(data).each(function(i, partner) {
+                    $('#partners').append(createPartnerCard(partner)); // HTML 추가
+                });
+                
+                // 클릭 이벤트 리스너 추가
+                $('.partner-card').on('click', function() {
+                    window.location.href = "/find/freelancerDetail?memberId=" + $(this).attr('data');
+                });
+            },
+            error: function() {
+                alert("추천 정보를 가져오는 데 실패했습니다.");
+            }
+        });
+    } else {
+        // 기존 프리랜서 배열을 정렬
+        let sortedFreelancers = [...freelancers];  // 원본 배열 복사
 
-    if (sortType === "rating") {
-        // 평점 높은 순으로 정렬
-        sortedFreelancers.sort((a, b) => b.totalRating - a.totalRating);
-    } else if (sortType === "portfolio") {
-        // 포트폴리오 많은 순으로 정렬
-        sortedFreelancers.sort((a, b) => b.totalPortfolios - a.totalPortfolios);
-    } else if (sortType === "default") {
-        // 기본 정렬: 불러온 데이터를 그대로 사용
-        sortedFreelancers = freelancers;  // 원본 데이터를 그대로 사용
+        if (sortType === "rating") {
+            // 평점 높은 순으로 정렬
+            sortedFreelancers.sort((a, b) => b.totalRating - a.totalRating);
+        } else if (sortType === "portfolio") {
+            // 포트폴리오 많은 순으로 정렬
+            sortedFreelancers.sort((a, b) => b.totalPortfolios - a.totalPortfolios);
+        } else if (sortType === "default") {
+            // 기본 정렬: 불러온 데이터를 그대로 사용
+            sortedFreelancers = freelancers;  // 원본 데이터를 그대로 사용
+        }
+
+        // 정렬된 리스트 다시 표시
+        updatePartnerList(sortedFreelancers);
     }
-
-    // 정렬된 리스트 다시 표시
-    updatePartnerList(sortedFreelancers);
 }

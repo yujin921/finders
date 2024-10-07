@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 페이지 로드 시 기본적으로 업무 알림 목록 로드
 	loadNotifications(projectNum);
 		
-	// 페이지 로드 시 기본적으로 프로젝트 완료 여부 체크 후 버튼(프로젝트 완료 or 리뷰 작성) 표시
+	// 페이지 로드 시 기본적으로 프로젝트 완료 여부 체크 후 버튼(프로젝트 완료) 표시
 	completeStatusCheck();
 	
     tabs.forEach(tab => {
@@ -1373,9 +1373,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	                
 	                // "프로젝트 완료" 버튼 숨기기
 	                document.getElementById('project-completion-button').style.display = 'none';
-
-	                // "리뷰 작성" 버튼 보이기
-	                document.getElementById('project-review-button').style.display = 'block';
 	                
 	                // 목록 화면 업데이트
 	                loadTasks();
@@ -1401,9 +1398,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	            if (response && response.completeStatus) {
 	                // "프로젝트 완료" 버튼 숨기기
 	                document.getElementById('project-completion-button').style.display = 'none';
-
-	                // "리뷰 작성" 버튼 보이기
-	                document.getElementById('project-review-button').style.display = 'block';
 	            }
 	        },
 	        error: function(xhr, status, error) {
