@@ -236,6 +236,7 @@
 }
 
 
+
 /* 반응형 디자인 */
 @media screen and (max-width: 768px) {
     .container {
@@ -267,4 +268,13 @@
         flex-direction: column;
         align-items: center;
     }
+}
+
+/* 채팅 컨테이너 */
+#chat-container {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 1000;
+    overflow: hidden;
 }
