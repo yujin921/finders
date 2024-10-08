@@ -117,6 +117,7 @@ function updatePagination(pageData) {
 
 function updatePartnerList(partners) {
     $('#partners').empty();
+	console.log(partners);
     partners.forEach(function(partner) {
         $('#partners').append(createPartnerCard(partner));
     });
@@ -128,11 +129,11 @@ function updatePartnerList(partners) {
 function sortFreelancers(sortType) {
     if (sortType === "recommended") {
         $.ajax({
-            url: 'recommendations/freelancers',
+            url: '/find/recommendations/freelancers',
             method: 'GET',
             data: { clientId: clientId, page: currentPage, size: itemsPerPage },
             success: function(response) {
-                updatePartnerList(response.content);
+                updatePartnerList(response);
                 updatePagination(response);
             },
             error: function() {
