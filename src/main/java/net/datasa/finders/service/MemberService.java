@@ -321,11 +321,12 @@ public class MemberService {
           memberRepository.save(member);
       }
     
+    @Transactional
     public void updateClient(ClientDTO dto, MultipartFile profileImg, String uploadPath) throws IOException {
         MemberEntity member = memberRepository.findById(dto.getMemberId())
             .orElseThrow(() -> new RuntimeException("Member not found"));
 
-        // 이름과 이메일 업데이트
+        // 기본 정보 업데이트
         member.setMemberName(dto.getMemberName());
         member.setEmail(dto.getEmail());
        
@@ -335,37 +336,38 @@ public class MemberService {
         }
 
         // 프로필 이미지 처리
-        String newImagePath = saveProfileImage(dto.getMemberId(), profileImg, uploadPath);
-        if (newImagePath != null) {
-            member.setProfileImg(newImagePath);
+        if (profileImg != null && !profileImg.isEmpty()) {
+            String newImagePath = saveProfileImage(dto.getMemberId(), profileImg, uploadPath);
+            if (newImagePath != null) {
+                member.setProfileImg(newImagePath);
+            }
         }
         
+        ClientEntity client = clientRepository.findByMember(member)
+              .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        // 클라이언트 상세 정보 업데이트
+        client.setClientPhone(dto.getClientPhone());
+        client.setIndustry(dto.getIndustry());
+        client.setFoundedDate(dto.getFoundedDate());
+        client.setEmployeeCount(dto.getEmployeeCount());
+        client.setWebsite(dto.getWebsite());
+        client.setPostalCode(dto.getPostalCode());
+        client.setAddress(dto.getAddress());
+        client.setDetailAddress(dto.getDetailAddress());
+        client.setExtraAddress(dto.getExtraAddress());
+        
+        // 필드와 카테고리 업데이트
         if (dto.getFields() != null && !dto.getFields().isEmpty()) {
             updateClientField(dto.getMemberId(), dto.getFields());
         }
         if (dto.getCategorys() != null && !dto.getCategorys().isEmpty()) {
             updateClientCategory(dto.getMemberId(), dto.getCategorys());
         }
-        
-        ClientEntity client = clientRepository.findByMember(member)
-              .orElseThrow(() -> new RuntimeException("client not found"));
 
-      client.setClientPhone(dto.getClientPhone());
-      client.setIndustry(dto.getIndustry());
-      client.setFoundedDate(dto.getFoundedDate());
-      client.setEmployeeCount(dto.getEmployeeCount());
-      client.setWebsite(dto.getWebsite());
-      client.setPostalCode(dto.getPostalCode());
-      client.setAddress(dto.getAddress());
-      client.setDetailAddress(dto.getDetailAddress());
-      client.setExtraAddress(dto.getExtraAddress());
-      
-      updateClientField(dto.getMemberId(), dto.getFields());
-      updateClientCategory(dto.getMemberId(), dto.getCategorys());
-
-          clientRepository.save(client);
-          memberRepository.save(member);
-      }
+        clientRepository.save(client);
+        memberRepository.save(member);
+    }
 
         	
     private String saveProfileImage(String memberId, MultipartFile file, String uploadPath) throws IOException {

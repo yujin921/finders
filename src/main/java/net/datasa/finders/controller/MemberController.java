@@ -173,7 +173,7 @@ public class MemberController {
     
     @PostMapping("/update/client")
     public String updateClient(@ModelAttribute ClientDTO clientDTO,
-                               @RequestParam("profileImg") MultipartFile profileImg,
+                               @RequestParam(value = "profileImg", required = false) MultipartFile profileImg,
                                @RequestParam(value = "selectedField", required = false) String selectedFieldString,
                                @RequestParam(value = "selectedCategory", required = false) String selectedCategoryString,
                                Model model) {
@@ -185,11 +185,11 @@ public class MemberController {
                 clientDTO.setCategorys(Arrays.asList(selectedCategoryString.split(",")));
             }
             memberService.updateClient(clientDTO, profileImg, uploadPath);
-            return "redirect:/";
+            return "redirect:/member/myPage";  // 수정 후 마이페이지로 리다이렉트
         } catch (Exception e) {
-        	log.debug("{}", clientDTO);
-            model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
-            return "redirect:/member/myPage";
+        	log.error("클라이언트 정보 업데이트 중 오류 발생", e);
+            model.addAttribute("error", "정보 수정 중 오류가 발생했습니다: " + e.getMessage());
+            return "member/myPage";
         }
     }
     

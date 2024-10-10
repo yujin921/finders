@@ -29,6 +29,8 @@ public class ClientDTO {
 	String address;
 	String detailAddress;
 	String extraAddress;
+
+	
 	
 	List<String> fields;
 	List<String> categorys;
