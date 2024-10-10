@@ -46,7 +46,7 @@ public class FindService {
 	public Page<FindFreelancerDTO> findFreelancerList(List<String> fields, List<String> areas, String search, Pageable pageable) {
 		
 		// 전체 회원 목록을 가져옵니다.
-        List<MemberEntity> allMembers = memberRepository.findAll();
+        List<MemberEntity> allMembers = memberRepository.findByRoleName(RoleName.ROLE_FREELANCER);
 
         // 필터링 및 변환 로직
         List<FindFreelancerDTO> filteredList = allMembers.stream()
