@@ -155,19 +155,32 @@ public class MemberController {
     								Model model) {
         try {
         	log.debug("{}",freelancerDTO);
-            if (selectedFieldString != null && !selectedFieldString.isEmpty()) {
-                freelancerDTO.setFields(Arrays.asList(selectedFieldString.split(",")));
-            }
-            if (selectedCategoryString != null && !selectedCategoryString.isEmpty()) {
-                freelancerDTO.setCategorys(Arrays.asList(selectedCategoryString.split(",")));
-            }
-            memberService.updateFreelancer(freelancerDTO, profileImg, uploadPath);
-            
-            return "redirect:/";
+        	
+        	// 기존 필드와 카테고리 가져오기
+        	List<String> existingFields = freelancerDTO.getFields(); // 기존 필드
+        	List<String> existingCategories = freelancerDTO.getCategorys(); // 기존 카테고리
+
+        	// 선택된 필드가 비어있으면 기존 필드 유지
+        	if (selectedFieldString != null && !selectedFieldString.isEmpty()) {
+        		freelancerDTO.setFields(Arrays.asList(selectedFieldString.split(",")));
+        	} else {
+        		freelancerDTO.setFields(existingFields); // 기존 필드 유지
+        	}
+
+        	// 선택된 카테고리가 비어있으면 기존 카테고리 유지
+        	if (selectedCategoryString != null && !selectedCategoryString.isEmpty()) {
+        		freelancerDTO.setCategorys(Arrays.asList(selectedCategoryString.split(",")));
+        	} else {
+        		freelancerDTO.setCategorys(existingCategories); // 기존 카테고리 유지
+        	}
+
+        	memberService.updateFreelancer(freelancerDTO, profileImg, uploadPath);
+        	
+        	return "redirect:/";
         } catch (Exception e) {
-            log.debug("{}", freelancerDTO);
-            model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
-            return "redirect:/member/myPage";
+        	log.debug("{}", freelancerDTO);
+        	model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
+        	return "redirect:/member/myPage";
         }
     }
     
@@ -185,7 +198,7 @@ public class MemberController {
                 clientDTO.setCategorys(Arrays.asList(selectedCategoryString.split(",")));
             }
             memberService.updateClient(clientDTO, profileImg, uploadPath);
-            return "redirect:/member/myPage";  // 수정 후 마이페이지로 리다이렉트
+            return "redirect:/";  // 수정 후 마이페이지로 리다이렉트
         } catch (Exception e) {
         	log.error("클라이언트 정보 업데이트 중 오류 발생", e);
             model.addAttribute("error", "정보 수정 중 오류가 발생했습니다: " + e.getMessage());
