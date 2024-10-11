@@ -168,7 +168,7 @@ function createPartnerCard(partner) {
     return `
         <div class="partner-card" data="${partner.memberId}">
             <div class="image-container">
-                <img src="${partner.profileImg}" alt="${partner.name}" class="partner-image">
+                <img src="data:image/png;base64,${partner.profileImg}" alt="${partner.name}" class="partner-image">
             </div>
             <div class="partner-info">
                 <h3 class="partner-id">${partner.memberId || '아이디 없음'}</h3>

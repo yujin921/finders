@@ -3,9 +3,12 @@ package net.datasa.finders.controller;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -149,12 +152,20 @@ public class MemberController {
     
     @PostMapping("/update/freelancer")
     public String updateFreelancer(@ModelAttribute FreelancerDTO freelancerDTO,
+                                    @ModelAttribute MemberDTO memberDTO,
     								@RequestParam("profileImg") MultipartFile profileImg,
     								@RequestParam(value = "selectedField", required = false) String selectedFieldString,
     								@RequestParam(value = "selectedCategory", required = false) String selectedCategoryString,
-    								Model model) {
+    								Model model,
+    								HttpServletResponse response) {
         try {
         	log.debug("{}",freelancerDTO);
+        	
+        	// 기존 헤더 제거
+        	response.reset();
+        	
+        	// 필요한 헤더만 추가
+        	response.setContentType("text/html;charset=UTF-8");
         	
         	// 기존 필드와 카테고리 가져오기
         	List<String> existingFields = freelancerDTO.getFields(); // 기존 필드
@@ -174,9 +185,17 @@ public class MemberController {
         		freelancerDTO.setCategorys(existingCategories); // 기존 카테고리 유지
         	}
 
+        	// 프로필 이미지 처리 로직 추가
+        	if (profileImg != null && !profileImg.isEmpty()) {
+        		byte[] imageBytes = profileImg.getBytes();
+        		String imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
+        		memberDTO.setProfileImgName(imageBase64);
+        	}
+
         	memberService.updateFreelancer(freelancerDTO, profileImg, uploadPath);
         	
-        	return "redirect:/";
+        	// 업데이트 후 새로운 정보로 리다이렉트
+        	return "redirect:/member/myPage";
         } catch (Exception e) {
         	log.debug("{}", freelancerDTO);
         	model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
@@ -186,6 +205,7 @@ public class MemberController {
     
     @PostMapping("/update/client")
     public String updateClient(@ModelAttribute ClientDTO clientDTO,
+                                @ModelAttribute MemberDTO memberDTO,
                                @RequestParam(value = "profileImg", required = false) MultipartFile profileImg,
                                @RequestParam(value = "selectedField", required = false) String selectedFieldString,
                                @RequestParam(value = "selectedCategory", required = false) String selectedCategoryString,
@@ -197,8 +217,17 @@ public class MemberController {
             if (selectedCategoryString != null && !selectedCategoryString.isEmpty()) {
                 clientDTO.setCategorys(Arrays.asList(selectedCategoryString.split(",")));
             }
+
+        	// 프로필 이미지 처리 로직 추가
+        	if (profileImg != null && !profileImg.isEmpty()) {
+        		byte[] imageBytes = profileImg.getBytes();
+        		String imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
+        		memberDTO.setProfileImgName(imageBase64);
+        	}
+
             memberService.updateClient(clientDTO, profileImg, uploadPath);
-            return "redirect:/";  // 수정 후 마이페이지로 리다이렉트
+            // 업데이트 후 새로운 정보로 리다이렉트
+            return "redirect:/";
         } catch (Exception e) {
         	log.error("클라이언트 정보 업데이트 중 오류 발생", e);
             model.addAttribute("error", "정보 수정 중 오류가 발생했습니다: " + e.getMessage());

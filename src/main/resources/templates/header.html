@@ -27,7 +27,7 @@
                     <a th:href="@{/member/login}" class="btn">로그인</a>
                 </th:block>
                 <th:block sec:authorize="isAuthenticated()">
-                    <img th:src="${profileImgUrl}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;">
+                    <img th:src="'data:image/png;base64,' + ${#authentication.principal.profileImg}" alt="Profile Image" style="width:50px;height:50px;border-radius:50%;">
                     <a th:href="@{/member/myPage}">마이페이지</a>
                     <a th:href="@{/member/logout}" class="btn">로그아웃</a>
                 </th:block>
