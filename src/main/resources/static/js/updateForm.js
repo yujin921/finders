@@ -56,30 +56,33 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             selectedTechs.splice(index, 1);
         }
-   }
+        document.getElementById('selectedSkills').value = selectedTechs.join(',');
+    }
    
    window.toggleField = function(element) {
        const field = element.getAttribute('data-field');
        element.classList.toggle('selected');
       
-      const index2 = selectedField.indexOf(field);
-      if (index2 === -1) {
+      const index = selectedField.indexOf(field);
+      if (index === -1) {
          selectedField.push(field);
       } else {
-         selectedField.splice(index2, 1);
+         selectedField.splice(index, 1);
       }
+      document.getElementById('selectedField').value = selectedField.join(',');
    }
    
    window.toggleCategory = function(element) {
       const category = element.getAttribute('data-category');
       element.classList.toggle('selected');   
       
-      const index3 = selectedCategory.indexOf(category);
-      if (index3 === -1) {
+      const index = selectedCategory.indexOf(category);
+      if (index === -1) {
          selectedCategory.push(category);
       } else {
-         selectedCategory.splice(index3, 1);
+         selectedCategory.splice(index, 1);
       }
+      document.getElementById('selectedCategory').value = selectedCategory.join(',');
    }
 
     // 프리랜서용 필드 토글 함수
@@ -109,6 +112,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         document.getElementById('selectedCategoryFreelancer').value = selectedCategoryFreelancer.join(',');
     }
+
+    // 기존 스킬 선택 상태로 만들기
+    const existingSkills = document.getElementById('selectedSkills').value.split(',');
+    existingSkills.forEach(skill => {
+        const skillButton = document.querySelector(`[data-tech="${skill}"]`);
+        if (skillButton) {
+            skillButton.classList.add('selected');
+            selectedTechs.push(skill);
+        }
+    });
 
     // // 회원가입 폼 제출 시 유효성 검사 수정
     // document.querySelectorAll('form').forEach(form => {

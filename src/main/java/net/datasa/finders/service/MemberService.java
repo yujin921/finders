@@ -276,6 +276,7 @@ public class MemberService {
     }
     
     
+    @Transactional
     public void updateFreelancer(FreelancerDTO dto, MultipartFile profileImg, String uploadPath) throws IOException {
         MemberEntity member = memberRepository.findById(dto.getMemberId())
             .orElseThrow(() -> new RuntimeException("Member not found"));
@@ -307,9 +308,12 @@ public class MemberService {
           freelancer.setDetailAddress(dto.getDetailAddress());
           freelancer.setExtraAddress(dto.getExtraAddress());
           
-          updateFreelancerSkills(dto.getMemberId(), dto.getSkills());
+          // 스킬 업데이트
+          if (dto.getSkills() != null && !dto.getSkills().isEmpty()) {
+              updateFreelancerSkills(dto.getMemberId(), dto.getSkills());
+          }
 
-          // 추가: Field와 Category 업데이트
+          // Field와 Category 업데이트
           if (dto.getFields() != null && !dto.getFields().isEmpty()) {
               updateClientField(dto.getMemberId(), dto.getFields());
           }

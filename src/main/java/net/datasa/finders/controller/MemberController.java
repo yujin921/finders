@@ -152,6 +152,7 @@ public class MemberController {
     								@RequestParam("profileImg") MultipartFile profileImg,
     								@RequestParam(value = "selectedField", required = false) String selectedFieldString,
     								@RequestParam(value = "selectedCategory", required = false) String selectedCategoryString,
+    								@RequestParam(value = "skills", required = false) String skillsString,
     								Model model) {
         try {
         	log.debug("{}",freelancerDTO);
@@ -159,6 +160,7 @@ public class MemberController {
         	// 기존 필드와 카테고리 가져오기
         	List<String> existingFields = freelancerDTO.getFields(); // 기존 필드
         	List<String> existingCategories = freelancerDTO.getCategorys(); // 기존 카테고리
+        	List<String> existingSkills = freelancerDTO.getSkills(); // 기존 스킬
 
         	// 선택된 필드가 비어있으면 기존 필드 유지
         	if (selectedFieldString != null && !selectedFieldString.isEmpty()) {
@@ -172,6 +174,13 @@ public class MemberController {
         		freelancerDTO.setCategorys(Arrays.asList(selectedCategoryString.split(",")));
         	} else {
         		freelancerDTO.setCategorys(existingCategories); // 기존 카테고리 유지
+        	}
+
+        	// 선택된 스킬이 비어있으면 기존 스킬 유지
+        	if (skillsString != null && !skillsString.isEmpty()) {
+        		freelancerDTO.setSkills(Arrays.asList(skillsString.split(",")));
+        	} else {
+        		freelancerDTO.setSkills(existingSkills); // 기존 스킬 유지
         	}
 
         	memberService.updateFreelancer(freelancerDTO, profileImg, uploadPath);
@@ -191,7 +200,8 @@ public class MemberController {
                                @RequestParam(value = "selectedCategory", required = false) String selectedCategoryString,
                                Model model) {
         try {
-        	if (selectedFieldString != null && !selectedFieldString.isEmpty()) {
+            // 필드와 카테고리 처리
+            if (selectedFieldString != null && !selectedFieldString.isEmpty()) {
                 clientDTO.setFields(Arrays.asList(selectedFieldString.split(",")));
             }
             if (selectedCategoryString != null && !selectedCategoryString.isEmpty()) {
@@ -200,7 +210,7 @@ public class MemberController {
             memberService.updateClient(clientDTO, profileImg, uploadPath);
             return "redirect:/";  // 수정 후 마이페이지로 리다이렉트
         } catch (Exception e) {
-        	log.error("클라이언트 정보 업데이트 중 오류 발생", e);
+            log.error("클라이언트 정보 업데이트 중 오류 발생", e);
             model.addAttribute("error", "정보 수정 중 오류가 발생했습니다: " + e.getMessage());
             return "member/myPage";
         }
