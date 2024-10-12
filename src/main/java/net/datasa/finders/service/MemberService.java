@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -50,22 +49,29 @@ public class MemberService {
     private final ClientCategoryRepository clientCategoryRepository;
     
     public MemberEntity join(MemberDTO dto, String uploadPath, MultipartFile profileImg) throws IOException {
-        String imageBase64 = null;
+        String imageUrl = null;
 
-        // 이미지 파일이 존재하는 경우 Base64로 인코딩
-        if (profileImg != null && !profileImg.isEmpty()) {
-            byte[] imageBytes = profileImg.getBytes(); // MultipartFile을 바이트 배열로 변환
-            imageBase64 = Base64.getEncoder().encodeToString(imageBytes); // Base64로 인코딩
+        // 이미지파일 경로 설정 및 이름 저장
+        File directoryPath = new File(uploadPath);
+        if (!directoryPath.exists()) {
+            directoryPath.mkdirs();
+        } 
+        if (!dto.getProfileImg().isEmpty()) {
+        	 String originalName = dto.getProfileImg().getOriginalFilename();
+             String extension = originalName.substring(originalName.lastIndexOf("."));
+             String dateString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+             String uuidString = UUID.randomUUID().toString();
+             String fileName = dateString + "_" + uuidString + extension;
+
+             File file = new File(uploadPath, fileName);
+             dto.getProfileImg().transferTo(file);
+             imageUrl = "http://localhost:8888/images/profile/" + fileName;
         } else {
-            // 기본 이미지 URL 설정
-            imageBase64 = "https://i.namu.wiki/i/Bge3xnYd4kRe_IKbm2uqxlhQJij2SngwNssjpjaOyOqoRhQlNwLrR2ZiK-JWJ2b99RGcSxDaZ2UCI7fiv4IDDQ.webp";
+        	imageUrl = "https://i.namu.wiki/i/Bge3xnYd4kRe_IKbm2uqxlhQJij2SngwNssjpjaOyOqoRhQlNwLrR2ZiK-JWJ2b99RGcSxDaZ2UCI7fiv4IDDQ.webp";
         }
 
-        // DTO에 Base64 이미지 저장
-        dto.setProfileImgName(imageBase64);
-
         MemberEntity entity = MemberEntity.builder()
-            .profileImg(imageBase64)
+            .profileImg(imageUrl)
             .memberId(dto.getMemberId())
             .memberPw(passwordEncoder.encode(dto.getMemberPw()))
             .memberName(dto.getMemberName())
@@ -80,8 +86,6 @@ public class MemberService {
         
         return memberRepository.save(entity);
     }
-
-    
     
     public boolean idCheck(String searchId) {
     	return !memberRepository.existsById(searchId);
@@ -272,7 +276,6 @@ public class MemberService {
     }
     
     
-    @Transactional
     public void updateFreelancer(FreelancerDTO dto, MultipartFile profileImg, String uploadPath) throws IOException {
         MemberEntity member = memberRepository.findById(dto.getMemberId())
             .orElseThrow(() -> new RuntimeException("Member not found"));
@@ -289,10 +292,9 @@ public class MemberService {
         }
 
         // 프로필 이미지 처리
-        if (profileImg != null && !profileImg.isEmpty()) {
-            byte[] imageBytes = profileImg.getBytes(); // MultipartFile을 바이트 배열로 변환
-            String imageBase64 = Base64.getEncoder().encodeToString(imageBytes); // Base64로 인코딩
-            member.setProfileImg(imageBase64); // Base64 문자열을 MemberEntity에 저장
+        String newImagePath = saveProfileImage(dto.getMemberId(), profileImg, uploadPath);
+        if (newImagePath != null) {
+            member.setProfileImg(newImagePath);
         }
         
         FreelancerEntity freelancer = freelancerRepository.findByMember(member)
@@ -335,9 +337,10 @@ public class MemberService {
 
         // 프로필 이미지 처리
         if (profileImg != null && !profileImg.isEmpty()) {
-            byte[] imageBytes = profileImg.getBytes(); // MultipartFile을 바이트 배열로 변환
-            String imageBase64 = Base64.getEncoder().encodeToString(imageBytes); // Base64로 인코딩
-            member.setProfileImg(imageBase64); // Base64 문자열을 MemberEntity에 저장
+            String newImagePath = saveProfileImage(dto.getMemberId(), profileImg, uploadPath);
+            if (newImagePath != null) {
+                member.setProfileImg(newImagePath);
+            }
         }
         
         ClientEntity client = clientRepository.findByMember(member)
