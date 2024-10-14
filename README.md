@@ -6,6 +6,7 @@
 
 **스마트 매칭, 실시간 채팅, 통합 프로젝트 관리, 포트폴리오 시스템을 통한 프로젝트 수행 지원**
 
+
 ### 사용 Stack
 1. 언어 및 기술
 - Java
@@ -34,6 +35,7 @@
 - Stomp
 - 카카오톡(Kakao Talk)
 
+
 ### 프로젝트 주요 기능
 
-![image](https://github.com/user-attachments/assets/d10bb992-32d8-4625-8c74-a817978696b0)
+![image](https://github.com/user-attachments/assets/f1679302-7a8d-4c33-9768-36129e912808)
