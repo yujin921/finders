@@ -850,7 +850,7 @@ public class ProjectManagementService {
         return false; // 삭제할 일정이 없음
     }
     
-    // 업무 알림 관련 메소드
+    // 업무 알림(SseEmitter : SpringBoot 기반의 Class) 관련 메소드
     public SseEmitter subscribe(String loginId) {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         emitterMap.put(loginId, emitter);
